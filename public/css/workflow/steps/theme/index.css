@@ -84,7 +84,7 @@ a.MzTreeLeaf
 {
    color:#393939;
    margin-left:0px;
-   padding:3 0 0 3px;
+   padding:3px 0 0 3px;
    height:20px;
    line-height:20px;
    text-decoration:none;
@@ -1352,7 +1352,7 @@ a.MzTreeLeaf:hover{
 	padding-top:5px;
 }
 #new_noc_panel .button #ViewAllNoc,
-#new_noc_panel .button #ViewDetail,
+#new_noc_panel .button #ViewDetail
 {
    display:none;
 }
