@@ -1,0 +1,47 @@
+#flow_data_table [type='text'],#flow_data_table select{
+	box-shadow: none !important;
+    font: inherit;
+    box-sizing: border-box;
+    display: block !important;
+    width: 100% !important;
+    height: 34px !important;
+    padding: 6px 12px !important;
+    font-size: 14px !important;
+    line-height: 1.42857143 !important;
+    color: #555 !important;
+    background-image: none !important;
+    border: 1px solid #ccc !important;
+    border-radius: 4px !important;
+
+
+}
+#flow_data_table textarea{
+	box-sizing: border-box !important;
+    min-height:60px !important;
+    font: inherit !important;
+	overflow: auto !important;
+    /*overflow-y:visible !important;
+    height:100% !important;*/
+	font-family: 'Open Sans', sans-serif !important;
+	resize: none !important;
+	box-shadow: none !important;
+    display: block !important;
+    width: 100% !important;
+    margin-top: 0px !important;
+    padding: 6px 12px !important;
+    font-size: 14px !important;
+    line-height: 1.42857143 !important;
+    color: #555 !important;
+    background-image: none !important;
+    border: 1px solid #ccc !important;
+    border-radius: 4px !important;
+}
+#flow_data_table [type='checkbox'],#flow_data_table [type='radio']{
+	margin: 10px !important;
+	font-weight: normal !important;
+	padding-top: 7px !important;
+    padding-left: 20px !important;
+    vertical-align: middle !important;
+    cursor: pointer !important;
+    display: inline-block !important;
+}

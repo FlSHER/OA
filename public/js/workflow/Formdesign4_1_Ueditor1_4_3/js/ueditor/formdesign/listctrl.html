@@ -1,0 +1,205 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>列表控件属性</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" >
+        <meta name="generator" content="www.leipi.org" />
+        <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="leipi.style.css">
+        <script type="text/javascript" src="../dialogs/internal.js"></script>
+        <script type="text/javascript" src="./jquery-1.7.2.min.js"></script>
+        <style>
+            #tbl{margin-left: 10px !important;margin-right: 10px !important;}
+            .delteTrs { float:left;margin-right:5px; margin-top:5px; cursor: pointer;  color:#333;}
+            .delteTrs + span{float:right; margin-top:5px;  color:#333;}
+            .tb{border: 1px solid #ddd;border-radius: 4px; font-size: 12px;}
+            .tb tr td{text-align:center;height:20px;padding: 0px 2px !important;margin:auto !important;border:0px !important;padding:5px0px;}
+            .tb input[type='text']{width:67%;height: 13px;margin: 2px 0px 2px;}
+            .tb select{width:100%;height: 24px;font-size: 12px;margin: 2px 0px 2px;}
+            .tb tr td:nth-child(3)>input{width:80px;}
+            .tb tr td:nth-child(4)>input{width:80px;}
+            .tb tr td:nth-child(5)>input{width:50px;}
+            .tb tr td:nth-child(6)>select{width:96px;}
+            .tb tr td:nth-child(7){text-align:center;}
+            /*.tb tr td:nth-child(8){width:150px;}*/
+            .tb tr td:nth-child(8)>label>input{width:150px;}
+            .tb tr td:nth-child(9)>input{width:130px;}
+            .tb tr td:nth-child(10)>select{width:135px;}
+            .tb tr td:nth-child(11){text-align:center;}
+            #thl1 tr th:nth-child(1){width:15px;}
+            #thl1 tr th:nth-child(2){width:20px;}
+            #thl1 tr th:nth-child(3){width:80px;}
+            #thl1 tr th:nth-child(4){width:80px;}
+            #thl1 tr th:nth-child(5){width:80px;}
+            #thl1 tr th:nth-child(6){width:96px;}
+            #thl1 tr th:nth-child(7){width:30px;}
+            #thl1 tr th:nth-child(8){width:150px;}
+            #thl1 tr th:nth-child(9){width:130px;}
+            #thl1 tr th:nth-child(10){width:135px;}
+            #thl1 tr th:nth-child(11){width:30px;}
+        </style>
+        
+    </head>
+    <body>
+        <div class="content">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <td> 
+                            <span> 控件名称 ：</span> 
+                            <input id="orgname" placeholder="必填项" type="text" class="input-medium" value="列表控件"/> <span class="label label-important">*</span>
+                            &nbsp; &nbsp; &nbsp; &nbsp;宽 <input id="orgwidth" type="text" value="100%" class="input-small span1" placeholder="auto"/> % 或 px
+                        </td>
+                        <td>
+                            <a id="btn_add" class="button cke_dialog_ui_button" href="javascript:;" onclick="tips();"><span class="button cke_dialog_ui_button">说明</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span>数据来源：</span>
+                            <select style="width:150px;" name="source" id="source">
+                            </select>
+
+                            <select style="width:150px;" id="dataSource">
+                                <option value="1">选择数据来源表</option>
+                                <optgroup  label="系统">
+                                    <!--<option value="2">选择数据来源</option>
+                                        <option value="3">选择数据来源</option>-->
+                                </optgroup>
+                                <optgroup label="自定义">
+                                </optgroup>
+                            </select>
+                        </td>
+                        <td>
+                            <span>工作办理时默认显示行数：</span>
+                            <input type="text" value="" class="input-small span1" id="rowNum"/> 
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span>是否新建子表：</span>
+                            <select id="isAddtable">
+                                <option value="1">是</option>
+                                <option value="0">否</option>
+                            </select>
+                        </td>
+                        <td></td>   
+                    </tr>
+                    <tr id="cal_tip" style="display:none;" colspan="2">
+                        <td nowrap="" colspan="2" align="left">
+                            <div style="font-size: 10pt;font-family:宋体;color:blue;">
+                                <b>“计算公式”说明：</b><br>
+                                用[1] [2] [3]等代表某列的数值。运算符支持+,-,*,/,%等，<br>
+                                同时可用“|”符号设置保留的小数位数。<br>
+                                如“([1]+[2]*[3]|2)-[4]”或者公式最后“[1]+[2]|2”表示保留两位小数。<br>
+                                <b>“值”说明：</b><br>
+                                当类型为下拉菜单、单选框和复选框时，设置的值起作用，<br>
+                                同时可用“|”符号设置默认值（复选框默认多个值时可用“,”分隔）。<br>
+                                如“同意,不同意|不同意”表示默认值为不同意。<br>
+                            </div>
+                        </td>
+                        <td></td>
+                    </tr>
+                </thead>
+            </table>
+
+
+            <table id="tbl">
+                <thead id="thl1">
+                    <tr>
+                        <th > <span></span> </th>
+                        <th > <span>序号</span> </th>
+                        <th > <span>表头</span> </th>
+                        <th > <span>字段名</span> </th>
+                        <th > <span>列宽度</span> </th>
+                        <th > <span>类型</span> </th>
+                        <th > <span>合计</span> </th>
+                        <th ><span>计算公式</span></th>
+                        <th > <span>默认值</span> </th>
+                    </tr>
+                </thead>
+                <tbody id="tbl1" class="tb">
+                </tbody>
+            </table>
+            <div>
+                <a id="btn_add" class="button cke_dialog_ui_button" style="margin-left:10px;margin-top:5px;" href="javascript:;" onclick="add_row();"><span class="button cke_dialog_ui_button">增加</span></a>   
+            </div>
+            <!--div class="alert alert-danger">提示：</div-->
+        </div>
+    </body>
+    <!-- <tr>
+                        <td><a title="删除" class="delteTrs" href="javascript:delete_row(this)" >X</a><span class="badge">1</span></td>
+                        <td title="Tab键切换输入框"> <input id="item_1" type="text" class="input-medium"> </td>
+                        <td title="Tab键切换输入框">
+                            <select id="coltype_1" class="input-medium">
+                                <option value="text">单行输入框</option>
+                                <option value="textarea">多行输入框</option>
+                                <option value="int">数值</option>
+                            </select>
+                        </td>
+                        <td title="Tab键切换输入框"> <label><input type="text" class="input-mini" id="unit_1" value=""> </label> </td>
+                        <td title="Tab键切换输入框"> <label> <input type="checkbox" id="sum_1" class="csum" value="1"> </label> </td>
+                        <td title="Tab键切换输入框"><input id="colvalue_1"  type="text" class="input-medium"/></td>
+                    </tr>
+
+                   <tr>
+                        <td><a title="删除" class="delteTrs" href="javascript:delete_row(this)" >X</a><span class="badge">2</span></td>
+                        <td title="Tab键切换输入框"> <input id="item_2" type="text" class="input-medium"> </td>
+                        <td title="Tab键切换输入框">
+                            <select id="coltype_2" class="input-medium">
+                                <option value="text">单行输入框</option>
+                                <option value="textarea">多行输入框</option>
+                                <option value="int">数值</option>
+                                
+                            </select>
+                        </td>
+                        <td title="Tab键切换输入框"> <label><input type="text" class="input-mini" id="unit_2" value=""> </label> </td>
+                        <td title="Tab键切换输入框"> <label> <input type="checkbox" id="sum_2" class="csum" value="2"> </label> </td>
+                        <td title="Tab键切换输入框"><input id="colvalue_2"  type="text" class="input-medium"/></td>
+                    </tr>
+                    
+                    <tr>
+                        <td><a title="删除" class="delteTrs" href="javascript:delete_row(this)" >X</a><span class="badge">3</span></td>
+                        <td title="Tab键切换输入框"> <input id="item_3" type="text" class="input-medium"> </td>
+                        <td title="Tab键切换输入框">
+                            <select id="coltype_3" class="input-medium">
+                                <option value="text">单行输入框</option>
+                                <option value="textarea">多行输入框</option>
+                                <option value="int">数值</option>
+                            </select>
+                        </td>
+                        <td title="Tab键切换输入框"> <label><input type="text" class="input-mini" id="unit_3" value=""> </label> </td>
+                        <td title="Tab键切换输入框"> <label> <input type="checkbox" id="sum_3" class="csum" value="3"> </label> </td>
+                        <td title="Tab键切换输入框"><input id="colvalue_3"  type="text" class="input-medium"/></td>
+                    </tr>
+                    <tr>
+                        <td><a title="删除" class="delteTrs" href="javascript:delete_row(this)" >X</a><span class="badge">4</span></td>
+                        <td title="Tab键切换输入框"> <input id="item_4" type="text" class="input-medium"> </td>
+                        <td title="Tab键切换输入框">
+                            <select id="coltype_4" class="input-medium">
+                                <option value="text">单行输入框</option>
+                                <option value="textarea">多行输入框</option>
+                                <option value="int">数值</option>
+                            </select>
+                        </td>
+                        <td title="Tab键切换输入框"> <label><input type="text" class="input-mini" id="unit_4" value=""> </label> </td>
+                        <td title="Tab键切换输入框"> <label> <input type="checkbox" id="sum_4" class="csum" value="4"> </label> </td>
+                        <td title="Tab键切换输入框"><input id="colvalue_4"  type="text" class="input-medium"/></td>
+                    </tr>
+                    <tr>
+                        <td><a title="删除" class="delteTrs" href="javascript:delete_row(this)" >X</a><span class="badge">5</span></td>
+                        <td title="Tab键切换输入框"> <input id="item_5" type="text" class="input-medium"> </td>
+                        <td title="Tab键切换输入框">
+                            <select id="coltype_5" class="input-medium">
+                                <option value="text">单行输入框</option>
+                                <option value="textarea">多行输入框</option>
+                                <option value="int">数值</option>
+                            </select>
+                        </td>
+                        <td title="Tab键切换输入框"> <label><input type="text" class="input-mini" id="unit_5" value=""> </label> </td>
+                        <td title="Tab键切换输入框"> <label> <input type="checkbox" id="sum_5" class="csum" value="5"> </label> </td>
+                        <td title="Tab键切换输入框"><input id="colvalue_5"  type="text" class="input-medium"/></td>
+                    </tr>-->
+    <script type="text/javascript" charset="utf-8" src="listctrl/listctrl.js"></script>
+</html>
