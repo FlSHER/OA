@@ -26,6 +26,7 @@ class CreateStaffManageTables extends Migration {
             $table->tinyInteger('gender_id')->unsigned()->comment('性别ID');
             $table->date('birthday')->comment('生日');
             $table->smallInteger('department_id')->unsigned()->comment('部门ID');
+            $table->smallInteger('position_id')->unsigned()->comment('职位ID');
             $table->timestamps();
             $table->softDeletes();
         });
