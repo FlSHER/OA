@@ -30,6 +30,7 @@ class CreateStaffManageTables extends Migration {
             $table->smallInteger('department_id')->unsigned()->comment('部门ID');
             $table->smallInteger('position_id')->unsigned()->comment('职位ID');
             $table->smallInteger('shop_id')->unsigned()->comment('店铺ID');
+            $table->tinyInteger('is_active')->unsigned()->comment('是否激活');
             $table->timestamps();
             $table->softDeletes();
         });
