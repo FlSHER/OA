@@ -51,6 +51,8 @@ class ReimburseController extends Controller {
         $this->validate($request, [
             'department_id' => 'required|numeric|unique:reimburse_mysql.departments,department_id,' . $request->id,
             'reim_department_id' => 'required|numeric',
+            'approver1' => 'required',
+            'approver2' => 'required_with:approver3',
                 ], [], trans('fields.reimburse.approver')
         );
         $result = $this->approverCURD->create($request->all());
