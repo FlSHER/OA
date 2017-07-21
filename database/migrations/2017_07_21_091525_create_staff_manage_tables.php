@@ -23,6 +23,7 @@ class CreateStaffManageTables extends Migration {
             $table->char('realname', 10)->comment('员工姓名');
             $table->char('mobile', 11)->comment('手机号码');
             $table->char('wechat_number', 20)->comment('微信号');
+            $table->tinyInteger('gender_id')->unsigned()->comment('性别ID');
             $table->timestamps();
             $table->softDeletes();
         });
