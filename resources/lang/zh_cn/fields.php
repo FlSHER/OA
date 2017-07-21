@@ -154,9 +154,12 @@ return [
             'auditor.*.auditor_realname' => '审核人',
         ],
         //审批
-        'approver' => [
+       'approver' => [
             'department_id' => "部门",
             'reim_department_id' => "资金归属",
+            'approver1' => '一级审批',
+            'approver2' => '二级审批',
+            'approver3' => '三级审批',
         ],
     ],
         /* ----------报销end--------------- */
