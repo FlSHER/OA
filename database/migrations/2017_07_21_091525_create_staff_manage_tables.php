@@ -45,6 +45,7 @@ class CreateStaffManageTables extends Migration {
         Schema::create('staff_info', function (Blueprint $table) {
             $table->mediumInteger('staff_sn')->unsigned()->primary();
             $table->char('account_number', 19)->comment('银行卡号');
+            $table->char('account_bank', 20)->comment('开户行');
             $table->timestamps();
             $table->softDeletes();
         });
