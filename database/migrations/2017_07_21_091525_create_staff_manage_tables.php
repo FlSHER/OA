@@ -25,6 +25,7 @@ class CreateStaffManageTables extends Migration {
             $table->char('wechat_number', 20)->comment('微信号');
             $table->tinyInteger('gender_id')->unsigned()->comment('性别ID');
             $table->date('birthday')->comment('生日');
+            $table->tinyInteger('brand_id')->unsigned()->comment('品牌ID');
             $table->smallInteger('department_id')->unsigned()->comment('部门ID');
             $table->smallInteger('position_id')->unsigned()->comment('职位ID');
             $table->timestamps();
