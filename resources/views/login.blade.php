@@ -7,7 +7,7 @@
         <meta name="author" content="Fisher">
         <meta name="csrf_token" content="{{csrf_token()}}">
         <link rel="shortcut icon" href="{{source('images/logo_icon.png')}}" type="image/png">
-        <title>喜歌实业1</title>
+        <title>喜歌实业</title>
         <link href="{{source('css/style.css')}}" rel="stylesheet">
         <link href="{{source('css/style-responsive.css')}}" rel="stylesheet">
         <style>
