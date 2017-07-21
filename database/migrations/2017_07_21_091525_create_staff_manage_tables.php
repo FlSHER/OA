@@ -24,6 +24,7 @@ class CreateStaffManageTables extends Migration {
             $table->char('mobile', 11)->comment('手机号码');
             $table->char('wechat_number', 20)->comment('微信号');
             $table->char('dingding', 50)->comment('钉钉id');
+            $table->char('id_card_number', 18)->comment('身份证号');
             $table->tinyInteger('gender_id')->unsigned()->comment('性别ID');
             $table->date('birthday')->comment('生日');
             $table->tinyInteger('brand_id')->unsigned()->comment('品牌ID');
