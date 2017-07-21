@@ -46,9 +46,9 @@ class CreateStaffManageTables extends Migration {
             $table->tinyInteger('id', true)->unsigned()->primary();
             $table->char('name', 5);
             $table->tinyInteger('group_id')->unsigned()->comment('关系分组');
-            $table->tinyInteger('opposite_group_id')->unsigned()->comment('');
-            $table->tinyInteger('gender_id')->unsigned()->default(0);
-            $table->tinyInteger('sort')->unsigned()->default(0);
+            $table->tinyInteger('opposite_group_id')->unsigned()->comment('对立分组');
+            $table->tinyInteger('gender_id')->unsigned()->default(0)->comment('性别限制');
+            $table->tinyInteger('sort')->unsigned()->default(0)->comment('排序');
         });
         /**
          * 预约调动临时表
