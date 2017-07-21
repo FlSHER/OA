@@ -47,6 +47,8 @@ class CreateStaffManageTables extends Migration {
             $table->char('account_number', 19)->comment('银行卡号');
             $table->char('account_bank', 20)->comment('开户行');
             $table->char('account_name', 10)->comment('开户人');
+            $table->char('height', 3)->comment('身高');
+            $table->char('weight', 3)->comment('体重');
             $table->timestamps();
             $table->softDeletes();
         });
