@@ -45,8 +45,8 @@ class CreateStaffManageTables extends Migration {
         Schema::create('staff_relative_type', function (Blueprint $table) {
             $table->tinyInteger('id', true)->unsigned()->primary();
             $table->char('name', 5);
-            $table->tinyInteger('group_id')->unsigned();
-            $table->tinyInteger('opposite_group_id')->unsigned();
+            $table->tinyInteger('group_id')->unsigned()->comment('关系分组');
+            $table->tinyInteger('opposite_group_id')->unsigned()->comment('');
             $table->tinyInteger('gender_id')->unsigned()->default(0);
             $table->tinyInteger('sort')->unsigned()->default(0);
         });
