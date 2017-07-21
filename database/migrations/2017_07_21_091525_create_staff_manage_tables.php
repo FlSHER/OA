@@ -33,6 +33,7 @@ class CreateStaffManageTables extends Migration {
             $table->tinyInteger('status_id')->comment('状态ID');
             $table->tinyInteger('is_active')->unsigned()->comment('是否激活');
             $table->date('hired_at')->comment('入职日期');
+            $table->date('employed_at')->comment('转正日期');
             $table->timestamps();
             $table->softDeletes();
         });
