@@ -17,9 +17,10 @@ class CreateStaffManageTables extends Migration {
          */
         Schema::create('staff', function (Blueprint $table) {
             $table->mediumInteger('staff_sn', true)->unsigned()->primary()->comment('员工编号');
-            $table->char('realname', 10)->comment('员工姓名');
             $table->char('username', 16)->comment('用户名');
             $table->char('password', 64)->comment('密码');
+            $table->char('salt', 6)->comment('加密后缀');
+            $table->char('realname', 10)->comment('员工姓名');
             $table->timestamps();
             $table->softDeletes();
         });
