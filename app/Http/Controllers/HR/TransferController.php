@@ -24,7 +24,7 @@ class TransferController extends Controller {
     }
 
     public function showManagePage() {
-        return view('hr.transfer');
+        return view('hr.attendance.transfer');
     }
 
     public function getList(Request $request) {

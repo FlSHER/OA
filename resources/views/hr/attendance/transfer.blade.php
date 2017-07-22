@@ -20,7 +20,7 @@
                 调动列表
             </header> 
             <!-- 筛选 start --> 
-            {{-- @include('hr/staff_filter') --}}
+
             <!-- 筛选 end -->
             <!-- 列表 start -->
             <div class="panel-body">
@@ -71,7 +71,7 @@
         <div class="modal-content">
             <form id="addForm" name="addForm" class="form-horizontal" method="post" action="{{route('hr.transfer.submit')}}">
                 @inject('HRM','HRM')
-                @include('hr/transfer_form')
+                @include('hr/attendance/transfer_form')
             </form>
         </div>
     </div>
@@ -86,7 +86,7 @@
         </div>
         <div class="modal-content">
             <form id="editForm" name="editForm" class="form-horizontal" method="post" action="{{route('hr.transfer.submit')}}">
-                @include('hr/transfer_form')
+                @include('hr/attendance/transfer_form')
                 <input type="hidden" name="id" >
             </form>
         </div>
