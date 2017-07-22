@@ -4,18 +4,10 @@
 @inject('HRM','HRM')
 
 @section('css')
-<!-- data table   -->
-<link rel="stylesheet" href="{{source('plug_in/datatables/css/dataTables.bootstrap.css')}}" />
-<link rel="stylesheet" href="{{source('plug_in/datatables/css/buttons.dataTables.css')}}" />
-<link rel="stylesheet" href="{{source('plug_in/datatables/css/buttons.bootstrap.css')}}" />
-<!-- zTree css -->
-<link rel="stylesheet" href="{{source('plug_in/ztree/css/metroStyle.css')}}" />
-<!-- validity -->
-<link rel="stylesheet" href="{{source('plug_in/validity/jquery.validity.css')}}" />
+<!-- data table -->
+<link rel="stylesheet" href="{{source('plug_in/datatables/datatables.min.css')}}" />
 <!-- checkbox -->
 <link rel="stylesheet" href="{{source('css/checkbox.css')}}" />
-<!-- datetimepicker  -->
-<link rel="stylesheet" href="{{source('plug_in/datetimepicker/bootstrap-datetimepicker.css')}}" />
 @endsection
 
 
@@ -88,17 +80,8 @@
 
 
 @section('js')
-<script type="text/javascript" src="{{source('plug_in/datatables/js/jquery.dataTables.js')}}"></script>
-<script type="text/javascript" src="{{source('plug_in/datatables/js/dataTables.bootstrap.js')}}"></script>
-<script type="text/javascript" src="{{source('plug_in/datatables/js/dataTables.buttons.js')}}"></script>
-<script type="text/javascript" src="{{source('plug_in/datatables/js/buttons.bootstrap.js')}}"></script>
-<script type="text/javascript" src="{{source('plug_in/datatables/js/buttons.colVis.js')}}"></script>
-<!-- zTree js -->
-<script type="text/javascript" src="{{source('plug_in/ztree/js/jquery.ztree.all.js')}}"></script>
-<!-- validity -->
-<script type="text/javascript" src="{{source('plug_in/validity/jquery.validity.js')}}"></script>
-<!-- datetimepicker -->
-<script type="text/javascript" src="{{source('plug_in/datetimepicker/bootstrap-datetimepicker.js')}}"></script>
+<!--data table-->
+<script type="text/javascript" src="{{source('plug_in/datatables/datatables.min.js')}}"></script>
 <!--script for this view-->
 <script type="text/javascript" src="{{source('js/HR/attendance.js')}}"></script>
 
@@ -115,11 +98,11 @@ var columns = [
     {"data": "shop_sn", "title": "店铺代码"},
     {"data": "shop_name", "title": "店铺名称"},
     {"data": "achievement", "title": "总业绩"},
-    {"data": "submit_time", "title": "提交时间", "width": "30px"},
+    {"data": "submit_time", "title": "提交时间"},
     {"data": "status", "title": "状态", "render": function (data) {
             var statusName = [
                 '<span class="text-danger">异常</span>',
-                '<span class="text-success">正常</span>',
+                '<span class="text-success">正常</span>'
             ];
             return statusName[data];
         }
@@ -128,28 +111,8 @@ var columns = [
             delete oData.password;
             delete oData.salt;
             var html = '';
-
-<?php if ($authority->checkAuthority(40)): ?>
-
-                html = '<button class="btn btn-sm btn-info" title="店员信息" onclick="showPersonalInfo(' + sData + ')"><i class="fa fa-address-card fa-fw"></i></button> ';
-<?php endif; ?>
-
-            //    <?php if ($authority->checkAuthority(41)): ?>
-
-                //     html += '&nbsp;<button class="btn btn-sm btn-danger" title="取消行程" onclick="del(' + sData + ')"><i class="fa fa-trash-o fa-fw"></i></button>';
-                // <?php endif; ?>    
-
-
+            html = '<button class="btn btn-sm btn-info" title="店员信息" onclick="showPersonalInfo(' + sData + ')"><i class="fa fa-address-card fa-fw"></i></button> ';
             $(nTd).html(html).css({"padding": "5px", "text-align": "center"});
-
-        }
-    },
-];
-
-var buttons = [
-    {"extend": "colvis", "text": "<i class='fa fa-eye-slash fa-fw'></i>", "titleAttr": "可见字段"},
-    {"text": "<i class='fa fa-refresh fa-fw'></i>", "titleAttr": "刷新", "action": function () {
-            table.fnDraw();
         }
     }
 ];

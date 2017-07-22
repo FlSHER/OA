@@ -1,128 +1,23 @@
-var table, zTreeSetting;
-var csrfToken = $("meta[name='_token']").attr("content");
+var table;
 
 $(function () {
-    $("#addDepartmentForm,#editDepartmentForm").validity(function () {
-        // $(this).find("input[name='staff_sn']").require().maxLength("20");
-        // $(this).find("input[name='out_shop_name']").require().maxLength("20"); 
-        // $(this).find("input[name='go_shop_name']").require().maxLength("30");
-    }, submitByAjax);
     /* dataTables start   */
     table = $('#transfer').oaTable({
         "columns": columns,
         "ajax": {
             url: '/hr/attendance/list'
         },
-        "scrollX": 746,
-        "buttons": buttons
+        "scrollX": 746
     });
 
-})
-function submitByAjax(form) {
-    oaWaiting.show();
-    var url = $(form).attr("action");
-    var data = $(form).serialize();
-    var type = $(form).attr('method');
-    $.ajax({
-        type: type,
-        url: url,
-        data: data,
-        dataType: 'jsonp',
-        success: function (msg) {
-            table.fnDraw();
-            $(".close").click();
-            oaWaiting.hide();
-            console.log(msg)
-        },
-        error: function (err) {
-            console.log('error')
-        }
-    });
-    return false;
-}
-
-
-
-function searchStaff(obj) {
-    var name = $(obj).parent().prev().val();
-    var url = "/hr/staff/search?_token=" + csrfToken;
-    var data = {"target": {"staff_sn": "staff_sn", "realname": "staff_name"}};
-    $.ajax({
-        type: "POST",
-        url: url,
-        data: data,
-        dataType: 'text',
-        success: function (msg) {
-            $("body").append(msg);
-            $("#openSearchStaffResult").click();
-        },
-        error: function (err) {
-            alert(err.responseText);
-        }
-    });
-}
-
-function searchShop(obj, str) {
-    var name = $(obj).parent().prev().val();
-
-    var url = "/hr/shop/search?_token=" + csrfToken;
-    var data = {"target": {"shop_sn": str + "_shop_sn", "name": str + "_shop_name"}};
-    $.ajax({
-        type: "POST",
-        url: url,
-        data: data,
-        dataType: 'text',
-        success: function (msg) {
-            $("body").append(msg);
-            $("#openSearchShopResult").click();
-        },
-        error: function (err) {
-            alert(err.responseText);
-        }
-    });
-}
-
-
-
-
-function setStaff(id) {
-    var url = "/hr/shop/shop_modal_set?_token=" + csrfToken;
-    var data = {"role_id": id};
-    $.ajax({
-        type: "POST",
-        url: url,
-        data: data,
-        dataType: 'text',
-        success: function (msg) {
-            $("body").append(msg);
-            $("#openSetStaff").click();
-            $("#setStaff").bind("remove", function () {
-                table.fnDraw();
-            });
-            oaWaiting.hide();
-            // console.log(msg)
-        },
-        error: function (err) {
-            document.write(err.responseText);
-        }
-    });
-    // $("#openEditStaff").click();
-}
+});
 
 
 //attend_id
 function showPersonalInfo(id) {
     oaWaiting.show();
-    console.log(id);
-    // var url = '/hr/attendan/staffinfo?_token='+csrfToken+'&staff_sn='+id;
-    // var url = '/hr/attendan/staffinfo?staff_sn='+id+'&_token'+csrfToken;
     var url = ATTENDANCE.get_staff_list + '?staff_sn=' + id;
-    // console.log(url);
-    // return false;
-    // var data = {'staff_sn': staffSn};
     var str = '';
-
-
 
     $.ajax({
         type: "get",
@@ -130,10 +25,8 @@ function showPersonalInfo(id) {
         url: url,
         dataType: 'jsonp',
         success: function (msg) {
-
             oaWaiting.hide();
             if (msg[0]) {
-
                 str += '<div class="col-sm-4 panel" style="padding-top:10px">';
                 str += '<div class="clearfix">';
                 str += '<div class="col-lg-12">';
@@ -146,8 +39,6 @@ function showPersonalInfo(id) {
                 str += '</div>'
                 str += '</div>'
                 str += '</div>';
-
-
 
                 str += '<div class="col-sm-4 panel" style="padding-top:10px">';
 

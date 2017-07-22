@@ -93,14 +93,15 @@ Route::group(['prefix' => 'hr', 'namespace' => 'HR', 'as' => 'hr'], function() {
     });
     Route::group(['prefix' => 'leave', 'as' => '.leave'], function() {//人事请假
         Route::get('/', ['uses' => 'LeaveController@showManagePage']);
+        Route::post('/list', ['uses' => 'LeaveController@getList'])->name('.list');
+        Route::post('/info', ['uses' => 'LeaveController@getInfo'])->name('.info');
         Route::post('/excelhandel', ['uses' => 'LeaveController@excelHandel']);
         Route::get('/excelhandel', ['uses' => 'LeaveController@excelHandel']);
     });
     Route::group(['prefix' => 'attendance', 'as' => '.attendance'], function() {//考勤
         Route::get('/', ['uses' => 'AttendanceController@showManagePage']);
         Route::post('/list', ['uses' => 'AttendanceController@getList'])->name('.list');
-        Route::post('/staffinfo', 'AttendanceController@showStaffInfo');
-        Route::any('/export', 'AttendanceController@exportStaffData');
+        Route::post('/export', ['uses' => 'AttendanceController@exportStaffData'])->name('.export');
     });
 });
 
