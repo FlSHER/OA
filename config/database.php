@@ -86,20 +86,6 @@ return [
             'strict' => true,
             'engine' => null,
         ],
-        //考勤
-        'attendance' => [
-            'driver' => 'mysql',
-            'host' => '192.168.120',
-            'port' => '3306',
-            'database' => 'attendance',
-            'username' => 'root',
-            'password' => 'root',
-            'charset' => 'utf8',
-            'collation' => 'utf8_general_ci',
-            'prefix' => '',
-            'strict' => true,
-            'engine' => null,
-        ],
     ],
     /*
       |--------------------------------------------------------------------------
