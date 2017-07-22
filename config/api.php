@@ -4,14 +4,9 @@ $reimbursePath = 'http://120.77.14.132:8001/';
 $crmPath = 'http://120.77.14.132:8003/';
 //$workflow ='http://192.168.1.42:8001/';
 $workflow = 'http://192.168.1.63:802/';
-//$reimbursePath = 'http://192.168.1.4:8001/';
-//$reimbursePath = 'http://fisher9389.oicp.io/';
-$transfer = 'http://192.168.1.110:8001/api/transfer/';  //调动
-#$holiday = 'http://192.168.1.110:8001/api/holiday/';  //请假数据
-$holiday = 'http://192.168.1.114/api/holiday/';
-$attendance = 'http://192.168.1.110:8001/api/attendance/';  //考勤
-$host114api = 'http://192.168.1.114/api';  //考勤
-$host110api = 'http://192.168.1.110:8001/api';  //考勤
+$transfer = 'http://192.168.1.117:8002/api/transfer/';  //调动
+$holiday = 'http://192.168.1.117:8002/api/holiday/'; //请假
+$attendance = 'http://192.168.1.117:8002/api';  //考勤
 return [
     /*
      * 各系统接口地址
@@ -100,16 +95,14 @@ return [
             'edit' => $holiday . 'edit',
         ],
         'attendance' => [       //考勤
-            'getlist' => $host110api . '/attendance/getlist', //获取店铺员工考勤
-            'stafflist' => $host110api . '/attendance/getstafflist', //获取店铺员工考勤数据 
-        // 'getlist'=>$host114api.'/attendance/getlist',
+            'getlist' => $attendance . '/attendance/getlist', //获取店铺员工考勤
+            'stafflist' => $attendance . '/attendance/getstafflist', //获取店铺员工考勤数据 
         ],
         'statistic' => [       //考勤
-            'getlist' => $host110api . '/statistic/getlist', //获取员工考勤
+            'getlist' => $attendance . '/statistic/getlist', //获取员工考勤
             'export' => '/hr/attendance/export', //获取店铺员工考勤数据 
-            // 'stafflist'=>$host110api.'/statistic/getstatistic',   //获取店铺员工考勤数据 
-            'stafflist' => $host114api . '/statistic/getstatistic', //获取店铺员工考勤数据 
-            'getstaffdetail' => $host114api . '/statistic/getstaffdetail', //获取店铺员工考勤数据 
+            'stafflist' => $attendance . '/statistic/getstatistic', //获取店铺员工考勤数据 
+            'getstaffdetail' => $attendance . '/statistic/getstaffdetail', //获取店铺员工考勤数据 
         ],
     ],
 ];

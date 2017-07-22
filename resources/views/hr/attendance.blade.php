@@ -5,17 +5,17 @@
 
 @section('css')
 <!-- data table   -->
-<link rel="stylesheet" href="{{asset('plug_in/datatables/css/dataTables.bootstrap.css')}}" />
-<link rel="stylesheet" href="{{asset('plug_in/datatables/css/buttons.dataTables.css')}}" />
-<link rel="stylesheet" href="{{asset('plug_in/datatables/css/buttons.bootstrap.css')}}" />
+<link rel="stylesheet" href="{{source('plug_in/datatables/css/dataTables.bootstrap.css')}}" />
+<link rel="stylesheet" href="{{source('plug_in/datatables/css/buttons.dataTables.css')}}" />
+<link rel="stylesheet" href="{{source('plug_in/datatables/css/buttons.bootstrap.css')}}" />
 <!-- zTree css -->
-<link rel="stylesheet" href="{{asset('plug_in/ztree/css/metroStyle.css')}}" />
+<link rel="stylesheet" href="{{source('plug_in/ztree/css/metroStyle.css')}}" />
 <!-- validity -->
-<link rel="stylesheet" href="{{asset('plug_in/validity/jquery.validity.css')}}" />
+<link rel="stylesheet" href="{{source('plug_in/validity/jquery.validity.css')}}" />
 <!-- checkbox -->
-<link rel="stylesheet" href="{{asset('css/checkbox.css')}}" />
+<link rel="stylesheet" href="{{source('css/checkbox.css')}}" />
 <!-- datetimepicker  -->
-<link rel="stylesheet" href="{{asset('plug_in/datetimepicker/bootstrap-datetimepicker.css')}}" />
+<link rel="stylesheet" href="{{source('plug_in/datetimepicker/bootstrap-datetimepicker.css')}}" />
 @endsection
 
 
@@ -88,19 +88,19 @@
 
 
 @section('js')
-<script type="text/javascript" src="{{asset('plug_in/datatables/js/jquery.dataTables.js')}}"></script>
-<script type="text/javascript" src="{{asset('plug_in/datatables/js/dataTables.bootstrap.js')}}"></script>
-<script type="text/javascript" src="{{asset('plug_in/datatables/js/dataTables.buttons.js')}}"></script>
-<script type="text/javascript" src="{{asset('plug_in/datatables/js/buttons.bootstrap.js')}}"></script>
-<script type="text/javascript" src="{{asset('plug_in/datatables/js/buttons.colVis.js')}}"></script>
+<script type="text/javascript" src="{{source('plug_in/datatables/js/jquery.dataTables.js')}}"></script>
+<script type="text/javascript" src="{{source('plug_in/datatables/js/dataTables.bootstrap.js')}}"></script>
+<script type="text/javascript" src="{{source('plug_in/datatables/js/dataTables.buttons.js')}}"></script>
+<script type="text/javascript" src="{{source('plug_in/datatables/js/buttons.bootstrap.js')}}"></script>
+<script type="text/javascript" src="{{source('plug_in/datatables/js/buttons.colVis.js')}}"></script>
 <!-- zTree js -->
-<script type="text/javascript" src="{{asset('plug_in/ztree/js/jquery.ztree.all.js')}}"></script>
+<script type="text/javascript" src="{{source('plug_in/ztree/js/jquery.ztree.all.js')}}"></script>
 <!-- validity -->
-<script type="text/javascript" src="{{asset('plug_in/validity/jquery.validity.js')}}"></script>
+<script type="text/javascript" src="{{source('plug_in/validity/jquery.validity.js')}}"></script>
 <!-- datetimepicker -->
-<script type="text/javascript" src="{{asset('plug_in/datetimepicker/bootstrap-datetimepicker.js')}}"></script>
+<script type="text/javascript" src="{{source('plug_in/datetimepicker/bootstrap-datetimepicker.js')}}"></script>
 <!--script for this view-->
-<script type="text/javascript" src="{{asset('js/HR/attendance.js')}}"></script>
+<script type="text/javascript" src="{{source('js/HR/attendance.js')}}"></script>
 
 <script>
 

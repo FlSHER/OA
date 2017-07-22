@@ -7,8 +7,6 @@ $(function () {
         // $(this).find("input[name='out_shop_name']").require().maxLength("20"); 
         // $(this).find("input[name='go_shop_name']").require().maxLength("30");
     }, submitByAjax);
-
-    console.log(ATTENDANCE.getlist)
     /* dataTables start   */
     table = $('#transfer').dataTable({
         "columns": columns,
