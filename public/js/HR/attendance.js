@@ -8,18 +8,12 @@ $(function () {
         // $(this).find("input[name='go_shop_name']").require().maxLength("30");
     }, submitByAjax);
     /* dataTables start   */
-    table = $('#transfer').dataTable({
+    table = $('#transfer').oaTable({
         "columns": columns,
-        // "ajax":"/hr/attendance/staffinfo?_token=" + csrfToken, 
         "ajax": {
-            url: ATTENDANCE.getlist,
-            dataType: 'JSONP'
+            url: '/hr/attendance/list'
         },
         "scrollX": 746,
-        "order": [[0, "asc"]],
-        "dom": "<'row'<'col-sm-3'l><'col-sm-6'B><'col-sm-3'f>r>" +
-                "t" +
-                "<'row'<'col-sm-5'i><'col-sm-7'p>>",
         "buttons": buttons
     });
 

@@ -5,11 +5,18 @@ namespace App\Http\Controllers\HR;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
+use Curl;
 
 class AttendanceController extends Controller {
 
     public function showManagePage() {
         return view('hr.attendance.attendance');
+    }
+
+    public function getList(Request $request) {
+        $url = config('api.url.attendance.getlist');
+        $response = Curl::setUrl($url)->sendMessageByPost($request->all());
+        return $response;
     }
 
     //查 店铺考勤数据
