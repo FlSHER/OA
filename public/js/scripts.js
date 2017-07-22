@@ -272,7 +272,7 @@ function OAForm(dom, options) {
         var url = arguments[0] ? arguments[0] : self.setting.dataSource.url;
         var data = arguments[1] ? arguments[1] : self.setting.dataSource.params;
         var type = arguments[2] ? arguments[2] : self.setting.dataSource.type;
-        if (url === undefined || url.length === 0) {
+        if (url === null || url.length === 0) {
             return false;
         }
         $.ajax({
