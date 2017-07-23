@@ -24,7 +24,8 @@ class OAService {
             $params['app_token'] = cache('OA_appToken_' . session('OA_staff_sn'));
             $response = CurlService::build($url)->sendMessageByPost($params);
             if (!isset($response['status'])) {
-                abort(500, '未知接口错误');
+                echo $response;
+                die;
             } elseif ($response['status'] == -1 && $response['error_code'] == 503) {
                 cache()->forget('OA_appToken_' . session('OA_staff_sn'));
                 session()->forget('OA_refresh_token');
