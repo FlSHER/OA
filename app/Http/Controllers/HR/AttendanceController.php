@@ -14,8 +14,19 @@ class AttendanceController extends Controller {
         return view('hr.attendance.attendance');
     }
 
+    public function showDetailPage(Request $request) {
+        $info = $this->getInfo($request);
+        return view('hr.attendance.attendance_info')->with($info->toArray());
+    }
+
     public function getList(Request $request) {
         return app('Plugin')->dataTables($request, $this->model);
+    }
+
+    public function getInfo(Request $request) {
+        $id = $request->id;
+        $model = $this->model;
+        return $model::with('details')->find($id);
     }
 
     /**

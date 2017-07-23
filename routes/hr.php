@@ -101,6 +101,7 @@ Route::group(['prefix' => 'hr', 'namespace' => 'HR', 'as' => 'hr'], function() {
     Route::group(['prefix' => 'attendance', 'as' => '.attendance'], function() {//考勤
         Route::get('/', ['uses' => 'AttendanceController@showManagePage']);
         Route::post('/list', ['uses' => 'AttendanceController@getList'])->name('.list');
+        Route::post('/detail', ['uses' => 'AttendanceController@showDetailPage'])->name('.detail');
         Route::post('/export', ['uses' => 'AttendanceController@exportStaffData'])->name('.export');
     });
 });
