@@ -82,23 +82,23 @@ return [
             'databaseManageAdd' => $workflow . 'api/workflow/databaseManageAdd', //数据源管理保存新增,编辑
             'databaseManageDelete' => $workflow . 'api/workflow/databaseManageDelete', //数据源管理删除
         ],
-        'transfer' => [      //调动
+        'transfer' => [//调动
             'list' => $transfer . 'list',
             'save' => $transfer . 'save',
             'edit' => $transfer . 'edit',
             'cancel' => $transfer . 'cancel',
         ],
-        'holiday' => [    //请假
+        'holiday' => [//请假
             'list' => $holiday . 'list', //请假列表
             'cancel' => $holiday . 'cancel',
             'imports' => $holiday . 'imports', //导入
             'edit' => $holiday . 'edit',
         ],
-        'attendance' => [       //考勤
-            'getlist' => $attendance . '/attendance/getlist', //获取店铺员工考勤
+        'attendance' => [//考勤
+            'public' => preg_replace('/\/\w+?$/', '', $attendance),
             'stafflist' => $attendance . '/attendance/getstafflist', //获取店铺员工考勤数据 
         ],
-        'statistic' => [       //考勤
+        'statistic' => [//考勤
             'getlist' => $attendance . '/statistic/getlist', //获取员工考勤
             'export' => '/hr/attendance/export', //获取店铺员工考勤数据 
             'stafflist' => $attendance . '/statistic/getstatistic', //获取店铺员工考勤数据 
