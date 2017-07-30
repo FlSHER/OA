@@ -17,7 +17,7 @@ class CreateShopsTable extends Migration {
             $table->smallIncrements('id');
             $table->char('shop_sn', 10)->comment('店铺代码');
             $table->char('name', 50)->comment('店铺名称');
-            $table->mediumInteger('manager_sn')->unsigned()->comment('店长员工编号');
+            $table->char('manager_sn', 6)->comment('店长员工编号');
             $table->char('manager_name', 10)->comment('店长姓名');
             $table->smallInteger('department_id')->comment('所属部门id');
             $table->tinyInteger('brand_id');
