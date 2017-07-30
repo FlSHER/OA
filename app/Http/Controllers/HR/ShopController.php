@@ -31,7 +31,7 @@ class ShopController extends Controller {
     }
 
     public function addOrEdit(Request $request) {
-        $this->validate($request, $this->makeValidator($request), []);
+        $this->validate($request, $this->makeValidator($request), [],trans('fields.shop'));
         return $this->curdService->createOrUpdate($request->all());
     }
 
