@@ -96,6 +96,21 @@ return [
         'operation_remark' => '操作备注',
     ],
     /* 员工管理 End */
+    
+    /* 店铺管理 Start */
+    'shop' => [
+        'shop_sn' => '店铺编号',
+        'name' => '店铺名称',
+        'department_id' => '所属部门ID',
+        'brand_id' => '品牌ID',
+        'province_id' => '省',
+        'city_id' => '市',
+        'county_id' => '区/县',
+        'address' => '详细地址',
+        'manager_sn' => '店长员工编号',
+        'manager_name' => '店长姓名',
+    ],
+    /* 店铺管理 End */
 
     /* 店铺人员调动 Start */
     'transfer' => [
