@@ -85,4 +85,24 @@ class HRMService {
         return $html;
     }
 
+    public function getCheckBox($name, $model, $where = [], $order = 'sort') {
+        $table = is_string($model) ? DB::table($model) : $model;
+        $data = $table->where($where)->orderBy($order, 'asc')->get();
+        return $this->changeDataIntoCheckBox($data, $name);
+    }
+
+    private function changeDataIntoCheckBox($data, $name) {
+        $html = '';
+        foreach ($data as $v) {
+            $html .= '<div class="col-sm-3 col-xs-6" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:0;">
+            <label class="frame check frame-sm" unselectable="on" onselectstart="return false;">
+                <input name="' . $name . '" type="checkbox" value="' . $v->id . '">
+                <span class="checkbox-outer"><i class="fa fa-check"></i></span>&nbsp;
+            </label>
+            <span>' . $v->name . '</span>
+        </div>';
+        }
+        return $html;
+    }
+
 }
