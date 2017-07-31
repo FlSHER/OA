@@ -25,6 +25,7 @@ class CreateStaffTransfer extends Migration {
             $table->char('arriving_shop_duty', 5)->comment('到达店铺职务');
             $table->date('arrived_at')->nullable()->comment('到达时间');
             $table->tinyInteger('status')->default(0)->comment('调动状态');
+            $table->char('tags',20)->comment('调动标签');
             $table->char('remark', 200)->comment('备注');
             $table->timestamps();
             $table->softDeletes();

@@ -14,9 +14,14 @@ class CreateStaffTransferTags extends Migration
     public function up()
     {
         Schema::create('staff_transfer_tags', function (Blueprint $table) {
-            $table->tinyIncrements('id');
+            $table->smallIncrements('id');
             $table->char('name',10)->comment('标签名称');
-            $table->timestamps();
+            $table->tinyInteger('sort')->unsigned()->comment('排序');
+        });
+        
+        Schema::create('staff_transfer_has_tags', function (Blueprint $table) {
+            $table->integer('transfer_id');
+            $table->smallInteger('tag_id');
         });
     }
 
@@ -28,5 +33,6 @@ class CreateStaffTransferTags extends Migration
     public function down()
     {
         Schema::dropIfExists('staff_transfer_tags');
+        Schema::dropIfExists('staff_transfer_has_tags');
     }
 }
