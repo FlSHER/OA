@@ -297,11 +297,12 @@ function OAForm(dom, options) {
                     } catch (err) {
                         var value = undefined;
                     }
+                    console.log(value);
                     var type = $(this).attr("type");
                     var lock = $(this).attr("locked");
                     if (typeof value !== undefined && !lock) {
                         if (type === "checkbox") {
-                            var check = $(this).val() == value;
+                            var check = $.isArray(value) ? $.inArray($(this).val(), value) : $(this).val() == value;
                             $(this).prop("checked", check);
                         } else {
                             $(this).val(value);
