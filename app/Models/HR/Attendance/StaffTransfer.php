@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\HR;
+namespace App\Models\HR\Attendance;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,7 +10,20 @@ class StaffTransfer extends Model {
     use SoftDeletes;
 
     protected $table = 'staff_transfer';
-    protected $guarded = [];
+    protected $fillable = [
+        'staff_sn',
+        'staff_name',
+        'staff_gender',
+        'staff_department',
+        'current_shop_sn',
+        'leaving_shop_sn',
+        'left_at',
+        'arriving_shop_sn',
+        'arriving_shop_duty',
+        'arrived_at',
+        'status',
+        'remark',
+    ];
 
     /* ----- 定义关联 Start ----- */
 
@@ -28,6 +41,10 @@ class StaffTransfer extends Model {
 
     public function arriving_shop() { //到达店铺
         return $this->belongsTo('App\Models\HR\Shop', 'arriving_shop_sn', 'shop_sn');
+    }
+
+    public function tag() {
+        return $this->belongsToMany('App\Models\HR\Attendance\StaffTransferTag', 'staff_transfer_has_tags', 'transfer_id', 'tag_id');
     }
 
     /* ----- 定义关联 End ----- */

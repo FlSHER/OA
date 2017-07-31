@@ -11,7 +11,7 @@ use App\Contracts\CURD;
 
 class TransferController extends Controller {
 
-    protected $model = 'App\Models\HR\StaffTransfer';
+    protected $model = 'App\Models\HR\Attendance\StaffTransfer';
     protected $transPath = 'fields.transfer';
     protected $curdService;
     protected $logService;
@@ -35,7 +35,7 @@ class TransferController extends Controller {
     public function getInfo(Request $request) {
         $id = $request->id;
         $model = $this->model;
-        $info = $model::with([])->find($id);
+        $info = $model::with(['tag'])->find($id);
         return $info;
     }
 

@@ -33,10 +33,10 @@ class EventServiceProvider extends ServiceProvider {
         });
 
         //StaffTransfer
-        \App\Models\HR\StaffTransfer::saving(function($model) {
+        \App\Models\HR\Attendance\StaffTransfer::saving(function($model) {
             $model->onSaving();
         });
-        \App\Models\HR\StaffTransfer::saved(function($model) {
+        \App\Models\HR\Attendance\StaffTransfer::saved(function($model) {
             $model->onSaved();
         });
 

@@ -9,7 +9,7 @@ use Excel;
 
 class LeaveController extends Controller {
 
-    protected $model = 'App\Models\Attendance\Vacate';
+    protected $model = 'App\Models\HR\Attendance\Vacate';
 
     public function showManagePage() {
         return view('hr.attendance.leave');

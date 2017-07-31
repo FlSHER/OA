@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Attendance;
+namespace App\Models\HR\Attendance;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,7 +12,7 @@ class Attendance extends Model {
     /* ----- 定义关联 Start ----- */
 
     public function details() {
-        return $this->hasMany('App\Models\Attendance\AttendanceStaff', 'parent')->orderBy('staff_sn', 'asc');
+        return $this->hasMany('App\Models\HR\Attendance\AttendanceStaff', 'parent')->orderBy('staff_sn', 'asc');
     }
 
     /* ----- 定义关联 End ----- */

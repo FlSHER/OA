@@ -8,7 +8,7 @@ use App\Http\Requests;
 
 class AttendanceController extends Controller {
 
-    protected $model = 'App\Models\Attendance\Attendance';
+    protected $model = 'App\Models\HR\Attendance\Attendance';
 
     public function showManagePage() {
         return view('hr.attendance.attendance');

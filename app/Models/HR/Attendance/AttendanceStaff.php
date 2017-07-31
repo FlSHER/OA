@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Attendance;
+namespace App\Models\HR\Attendance;
 
 use Illuminate\Database\Eloquent\Model;
 
