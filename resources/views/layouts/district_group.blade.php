@@ -1,5 +1,6 @@
 <div class="input-3level-group">
     <select class="form-control" name="{{$provinceName}}" title="省">
+        <option value=0>-- 无 --</option>
         <option value="110000">北京市</option>
         <option value="120000">天津市</option>
         <option value="130000">河北省</option>
