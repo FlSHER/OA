@@ -90,14 +90,20 @@ class ExcelImport {
 
     protected function makeColumns($heading) {
         $columns = [];
+        $arrayColumns = [];
         foreach ($heading as $key => $column) {
             if (empty($column)) {
                 continue;
             } elseif (preg_match('/^[\x80-\xff ]$/', $column) != -1 && !empty($this->localization)) {//全中文时匹配翻译
-                $columns[$key] = array_has($this->localization, $column) ? $this->localization[$column] : $column;
+                $column = array_has($this->localization, $column) ? $this->localization[$column] : $column;
             } else {
-                $columns[$key] = preg_replace(['/([\x80-\xff \]]*)/i', '/\[/'], ['', '.'], $column); //去除中文和空格，将数组改为点分割字符串
+                $column = preg_replace(['/([\x80-\xff \]]*)/i', '/\[/'], ['', '.'], $column); //去除中文和空格，将数组改为点分割字符串
             }
+            if (preg_match('/\*/', $column)) {
+                $arrayColumns[$column] = isset($arrayColumns[$column]) ? $arrayColumns[$column] + 1 : 0;
+                $column = preg_replace('/\*/', $arrayColumns[$column], $column);
+            }
+            $columns[$key] = $column;
         }
         return $columns;
     }

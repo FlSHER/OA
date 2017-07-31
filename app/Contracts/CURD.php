@@ -325,11 +325,9 @@ class CURD {
                 if (is_array($v) && array_key_exists('pivot', $v)) {
                     $pivot = $v['pivot'];
                     $input[$v['pivot'][$otherKey]] = $pivot;
-                } else if (is_array($v)) {
-                    $pivot = array_except($v, $otherKey);
-                    $input[$v[$otherKey]] = $pivot;
                 } else {
-                    $input[$v] = [];
+                    $relationKey = is_array($v) ? $relationQuery->getModel()->newQuery()->where($v)->first()->getKey() : $v;
+                    $input[$relationKey] = [];
                 }
             }
             $dirty = $relationQuery->sync($input);

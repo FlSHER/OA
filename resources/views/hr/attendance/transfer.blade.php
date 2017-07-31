@@ -121,6 +121,7 @@ var columns = [
     {data: "arriving_shop_duty", title: "到店职务", visible: false, defaultContent: "待定"},
     {data: "left_at", title: "出发时间"},
     {data: "created_at", title: "创建时间"},
+    {data: "{tag.*.name}", name: "tag.*.name", title: "标签"},
     {data: "remark", title: "备注"},
 //    {data: "arrived_at", title: "到达时间", visible: false},
     {data: "id", title: "操作", "sortable": false, "width": "50px", "createdCell": function (nTd, sData, oData, iRow, iCol) {

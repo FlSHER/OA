@@ -121,11 +121,11 @@ class ExcelExport {
 
     protected function filter(array $data) {
         $filteredData = array_map(function($value) {
-            $dotArray = array_dot($value);
             $response = [];
             foreach ($this->columns as $name => $column) {
                 is_numeric($name) && $name = $column;
-                array_set($response, $name, array_has($dotArray, $column) ? $dotArray[$column] : "");
+                $cell = array_get($value, $column);
+                array_set($response, $name, is_array($cell) ? implode(',', $cell) : $cell);
             }
             return $response;
         }, $data);

@@ -146,7 +146,7 @@ return [
         'left_at' => '出发时间',
         'arrived_at' => '到达时间',
         'created_at' => '创建时间',
-        'tag.*.' => [
+        'tag.*' => [
             'pivot.tag_id' => '标签ID',
             'name' => '标签',
         ],

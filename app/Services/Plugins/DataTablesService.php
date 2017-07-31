@@ -88,8 +88,8 @@ class DataTablesService {
         $columns = [];
         foreach ($request->columns as $k => $v) {
             $column = [];
-            if (preg_match_all('/{([\w\.]+)}/', $v['data'], $column)) {
-                $columns[$k] = $column[1];
+            if (preg_match_all('/{([\w\.\*]+)}/', $v['data'], $column)) {
+                $columns[$k] = [$v['name']];
             } else {
                 $columns[$k] = [$v['data']];
             }
@@ -103,7 +103,7 @@ class DataTablesService {
             $relation = [];
             foreach ($columnGroup as $column) {
                 if (preg_match('/\./', $column)) {
-                    $relation[] = preg_replace('/\.\w+$/', '', $column);
+                    $relation[] = preg_replace('/(\.\w+$|\.\*)/', '', $column);
                 }
             }
             if (!empty($relation)) {
@@ -265,8 +265,8 @@ class DataTablesService {
         foreach ($data as $index => $row) {
             foreach ($request->columns as $v) {
                 $column = $v['data'];
-                if (preg_match('/{[\w\.]+}/', $column)) {
-                    $code = preg_replace('/{([\w\.]+)}/', 'array_get($row, \'$1\')', $column);
+                if (preg_match('/{[\w\.\*]+}/', $column)) {
+                    $code = preg_replace(['/{([\w\.]+)}/', '/{([\w\.]+)\.\*\.([\w\.]+)}/'], [ 'array_get($row, \'$1\')', 'array_pluck(array_get($row, \'$1\'),\'$2\')'], $column);
                     eval('array_set($data[$index], $column, ' . $code . ');');
                 }
             }
