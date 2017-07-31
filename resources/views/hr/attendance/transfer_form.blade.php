@@ -48,6 +48,12 @@
         <div class="col-sm-1"></div>
     </div>
     <div class="form-group">
+        <label class="control-label col-sm-2"></label>
+        <div class="col-sm-8">
+            {!! $HRM->getCheckBox('tag[][pivot][tag_id]','staff_transfer_tags') !!}
+        </div>
+    </div>
+    <div class="form-group">
         <label class="control-label col-sm-2">备注</label>
         <div class="col-sm-9">
             <textarea class="form-control" name="remark" title="备注" style="resize: none" rows="5" placeholder="最大长度200字符"></textarea>
