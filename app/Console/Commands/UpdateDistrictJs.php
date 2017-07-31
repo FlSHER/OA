@@ -69,7 +69,8 @@ class UpdateDistrictJs extends Command {
 
     private function makeBladeContent() {
         $content = '<div class="input-3level-group">
-    <select class="form-control" name="{{$provinceName}}" title="省">';
+    <select class="form-control" name="{{$provinceName}}" title="省">
+        <option value=0>-- 无 --</option>';
         foreach ($this->province as $province) {
             $content .= '
         <option value="' . $province->id . '">' . $province->name . '</option>';
