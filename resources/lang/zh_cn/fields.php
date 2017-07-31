@@ -96,7 +96,7 @@ return [
         'operation_remark' => '操作备注',
     ],
     /* 员工管理 End */
-    
+
     /* 店铺管理 Start */
     'shop' => [
         'shop_sn' => '店铺编号',
@@ -146,6 +146,10 @@ return [
         'left_at' => '出发时间',
         'arrived_at' => '到达时间',
         'created_at' => '创建时间',
+        'tag.*.' => [
+            'pivot.tag_id' => '标签ID',
+            'name' => '标签',
+        ],
         'remark' => '备注',
     ],
     /* 店铺人员调动 End */
@@ -169,7 +173,7 @@ return [
             'auditor.*.auditor_realname' => '审核人',
         ],
         //审批
-       'approver' => [
+        'approver' => [
             'department_id' => "部门",
             'reim_department_id' => "资金归属",
             'approver1' => '一级审批',
