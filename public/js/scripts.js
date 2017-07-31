@@ -297,12 +297,11 @@ function OAForm(dom, options) {
                     } catch (err) {
                         var value = undefined;
                     }
-                    console.log(value);
                     var type = $(this).attr("type");
                     var lock = $(this).attr("locked");
                     if (typeof value !== undefined && !lock) {
                         if (type === "checkbox") {
-                            var check = $.isArray(value) ? $.inArray($(this).val(), value) : $(this).val() == value;
+                            var check = $.isArray(value) ? self.inArray($(this).val(), value) : $(this).val() == value;
                             $(this).prop("checked", check);
                         } else {
                             $(this).val(value);
@@ -316,6 +315,20 @@ function OAForm(dom, options) {
             }
         });
         _call('afterFillData');
+    };
+    /**
+     * 判断值是否在数组中
+     * @param {type} value
+     * @param {type} array
+     * @returns {Boolean}
+     */
+    this.inArray = function (value, array) {
+        for (var i in array) {
+            if (array[i] == value) {
+                return true;
+            }
+        }
+        return false;
     };
     /**
      * 获取多维数组的值

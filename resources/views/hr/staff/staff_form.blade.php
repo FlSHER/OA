@@ -338,7 +338,7 @@
                                         <button type="button" class="btn btn-default" oaSearchShow><i class="fa fa-search"></i></button>
                                     </span>
                                 </div>
-                                <input name="relative[][relative_sn]" oaSearchColumn="staff_sn" type="hidden"/>
+                                <input name="relative[][pivot][relative_sn]" oaSearchColumn="staff_sn" type="hidden"/>
                             </div>
                             <label class="control-label col-sm-2">关系类型</label>
                             <div class="col-sm-3">
