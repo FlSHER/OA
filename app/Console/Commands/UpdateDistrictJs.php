@@ -8,6 +8,8 @@ use DB;
 class UpdateDistrictJs extends Command {
 
     protected $tableName = 'i_district';
+    protected $province;
+    protected $city;
 
     /**
      * The name and signature of the console command.
@@ -30,6 +32,8 @@ class UpdateDistrictJs extends Command {
      */
     public function __construct() {
         parent::__construct();
+        $this->province = DB::table($this->tableName)->where('level', 1)->get();
+        $this->city = DB::table($this->tableName)->where('level', 2)->get();
     }
 
     /**
@@ -38,14 +42,50 @@ class UpdateDistrictJs extends Command {
      * @return mixed
      */
     public function handle() {
+        $this->makeBladeFile();
+        $this->makeJavascriptFile();
+    }
+
+    private function makeBladeFile() {
+        $content = $this->makeBladeContent();
+        $fileName = resource_path('views/layouts/district_group.blade.php');
+        $this->makeFile($fileName, $content);
+    }
+
+    private function makeJavascriptFile() {
         $bindContent = $this->makeBindContent();
         $objectContent = $this->makeObjectContent();
         $jsContent = $bindContent . $objectContent;
         $fileName = public_path('js/layout/district.js');
+        $this->makeFile($fileName, $jsContent);
+    }
+
+    private function makeFile($fileName, $content) {
         if (!file_exists($fileName)) {
             fopen($fileName, 'w');
         }
-        file_put_contents($fileName, $jsContent);
+        file_put_contents($fileName, $content);
+    }
+
+    private function makeBladeContent() {
+        $content = '<div class="input-3level-group">
+    <select class="form-control" name="{{$provinceName}}" title="省">';
+        foreach ($this->province as $province) {
+            $content .= '
+        <option value="' . $province->id . '">' . $province->name . '</option>';
+        }
+        $content .= '
+    </select>
+    <select class="form-control" name="{{$cityName}}" title="市">
+
+    </select>
+    <select class="form-control" name="{{$countyName}}" title="区/县">
+
+    </select>
+</div>
+<!-- district -->
+<script type="text/javascript" src="{{source(\'js/layout/district.js\')}}"></script>';
+        return $content;
     }
 
     private function makeBindContent() {
@@ -101,10 +141,7 @@ function District() {
     }
 
     private function makeDistrictOptions() {
-        $tableName = $this->tableName;
-        $province = DB::table($tableName)->where('level', 1)->get();
-        $city = DB::table($tableName)->where('level', 2)->get();
-        $districtContent = $this->makeSubDistrictContent(array_collapse([$province, $city]));
+        $districtContent = $this->makeSubDistrictContent(array_collapse([$this->province, $this->city]));
         $districtData = $districtContent;
         return $districtData;
     }
@@ -113,7 +150,9 @@ function District() {
         $subContent = '{';
         foreach ($parent as $v) {
             $parentId = $v->id;
-            $options = DB::table($this->tableName)->where('parent_id', $parentId)->get()->map(function($value) {
+            $options = DB::table($this->tableName)->where('parent_id', $parentId)
+//                            ->orderByRaw('convert( `name` USING gbk ) COLLATE gbk_chinese_ci')
+                            ->get()->map(function($value) {
                         return '<option value="' . $value->id . '">' . $value->name . '</option>';
                     })->all();
             $subContent .= '
