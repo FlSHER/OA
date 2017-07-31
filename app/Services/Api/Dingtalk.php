@@ -38,13 +38,27 @@ class Dingtalk {
         $url = $this->getCurrentUrl();
         $signature = $this->makeSignature($jsApiTicket, $nonceStr, $timeStamp, $url); //js-API签名
         $config = [
-            'agentId' => config('dingding.agentId.reimburse'), //微应用id
+            'agentId' => config('dingding.agentId'), //微应用id
             'corpId' => config('dingding.CorpId'), //企业id
             'timeStamp' => $timeStamp, //生成签名的时间戳
             'nonceStr' => $nonceStr, //生成签名的随机串
             'signature' => $signature, //签名
         ];
         return $config;
+    }
+
+    /**
+     * 免登
+     * 通过CODE换取用户身份
+     * @param type $code
+     */
+    public function passCodeGetUserInfo($code) {
+        $message = [
+            'access_token' => $this->getAccessToken(),
+            'code' => $code
+        ];
+        $userInfo = Curl::build($this->url . 'user/getuserinfo')->sendMessage($message);
+        return $userInfo;
     }
 
     /**
@@ -83,6 +97,8 @@ class Dingtalk {
             Cache::put('accessToken', $accessToken, 119);
             return $accessToken;
         }
+//        $url = 'http://of.xigemall.com/api/get_dingtalk_access_token';
+//        return Curl::build($url)->get();
     }
 
     /**
@@ -127,4 +143,5 @@ class Dingtalk {
                 '&url=' . $url;
         return sha1($plain);
     }
+
 }
