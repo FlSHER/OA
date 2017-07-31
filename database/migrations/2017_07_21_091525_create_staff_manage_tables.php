@@ -16,7 +16,7 @@ class CreateStaffManageTables extends Migration {
          * 员工主表
          */
         Schema::create('staff', function (Blueprint $table) {
-            $table->mediumInteger('staff_sn', true)->unsigned()->primary()->comment('员工编号');
+            $table->mediumIncrements('staff_sn', true)->comment('员工编号');
             $table->char('username', 16)->comment('用户名');
             $table->char('password', 64)->comment('密码');
             $table->char('salt', 6)->comment('加密后缀');
