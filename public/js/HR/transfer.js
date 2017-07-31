@@ -14,6 +14,7 @@ $(function () {
         "ajax": {
             url: '/hr/transfer/list'
         },
+        order: [0, 'desc'],
         "scrollX": 746,
         "buttons": buttons
     });

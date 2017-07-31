@@ -288,9 +288,12 @@ function OAForm(dom, options) {
                 });
                 self.refreshUnits();
                 self.units.each(function () {
-                    var name = $(this).attr("name").replace(/^(.*?)(\[.*\])*$/, '[$1]$2').replace(/\[(\w+?)\]/g, '["$1"]');
+                    var name = $(this).attr("name")
+                            .replace(/^(.*?)(\[.*\])*$/, '[$1]$2')
+                            .replace(/\[(\w+?)\]/g, '["$1"]');
+                    var getValueCode = ('msg' + name).replace(/^(.*?)\[\](.*)$/, 'self.arrayPluck($1,\'$2\')');
                     try {
-                        var value = eval('msg' + name);
+                        var value = eval(getValueCode);
                     } catch (err) {
                         var value = undefined;
                     }
@@ -312,6 +315,24 @@ function OAForm(dom, options) {
             }
         });
         _call('afterFillData');
+    };
+    /**
+     * 获取多维数组的值
+     * @param {type} array
+     * @param {type} key
+     * @returns {Array|OAForm.arrayPluck.response}
+     */
+    this.arrayPluck = function (array, key) {
+        var response = [];
+        for (var i in array) {
+            try {
+                var value = eval('array[i]' + key);
+            } catch (err) {
+                continue;
+            }
+            response.push(value);
+        }
+        return response;
     };
     /**
      * AJAX提交表单
