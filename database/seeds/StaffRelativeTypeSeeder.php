@@ -25,6 +25,7 @@ class StaffRelativeTypeSeeder extends Seeder {
             ['name' => '师傅', 'group_id' => 7, 'opposite_group_id' => 8, 'gender_id' => 0, 'sort' => 12],
             ['name' => '徒弟', 'group_id' => 8, 'opposite_group_id' => 7, 'gender_id' => 0, 'sort' => 13],
         ];
+        DB::table('staff_relative_type')->truncate();
         DB::table('staff_relative_type')->insert($data);
     }
 
