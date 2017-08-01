@@ -89,7 +89,7 @@ class DataTablesService {
         foreach ($request->columns as $k => $v) {
             $column = [];
             if (preg_match_all('/{([\w\.\*]+)}/', $v['data'], $column)) {
-                $columns[$k] = [$v['name']];
+                $columns[$k] = $column[1];
             } else {
                 $columns[$k] = [$v['data']];
             }

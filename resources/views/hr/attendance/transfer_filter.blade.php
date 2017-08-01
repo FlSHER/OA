@@ -59,7 +59,7 @@
                 <div class="row">
                     <label class="control-label col-lg-4 col-sm-2">标签</label>
                     <div class="col-sm-8">
-                        <select class="form-control" name="tag.*.name.is">
+                        <select class="form-control" name="tag.id.is">
                             <option value="">全部</option>
                             {!!$HRM->getOptions(new App\Models\HR\Attendance\StaffTransferTag)!!}
                         </select>
