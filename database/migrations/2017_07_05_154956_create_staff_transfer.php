@@ -14,7 +14,7 @@ class CreateStaffTransfer extends Migration {
     public function up() {
         Schema::create('staff_transfer', function (Blueprint $table) {
             $table->increments('id');
-            $table->mediumInteger('staff_sn')->comment('员工编号');
+            $table->mediumInteger('staff_sn')->unsigned()->comment('员工编号');
             $table->char('staff_name', 10)->comment('员工姓名');
             $table->char('staff_gender', 10)->comment('性别');
             $table->char('staff_department', 10)->comment('部门名称');
@@ -25,7 +25,8 @@ class CreateStaffTransfer extends Migration {
             $table->char('arriving_shop_duty', 5)->comment('到达店铺职务');
             $table->date('arrived_at')->nullable()->comment('到达时间');
             $table->tinyInteger('status')->default(0)->comment('调动状态');
-            $table->char('tags',20)->comment('调动标签');
+            $table->mediumInteger('maker_sn')->unsigned()->comment('创建人编号');
+            $table->char('maker_name', 10)->comment('创建人姓名');
             $table->char('remark', 200)->comment('备注');
             $table->timestamps();
             $table->softDeletes();
