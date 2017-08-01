@@ -973,6 +973,11 @@ function OATable(dom, options) {
     this.getFilter = function () {
         self.filterBox = self.setting.filter;
         self.filterForm = self.filterBox.find('form');
+        self.filterForm.find('[isDate][isDate!=false]').oaDate();
+        self.filterForm.find('[isDateTime][isDateTime!=false]').oaDateTime();
+        self.filterForm.find('[oaSearch][oaSearch!=false]').each(function () {
+            $(this).oaSearch($(this).attr('oaSearch'));
+        });
         self.filterForm.on('submit', self.submitFilter);
     };
     this.submitFilter = function () {

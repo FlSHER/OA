@@ -87,10 +87,10 @@
             <div class="col-lg-3">
                 <div class="row">
                     <label class="control-label col-lg-4 col-sm-2">店铺编号</label>
-                    <div class="col-sm-8 input-group input-group-sm">
-                        <input class="form-control" name="shop_sn.is" type="text" title="店铺编号"/>
+                    <div class="col-sm-8 input-group input-group-sm" oaSearch="shop">
+                        <input class="form-control" name="shop_sn.is" oaSearchColumn="shop_sn" type="text" title="店铺编号"/>
                         <span class="input-group-btn">
-                            <button type="button" class="btn btn-default" onclick="searchShop(this)"><i class="fa fa-search"></i></button>
+                            <button type="button" class="btn btn-default" oaSearchShow><i class="fa fa-search"></i></button>
                         </span>
                     </div>
                 </div>
@@ -134,11 +134,11 @@
                     <div class="col-lg-9 col-sm-8">
                         <div class="row">
                             <div class="col-xs-6">
-                                <input class="form-control" name="hired_at.min" type="text"/>
+                                <input class="form-control" name="hired_at.min" type="text" isDate/>
                             </div>
                             <label class="control-label row pull-left" style="padding-left: 9px">至</label>
                             <div class="col-xs-6">
-                                <input class="form-control" name="hired_at.max" type="text"/>
+                                <input class="form-control" name="hired_at.max" type="text" isDate/>
                             </div>
                         </div>
                     </div>
@@ -150,11 +150,11 @@
                     <div class="col-lg-9 col-sm-8">
                         <div class="row">
                             <div class="col-xs-6">
-                                <input class="form-control" name="employed_at.min" type="text"/>
+                                <input class="form-control" name="employed_at.min" type="text" isDate/>
                             </div>
                             <label class="control-label row pull-left" style="padding-left: 9px">至</label>
                             <div class="col-xs-6">
-                                <input class="form-control" name="employed_at.max" type="text"/>
+                                <input class="form-control" name="employed_at.max" type="text" isDate/>
                             </div>
                         </div>
                     </div>
@@ -168,11 +168,11 @@
                     <div class="col-lg-9 col-sm-8">
                         <div class="row">
                             <div class="col-xs-6">
-                                <input class="form-control" name="left_at.min" type="text"/>
+                                <input class="form-control" name="left_at.min" type="text" isDate/>
                             </div>
                             <label class="control-label row pull-left" style="padding-left: 9px">至</label>
                             <div class="col-xs-6">
-                                <input class="form-control" name="left_at.max" type="text"/>
+                                <input class="form-control" name="left_at.max" type="text" isDate/>
                             </div>
                         </div>
                     </div>
@@ -184,11 +184,11 @@
                     <div class="col-lg-9 col-sm-8">
                         <div class="row">
                             <div class="col-xs-6">
-                                <input class="form-control" name="birthday.min" type="text"/>
+                                <input class="form-control" name="birthday.min" type="text" isDate/>
                             </div>
                             <label class="control-label row pull-left" style="padding-left: 9px">至</label>
                             <div class="col-xs-6">
-                                <input class="form-control" name="birthday.max" type="text"/>
+                                <input class="form-control" name="birthday.max" type="text" isDate/>
                             </div>
                         </div>
                     </div>
@@ -212,7 +212,6 @@
                 $('#department_filter').find('input').removeAttr('name');
             }
         });
-        $("#filter form").find("input[name*=birthday],input[name*=_at]").oaDate();
         $("#filter form").on("reset", function () {
             $(this).find('input,select').val('').change();
         });
