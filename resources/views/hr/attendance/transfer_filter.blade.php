@@ -37,7 +37,7 @@
                 <div class="row">
                     <label class="control-label col-lg-4 col-sm-2">调离店铺</label>
                     <div class="col-sm-8 input-group input-group-sm" oaSearch="shop">
-                        <input class="form-control" name="leaving_shop_sn.is" oaSearchColumn="shop_sn" type="text" title="调离店铺"/>
+                        <input class="form-control" name="leaving_shop_sn.like" oaSearchColumn="shop_sn" type="text" title="调离店铺"/>
                         <span class="input-group-btn">
                             <button type="button" class="btn btn-default" oaSearchShow><i class="fa fa-search"></i></button>
                         </span>
@@ -48,7 +48,7 @@
                 <div class="row">
                     <label class="control-label col-lg-4 col-sm-2">到达店铺</label>
                     <div class="col-sm-8 input-group input-group-sm" oaSearch="shop">
-                        <input class="form-control" name="arriving_shop_sn.is" oaSearchColumn="shop_sn" type="text" title="到达店铺"/>
+                        <input class="form-control" name="arriving_shop_sn.like" oaSearchColumn="shop_sn" type="text" title="到达店铺"/>
                         <span class="input-group-btn">
                             <button type="button" class="btn btn-default" oaSearchShow><i class="fa fa-search"></i></button>
                         </span>
@@ -63,6 +63,17 @@
                             <option value="">全部</option>
                             {!!$HRM->getOptions(new App\Models\HR\Attendance\StaffTransferTag)!!}
                         </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="row">
+                    <label class="control-label col-lg-4 col-sm-2">建单人</label>
+                    <div class="col-sm-8 input-group input-group-sm" oaSearch="staff">
+                        <input class="form-control" name="maker_name.like" oaSearchColumn="realname" type="text" title="建单人"/>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" oaSearchShow><i class="fa fa-search"></i></button>
+                        </span>
                     </div>
                 </div>
             </div>

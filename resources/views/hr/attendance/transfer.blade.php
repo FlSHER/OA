@@ -119,12 +119,15 @@ var columns = [
     {data: "arriving_shop_duty", title: "到店职务", visible: false, defaultContent: "待定"},
     {data: "left_at", title: "出发时间"},
     {data: "created_at", title: "创建时间"},
+    {data: "maker_name", title: "建单人", visible: false},
     {data: "implode(',',{tag.*.name}).' '.{remark}", name: "remark", title: "备注"},
 //    {data: "arrived_at", title: "到达时间", visible: false},
     {data: "id", title: "操作", "sortable": false, "width": "50px", "createdCell": function (nTd, sData, oData, iRow, iCol) {
             var html = '';
 <?php if ($authority->checkAuthority(81)): ?>
-                html += '<button class="btn btn-sm btn-default" title="编辑" onclick=\'edit(' + sData + ')\'><i class="fa fa-edit fa-fw"></i></button>';
+                if (oData.maker_sn == "{{app('CurrentUser')->staff_sn}}" || "{{app('CurrentUser')->staff_sn}}" == "999999") {
+                    html += '<button class="btn btn-sm btn-default" title="编辑" onclick=\'edit(' + sData + ')\'><i class="fa fa-edit fa-fw"></i></button>';
+                }
 <?php endif; ?>
 
 //                html += '&nbsp;<button class="btn btn-sm btn-danger" title="取消行程" onclick="del(' + sData + ')"><i class="fa fa-trash-o fa-fw"></i></button>';

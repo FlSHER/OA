@@ -22,6 +22,8 @@ class StaffTransfer extends Model {
         'arriving_shop_duty',
         'arrived_at',
         'status',
+        'maker_sn',
+        'maker_name',
         'remark',
     ];
 

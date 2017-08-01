@@ -54,6 +54,8 @@ class TransferController extends Controller {
         if ($count > 0) {
             $response['message'] = '调动已存在';
         } else {
+            $request->offsetSet('maker_sn', app('CurrentUser')->staff_sn);
+            $request->offsetSet('maker_name', app('CurrentUser')->realname);
             $data = $request->all();
             $response = $this->curdService->create($data);
         }
@@ -114,7 +116,7 @@ class TransferController extends Controller {
 
     protected function makeValidator($input) {
         $validator = [
-            'staff_sn' => [],
+            'staff_sn' => ['required_with:staff_name'],
             'staff_name' => ['required', 'exists:staff,realname,staff_sn,' . $input['staff_sn']],
             'leaving_shop_sn' => ['exists:shops,shop_sn,deleted_at,NULL'],
             'arriving_shop_sn' => ['required', 'exists:shops,shop_sn,deleted_at,NULL'],

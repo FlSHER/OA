@@ -150,6 +150,8 @@ return [
             'pivot.tag_id' => '标签ID',
             'name' => '标签',
         ],
+        'maker_sn' => '建单人编号',
+        'maker_name' => '建单人',
         'remark' => '备注',
     ],
     /* 店铺人员调动 End */
