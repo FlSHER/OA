@@ -322,12 +322,14 @@ class CURD {
             $otherKey = str_replace($relationQuery->getTable() . '.', '', $relationQuery->getOtherKey());
             $input = [];
             foreach ($data as $v) {
-                if (is_array($v) && array_key_exists('pivot', $v)) {
+                if (!is_array($v)) {
+                    $input[$v] = [];
+                } elseif (array_key_exists('pivot', $v)) {
                     $pivot = $v['pivot'];
                     $input[$v['pivot'][$otherKey]] = $pivot;
                 } else {
-                    $relationKey = is_array($v) ? $relationQuery->getModel()->newQuery()->where($v)->first()->getKey() : $v;
-                    $input[$relationKey] = [];
+                    $relationModel = $relationQuery->getModel()->newQuery()->where($v)->first();
+                    !empty($relationModel) && $input[$relationModel->getKey()] = [];
                 }
             }
             $dirty = $relationQuery->sync($input);
