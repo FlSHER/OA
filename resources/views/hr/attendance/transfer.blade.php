@@ -20,7 +20,7 @@
                 调动列表
             </header> 
             <!-- 筛选 start --> 
-
+            @include('hr/attendance/transfer_filter')
             <!-- 筛选 end -->
             <!-- 列表 start -->
             <div class="panel-body">
@@ -98,8 +98,6 @@
 
 @section('js')
 <script type="text/javascript" src="{{source('plug_in/datatables/datatables.min.js')}}"></script>
-<!-- datetimepicker -->
-<script type="text/javascript" src="{{source('plug_in/datetimepicker/bootstrap-datetimepicker.js')}}"></script>
 <!--script for this view-->
 <script type="text/javascript" src="{{source('js/HR/transfer.js')}}"></script>
 

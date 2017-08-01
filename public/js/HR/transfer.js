@@ -10,16 +10,15 @@ $(function () {
     $(".modal form").oaForm(oaFormOption);
     /* dataTables start */
     table = $('#transfer').oaTable({
-        "columns": columns,
-        "ajax": {
+        columns: columns,
+        ajax: {
             url: '/hr/transfer/list'
         },
-        order: [0, 'desc'],
-        "scrollX": 746,
-        "buttons": buttons
+        filter: $("#filter"),
+        order: [[0, 'desc']],
+        buttons: buttons
     });
     /* dataTables end */
-
     $("#import_input").on("change", importByExcel);
 });
 
