@@ -104,10 +104,10 @@
 <script>
 
 var columns = [
-    {data: "id", title: "ID"},
+    {data: "id", title: "ID",searchable:false},
     {data: "staff_sn", title: "员工编号"},
     {data: "staff_name", title: "员工姓名"},
-    {data: "staff_gender", title: "性别", visible: false},
+    {data: "staff_gender", title: "性别", visible: false,searchable:false},
     {data: "staff_department", title: "部门名称", defaultContent: "无"},
     {data: "current_shop.name", title: "所属店铺", visible: false, defaultContent: "无"},
     {data: "leaving_shop_sn", title: "调离店铺代码", visible: false},
@@ -116,9 +116,9 @@ var columns = [
     {data: "arriving_shop_sn", title: "到达店铺代码", visible: false},
     {data: "arriving_shop.name", title: "到达店铺名称", defaultContent: "无"},
     {data: "{arriving_shop.province.name}.'-'.{arriving_shop.city.name}.'-'.{arriving_shop.county.name}.' '.{arriving_shop.address}", name: "arriving_shop.address", title: "到达店铺地址", visible: false},
-    {data: "arriving_shop_duty", title: "到店职务", visible: false, defaultContent: "待定"},
-    {data: "left_at", title: "出发时间"},
-    {data: "created_at", title: "创建时间"},
+    {data: "arriving_shop_duty", title: "到店职务", visible: false, defaultContent: "待定",searchable:false},
+    {data: "left_at", title: "出发时间",searchable:false},
+    {data: "created_at", title: "创建时间",searchable:false},
     {data: "maker_name", title: "建单人", visible: false},
     {data: "implode(',',{tag.*.name}).' '.{remark}", name: "remark", title: "备注"},
 //    {data: "arrived_at", title: "到达时间", visible: false},
