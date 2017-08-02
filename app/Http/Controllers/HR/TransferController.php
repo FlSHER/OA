@@ -121,7 +121,7 @@ class TransferController extends Controller {
             'leaving_shop_sn' => ['exists:shops,shop_sn,deleted_at,NULL'],
             'arriving_shop_sn' => ['required', 'exists:shops,shop_sn,deleted_at,NULL'],
             'arriving_shop_duty' => ['in:店长,店助,导购,协助'],
-            'left_at' => ['date', 'after:2000-1-1'],
+            'left_at' => ['required', 'date', 'after:2000-1-1'],
             'remark' => ['max:200'],
         ];
         return $validator;

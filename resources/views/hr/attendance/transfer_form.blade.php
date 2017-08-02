@@ -12,7 +12,7 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="control-label col-sm-2">*调离店铺</label>
+        <label class="control-label col-sm-2">调离店铺</label>
         <div class="col-sm-4">
             <div class="input-group" oaSearch="shop">
                 <input class="form-control" name="leaving_shop_sn" oaSearchColumn="shop_sn" type="text" title="调离店铺"/>
@@ -35,6 +35,7 @@
         <label class="control-label col-sm-2">*到店职务</label>
         <div class="col-sm-4">
             <select class="form-control" name="arriving_shop_duty" title="到店职务" >
+                <option value="">待定</option>
                 <option>店长</option>
                 <option>店助</option>
                 <option>导购</option>
