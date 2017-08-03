@@ -20,7 +20,9 @@ class CreateShopsTable extends Migration {
             $table->char('manager_sn', 6)->comment('店长员工编号');
             $table->char('manager_name', 10)->comment('店长姓名');
             $table->smallInteger('department_id')->comment('所属部门id');
-            $table->tinyInteger('brand_id');
+            $table->tinyInteger('brand_id')->comment('品牌id');
+            $table->decimal('lng', 9, 6)->comment('经度');
+            $table->decimal('lat', 9, 6)->comment('纬度');
             $table->mediumInteger('province_id');
             $table->mediumInteger('city_id');
             $table->mediumInteger('county_id');
