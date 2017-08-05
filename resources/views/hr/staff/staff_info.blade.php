@@ -6,7 +6,7 @@
                 <li class="active">
                     <a href="#info" data-toggle="tab"><i class="fa fa-address-card"></i> 详细信息</a>
                 </li>
-                @if($authority->checkAuthority(66))
+                @if($authority->checkAuthority(118))
                 <li class="">
                     <a href="#info-log" data-toggle="tab"><i class="fa fa-history"></i> 变更日志</a>
                 </li>
@@ -205,7 +205,7 @@
                 </div>
                 <!-- 详细信息 end -->
                 <!-- 变更日志 start -->
-                @if($authority->checkAuthority(66))
+                @if($authority->checkAuthority(118))
                 <div class="tab-pane" id="info-log">
                     <table class="table">
                         <thead>
