@@ -157,7 +157,7 @@ class AuthorityService {
      */
     public function getAvailableDepartmentsByStaffSn($staffSn) {
         if ($this->isDeveloper($staffSn)) {
-            $departments = Department::get()->pluck('id')->toArray();
+            $departments = Department::withTrashed()->get()->pluck('id')->toArray();
             array_push($departments, 0);
         } else {
             $roles = Staff::find($staffSn)->role;

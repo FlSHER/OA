@@ -34,7 +34,7 @@ class Shop extends Model {
     }
 
     public function department() { //所属部门
-        return $this->belongsTo('App\Models\Department', 'department_id');
+        return $this->belongsTo('App\Models\Department', 'department_id')->withTrashed();
     }
 
     public function brand() { //所属品牌
@@ -71,7 +71,7 @@ class Shop extends Model {
         $query->whereHas('brand', function($q)use($brands) {
             $q->whereIn('id', $brands);
         })->whereHas('department', function($q)use($departments) {
-            $q->whereIn('id', $departments);
+            $q->whereIn('id', $departments)->withTrashed();
         });
     }
 
