@@ -874,6 +874,7 @@ function OATable(dom, options) {
     this.dom = dom;
     this.query = $(dom);
     this._construct = function () {
+        self.getButtonFromLibrary();
         if (self.setting.filter === true) {
             self.makeFilter();
             self.setting.buttons.unshift(self.buttonLibrary.filter);
@@ -952,6 +953,12 @@ function OATable(dom, options) {
         filter: {text: "<i class='fa fa-filter fa-fw'></i>", titleAttr: "筛选", className: "btn-primary", action: function () {
                 self.filterBox.slideToggle();
             }
+        },
+        export: function (url) {
+            return {text: "<i class='fa fa-download fa-fw'></i>", titleAttr: "导出", className: "btn-default", action: function () {
+                    self.exportToExcel(url);
+                }
+            };
         }
     };
     /**
@@ -1007,6 +1014,51 @@ function OATable(dom, options) {
             self.buttons().container().find('.fa-filter').attr("style", false);
         }
         return false;
+    };
+    /**
+     * 导出为excel
+     * @returns {undefined}
+     */
+    this.exportToExcel = function (url) {
+        var dataCount = self.ajax.json().recordsFiltered;
+        if (dataCount == 0) {
+            alert("无可用信息");
+        } else if (confirm("确认以当前条件导出？")) {
+            oaWaiting.show();
+            var params = self.ajax.params();
+            delete params.length;
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: params,
+                dataType: 'json',
+                success: function (msg) {
+                    if (msg['state'] == 1) {
+                        var fileName = msg['file_name'];
+                        window.location.href = '/storage/exports/' + fileName + '.xlsx';
+                        oaWaiting.hide();
+                    }
+                },
+                error: function (err) {
+                    document.write(err.responseText);
+                }
+            });
+        }
+    };
+
+    this.getButtonFromLibrary = function () {
+        for (var i in self.setting.buttons) {
+            var button = self.setting.buttons[i];
+            if (typeof button === 'string') {
+                var buttonName = button.match(/^(\w+):?(.*)$/)[1];
+                var buttonParams = button.match(/^(\w+):?(.*)$/)[2].split(',');
+                if (typeof self.buttonLibrary[buttonName] === 'object') {
+                    self.setting.buttons[i] = self.buttonLibrary[buttonName];
+                } else if (typeof self.buttonLibrary[buttonName] === 'function') {
+                    self.setting.buttons[i] = self.buttonLibrary[buttonName].apply(self, buttonParams);
+                }
+            }
+        }
     };
     this._construct();
 }
