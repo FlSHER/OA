@@ -145,9 +145,6 @@ var buttons = [];
                 }, "titleAttr": "导入"}
     );
 <?php endif; ?>
-buttons.push(
-        {"text": "<i class='fa fa-download fa-fw'></i>", "action": exportByExcel, "titleAttr": "导出为Excel"}
-);
-
+buttons.push('export:/hr/transfer/export');
 </script>
 @endsection
