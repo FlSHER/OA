@@ -123,7 +123,7 @@ class ExcelExport {
         $filteredData = array_map(function($value) {
             $response = [];
             foreach ($this->columns as $k => $v) {
-                $column = isArray($v) ? $v['data'] : $v;
+                $column = is_array($v) ? $v['data'] : $v;
                 is_numeric($k) && $name = empty($v['name']) ? $column : $v['name'];
                 $cell = array_get($value, $column);
                 array_set($response, $name, is_array($cell) ? implode(',', $cell) : $cell);
