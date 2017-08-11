@@ -125,8 +125,6 @@ class ExcelExport {
             foreach ($this->columns as $k => $v) {
                 $column = isArray($v) ? $v['data'] : $v;
                 is_numeric($k) && $name = empty($v['name']) ? $column : $v['name'];
-                if (isArray($column))
-                    $name = empty($column['name']) ? $column['data'] : $column['name'];
                 $cell = array_get($value, $column);
                 array_set($response, $name, is_array($cell) ? implode(',', $cell) : $cell);
             }
