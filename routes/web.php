@@ -19,15 +19,16 @@ Route::group(['middleware' => 'admin'], function() {
     Route::group(['prefix' => 'finance', 'namespace' => 'Finance', 'as' => 'finance'], function() {
         Route::group(['prefix' => 'reimburse', 'as' => '.reimburse'], function() {//报销系统
             Route::get('/', ['uses' => 'ReimburseController@showReimbursePage']);
-            Route::post('/list', ['uses' => 'ReimburseController@getHandleList'])->name('.list'); //ajax获取待处理报销单
+            Route::post('/list', ['uses' => 'ReimburseController@getHandleList'])->name('.list'); //ajax获取待审核报销单
+            Route::post('/expenses', ['uses' => 'ReimburseController@getExpensesByReimId'])->name('.expense'); //ajax获取消费明细
+            Route::post('/agree', ['uses' => 'ReimburseController@agree'])->name('.agree'); //通过当前报销
+            Route::post('/reject', ['uses' => 'ReimburseController@reject'])->name('.reject'); //驳回当前报销
+            Route::get('/print/{reim_id}', ['uses' => 'ReimburseController@printReimbursement'])->name('.print'); //打印审核明细
             Route::post('/audited', ['uses' => 'ReimburseController@getAuditedList'])->name('.audited'); //ajax获取会计已审核报销单
             Route::post('/rejected', ['uses' => 'ReimburseController@getRejectedList'])->name('.rejected'); //ajax获取已驳回报销单
-            Route::post('/reject', ['uses' => 'ReimburseController@reject'])->name('.reject'); //驳回当前报销
-            Route::post('/agree', ['uses' => 'ReimburseController@agree'])->name('.agree'); //通过当前报销
-            Route::post('/delete', ['uses' => 'ReimburseController@delete'])->name('.delete'); //删除报销单
-            Route::post('/expenses', ['uses' => 'ReimburseController@getExpensesByReimId'])->name('.expense'); //ajax获取消费明细
-            Route::get('/print/{reim_id}', ['uses' => 'ReimburseController@printReimbursement'])->name('.print'); //打印审批明细
-            Route::get('/excel', ['uses' => 'ReimburseController@exportAsExcel'])->name('.excel'); //导出为excel
+            Route::post('/delete', ['uses' => 'ReimburseController@delete'])->name('.delete'); //删除驳回报销单
+
+            Route::post('/excel', ['uses' => 'ReimburseController@exportAsExcel'])->name('.excel'); //导出为excel
         });
         Route::group(['prefix' => 'check_reimburse', 'as' => '.check_reimburse'], function() {//查看所有报销单
             Route::get('/', ['uses' => 'ReimburseController@checkAllReimbursements']);
@@ -43,19 +44,7 @@ Route::group(['middleware' => 'admin'], function() {
     /* -- 应用管理 -- */
     Route::group(['prefix' => 'app', 'namespace' => 'app', 'as' => 'app'], function() {
         /* --报销系统-- */
-        Route::group(['prefix' => 'reimburse', 'namespace' => 'Reimburse'], function() {
-            Route::get('/approver', ['uses' => 'ReimburseController@approverList']); //配置审批人列表 视图
-            Route::post('/approver', ['uses' => 'ReimburseController@approverInfo']); //获取配置审批人列表 
-            Route::post('/saveApprover', ['uses' => 'ReimburseController@saveApprover']); //保存审批人
-            Route::post('/delApprover', ['uses' => 'ReimburseController@delApprover']); //删除审批人
-            Route::post('/editApprover', ['uses' => 'ReimburseController@editApprover']); //删除审批人
-            
-            Route::get('/auditor',['uses'=>'ReimburseController@auditorList']);//审核人列表视图
-            Route::post('/auditor',['uses'=>'ReimburseController@auditorInfo']);//审核人列表
-            Route::post('/saveAuditor',['uses'=>'ReimburseController@saveAuditor']);//审核保存
-            Route::post('/delAuditor',['uses'=>'ReimburseController@delAuditor']);//审核数据删除
-            Route::post('/editAuditor',['uses'=>'ReimburseController@editAuditor']);//审核数据修改
-        });
+        include('reimburse.php');
 
         Route::get('/crm', function() {//客户CRM
             return redirect(config('api.url.crm.admin'));
