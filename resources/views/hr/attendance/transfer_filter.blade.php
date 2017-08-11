@@ -115,11 +115,11 @@
                     <div class="col-lg-9 col-sm-8">
                         <div class="row">
                             <div class="col-xs-6">
-                                <input class="form-control" name="employed_at.min" type="text" isDateTime/>
+                                <input class="form-control" name="created_at.min" type="text" isDateTime/>
                             </div>
                             <label class="control-label row pull-left" style="padding-left: 9px">至</label>
                             <div class="col-xs-6">
-                                <input class="form-control" name="employed_at.max" type="text" isDateTime/>
+                                <input class="form-control" name="created_at.max" type="text" isDateTime/>
                             </div>
                         </div>
                     </div>
