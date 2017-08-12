@@ -90,16 +90,16 @@ class Dingtalk {
      * 获取access_token
      */
     public function getAccessToken() {
-        if (Cache::has('accessToken')) {
-            return Cache::get('accessToken');
-        } else {
-            $accessToken = $this->getAccessTokenByApi();
-            Cache::put('accessToken', $accessToken, 119);
-            return $accessToken;
+//        if (Cache::has('accessToken')) {
+//            return Cache::get('accessToken');
+//        } else {
+//            $accessToken = $this->getAccessTokenByApi();
+//            Cache::put('accessToken', $accessToken, 119);
+//            return $accessToken;
+//        }
+        $url = 'http://of.xigemall.com/api/get_dingtalk_access_token';
+        return Curl::build($url)->get();
         }
-//        $url = 'http://of.xigemall.com/api/get_dingtalk_access_token';
-//        return Curl::build($url)->get();
-    }
 
     /**
      * api获取accessToken
