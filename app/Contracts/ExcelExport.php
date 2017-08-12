@@ -77,7 +77,16 @@ class ExcelExport {
      * @return \App\Contracts\ExcelExport
      */
     public function setColumns(array $columns) {
-        $this->columns = $columns;
+        $inSheet = false;
+        foreach ($columns as $v) {
+            if (!is_array($v)) {
+                break;
+            } elseif (!array_has($v, 'data')) {
+                $inSheet = true;
+                break;
+            }
+        }
+        $this->columns = $inSheet ? $columns : [$columns];
         return $this;
     }
 
@@ -106,10 +115,11 @@ class ExcelExport {
         return $file;
     }
 
-    protected function makeSheet($excel, $sheetName, $data) {
-        $excel->sheet($sheetName, function($sheet)use($data) {
-            if (!empty($this->columns)) {
-                $data = $this->filter($data);
+    protected function makeSheet($excel, $sheetName, array $data) {
+        $excel->sheet($sheetName, function($sheet)use($data, $sheetName) {
+            if (!empty($this->columns[$sheetName]) || !empty($this->columns[0])) {
+                $sheetColumns = array_has($this->columns, $sheetName) ? $this->columns[$sheetName] : $this->columns[0];
+                $data = $this->filter($data, $sheetColumns);
             }
             if (!empty($this->localization)) {
                 $data = $this->localize($data);
@@ -119,10 +129,10 @@ class ExcelExport {
         });
     }
 
-    protected function filter(array $data) {
-        $filteredData = array_map(function($value) {
+    protected function filter(array $data, $columns) {
+        $filteredData = array_map(function($value)use($columns) {
             $response = [];
-            foreach ($this->columns as $k => $v) {
+            foreach ($columns as $k => $v) {
                 $column = is_array($v) ? $v['data'] : $v;
                 is_numeric($k) && $name = empty($v['name']) ? $column : $v['name'];
                 $cell = array_get($value, $column);
