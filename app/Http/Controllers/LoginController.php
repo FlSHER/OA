@@ -100,7 +100,8 @@ class LoginController extends Controller {
      */
     public function logout() {
         session()->flush();
-        return redirect(route('login'));
+        $data = request()->only(['url']);
+        return redirect()->route('login')->with($data);
     }
 
     /**
@@ -134,7 +135,7 @@ class LoginController extends Controller {
     }
 
     /**
-     * 通过用户名获取Admin 
+     * 通过用户名获取Admin
      * @return object
      */
     private function getAdminByUsername($username) {
