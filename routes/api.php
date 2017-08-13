@@ -24,4 +24,5 @@ Route::group(['namespace' => 'Api', 'middleware' => 'apiPassport'], function() {
 Route::get('/get_auth_code', ['uses' => 'Api\OAuthController@getAuthCode']);
 Route::any('/get_token', ['uses' => 'Api\OAuthController@getAppToken']);
 Route::any('/refresh_token', ['uses' => 'Api\OAuthController@refreshAppToken']);
-Route::any('/get_dingtalk_access_token',['uses'=>'Api\DingtalkController@getDingTalkAccessToken']);//获取钉钉的accessToken
+Route::any('/get_dingtalk_access_token',['uses'=>'Api\DingtalkController@getAccessToken']);//获取钉钉的accessToken
+Route::any('/get_dingtalk_js_api_ticket',['uses'=>'Api\DingtalkController@getJsApiTicket']);//获取钉钉的jsApiTicket

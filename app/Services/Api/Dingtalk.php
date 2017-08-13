@@ -65,15 +65,17 @@ class Dingtalk {
      * 获取jsapi-ticket
      */
     private function getJsApiTicket() {
-        if (Cache::has('jsApiTicket')) {
-            return Cache::get('jsApiTicket');
-        } else {
-            $response = $this->getJsApiTicketApi(); //生成jsApiTicket
-            $jsApiTicket = $response['ticket'];
-            $time = floor($response['expires_in'] / 60);
-            Cache::put('jsApiTicket', $jsApiTicket, $time);
-            return $jsApiTicket;
-        }
+//        if (Cache::has('jsApiTicket')) {
+//            return Cache::get('jsApiTicket');
+//        } else {
+//            $response = $this->getJsApiTicketApi(); //生成jsApiTicket
+//            $jsApiTicket = $response['ticket'];
+//            $time = floor($response['expires_in'] / 60 - 1);
+//            Cache::put('jsApiTicket', $jsApiTicket, $time);
+//            return $jsApiTicket;
+//        }
+        $url = 'http://of.xigemall.com/api/get_dingtalk_js_api_ticket';
+        return Curl::build($url)->get();
     }
 
     /**
@@ -99,7 +101,7 @@ class Dingtalk {
 //        }
         $url = 'http://of.xigemall.com/api/get_dingtalk_access_token';
         return Curl::build($url)->get();
-        }
+    }
 
     /**
      * api获取accessToken

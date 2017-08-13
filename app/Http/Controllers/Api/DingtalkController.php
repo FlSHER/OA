@@ -7,7 +7,11 @@ use App\Http\Controllers\Controller;
 
 class DingtalkController extends Controller
 {
-   public function getDingTalkAccessToken(){
+   public function getAccessToken(){
        return app('Dingtalk')->getAccessToken();
+   }
+   
+   public function getJsApiTicket(){
+       return app('Dingtalk')->getJsApiTicket();
    }
 }
