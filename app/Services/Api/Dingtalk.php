@@ -64,7 +64,7 @@ class Dingtalk {
     /**
      * 获取jsapi-ticket
      */
-    private function getJsApiTicket() {
+    public function getJsApiTicket() {
 //        if (Cache::has('jsApiTicket')) {
 //            return Cache::get('jsApiTicket');
 //        } else {
