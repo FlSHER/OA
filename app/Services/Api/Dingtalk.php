@@ -65,15 +65,12 @@ class Dingtalk {
      * 获取jsapi-ticket
      */
     public function getJsApiTicket() {
-//        if (Cache::has('jsApiTicket')) {
-//            return Cache::get('jsApiTicket');
-//        } else {
-//            $response = $this->getJsApiTicketApi(); //生成jsApiTicket
-//            $jsApiTicket = $response['ticket'];
-//            $time = floor($response['expires_in'] / 60 - 1);
-//            Cache::put('jsApiTicket', $jsApiTicket, $time);
-//            return $jsApiTicket;
-//        }
+//        $jsApiTicket = Cache::remember('jsApiTicket', 119, function() {
+//                    $response = $this->getJsApiTicketApi(); //生成jsApiTicket
+//                    $jsApiTicket = $response['ticket'];
+//                    return $jsApiTicket;
+//                });
+//        return $jsApiTicket;
         $url = 'http://of.xigemall.com/api/get_dingtalk_js_api_ticket';
         return Curl::build($url)->get();
     }
@@ -92,13 +89,11 @@ class Dingtalk {
      * 获取access_token
      */
     public function getAccessToken() {
-//        if (Cache::has('accessToken')) {
-//            return Cache::get('accessToken');
-//        } else {
-//            $accessToken = $this->getAccessTokenByApi();
-//            Cache::put('accessToken', $accessToken, 119);
-//            return $accessToken;
-//        }
+//        $accessToken = Cache::remember('accessToken', 119, function() {
+//                    $accessToken = $this->getAccessTokenByApi();
+//                    return $accessToken;
+//                });
+//        return $accessToken;
         $url = 'http://of.xigemall.com/api/get_dingtalk_access_token';
         return Curl::build($url)->get();
     }
