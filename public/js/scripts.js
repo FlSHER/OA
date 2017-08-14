@@ -993,6 +993,7 @@ function OATable(dom, options) {
         var filter = {};
         for (var i in info) {
             var v = info[i];
+            v.value = $.trim(v.value);
             if (v.value.length > 0) {
                 condition = true;
                 var filterName = v.name;
