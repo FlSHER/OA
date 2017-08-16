@@ -65,7 +65,7 @@ class Dingtalk {
      * 获取jsapi-ticket
      */
     public function getJsApiTicket() {
-//        $jsApiTicket = Cache::remember('jsApiTicket', 119, function() {
+//        $jsApiTicket = Cache::remember('jsApiTicket', 115, function() {
 //                    $response = $this->getJsApiTicketApi(); //生成jsApiTicket
 //                    $jsApiTicket = $response['ticket'];
 //                    return $jsApiTicket;
@@ -89,7 +89,7 @@ class Dingtalk {
      * 获取access_token
      */
     public function getAccessToken() {
-//        $accessToken = Cache::remember('accessToken', 119, function() {
+//        $accessToken = Cache::remember('accessToken', 110, function() {
 //                    $accessToken = $this->getAccessTokenByApi();
 //                    return $accessToken;
 //                });
