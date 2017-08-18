@@ -20,9 +20,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'apiPassport'], function() {
     Route::any('/get_shop', ['uses' => 'HRMController@getShopInfo']); // 获取店铺信息
     Route::any('/get_brand', ['uses' => 'HRMController@getBrandInfo']); // 获取品牌信息
     Route::any('/get_position', ['uses' => 'HRMController@getPositionInfo']); // 获取职位信息
+    Route::any('/get_dingtalk_access_token', ['uses' => 'Api\DingtalkController@getAccessToken']); //获取钉钉的accessToken
+    Route::any('/get_dingtalk_js_api_ticket', ['uses' => 'Api\DingtalkController@getJsApiTicket']); //获取钉钉的jsApiTicket
 });
 Route::get('/get_auth_code', ['uses' => 'Api\OAuthController@getAuthCode']);
 Route::any('/get_token', ['uses' => 'Api\OAuthController@getAppToken']);
 Route::any('/refresh_token', ['uses' => 'Api\OAuthController@refreshAppToken']);
-Route::any('/get_dingtalk_access_token',['uses'=>'Api\DingtalkController@getAccessToken']);//获取钉钉的accessToken
-Route::any('/get_dingtalk_js_api_ticket',['uses'=>'Api\DingtalkController@getJsApiTicket']);//获取钉钉的jsApiTicket
