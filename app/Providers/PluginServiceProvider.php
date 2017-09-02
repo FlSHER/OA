@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Services\PluginService;
-use App\Services\DingdingApi;
 
 class PluginServiceProvider extends ServiceProvider {
 
@@ -31,9 +30,7 @@ class PluginServiceProvider extends ServiceProvider {
      */
     public function register() {
         $this->app->instance('Plugin', new PluginService);
-        $this->app->singleton('DingdingApi', function() {
-            return new DingdingApi();
-        });
+        $this->app->singleton('Dingtalk', \App\Services\Dingtalk\Dingtalk::class);
     }
 
     /**
@@ -42,7 +39,7 @@ class PluginServiceProvider extends ServiceProvider {
      * @return array
      */
     public function provides() {
-        return ['Plugin', 'DingdingApi'];
+        return ['Plugin', 'Dingtalk'];
     }
 
 }

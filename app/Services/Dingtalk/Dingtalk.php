@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace App\Services\Api;
+namespace App\Services\Dingtalk;
 
 /**
  * Description of Dingtalk
@@ -139,6 +139,17 @@ class Dingtalk {
                 '&timestamp=' . $timeStamp .
                 '&url=' . $url;
         return sha1($plain);
+    }
+
+    public function registerCallback() {
+        $accessToken = $this->getAccessToken();
+        $response = app('Curl')->setUrl('https://oapi.dingtalk.com/call_back/register_call_back?access_token=' . $accessToken)
+                ->sendMessageByPost([
+            'call_back_tag' => ['bpms_task_change', 'bpms_instance_change'],
+            'token' => '547368',
+            'aes_key' => 'RjBwV2lTT1hjckRVZmFiNmxQbDhLazlZQUUyY25jcWs',
+            'url' => 'http://of.xigemall.com/api/leave/callback',
+        ]);
     }
 
 }
