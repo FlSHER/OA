@@ -141,15 +141,41 @@ class Dingtalk {
         return sha1($plain);
     }
 
-    public function registerCallback() {
+    /**
+     * 注册钉钉回调URL
+     * @param type $callBackUrl
+     * @param type $callBackTag
+     * @return type
+     */
+    public function registerCallback($callBackUrl = 'http://of.xigemall.com/api/dingtalk/approval_callback', $callBackTag = ['bpms_task_change', 'bpms_instance_change']) {
         $accessToken = $this->getAccessToken();
         $response = app('Curl')->setUrl('https://oapi.dingtalk.com/call_back/register_call_back?access_token=' . $accessToken)
                 ->sendMessageByPost([
-            'call_back_tag' => ['bpms_task_change', 'bpms_instance_change'],
-            'token' => '547368',
-            'aes_key' => 'RjBwV2lTT1hjckRVZmFiNmxQbDhLazlZQUUyY25jcWs',
-            'url' => 'http://of.xigemall.com/api/leave/callback',
+            'call_back_tag' => $callBackTag,
+            'token' => config('dingding.token'),
+            'aes_key' => config('dingding.AESKey'),
+            'url' => $callBackUrl,
         ]);
+        return $response;
+    }
+
+    public function startApprovalProcess($agentId, $processCode, $approvers, $formData) {
+        $dingId = app('CurrentUser')->dingding;
+        $accessToken = $this->getAccessToken();
+        $userInfo = app('Curl')->setUrl('https://oapi.dingtalk.com/user/get?access_token=' . $accessToken . '&userid=' . $dingId)->get();
+        $departmentId = (string) $userInfo['department'][0];
+
+        $req = new SmartworkBpmsProcessinstanceCreateRequest;
+        $req->setAgentId($agentId);
+        $req->setProcessCode($processCode);
+        $req->setOriginatorUserId($dingId);
+        $req->setDeptId($departmentId);
+        $req->setApprovers($approvers);
+        // $req->setCcList("");
+        // $req->setCcPosition("FINISH");
+        $req->setFormComponentValues(json_encode($formData));
+        $dingTalk = app('DingTalk')->execute($req, $accessToken);
+        return $dingTalk;
     }
 
 }

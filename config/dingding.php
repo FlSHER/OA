@@ -21,4 +21,12 @@ return [
      * 签名随机字符串
      */
     'nonceStr' => 'EGh32fgTue345',
+    /**
+     * 加解密token
+     */
+    'token'=>'AQMy1QHJ',
+    /**
+     * 加解密密钥，必须为43位
+     */
+    'AESKey'=>'RjBwV2lTT1hjckRVZmFiNmxQbDhLazlZQUUyY25jcWs',
 ];
