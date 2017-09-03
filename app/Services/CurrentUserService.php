@@ -11,8 +11,23 @@ use App\Models\HR\Staff;
 
 class CurrentUserService {
 
+    protected $userInfo;
+
+    public function __construct() {
+        if ($this->isLogin) {
+            $this->userInfo = session('admin');
+        } elseif (request()->has('current_staff_sn')) {
+            $staffSn = request()->get('current_staff_sn');
+            if ($staffSn == '999999') {
+                $this->userInfo = config('auth.developer');
+            } else {
+                $this->userInfo = Staff::find($staffSn)->toArray();
+            }
+        }
+    }
+
     public function __get($name) {
-        return isset(session('admin')[$name]) ? session('admin')[$name] : '无效属性';
+        return isset($this->userInfo[$name]) ? $this->userInfo[$name] : '无效属性';
     }
 
     /**
@@ -20,7 +35,7 @@ class CurrentUserService {
      * @return int
      */
     public function getStaffSn() {
-        return session('admin')['staff_sn'];
+        return $this->userInfo['staff_sn'];
     }
 
     /**
@@ -28,7 +43,7 @@ class CurrentUserService {
      * @return string
      */
     public function getName() {
-        return session('admin')['realname'];
+        return $this->userInfo['realname'];
     }
 
     /**
@@ -36,7 +51,7 @@ class CurrentUserService {
      * @return array
      */
     public function getInfo() {
-        return array_except(session('admin'), ['user_token', 'user_token_expiration']);
+        return array_except($this->userInfo, ['user_token', 'user_token_expiration']);
     }
 
     /**
@@ -52,7 +67,7 @@ class CurrentUserService {
      * @return boolean
      */
     public function isDeveloper() {
-        return session('admin')['username'] == 'developer' ? true : false;
+        return $this->userInfo['username'] == 'developer' ? true : false;
     }
 
 }

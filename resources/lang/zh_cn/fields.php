@@ -221,7 +221,7 @@ return [
             'auditor.*.auditor_staff_sn' => '审核人编号',
             'auditor.*.auditor_realname' => '审核人',
         ],
-        //配置审批人 
+        //配置审批人
         'approver' => [
             'department_id' => "部门",
             'reim_department_id' => "资金归属",
@@ -229,19 +229,19 @@ return [
             'approver2' => '二级审批',
             'approver3' => '三级审批',
         ],
-        //待审核通过 
+        //待审核通过
         'audit' => [
             'reim_id' => "报销单id",
             'expenses' => '明细',
             'expenses.*.id' => "消费明细id",
             'expenses.*.audited_cost' => '审核金额',
         ],
-        //驳回 
+        //驳回
         'reject' => [
             'id' => '当前报销单id',
             'remarks' => '驳回原因',
         ],
     ],
     /* ----------报销end--------------- */
-]; 
- 
+];
+
