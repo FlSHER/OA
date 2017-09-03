@@ -24,9 +24,10 @@ Route::group(['namespace' => 'Api', 'middleware' => 'apiPassport'], function() {
     Route::any('/get_dingtalk_js_api_ticket', ['uses' => 'DingtalkController@getJsApiTicket']); //获取钉钉的jsApiTicket
     Route::group(['prefix' => 'dingtalk'], function() {
         Route::any('/start_approval', ['uses' => 'DingtalkController@startApproval']); //发起钉钉审批
-        Route::any('/approval_callback', ['uses' => 'DingtalkController@approvalCallback']); //钉钉审批回调
     });
 });
 Route::get('/get_auth_code', ['uses' => 'Api\OAuthController@getAuthCode']);
 Route::any('/get_token', ['uses' => 'Api\OAuthController@getAppToken']);
 Route::any('/refresh_token', ['uses' => 'Api\OAuthController@refreshAppToken']);
+
+Route::any('/approval_callback', ['uses' => 'DingtalkController@approvalCallback']); //钉钉审批回调

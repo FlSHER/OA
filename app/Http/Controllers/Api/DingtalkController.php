@@ -17,7 +17,7 @@ class DingtalkController extends Controller {
     }
 
     public function startApproval(Request $request) {
-        app('Dingtalk')->registerCallback();
+        app('Dingtalk')->startApprovalProcess();
     }
 
     public function approvalCallback(Request $request) {
