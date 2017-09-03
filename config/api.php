@@ -1,8 +1,7 @@
 <?php
 
-$reimbursePath = 'http://120.77.14.132:8001/';
+$reimbursePath = 'http://120.77.14.132:8001/';//报销
 $crmPath = 'http://120.77.14.132:8003/';
-//$workflow ='http://192.168.1.42:8001/';
 $workflow = 'http://192.168.1.63:802/';
 $transfer = 'http://192.168.1.117:8002/api/transfer/';  //调动
 $holiday = 'http://192.168.1.117:8002/api/holiday/'; //请假
@@ -14,16 +13,6 @@ return [
     'url' => [
         'reimburse' => [
             'base' => $reimbursePath,
-            'list' => $reimbursePath . 'api/reimburse/list', //获取报销列表
-            'detail' => $reimbursePath . 'api/reimburse/detail', //获取报销详情
-            'print' => $reimbursePath . 'api/reimburse/print', //打印报销单
-            'history' => $reimbursePath . 'api/reimburse/history', //获取已审核报销列表
-            'audited' => $reimbursePath . 'api/reimburse/audited', //获取会计已审核报销列表
-            'rejected' => $reimbursePath . 'api/reimburse/rejected', //已驳回报销单
-            'reject' => $reimbursePath . 'api/reimburse/reject', //驳回
-            'agree' => $reimbursePath . 'api/reimburse/audit', //通过
-            'delete' => $reimbursePath . 'api/reimburse/delete', //删除
-            'expenses' => $reimbursePath . 'api/reimburse/expenses', //获取消费明细
             'approverCache' => $reimbursePath . 'api/reimburse/approverCache', //审批人信息存入缓存
         ],
         'crm' => [
