@@ -168,13 +168,60 @@ return [
     /* ---------------工作流end-------------- */
     /* -------------报销start---------------- */
     'reimburse' => [
-        //审核
+        /*----------导出翻译字段start------*/
+        'reim_sn' => '编号',
+        'description' => '标题描述',
+        'remark' => '备注',
+        'payee_name' => '收款人',
+        'payee_bank_account' => '银行卡号',
+        'payee_bank_other' => '银行',
+        'payee_phone' => '手机',
+        'payee_province' => '开户所在省',
+        'payee_city' => '开户所在市',
+        'payee_bank_dot' => '开户网点',
+        'status' => [
+            'name' => '状态',
+        ],
+        'staff_sn' => '工号',
+        'realname' => '姓名',
+        'department_id' => '部门id',
+        'department_name' => '部门',
+        'approver_staff_sn' => '审批人编号',
+        'approver_name' => '审批人',
+        'accountant_staff_sn' => '审核人编号',
+        'accountant_name' => '审核人',
+        'reim_department' => [
+            'name' => '资金归属',
+        ],
+        'send_cost' => '提交金额',
+        'approved_cost' => '审核前金额',
+        'audited_cost' => '审核后金额',
+        'create_time' => '创建时间',
+        'send_time' => '提交时间',
+        'approve_time' => '审批时间',
+        'audit_time' => '审核时间',
+        'reject_staff_sn' => '驳回人编号',
+        'reject_name' => '驳回人',
+        'reject_time' => '驳回时间',
+        'reject_remarks' => '驳回原因',
+        'expenses.*' => [
+            'date' => '明细时间',
+            'description' => '明细描述',
+            'send_cost' => '审核前费用',
+            'audited_cost' => '审核后费用',
+            'type' => [
+                'name' => '类型',
+            ],
+        ],
+        /*----------导出翻译字段end-----*/
+
+//配置审核人
         'auditor' => [
             'name' => '资金归属',
             'auditor.*.auditor_staff_sn' => '审核人编号',
             'auditor.*.auditor_realname' => '审核人',
         ],
-        //审批
+        //配置审批人 
         'approver' => [
             'department_id' => "部门",
             'reim_department_id' => "资金归属",
@@ -182,7 +229,19 @@ return [
             'approver2' => '二级审批',
             'approver3' => '三级审批',
         ],
+        //待审核通过 
+        'audit' => [
+            'reim_id' => "报销单id",
+            'expenses' => '明细',
+            'expenses.*.id' => "消费明细id",
+            'expenses.*.audited_cost' => '审核金额',
+        ],
+        //驳回 
+        'reject' => [
+            'id' => '当前报销单id',
+            'remarks' => '驳回原因',
+        ],
     ],
-        /* ----------报销end--------------- */
-];
-
+    /* ----------报销end--------------- */
+]; 
+ 

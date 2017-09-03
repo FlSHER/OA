@@ -155,6 +155,7 @@ return [
         App\Providers\ToolServiceProvider::class,
         App\Providers\SystemServiceProvider::class,
         App\Providers\PluginServiceProvider::class,
+        App\Providers\AppServiceProvider::class,
     ],
     /*
       |--------------------------------------------------------------------------
