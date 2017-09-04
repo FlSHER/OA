@@ -400,17 +400,17 @@ class AuditService
     /**
      * 撤回 （查看报销单）
      */
-    public function checkReimburseReply($reim_id)
+    public function checkReimburseRestore($reim_id)
     {
         $data = Reimbursement::find($reim_id);
         if ($data->status_id == 4) {
-            $this->replySave($data);
+            $this->restoreSave($data);
             return 'success';
         }
         return 'error';
     }
 
-    private function replySave($data)
+    private function restoreSave($data)
     {
         DB::transaction(function () use ($data) {
             $data->status_id = 3;
