@@ -394,7 +394,7 @@ class AuditService
      */
     public function getReimDepartmentName()
     {
-        return Reim_department::get();
+        return Reim_department::withTrashed()->get();
     }
 
 
