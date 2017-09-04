@@ -243,6 +243,7 @@ class AuditService
         }
         $expense_where = ['expenses' => function ($query) {
             $query->where('is_audited', '=', 1);
+            $query->orderBy('date','asc');
         }];
         $result = app('Plugin')->dataTables($request, Reimbursement::with('expenses.type')->with($expense_where), $where);
         return $result['data'];
