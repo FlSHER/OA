@@ -39,7 +39,7 @@ class SystemServiceProvider extends ServiceProvider {
         /**
          * 当前用户
          */
-        $this->app->instance('CurrentUser', new CurrentUserService);
+        $this->app->singleton('CurrentUser', CurrentUserService::class);
     }
 
 }
