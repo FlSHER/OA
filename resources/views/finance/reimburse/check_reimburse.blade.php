@@ -109,7 +109,7 @@
     <script>
         //查看报销单的撤回权限
         var reply_button = false;
-        <?php if ($authority->checkAuthority(33)) { ?>
+        <?php if ($authority->checkAuthority(119)) { ?>
             reply_button = true;
         <?php } ?>
         /**
