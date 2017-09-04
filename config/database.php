@@ -75,11 +75,11 @@ return [
         //报销
         'reimburse_mysql' => [
             'driver' => 'mysql',
-            'host' => '120.77.14.132',
-            'port' => '13000',
+            'host' => '192.168.1.6',
+            'port' => '3306',
             'database' => 'reimburse',
-            'username' => 'reimburse',
-            'password' => 'reimburse',
+            'username' => 'root',
+            'password' => 'root',
             'charset' => 'utf8',
             'collation' => 'utf8_general_ci',
             'prefix' => 'bx_',
