@@ -55,8 +55,8 @@ class CheckReimburseController extends Controller
      * 撤回
      * @param Request $request
      */
-    public function reply(Request $request){
+    public function restore(Request $request){
         $reim_id = $request->reim_id;
-        return app('AuditService')->checkReimburseReply($reim_id);
+        return app('AuditService')->checkReimburseRestore($reim_id);
     }
 }

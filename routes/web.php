@@ -34,7 +34,7 @@ Route::group(['middleware' => 'admin'], function () {
             Route::post('/audited', ['uses' => 'CheckReimburseController@getAllAuditedList']);//ajax获取所有已审核报销单
             Route::post('/expenses', ['uses' => 'CheckReimburseController@getCheckReimburseExpenses']);//ajax获取消费明细报销单
             Route::get('/print/{reim_id}', ['uses' => 'CheckReimburseController@checkReimbursePrint']); //打印审核明细
-            Route::post('/reply', ['uses' => 'CheckReimburseController@reply']);//撤回已审核单
+            Route::post('/restore', ['uses' => 'CheckReimburseController@restore']);//撤回已审核单
         });
     });
     /* -- 人事系统 -- */

@@ -99,7 +99,7 @@ function createDataTable() {
                 createdCell: function (nTd, sData, oData, iRow, iCol) {
                     var html = '<a target="_blank" href="/finance/check_reimburse/print/' + sData + '" class="btn btn-sm btn-default print" title="打印"><i class="fa fa-print"></i></a>';//打印
                     if (reply_button) {//撤回权限
-                        html += ' <button class = "btn btn-sm btn-danger" title = "撤回" onclick="reply(' + sData + ')"><i class = "fa fa-reply"></i></button>';
+                        html += ' <button class = "btn btn-sm btn-danger" title = "撤回" onclick="restore(' + sData + ')"><i class = "fa fa-reply"></i></button>';
                     }
                     $(nTd).html(html).css("padding", "6px");
                 }
@@ -305,9 +305,9 @@ function expensesBillsClick(pic_path_str, description, cost) {
  * 撤回（操作）
  * @param id
  */
-function reply(id) {
+function restore(id) {
     if (confirm('确认撤回')) {
-        var url = '/finance/check_reimburse/reply/';
+        var url = '/finance/check_reimburse/restore';
         $.post(url, {reim_id: id}, function (msg) {
             if (msg === 'success') {
                 hTable.draw();
