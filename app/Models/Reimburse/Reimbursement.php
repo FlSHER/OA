@@ -15,7 +15,7 @@ class Reimbursement extends Model
      * 资金归属
      */
     public function reim_department() {
-        return $this->belongsTo('App\Models\Reimburse\Reim_department');
+        return $this->belongsTo('App\Models\Reimburse\Reim_department')->withTrashed();
     }
 
     public function expenses() {//消费明细
