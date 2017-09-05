@@ -139,13 +139,13 @@ class StaffRequest extends FormRequest {
                 'info.living_province_id' => $this->info['living_province_id'] == 0 ? [] : ['exists:i_district,id,level,1'],
                 'info.living_city_id' => $this->info['living_city_id'] == 0 ? [] : ['exists:i_district,id,level,2'],
                 'info.living_county_id' => $this->info['living_county_id'] == 0 ? [] : ['exists:i_district,id,level,3'],
-                'relative.*.relative_sn' => ['required_with:relative.*.pivot.relative_name'],
+                'relative.*.pivot.relative_sn' => ['required_with:relative.*.pivot.relative_name'],
                 'relative.*.pivot.relative_type' => ['required'],
                 'relative.*.pivot.relative_name' => ['required'],
             ];
         }
         if ($this->operationMatch($operationType, ['edit'])) {
-            $formValidatorPersonal['relative.*.relative_sn'][] = 'different:staff_sn';
+            $formValidatorPersonal['relative.*.pivot.relative_sn'][] = 'different:staff_sn';
         }
         $this->validator = array_collapse([$this->validator, $formValidator, $formValidatorOrganic, $formValidatorPersonal]);
     }
