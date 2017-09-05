@@ -27,7 +27,10 @@ class AuditService
     {
         $staff_sn = session()->get('admin')['staff_sn'];
         $result['data'] = [];
-        $reim_department_id_array = Auditor::where('auditor_staff_sn', $staff_sn)->pluck('reim_department_id');//当前审核人的审核权限资金归属id 
+        $result['draw'] = 2;
+        $result['recordsFiltered'] = 0;
+        $result['recordsTotal'] = 0;
+        $reim_department_id_array = Auditor::where('auditor_staff_sn', $staff_sn)->pluck('reim_department_id');//当前审核人的审核权限资金归属id
         if (count($reim_department_id_array) > 0) {//当前用户在审核人中 
             $reim_department_id_str = implode(',', $reim_department_id_array->toArray());
             $where = 'status_id = 3 and reim_department_id in (' . $reim_department_id_str . ')';
