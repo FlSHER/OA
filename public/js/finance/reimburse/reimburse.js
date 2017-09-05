@@ -229,7 +229,6 @@ function createDataTable() {
                 "title": "操作", "data": "id", "name": "id", "class": "text-center", "sortable": false,
                 "createdCell": function (nTd, sData, oData, iRow, iCol) {
                     var html = '<button class = "btn btn-sm btn-danger" onclick="deleteReject(' + sData + ')" title = "删除"><i class = "fa fa-trash-o"></i></button>';
-                    console.log(html);
                     $(nTd).html(html).css("padding", "6px");
                 }
             }
