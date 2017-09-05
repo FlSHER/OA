@@ -93,7 +93,7 @@ function createDataTable() {
         //     }
         // ]
         'order': [[6, 'desc']],
-        'scrollY':586
+        'scrollY': 586
     });
     //已审核报销单列表数据
     hTable = $('#history-table').oaTable({
@@ -169,13 +169,13 @@ function createDataTable() {
         ],
         filter: $("#searchApproved"),//搜索
         'order': [[8, 'desc']],
-        'scrollY':586
+        'scrollY': 586
     });
     //已驳回报销单列表数据
     rTable = $('#reject-table').oaTable({
         "columns": [
             {
-                "title": "详情", "data": "id", "name": "id", "class": "text-center",'sortable':false,
+                "title": "详情", "data": "id", "name": "id", "class": "text-center", 'sortable': false,
                 "render": function (data, type, row, meta) {
                     return '<i class = "fa fa-plus-circle show_expense" style = "font-size:20px;cursor:pointer;" reim-id = "' + data + '"></i>';
                 }
@@ -228,14 +228,15 @@ function createDataTable() {
             {
                 "title": "操作", "data": "id", "name": "id", "class": "text-center", "sortable": false,
                 "createdCell": function (nTd, sData, oData, iRow, iCol) {
-                    var html = '<button class = "btn btn-sm btn-danger delete" onclick="deleteReject(' + sData + ')" title = "删除"><i class = "fa fa-trash-o"></i></button>';
+                    var html = '<button class = "btn btn-sm btn-danger" onclick="deleteReject(' + sData + ')" title = "删除"><i class = "fa fa-trash-o"></i></button>';
+                    console.log(html);
                     $(nTd).html(html).css("padding", "6px");
                 }
             }
         ],
         "ajax": {"url": "/finance/reimburse/rejected"},
         "scrollX": 1000,
-        'scrollY':586,
+        'scrollY': 586,
         "dom": "<'row'<'col-sm-3'l><'col-sm-6'B><'col-sm-3'f>r>" +
         "t" +
         "<'row'<'col-sm-5'i><'col-sm-7'p>>",
@@ -591,7 +592,7 @@ function confirm_reject(_self) {
             } else if (msg.msg === "success") {
                 $('#myModals .close').click();
                 oTable.draw();
-            }else if(msg =='warning'){
+            } else if (msg == 'warning') {
                 alert(msg.result);
             }
         },
