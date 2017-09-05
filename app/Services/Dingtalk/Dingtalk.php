@@ -15,6 +15,7 @@ namespace App\Services\Dingtalk;
  */
 use Curl;
 use Cache;
+use App\Models\HR\Staff;
 
 class Dingtalk {
 
@@ -65,14 +66,14 @@ class Dingtalk {
      * 获取jsapi-ticket
      */
     public function getJsApiTicket() {
-//        $jsApiTicket = Cache::remember('jsApiTicket', 115, function() {
-//                    $response = $this->getJsApiTicketApi(); //生成jsApiTicket
-//                    $jsApiTicket = $response['ticket'];
-//                    return $jsApiTicket;
-//                });
-//        return $jsApiTicket;
-        $url = 'http://of.xigemall.com/api/get_dingtalk_js_api_ticket';
-        return Curl::build($url)->get();
+        $jsApiTicket = Cache::remember('jsApiTicket', 115, function() {
+                    $response = $this->getJsApiTicketApi(); //生成jsApiTicket
+                    $jsApiTicket = $response['ticket'];
+                    return $jsApiTicket;
+                });
+        return $jsApiTicket;
+//        $url = 'http://of.xigemall.com/api/get_dingtalk_js_api_ticket';
+//        return Curl::build($url)->get();
     }
 
     /**
@@ -89,13 +90,13 @@ class Dingtalk {
      * 获取access_token
      */
     public function getAccessToken() {
-//        $accessToken = Cache::remember('accessToken', 110, function() {
-//                    $accessToken = $this->getAccessTokenByApi();
-//                    return $accessToken;
-//                });
-//        return $accessToken;
-        $url = 'http://of.xigemall.com/api/get_dingtalk_access_token';
-        return Curl::build($url)->get();
+        $accessToken = Cache::remember('accessToken', 110, function() {
+                    $accessToken = $this->getAccessTokenByApi();
+                    return $accessToken;
+                });
+        return $accessToken;
+//        $url = 'http://of.xigemall.com/api/get_dingtalk_access_token';
+//        return Curl::build($url)->get();
     }
 
     /**
@@ -147,23 +148,28 @@ class Dingtalk {
      * @param type $callBackTag
      * @return type
      */
-    public function registerCallback($callBackUrl = 'http://of.xigemall.com/api/dingtalk/approval_callback', $callBackTag = ['bpms_task_change', 'bpms_instance_change']) {
+    public function registerCallback($callBackUrl, $callBackTag) {
         $accessToken = $this->getAccessToken();
-        $response = app('Curl')->setUrl('https://oapi.dingtalk.com/call_back/register_call_back?access_token=' . $accessToken)
-                ->sendMessageByPost([
+        $registerMessage = [
             'call_back_tag' => $callBackTag,
             'token' => config('dingding.token'),
             'aes_key' => config('dingding.AESKey'),
             'url' => $callBackUrl,
-        ]);
+        ];
+        $response = app('Curl')->setUrl(config('dingding.server_api') . 'call_back/register_call_back?access_token=' . $accessToken)->sendMessageByPost($registerMessage);
+        if ($response['errcode'] == 71006) {
+            $response = app('Curl')->setUrl(config('dingding.server_api') . 'call_back/update_call_back?access_token=' . $accessToken)->sendMessageByPost($registerMessage);
+        }
         return $response;
     }
 
-    public function startApprovalProcess($agentId, $processCode, $approvers, $formData) {
+    public function startApprovalProcess($agentId, $processCode, $approvers_sn, $formData) {
         $dingId = app('CurrentUser')->dingding;
         $accessToken = $this->getAccessToken();
         $userInfo = app('Curl')->setUrl('https://oapi.dingtalk.com/user/get?access_token=' . $accessToken . '&userid=' . $dingId)->get();
         $departmentId = (string) $userInfo['department'][0];
+        $approvers = $this->getApproversDingtalkId($approvers_sn);
+        $realFormData = $this->makeRealFormData($formData);
 
         $req = new SmartworkBpmsProcessinstanceCreateRequest;
         $req->setAgentId($agentId);
@@ -173,9 +179,30 @@ class Dingtalk {
         $req->setApprovers($approvers);
         // $req->setCcList("");
         // $req->setCcPosition("FINISH");
-        $req->setFormComponentValues(json_encode($formData));
-        $dingTalk = app('DingTalk')->execute($req, $accessToken);
-        return $dingTalk;
+        $req->setFormComponentValues(json_encode($realFormData));
+        $dingTalk = new DingTalkClient;
+        $response = $dingTalk->execute($req, $accessToken);
+        dd($response);
+    }
+
+    protected function makeRealFormData($formData) {
+        $response = [];
+        foreach ($formData as $k => $v) {
+            $response[] = ['name' => $k, 'value' => $v];
+        }
+        return $response;
+    }
+
+    protected function getApproversDingtalkId($approvers) {
+        if (is_array($approvers)) {
+            $response = [];
+            foreach ($approvers as $v) {
+                $response[] = Staff::find($v)->dingding;
+            }
+        } else {
+            $response = Staff::find($approvers)->dingding;
+        }
+        return $response;
     }
 
 }
