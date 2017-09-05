@@ -14,7 +14,7 @@ class CurrentUserService {
     protected $userInfo;
 
     public function __construct() {
-        if ($this->isLogin) {
+        if ($this->isLogin()) {
             $this->userInfo = session('admin');
         } elseif (request()->has('current_staff_sn')) {
             $staffSn = request()->get('current_staff_sn');
