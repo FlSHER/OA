@@ -7,7 +7,6 @@ use App\Models\Reimburse\Reimbursement;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Services\EncyptionService;
-use App\Services\Finance\Reimburse\AuditAuthority;
 
 class ReimburseController extends Controller
 {
@@ -27,7 +26,21 @@ class ReimburseController extends Controller
      */
     public function getHandleList(Request $request)
     {
-        return app('AuditService')->getAuditListData($request);
+        return $this->getHandleData($request);
+    }
+
+    private function getHandleData($request)
+    {
+        $reim_deparment_arr = app('AuditService')->getReimDepartmentId();
+        if (!$reim_deparment_arr) {
+            $result['data'] = [];
+            $result['draw'] = 2;
+            $result['recordsFiltered'] = 0;
+            $result['recordsTotal'] = 0;
+        } else {
+            $result = app('Plugin')->dataTables($request, Reimbursement::where('status_id', 3)->whereIn('reim_department_id', $reim_deparment_arr));
+        }
+        return $result;
     }
 
     /**
@@ -35,7 +48,7 @@ class ReimburseController extends Controller
      * @param Request $request
      * @return json
      */
-    public function getExpensesByReimId(Request $request)
+    public function getReimburseExpenses(Request $request)
     {
         //模型条件（查询审批通过的单 is_approved =1的）
         $expensesWHere = [
@@ -43,7 +56,8 @@ class ReimburseController extends Controller
                 $query->where('is_approved', '=', 1);
             }
         ];
-        return app('AuditService')->getReimIdExpenses($request->reim_id, $expensesWHere);
+        $data = Reimbursement::with('expenses.type', 'expenses.bills')->with($expensesWHere)->find($request->reim_id);
+        return $data;
 
     }
 
@@ -53,9 +67,9 @@ class ReimburseController extends Controller
      * @param Request $request
      * @return string
      */
-    public function agree(Request $request, AuditAuthority $auth)
+    public function agree(Request $request)
     {
-        $auditAuth = $auth->getAuditAuthority($request->reim_id);
+        $auditAuth = app('AuditService')->getAuditAuthority($request->reim_id);
         if ($auditAuth['msg'] != 'success') {
             return $auditAuth;
         }
@@ -66,7 +80,7 @@ class ReimburseController extends Controller
             'expenses.*.audited_cost' => 'required|regex:/^[0-9]+(.[0-9]{1,2})?$/',
         ], [], trans('fields.reimburse.audit')
         );
-        return app('AuditService')->saveAudit($request);
+        return app('AuditRepository')->saveAudit($request);
     }
 
     /**
@@ -74,9 +88,9 @@ class ReimburseController extends Controller
      * @param Request $request
      * @return string
      */
-    public function reject(Request $request, AuditAuthority $auth)
+    public function reject(Request $request)
     {
-        $auditAuth = $auth->getAuditAuthority($request->id);
+        $auditAuth = app('AuditService')->getAuditAuthority($request->id);
         if ($auditAuth['msg'] != 'success') {
             return $auditAuth;
         }
@@ -86,7 +100,7 @@ class ReimburseController extends Controller
             'remarks' => 'required|string',
         ], [], trans('fields.reimburse.reject'));
 
-        return app('AuditService')->reject($request);
+        return app('AuditRepository')->reject($request);
     }
 
 
@@ -98,12 +112,11 @@ class ReimburseController extends Controller
      */
     public function printReimbursement(Request $request)
     {
-        $data = app('AuditService')->printReimburse($request);
+        $data = app('AuditRepository')->printReimburse($request);
         if ($data['msg'] != 1) {
             return $data['result'];
         }
         $reim = $data['result'];
-
         return view('finance.reimburse.reimburse_print', ['data' => $reim]);
     }
 
@@ -115,9 +128,9 @@ class ReimburseController extends Controller
      */
     public function getAuditedList(Request $request)
     {
-        $staff_sn = session()->get('admin')['staff_sn'];
-        $where = 'accountant_staff_sn = ' . $staff_sn . ' and ';
-        return app('AuditService')->getAuditedReimburseList($request, $where);
+        $where = ['status_id' => 4, 'accountant_staff_sn' => app('CurrentUser')->staff_sn];
+        $result = app('Plugin')->dataTables($request, Reimbursement::where($where));
+        return $result;
     }
 
 
@@ -128,7 +141,11 @@ class ReimburseController extends Controller
      */
     public function getRejectedList(Request $request)
     {
-        return app('AuditService')->getAuditRejectList($request);
+        $staff_sn = app('CurrentUser')->staff_sn;
+        $where = ['reject_staff_sn' => $staff_sn, 'accountant_delete' => 0];
+        $whereNotNull = 'approve_time';
+        $result = app('Plugin')->dataTables($request, Reimbursement::where($where)->whereNotNull($whereNotNull));
+        return $result;
     }
 
 
@@ -137,9 +154,16 @@ class ReimburseController extends Controller
      * @param Request $request
      * @return mixed
      */
-    public function delete(Request $request)
+    public function deleteReject(Request $request)
     {
-        return app('AuditService')->deleteRejectAudit($request);
+        $staff_sn = app('CurrentUser')->staff_sn;
+        $reimburse = Reimbursement::where('reject_staff_sn', $staff_sn)->where('approve_time', '!=', null)->find($request->id);
+        if (count($reimburse) < 1) {
+            return ['msg' => 'error', 'result' => '你不能进行删除！该报销单不是你审核的'];
+        }
+        $reimburse->accountant_delete = 1;
+        $reimburse->save();
+        return ['msg' => 'success'];
 
     }
 
@@ -149,7 +173,7 @@ class ReimburseController extends Controller
      */
     public function exportAsExcel(Request $request)
     {
-        return $data = app('AuditService')->exportExcel($request);
+        return $data = app('AuditRepository')->exportExcel($request);
     }
 
 
