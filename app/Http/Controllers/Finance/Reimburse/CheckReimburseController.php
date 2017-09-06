@@ -23,7 +23,9 @@ class CheckReimburseController extends Controller
      */
     public function getAllAuditedList(Request $request)
     {
-        return app('AuditService')->getAuditedReimburseList($request);
+        $where = ['status_id'=>4];
+        $result = app('Plugin')->dataTables($request, Reimbursement::where($where));
+        return $result;
     }
 
     /**
@@ -36,18 +38,20 @@ class CheckReimburseController extends Controller
         $expensesWHere = [
             'expenses' => function ($query) {
                 $query->where('is_audited', '=', 1);
-                $query->orderBy('date','asc');
+                $query->orderBy('date', 'asc');
             }
         ];
-        return app('AuditService')->getReimIdExpenses($request->reim_id, $expensesWHere);
+        $data = Reimbursement::with('expenses.type', 'expenses.bills')->with($expensesWHere)->find($request->reim_id);
+        return $data;
     }
 
     /**
      * 打印 (查看报销单)
      * @param Request $request
      */
-    public function checkReimbursePrint(Request $request){
-        $reim = app('AuditService')->getCheckReimbursePrint($request->reim_id);
+    public function checkReimbursePrint(Request $request)
+    {
+        $reim = app('AuditRepository')->getCheckReimbursePrint($request->reim_id);
         return view('finance.reimburse.reimburse_print', ['data' => $reim]);
     }
 
@@ -55,8 +59,9 @@ class CheckReimburseController extends Controller
      * 撤回
      * @param Request $request
      */
-    public function restore(Request $request){
+    public function restore(Request $request)
+    {
         $reim_id = $request->reim_id;
-        return app('AuditService')->checkReimburseRestore($reim_id);
+        return app('AuditRepository')->checkReimburseRestore($reim_id);
     }
 }
