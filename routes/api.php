@@ -30,4 +30,5 @@ Route::get('/get_auth_code', ['uses' => 'Api\OAuthController@getAuthCode']);
 Route::any('/get_token', ['uses' => 'Api\OAuthController@getAppToken']);
 Route::any('/refresh_token', ['uses' => 'Api\OAuthController@refreshAppToken']);
 
-Route::any('/approval_callback', ['uses' => 'DingtalkController@approvalCallback']); //钉钉审批回调
+Route::get('/dingtalk/register_approval_callback',['uses'=>'Api\DingtalkController@registerApprovalCallback']);//注册钉钉审批回调
+Route::any('/dingtalk/approval_callback', ['uses' => 'Api\DingtalkController@approvalCallback']); //钉钉审批回调

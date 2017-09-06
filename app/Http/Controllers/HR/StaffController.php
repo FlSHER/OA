@@ -47,9 +47,10 @@ class StaffController extends Controller {
      */
     public function getStaffList(Request $request) {
         $staffModel = $this->model;
-        if ($request->get('with_auth') !== false) {
-            $staffModel = $staffModel::visible();
-        }
+//        //员工列表的权限验证
+//        if ($request->get('with_auth') !== false) {
+//            $staffModel = $staffModel::visible();
+//        }
         return app('Plugin')->dataTables($request, $staffModel);
     }
 
