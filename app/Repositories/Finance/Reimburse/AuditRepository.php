@@ -157,7 +157,7 @@ class AuditRepository
      */
     public function exportExcel($request)
     {
-        $path = 'finance/reimburse/export';
+        $path = 'finance/reimburse/export/';
         $trans = 'fields.reimburse';
         $fileName = app('CurrentUser')->realname . '已审核单';
         if($request->type=='all'){
