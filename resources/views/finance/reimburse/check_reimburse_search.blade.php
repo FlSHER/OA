@@ -207,7 +207,7 @@
                 $('#department_filter').find('input').removeAttr('name');
             }
         });
-        $("#filter form").on("reset", function () {
+        $("#check_reimburse_search form").on("reset", function () {
             $(this).find('input,select').val('').change();
         });
     };
