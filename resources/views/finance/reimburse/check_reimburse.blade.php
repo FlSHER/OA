@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="{{source('plug_in/daterangepicker/daterangepicker.css')}}"/>
     <!--viewerjs-->
     <link rel="stylesheet" href="{{source('plug_in/viewerjs/css/viewer.css')}}"/>
+    <!-- checkbox -->
+    <link rel="stylesheet" href="{{source('css/checkbox.css')}}"/>
+    <!-- zTree css -->
+    <link rel="stylesheet" href="{{source('plug_in/ztree/css/metroStyle.css')}}"/>
 @endsection
 
 @section('content')
@@ -106,11 +110,14 @@
     <script type="text/javascript" src="{{source('plug_in/daterangepicker/daterangepicker.js')}}"></script>
     <!--viewerjs-->
     <script src="{{source('plug_in/viewerjs/js/viewer.js')}}"></script>
+    <!-- zTree js -->
+    <script type="text/javascript" src="{{source('plug_in/ztree/js/jquery.ztree.all.js')}}"></script>
     <script>
         //查看报销单的撤回权限
         var reply_button = false;
         <?php if ($authority->checkAuthority(119)) { ?>
             reply_button = true;
+
         <?php } ?>
         /**
          * 详情图片调用
