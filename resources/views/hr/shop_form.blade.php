@@ -2,7 +2,11 @@
     <div class="form-group">
         <label class="control-label col-lg-3">*店铺代码</label>
         <div class="col-lg-8">
+            @if($type == 'add')
             <input class="form-control" name="shop_sn" type="text" title="店铺代码"/>
+            @else
+            <input class="form-control" name="shop_sn" type="text" title="店铺代码" readonly>
+            @endif
         </div>
     </div>
     <div class="form-group">

@@ -43,7 +43,7 @@
         <div class="modal-content">
             <form id="addForm" name="addForm" class="form-horizontal" method="post" action="{{source(route('hr.shop.submit'))}}">
                 @inject('HRM','HRM')
-                @include('hr/shop_form')
+                @include('hr/shop_form',['type'=>'add'])
             </form>
         </div>
     </div>
@@ -59,7 +59,7 @@
         </div>
         <div class="modal-content">
             <form id="editForm" name="editForm" class="form-horizontal" method="post" action="{{source(route('hr.shop.submit'))}}">
-                @include('hr/shop_form')
+                @include('hr/shop_form',['type'=>'edit'])
                 <input type="hidden" name="id" >
             </form>
         </div>
