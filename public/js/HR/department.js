@@ -1,27 +1,20 @@
 var table, zTreeSetting;
-$(function () {
 
-    /* validity start */
-    $("#addDepartmentForm").validity(function () {
-        $(this).find("input[name='name']").require().maxLength("20");
-        $(this).find("input[name='parent_id']").require();
-    }, submitByAjax);
-    $("#editDepartmentForm").validity(function () {
-        $(this).find("input[name='id']").require();
-        $(this).find("input[name='name']").require().maxLength("20");
-        $(this).find("input[name='parent_id']").require();
-    }, submitByAjax);
-    /* validity end */
+var oaFormOption = {
+    callback: {
+        submitSuccess: oaFormSubmitSuccess
+    }
+};
+
+$(function () {
+    /* oaForm */
+    $(".modal form").oaForm(oaFormOption);
 
     /* dataTables start */
-    table = $('#department_list').dataTable({
+    table = $('#department_list').oaTable({
         "columns": columns,
-        "ajax": "/hr/department/list",
-        "scrollX": 746,
-        "order": [[0, "asc"]],
-        "dom": "<'row'<'col-sm-3'l><'col-sm-6'B><'col-sm-3'f>r>" +
-                "t" +
-                "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+        ajax: {url: "/hr/department/list"},
+        scrollY: 586,
         "buttons": buttons
     });
     /* dataTables end */
@@ -58,45 +51,18 @@ $(function () {
 
 function addDepartment() {
     oaWaiting.show();
-    $("#addDepartmentForm")[0].reset();
-    $("#addDepartmentForm .validity-tooltip").remove();
+    var form = $("#addDepartmentForm");
+    form[0].reset();
     oaWaiting.hide();
-    $("#openAddByOne").click();
 }
 
 function editDepartment(id) {
     oaWaiting.show();
-    $("#editDepartmentForm")[0].reset();
+    var form = $("#editDepartmentForm");
     var url = "/hr/department/info";
     var data = {"id": id};
-    $.ajax({
-        type: "POST",
-        url: url,
-        data: data,
-        async: false,
-        dataType: 'json',
-        success: function (msg) {
-            var position_ids = new Array();
-            $("#editDepartmentForm input,#editDepartmentForm select").each(function () {
-                var value = msg[$(this).attr("name")];
-                if (value !== undefined) {
-                    $(this).val(value);
-                }
-            });
-//            for (var i in msg["position"]) {
-//                position_ids.push(msg["position"][i]['id']);
-//            }
-//            $("#editDepartmentForm input[name='position_id[]']").each(function () {
-//                var value = parseInt($(this).val());
-//                if ($.inArray(value, position_ids) !== -1) {
-//                    $(this).prop("checked", true);
-//                }
-//            });
-            $("#editDepartmentForm .validity-tooltip").remove();
-            oaWaiting.hide();
-            $("#openEditByOne").click();
-        }
-    });
+    form.oaForm()[0].fillData(url, data);
+    oaWaiting.hide();
 }
 
 function deleteDepartment(id) {
@@ -113,7 +79,7 @@ function deleteDepartment(id) {
             dataType: 'json',
             success: function (msg) {
                 if (msg['status'] === 1) {
-                    table.fnDraw();
+                    table.draw(false);
                     $.fn.zTree.getZTreeObj("department_tree_view").reAsyncChildNodes(null, "refresh");
                     oaWaiting.hide();
                 } else if (msg['status'] === -1) {
@@ -124,32 +90,6 @@ function deleteDepartment(id) {
             }
         });
     }
-}
-
-function submitByAjax(form) {
-    oaWaiting.show();
-    var url = $(form).attr("action");
-    var data = $(form).serialize();
-    var type = $(form).attr('method');
-    $.ajax({
-        type: type,
-        url: url,
-        data: data,
-        dataType: 'json',
-        success: function (msg) {
-            if (msg['status'] === 1) {
-                table.fnDraw();
-                $.fn.zTree.getZTreeObj("department_tree_view").reAsyncChildNodes(null, "refresh");
-                $(".close").click();
-                oaWaiting.hide();
-                reloadDepartmentOptions();
-            }
-        },
-        error: function (err) {
-            document.write(err.responseText);
-        }
-    });
-    return false;
 }
 
 function reloadDepartmentOptions() {
@@ -185,7 +125,7 @@ function updateOrder(event, treeId, treeNodes, targetNode, moveType) {
         dataType: 'json',
         success: function (msg) {
             if (msg['status'] === 1) {
-                table.fnDraw();
+                table.draw(false);
                 oaWaiting.hide();
                 return true;
             } else if (msg['status'] === -1) {
@@ -258,4 +198,11 @@ function hideTreeViewOptions(event) {
         $(".ztree.ztreeOptions").hide();
         $("body").unbind("click", hideTreeViewOptions);
     }
+}
+
+function oaFormSubmitSuccess(msg, obj) {
+    table.draw(false);
+    $.fn.zTree.getZTreeObj("department_tree_view").reAsyncChildNodes(null, "refresh");
+    reloadDepartmentOptions();
+    $(".close").click();
 }

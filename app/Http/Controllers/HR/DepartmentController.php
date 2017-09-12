@@ -8,11 +8,19 @@ use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\Position;
 use App\Models\Role;
+use App\Contracts\CURD;
 use App\Services\PluginService;
 use Authority;
 use DB;
 
 class DepartmentController extends Controller {
+
+    protected $model = 'App\Models\Department';
+    protected $curdService;
+
+    public function __construct(CURD $curd) {
+        $this->curdService = $curd->model($this->model);
+    }
 
     public function showManagePage() {
         $data['position'] = Position::orderBy('level', 'asc')->get();
@@ -76,12 +84,7 @@ class DepartmentController extends Controller {
      * @return type
      */
     public function addDepartmentByOne(Request $request) {
-        $data = $request->except(['_url', '_token', 'position_id']);
-        $department = Department::create($data);
-//        $positionId = $request->has('position_id') ? $request->position_id : [];
-//        $department->position()->sync($positionId);
-        Authority::forgetAuthorities();
-        return $data = ['status' => 1, 'message' => '添加成功'];
+        return $this->addOrUpdate($request);
     }
 
     /**
@@ -90,14 +93,22 @@ class DepartmentController extends Controller {
      * @return type
      */
     public function editDepartmentByOne(Request $request) {
-        $data = $request->except(['_url', '_token', 'position_id']);
-        $id = $data['id'];
-        $department = Department::find($id);
-        $department->update($data);
-//        $positionId = $request->has('position_id') ? $request->position_id : [];
-//        $department->position()->sync($positionId);
+        return $this->addOrUpdate($request);
+    }
+
+    /**
+     * 添加或编辑
+     * @param Request $request
+     * @return type
+     */
+    protected function addOrUpdate(Request $request) {
+        $validateMsg = [
+            'manager_name.exists' => '部门负责人 已离职或不存在',
+        ];
+        $this->validate($request, $this->makeValidator($request), $validateMsg, trans('fields.department'));
+        $response = $this->curdService->createOrUpdate($request->all());
         Authority::forgetAuthorities();
-        return ['status' => 1, 'message' => '编辑成功'];
+        return $response;
     }
 
     /**
@@ -160,6 +171,14 @@ class DepartmentController extends Controller {
             $data[] = $dataTmp;
         }
         return $data;
+    }
+
+    protected function makeValidator(Request $request) {
+        return [
+            'name' => ['required', 'unique:departments,name,' . $request->id . ',id,parent_id,' . $request->parent_id . ',deleted_at,NULL'],
+            'parent_id' => ['required'],
+            'manager_name' => ['exists:staff,realname,status_id,>0'],
+        ];
     }
 
 }

@@ -4,15 +4,15 @@
 
 @section('css')
 <!-- data table -->
-<link rel="stylesheet" href="{{asset('plug_in/datatables/css/dataTables.bootstrap.css')}}" />
-<link rel="stylesheet" href="{{asset('plug_in/datatables/css/buttons.dataTables.css')}}" />
-<link rel="stylesheet" href="{{asset('plug_in/datatables/css/buttons.bootstrap.css')}}" />
+<link rel="stylesheet" href="{{source('plug_in/datatables/css/dataTables.bootstrap.css')}}" />
+<link rel="stylesheet" href="{{source('plug_in/datatables/css/buttons.dataTables.css')}}" />
+<link rel="stylesheet" href="{{source('plug_in/datatables/css/buttons.bootstrap.css')}}" />
 <!-- validity css -->
-<link rel="stylesheet" href="{{asset('plug_in/validity/jquery.validity.css')}}" />
+<link rel="stylesheet" href="{{source('plug_in/validity/jquery.validity.css')}}" />
 <!-- zTree css -->
-<link rel="stylesheet" href="{{asset('plug_in/ztree/css/metroStyle.css')}}" />
+<link rel="stylesheet" href="{{source('plug_in/ztree/css/metroStyle.css')}}" />
 <!-- checkbox -->
-<link rel="stylesheet" href="{{asset('css/checkbox.css')}}" />
+<link rel="stylesheet" href="{{source('css/checkbox.css')}}" />
 @endsection
 
 @section('content')
@@ -60,7 +60,7 @@
             <h4 class="modal-title">添加部门</h4>
         </div>
         <div class="modal-content">
-            <form id="addDepartmentForm" name="addDepartmentForm" class="form-horizontal" method="post" action="{{asset(route('hr.department.add'))}}">
+            <form id="addDepartmentForm" name="addDepartmentForm" class="form-horizontal" method="post" action="{{route('hr.department.add')}}">
                 @inject('HRM','HRM')
                 @include('hr/department_form')
                 <div class="modal-footer">
@@ -81,7 +81,7 @@
             <h4 class="modal-title">编辑部门</h4>
         </div>
         <div class="modal-content">
-            <form id="editDepartmentForm" name="editDepartmentForm" class="form-horizontal" method="post" action="{{asset(route('hr.department.edit'))}}">
+            <form id="editDepartmentForm" name="editDepartmentForm" class="form-horizontal" method="post" action="{{route('hr.department.edit')}}">
                 @include('hr/department_form')
                 <input type="hidden" name="id" >
                 <div class="modal-footer">
@@ -100,17 +100,17 @@
 
 @section('js')
 <!-- zTree js -->
-<script type="text/javascript" src="{{asset('plug_in/ztree/js/jquery.ztree.all.js')}}"></script>
+<script type="text/javascript" src="{{source('plug_in/ztree/js/jquery.ztree.all.js')}}"></script>
 <!--data table-->
-<script type="text/javascript" src="{{asset('plug_in/datatables/js/jquery.dataTables.js')}}"></script>
-<script type="text/javascript" src="{{asset('plug_in/datatables/js/dataTables.bootstrap.js')}}"></script>
-<script type="text/javascript" src="{{asset('plug_in/datatables/js/dataTables.buttons.js')}}"></script>
-<script type="text/javascript" src="{{asset('plug_in/datatables/js/buttons.bootstrap.js')}}"></script>
-<script type="text/javascript" src="{{asset('plug_in/datatables/js/buttons.colVis.js')}}"></script>
+<script type="text/javascript" src="{{source('plug_in/datatables/js/jquery.dataTables.js')}}"></script>
+<script type="text/javascript" src="{{source('plug_in/datatables/js/dataTables.bootstrap.js')}}"></script>
+<script type="text/javascript" src="{{source('plug_in/datatables/js/dataTables.buttons.js')}}"></script>
+<script type="text/javascript" src="{{source('plug_in/datatables/js/buttons.bootstrap.js')}}"></script>
+<script type="text/javascript" src="{{source('plug_in/datatables/js/buttons.colVis.js')}}"></script>
 <!-- validity -->
-<script type="text/javascript" src="{{asset('plug_in/validity/jquery.validity.js')}}"></script>
+<script type="text/javascript" src="{{source('plug_in/validity/jquery.validity.js')}}"></script>
 <!--script for this view-->
-<script type="text/javascript" src="{{asset('js/HR/department.js')}}"></script>
+<script type="text/javascript" src="{{source('js/HR/department.js')}}"></script>
 <script>
 /* -- 列表字段 -- */
 var columns = [
@@ -133,17 +133,6 @@ var columns = [
             $(nTd).attr("title", "员工编号：" + oData.manager_sn);
         }
     },
-//    {"data": "position.name", "title": "关联职位", "sortable": false, "defaultContent": "",
-//        "createdCell": function (nTd, sData, oData, iRow, iCol) {
-//            var html = sData.join(','), htmlView;
-//            if (html.length > 40) {
-//                htmlView = html.substring(0, 38) + "...";
-//            } else {
-//                htmlView = html;
-//            }
-//            $(nTd).html(htmlView).attr("title", html);
-//        }
-//    },
     {data: "id", title: "操作", sortable: false, width: "130px",
         "createdCell": function (nTd, sData, oData, iRow, iCol) {
             delete oData.password;
@@ -163,14 +152,7 @@ var columns = [
     }
 ];
 /* -- 列表按钮 -- */
-var buttons = [
-    {"extend": "colvis", "text": "<i class='fa fa-eye-slash fa-fw'></i>", "titleAttr": "可见字段", "className": "btn-primary"},
-    {"text": "<i class='fa fa-refresh fa-fw'></i>", "titleAttr": "刷新", "className": "btn-primary", "action": function () {
-            table.fnDraw();
-            $.fn.zTree.getZTreeObj("department_tree_view").reAsyncChildNodes(null, "refresh");
-        }
-    }
-];
+var buttons = [];
 <?php if ($authority->checkAuthority(39)): ?>
     buttons.push({"text": "<i class='fa fa-plus fa-fw'></i>", "action": addDepartment, "titleAttr": "添加"});
 <?php endif; ?>
