@@ -34,6 +34,7 @@ var oaWaiting = {
 $.fn.oaForm = oaForm;
 $.fn.oaDate = oaDate;
 $.fn.oaDateTime = oaDateTime;
+$.fn.oaTime = oaTime;
 $.fn.oaFormList = oaFormList;
 $.fn.oaSearch = oaSearch;
 $.fn.oaTable = oaTable;
@@ -117,6 +118,21 @@ function oaDate() {
         var fp = $(this).flatpickr(options);
         dateGroup.push(fp);
     });
+}
+
+/**
+ * OA时间插件初始化（带时分秒）
+ * @returns {Array|oaDate.dateGroup}
+ */
+function oaTime() {
+    var options = arguments[0] ? arguments[0] : {};
+    var optionOrigin = {
+        enableTime: true,
+        noCalendar: true,
+        enableSeconds: true
+    };
+    options = $.extend(true, {}, optionOrigin, options);
+    return this.oaDate(options);
 }
 
 /**
@@ -221,6 +237,7 @@ function OAForm(dom, options) {
         /* 关联插件初始化 start */
         self.query.find('[isDate][isDate!=false]').oaDate(self.setting.oaDate);
         self.query.find('[isDateTime][isDateTime!=false]').oaDateTime(self.setting.oaDateTime);
+        self.query.find('[isTime][isTime!=false]').oaTime(self.setting.oaTime);
         self.formList = self.query.find('[isFormList][isFormList!=false]').oaFormList(self.setting.oaFormList);
         self.query.find('[oaSearch][oaSearch!=false]').each(function () {
             $(this).oaSearch($(this).attr('oaSearch'));

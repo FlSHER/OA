@@ -45,6 +45,16 @@
         </div>
     </div>
     <div class="form-group">
+        <label class="control-label col-sm-3">上班时间</label>
+        <div class="col-sm-3">
+            <input class="form-control" name="clock_in" type="text" value="09:00" isTime title="上班时间"/>
+        </div>
+        <label class="control-label col-sm-2">下班时间</label>
+        <div class="col-sm-3">
+            <input class="form-control" name="clock_out" type="text" value="18:00" isTime title="下班时间"/>
+        </div>
+    </div>
+    <div class="form-group">
         <label class="control-label col-sm-3">店长</label>
         <div class="col-sm-4" oaSearch="staff">
             <div class="input-group">

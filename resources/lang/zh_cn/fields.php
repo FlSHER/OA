@@ -116,6 +116,8 @@ return [
         'city_id' => '市',
         'county_id' => '区/县',
         'address' => '详细地址',
+        'clock_in' => '上班时间',
+        'clock_out' => '下班时间',
         'manager_sn' => '店长员工编号',
         'manager_name' => '店长姓名',
     ],

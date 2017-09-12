@@ -67,6 +67,8 @@ class ShopController extends Controller {
             'city_id' => ['required', 'exists:i_district,id,level,2'],
             'county_id' => ['required', 'exists:i_district,id,level,3'],
             'address' => ['required', 'max:50'],
+            'clock_in' => ['required', 'regex:/^\d{2}:\d{2}$/'],
+            'clock_out' => ['required', 'regex:/^\d{2}:\d{2}$/'],
             'manager_sn' => ['required_with:manager_name'],
             'manager_name' => [],
         ];
