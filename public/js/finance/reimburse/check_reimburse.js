@@ -55,19 +55,19 @@ function createDataTable() {
             {"title": "审批人", "data": "approver_name", "name": "approver_name", "sortable": true},
             {"title": "资金归属", "data": "reim_department.name", "name": "reim_department.name", "sortable": true},
             {
-                "title": "申请时间", "data": "send_time", "name": "send_time", "sortable": true,
+                "title": "申请时间", "data": "send_time", "name": "send_time", "sortable": true, searchable: false,
                 "createdCell": function (nTd, sData, oData, iRow, iCol) {
                     $(nTd).html(sData.substring(0, 10)).attr("title", sData);
                 }
             },
             {
-                "title": "审批时间", "data": "approve_time", "name": "approve_time", "sortable": true,
+                "title": "审批时间", "data": "approve_time", "name": "approve_time", "sortable": true, searchable: false,
                 "createdCell": function (nTd, sData, oData, iRow, iCol) {
                     $(nTd).html(sData.substring(0, 10)).attr("title", sData);
                 }
             },
             {
-                "title": "审核时间", "data": "audit_time", "name": "audit_time", "sortable": true,
+                "title": "审核时间", "data": "audit_time", "name": "audit_time", "sortable": true, searchable: false,
                 "createdCell": function (nTd, sData, oData, iRow, iCol) {
                     $(nTd).html(sData.substring(0, 10)).attr("title", sData);
                 }
@@ -115,7 +115,7 @@ function createDataTable() {
         ],
         filter: $("#check_reimburse_search"),//搜索
         'order': [['8', 'desc']],
-        'scrollY':586
+        'scrollY': 586
     });
 }
 
@@ -163,7 +163,7 @@ function getFnFormatDetails(reim_id) {
 }
 
 function getExpensesHtml(msg) {
-    var payee_city = msg.payee_city? ('-'+msg.payee_city):'';
+    var payee_city = msg.payee_city ? ('-' + msg.payee_city) : '';
     sOut = '<p title="' + msg.description + '"> 描述：' + msg.description + '</p>';
     sOut += '<p title="' + msg.remark + '" style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width:800px;font-weight:700;"> 备注：' + msg.remark + '</p>';
     sOut += '<p>' +
