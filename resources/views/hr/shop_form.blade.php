@@ -2,7 +2,11 @@
     <div class="form-group">
         <label class="control-label col-lg-3">*店铺代码</label>
         <div class="col-lg-8">
+            @if($type == 'add')
             <input class="form-control" name="shop_sn" type="text" title="店铺代码"/>
+            @else
+            <input class="form-control" name="shop_sn" type="text" title="店铺代码" readonly>
+            @endif
         </div>
     </div>
     <div class="form-group">
@@ -38,6 +42,16 @@
         <label class="control-label col-sm-3"></label>
         <div class="col-sm-8">
             <input class="form-control" name="address" type="text" title="店铺地址" placeholder="请输入店铺街道地址" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-3">上班时间</label>
+        <div class="col-sm-3">
+            <input class="form-control" name="clock_in" type="text" value="09:00" isTime title="上班时间"/>
+        </div>
+        <label class="control-label col-sm-2">下班时间</label>
+        <div class="col-sm-3">
+            <input class="form-control" name="clock_out" type="text" value="18:00" isTime title="下班时间"/>
         </div>
     </div>
     <div class="form-group">

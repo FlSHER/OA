@@ -207,4 +207,22 @@ class Dingtalk {
         return $response;
     }
 
+    public function decryptMsg($signature, $timestamp, $nonce, $encrypt) {
+        $msg = '';
+        $crypt = new DingtalkCrypt(config('dingding.token'), config('dingding.AESKey'), config('dingding.CorpId'));
+        $requestErrCode = $crypt->DecryptMsg($signature, $timestamp, $nonce, $encrypt, $msg);
+        if ($requestErrCode == 0) {
+            return json_decode($msg, true);
+        } else {
+            abort(500, 'Can\'t decrypt');
+        }
+    }
+
+    public function encryptMsg($message, $timestamp, $nonce) {
+        $response = '';
+        $crypt = new DingtalkCrypt(config('dingding.token'), config('dingding.AESKey'), config('dingding.CorpId'));
+        $crypt->EncryptMsg($message, $timestamp, $nonce, $response);
+        return $response;
+    }
+
 }

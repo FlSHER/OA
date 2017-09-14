@@ -7,6 +7,9 @@ $(function () {
                 table.draw();
             }
         },
+        oaTime: {
+            enableSeconds: false
+        },
         oaFormList: {
             min: 0,
             unit: {

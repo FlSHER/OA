@@ -41,15 +41,13 @@ class DingtalkController extends Controller {
     }
 
     public function approvalCallback(Request $request) {
-        $msg = '';
-        $crypt = new \App\Services\Dingtalk\DingtalkCrypt(config('dingding.token'), config('dingding.AESKey'), config('dingding.CorpId'));
-        $requestErrCode = $crypt->DecryptMsg($request->signature, $request->timestamp, $request->nonce, $request->encrypt, $msg);
-        $requestMsg = json_decode($msg, true);
-        if ($requestErrCode == 0 && $requestMsg['EventType'] !== 'check_url') {
+        $requestMsg = app('Dingtalk')->decryptMsg($request->signature, $request->timestamp, $request->nonce, $request->encrypt);
+        if ($requestMsg['EventType'] == 'bpms_task_change' || $requestMsg['type'] == 'terminate') {
             DB::table('test')->insert(['time' => date('Y-m-d H:i:s'), 'remark' => json_encode($requestMsg)]);
+            $callbackUrl = DB::table('dingtalk_approval_process')->where('process_instance_id', $requestMsg['processInstanceId'])->value('callback_url');
+            $appResponse = app('Curl')->setUrl($callbackUrl)->sendMessageByPost($requestMsg);
         }
-        $responseMsg = '';
-        $crypt->EncryptMsg('success', $request->timestamp, $request->nonce, $responseMsg);
+        $responseMsg = app('Dingtalk')->encryptMsg('success', $request->timestamp, $request->nonce);
         return $responseMsg;
     }
 

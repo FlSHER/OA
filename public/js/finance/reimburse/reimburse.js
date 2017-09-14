@@ -14,7 +14,7 @@ function createDataTable() {
     oTable = $('#pending-table').oaTable({
         "columns": [
             {
-                "title": "详情", "data": "id", "name": "id", "class": "text-center", "sortable": false,
+                title: "详情", data: "id", name: "id", "class": "text-center", "sortable": false,
                 "render": function (data, type, row, meta) {
                     return '<i class = "fa fa-plus-circle show_expense" style = "font-size:20px;cursor:pointer;" reim-id = "' + data + '"></i>';
                 }
@@ -36,13 +36,13 @@ function createDataTable() {
             },
             {"title": "资金归属", "data": "reim_department.name", "name": "reim_department_id", "sortable": true},
             {
-                "title": "申请时间", "data": "send_time", "name": "send_time", "sortable": true,
+                "title": "申请时间", "data": "send_time", "name": "send_time", "sortable": true, searchable: false,
                 "createdCell": function (nTd, sData, oData, iRow, iCol) {
                     $(nTd).html(sData.substring(0, 10)).attr("title", sData);
                 }
             },
             {
-                "title": "审批时间", "data": "approve_time", "name": "approve_time", "sortable": true,
+                "title": "审批时间", "data": "approve_time", "name": "approve_time", "sortable": true, searchable: false,
                 "createdCell": function (nTd, sData, oData, iRow, iCol) {
                     sData = sData ? sData : '';
                     $(nTd).html(sData.substring(0, 10)).attr("title", sData);

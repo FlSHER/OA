@@ -31,7 +31,7 @@ class ShopController extends Controller {
     }
 
     public function addOrEdit(Request $request) {
-        $this->validate($request, $this->makeValidator($request), [],trans('fields.shop'));
+        $this->validate($request, $this->makeValidator($request), [], trans('fields.shop'));
         return $this->curdService->createOrUpdate($request->all());
     }
 
@@ -58,8 +58,8 @@ class ShopController extends Controller {
     }
 
     protected function makeValidator(Request $request) {
-        return [
-            'shop_sn' => ['required', 'max:10', 'unique:shops,shop_sn,' . $request->id . ',id,deleted_at,NULL'],
+        $validator = [
+            'shop_sn' => ['required', 'max:10'],
             'name' => ['required', 'max:50'],
             'department_id' => ['required', 'integer', 'min:2', 'exists:departments,id,deleted_at,NULL'],
             'brand_id' => ['required', 'integer', 'exists:brands,id'],
@@ -67,9 +67,17 @@ class ShopController extends Controller {
             'city_id' => ['required', 'exists:i_district,id,level,2'],
             'county_id' => ['required', 'exists:i_district,id,level,3'],
             'address' => ['required', 'max:50'],
+            'clock_in' => ['required', 'regex:/^\d{2}:\d{2}$/'],
+            'clock_out' => ['required', 'regex:/^\d{2}:\d{2}$/'],
             'manager_sn' => ['required_with:manager_name'],
             'manager_name' => [],
         ];
+        if ($request->has('id')) {
+            $validator['shop_sn'][] = 'exists:shops,shop_sn,id,' . $request->id;
+        } else {
+            $validator['shop_sn'][] = 'unique:shops,shop_sn,NULL,id,deleted_at,NULL';
+        }
+        return $validator;
     }
 
 }

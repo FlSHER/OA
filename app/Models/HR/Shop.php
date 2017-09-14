@@ -21,6 +21,8 @@ class Shop extends Model {
         'city_id',
         'county_id',
         'address',
+        'clock_in',
+        'clock_out',
     ];
 
     /* ----- 定义关联Start ----- */
@@ -54,6 +56,18 @@ class Shop extends Model {
     }
 
     /* ----- 定义关联End ----- */
+
+    /* ----- 查询器 Start ----- */
+
+    public function getClockInAttribute($value) {
+        return preg_replace('/^(\d{1,2}:\d{2})(:\d{2})?$/', '$1', $value);
+    }
+
+    public function getClockOutAttribute($value) {
+        return preg_replace('/^(\d{1,2}:\d{2})(:\d{2})?$/', '$1', $value);
+    }
+
+    /* ----- 查询器 End ----- */
 
     /* ----- 修改器Start ----- */
 
