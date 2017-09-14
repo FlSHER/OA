@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
   |
  */
 
-Route::group(['namespace' => 'Api', 'middleware' => 'apiPassport'], function() {
+Route::group(['namespace' => 'Api', 'middleware' => 'apiPassport'], function () {
     Route::any('/get_current_user', ['uses' => 'HRMController@getCurrentUserInfo']); // 获取当前用户信息
     Route::any('/get_user', ['uses' => 'HRMController@getUserInfo']); // 获取用户信息
     Route::any('/get_department', ['uses' => 'HRMController@getDepartmentInfo']); // 获取部门信息
@@ -22,13 +22,16 @@ Route::group(['namespace' => 'Api', 'middleware' => 'apiPassport'], function() {
     Route::any('/get_position', ['uses' => 'HRMController@getPositionInfo']); // 获取职位信息
     Route::any('/get_dingtalk_access_token', ['uses' => 'DingtalkController@getAccessToken']); //获取钉钉的accessToken
     Route::any('/get_dingtalk_js_api_ticket', ['uses' => 'DingtalkController@getJsApiTicket']); //获取钉钉的jsApiTicket
-    Route::group(['prefix' => 'dingtalk'], function() {
+    Route::group(['prefix' => 'dingtalk'], function () {
         Route::any('/start_approval', ['uses' => 'DingtalkController@startApproval']); //发起钉钉审批
+    });
+    Route::group(['prefix' => 'hr'], function () {
+        Route::post('staff_update', ['uses' => 'HRMController@changeStaffInfo']);//修改员工信息
     });
 });
 Route::get('/get_auth_code', ['uses' => 'Api\OAuthController@getAuthCode']);
 Route::any('/get_token', ['uses' => 'Api\OAuthController@getAppToken']);
 Route::any('/refresh_token', ['uses' => 'Api\OAuthController@refreshAppToken']);
 
-Route::get('/dingtalk/register_approval_callback',['uses'=>'Api\DingtalkController@registerApprovalCallback']);//注册钉钉审批回调
+Route::get('/dingtalk/register_approval_callback', ['uses' => 'Api\DingtalkController@registerApprovalCallback']);//注册钉钉审批回调
 Route::any('/dingtalk/approval_callback', ['uses' => 'Api\DingtalkController@approvalCallback']); //钉钉审批回调
