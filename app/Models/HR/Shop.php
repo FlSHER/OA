@@ -90,7 +90,7 @@ class Shop extends Model {
     }
 
     public function scopeApi($query) {
-        $query->with(['staff', 'department', 'brand', 'province', 'city', 'county']);
+        $query->with(['staff', 'department', 'brand', 'province', 'city', 'county','clock_in','clock_out']);
     }
 
     /* ----- 本地作用域 End ----- */
