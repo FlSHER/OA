@@ -161,7 +161,7 @@ class AuditRepository
         $trans = 'fields.reimburse';
         $fileName = app('CurrentUser')->realname . '已审核单';
         if($request->type=='all'){
-            $fileName ='报销单';
+            $fileName =app('CurrentUser')->realname .'导出的报销单';
         }
         $data = $this->getExportData($request);
         $export = new ReimburseExport();
