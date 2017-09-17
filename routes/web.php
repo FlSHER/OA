@@ -59,3 +59,9 @@ Route::get('/get_user_token/{url?}', ['uses' => 'Api\UserController@getUserToken
 Route::group(['prefix' => 'excel'], function () {
     Route::get('staff', ['uses' => 'HR\StaffController@showDataForExcel']); //部门
 });
+
+Route::get('weather_image', function () {
+    app('ApiResponse')->makeWeatherImage(request('city'));
+    return response('')
+        ->header('Content-Type', 'image/png');
+});
