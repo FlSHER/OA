@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Mockery\Exception;
+
 class ApiResponseService
 {
 
@@ -38,10 +40,27 @@ class ApiResponseService
 
     /* 生成天气预报图片 start */
 
-    public function makeWeatherImage($cityCode)
+    public function getWeatherImage($cityCode)
     {
-        $url = 'http://restapi.amap.com/v3/weather/weatherInfo?city=' . $cityCode . '&key=46649b37382db424a33e34f487c5f3b7&extensions=all';
-        $weatherData = app('Curl')->setUrl($url)->get();
+        $baseUrl = 'http://restapi.amap.com/v3/weather/weatherInfo?key=46649b37382db424a33e34f487c5f3b7&extensions=all&city=';
+        $weatherData = app('Curl')->setUrl($baseUrl . $cityCode)->get();
+        try {
+            $this->makeWeatherImage($weatherData);
+        } catch (\Exception $e) {
+            $cityCode = substr($cityCode, 0, 4) . '00';
+            $weatherData = app('Curl')->setUrl($baseUrl . $cityCode)->get();
+            try {
+                $this->makeWeatherImage($weatherData);
+            } catch (\Exception $e) {
+                $cityCode = substr($cityCode, 0, 2) . '0000';
+                $weatherData = app('Curl')->setUrl($baseUrl . $cityCode)->get();
+                $this->makeWeatherImage($weatherData);
+            }
+        }
+    }
+
+    protected function makeWeatherImage($weatherData)
+    {
         $province = $weatherData['forecasts'][0]['province'];
         $city = $weatherData['forecasts'][0]['city'];
         $weather1 = $weatherData['forecasts'][0]['casts'][0];
