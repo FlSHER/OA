@@ -72,7 +72,7 @@ class Shop extends Model {
     /* ----- 修改器Start ----- */
 
     public function setShopSnAttribute($value) {
-        $this->attributes['shop_sn'] = strtolower($value);
+        $this->attributes['shop_sn'] = trim(strtolower($value));
     }
 
     /* ----- 修改器End ----- */
