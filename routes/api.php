@@ -22,6 +22,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'apiPassport'], function () 
     Route::any('/get_position', ['uses' => 'HRMController@getPositionInfo']); // 获取职位信息
     Route::any('/get_dingtalk_access_token', ['uses' => 'DingtalkController@getAccessToken']); //获取钉钉的accessToken
     Route::any('/get_dingtalk_js_api_ticket', ['uses' => 'DingtalkController@getJsApiTicket']); //获取钉钉的jsApiTicket
+    Route::any('/get_dingtalk_js_config', ['uses' => 'DingtalkController@getDingtalkConfig']); //获取钉钉的jsConfig
     Route::group(['prefix' => 'dingtalk'], function () {
         Route::any('/start_approval', ['uses' => 'DingtalkController@startApproval']); //发起钉钉审批
     });
