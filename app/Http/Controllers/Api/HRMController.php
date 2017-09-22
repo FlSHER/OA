@@ -113,7 +113,7 @@ class HRMController extends Controller
                 $model::find($key)->fill($data)->save();
             }
             return app('ApiResponse')->makeSuccessResponse('修改成功', 200);
-        } catch (HttpException $e) {
+        } catch (\Exception $e) {
             return app('ApiResponse')->makeErrorResponse($e->getMessage(), 501, $e->getStatusCode());
         }
     }
@@ -133,7 +133,8 @@ class HRMController extends Controller
             $recordsTotal = $model::api()->count();
             $recordsFiltered = $this->model->count();
             if ($recordsFiltered > 500 && $this->length == 0) {
-                abort(501, '获取数据过多（' . $recordsFiltered . '条），请添加分页或筛选条件');
+                abort(500, '获取数据过多（' . $recordsFiltered . '条），请添加分页或筛选条件');
+//                throw new \Exception('获取数据过多（' . $recordsFiltered . '条），请添加分页或筛选条件', 500);
             }
 
             $data = $this->model->when($this->length > 0, function ($query) {
@@ -143,7 +144,7 @@ class HRMController extends Controller
                 $data = $data[0];
             }
             return app('ApiResponse')->makeSuccessResponse($data, 200, ['recordsFiltered' => $recordsFiltered, 'recordsTotal' => $recordsTotal]);
-        } catch (HttpException $e) {
+        } catch (\Exception $e) {
             return app('ApiResponse')->makeErrorResponse($e->getMessage(), 501, $e->getStatusCode());
         }
     }
