@@ -68,7 +68,7 @@ class HRMController extends Controller
 
     public function setShopInfo(Request $request)
     {
-        Shop::where('shop_sn', $request->shop_sn)->fill($request->input())->save();
+        Shop::where('shop_sn', $request->shop_sn)->update($request->input());
     }
 
     /**
