@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\HR\Shop;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Models\HR\Staff;
@@ -63,6 +64,11 @@ class HRMController extends Controller
     public function getShopInfo(Request $request)
     {
         return $this->getInfo($request, 'App\Models\HR\Shop');
+    }
+
+    public function setShopInfo(Request $request)
+    {
+        Shop::where('shop_sn', $request->shop_sn)->fill($request->input())->save();
     }
 
     /**
