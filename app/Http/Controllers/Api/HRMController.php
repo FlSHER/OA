@@ -68,7 +68,13 @@ class HRMController extends Controller
 
     public function setShopInfo(Request $request)
     {
-        Shop::where('shop_sn', $request->shop_sn)->update($request->input());
+        $shop = Shop::where('shop_sn', $request->shop_sn)->first();
+        $updateSuccess = $shop->update($request->input());
+        if ($updateSuccess) {
+            return app('ApiResponse')->makeSuccessResponse('修改成功', 200);
+        } else {
+            return app('ApiResponse')->makeErrorResponse('修改失败', 500);
+        }
     }
 
     /**
