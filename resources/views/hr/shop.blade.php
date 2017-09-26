@@ -85,8 +85,8 @@
             {data: "department.name", title: "所属部门"},
             {data: "brand.name", title: "所属品牌"},
             {data: "{province.name}.'-'.{city.name}.'-'.{county.name}.' '.{address}", title: "店铺地址"},
-            {data: "clock_in", title: "上班时间"},
-            {data: "clock_out", title: "下班时间"},
+            {data: "clock_in", title: "上班时间", searchable: false},
+            {data: "clock_out", title: "下班时间", searchable: false},
             {data: "manager_name", title: "店长"},
             {
                 data: "staff.realname", title: "店员", searchable: false, sortable: false, defaultContent: "",
