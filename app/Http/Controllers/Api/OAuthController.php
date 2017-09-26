@@ -7,11 +7,14 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 /* model start */
+
 use App\Models\App;
 /* model end */
+
 use DB;
 
-class OAuthController extends Controller {
+class OAuthController extends Controller
+{
 
     protected $appId;
     protected $staffSn;
@@ -27,7 +30,8 @@ class OAuthController extends Controller {
      * @param Request $request
      * @return type
      */
-    public function getAuthCode(Request $request) {
+    public function getAuthCode(Request $request)
+    {
         $this->checkAppId($request);
         $this->checkRedirectUri($request);
         if (app('CurrentUser')->isLogin()) {
@@ -47,7 +51,8 @@ class OAuthController extends Controller {
      * 获取访问令牌
      * @param Request $request
      */
-    public function getAppToken(Request $request) {
+    public function getAppToken(Request $request)
+    {
         try {
             $this->checkRedirectUri($request);
             $this->checkAuthCode($request);
@@ -65,7 +70,8 @@ class OAuthController extends Controller {
      * @param Request $request
      * @return type
      */
-    public function refreshAppToken(Request $request) {
+    public function refreshAppToken(Request $request)
+    {
         try {
             $this->checkRefreshToken($request);
             $this->saveAppToken();
@@ -80,7 +86,8 @@ class OAuthController extends Controller {
      * 测试重定向路由
      * @param type $request
      */
-    private function checkRedirectUri($request) {
+    private function checkRedirectUri($request)
+    {
         if (empty($request->redirect_uri)) {
             abort(500, '缺少重定向路由');
         }
@@ -93,7 +100,8 @@ class OAuthController extends Controller {
      * 检验app_id
      * @param type $request
      */
-    private function checkAppId($request) {
+    private function checkAppId($request)
+    {
         if (!$request->has('app_id')) {
             abort(500, '缺少app_id');
         }
@@ -105,7 +113,8 @@ class OAuthController extends Controller {
      * @param type $request
      * @return type
      */
-    private function redirectToApp($request) {
+    private function redirectToApp($request)
+    {
         $redirectUri = $request->redirect_uri;
         $params['auth_code'] = $this->authCode;
         $params['state'] = $request->state;
@@ -118,7 +127,8 @@ class OAuthController extends Controller {
      * @param type $request
      * @return type
      */
-    private function redirectToLoginPage($request) {
+    private function redirectToLoginPage($request)
+    {
         $apiRequest = $request->only(['app_id', 'redirect_uri']);
         $url = url()->current() . '?' . http_build_query($apiRequest);
         return redirect()->route('login')->with(['url' => $url]);
@@ -128,7 +138,8 @@ class OAuthController extends Controller {
      * 从数据库获取授权码
      * @return type
      */
-    private function getAuthCodeFromDatabase() {
+    private function getAuthCodeFromDatabase()
+    {
         $authCode = DB::table('app_auth_code')->where([['staff_sn', '=', $this->staffSn], ['app_id', '=', $this->appId], ['redirect_uri', '=', $this->redirectUri], ['expiration', '>', time()]])->value('app_auth_code');
         return $authCode;
     }
@@ -136,7 +147,8 @@ class OAuthController extends Controller {
     /**
      * 保存授权码
      */
-    private function saveAuthCode($request) {
+    private function saveAuthCode($request)
+    {
         $expiration = time() + $this->authCodeExpiration * 60;
         $redirectUri = trim($request->redirect_uri, '/');
         $app = App::find($this->appId);
@@ -151,7 +163,8 @@ class OAuthController extends Controller {
      * 生成授权码
      * @return type
      */
-    private function makeAuthCode() {
+    private function makeAuthCode()
+    {
         $code = md5($this->staffSn . $this->appId . time() . 'code');
         return $code;
     }
@@ -163,9 +176,10 @@ class OAuthController extends Controller {
     /**
      * 检验授权码
      * @param type $request
-     * @return boolean 
+     * @return boolean
      */
-    private function checkAuthCode(Request $request) {
+    private function checkAuthCode(Request $request)
+    {
         if ($request->has('auth_code')) {
             $authCode = $request->auth_code;
         } else {
@@ -188,7 +202,8 @@ class OAuthController extends Controller {
      * @param type $request
      * @return boolean
      */
-    private function checkSecret(Request $request) {
+    private function checkSecret(Request $request)
+    {
         if ($request->has('secret')) {
             $secret = $request->secret;
         } else {
@@ -208,13 +223,14 @@ class OAuthController extends Controller {
      * @param Request $request
      * @return boolean
      */
-    private function checkRefreshToken(Request $request) {
+    private function checkRefreshToken(Request $request)
+    {
         if ($request->has('refresh_token')) {
             $refreshToken = $request->refresh_token;
         } else {
             abort(500, '缺少refresh_token');
         }
-        $app = DB::table('app_token')->where([['refresh_token', '=', $refreshToken], ['expiration', '<', time()]])->first();
+        $app = DB::table('app_token')->where([['refresh_token', '=', $refreshToken], ['expiration', '<', time() + 600]])->first();
         if (!empty($app)) {
             $this->appId = $app->app_id;
             $this->staffSn = $app->staff_sn;
@@ -227,7 +243,8 @@ class OAuthController extends Controller {
     /**
      * 保存访问令牌
      */
-    private function saveAppToken() {
+    private function saveAppToken()
+    {
         $this->appToken = $this->makeAppToken();
         $this->refreshToken = $this->makeRefreshToken();
         $expiration = time() + $this->appTokenExpiration * 60;
@@ -240,7 +257,8 @@ class OAuthController extends Controller {
      * 生成访问令牌
      * @return string
      */
-    private function makeAppToken() {
+    private function makeAppToken()
+    {
         $token = md5($this->staffSn . $this->appId . time() . 'token');
         return $token;
     }
@@ -249,7 +267,8 @@ class OAuthController extends Controller {
      * 生成更新令牌
      * @return type
      */
-    private function makeRefreshToken() {
+    private function makeRefreshToken()
+    {
         $token = md5($this->staffSn . $this->appId . time() . 'refresh_token');
         return $token;
     }
@@ -258,7 +277,8 @@ class OAuthController extends Controller {
      * 生成app_token响应
      * @return type
      */
-    private function makeAppTokenResponse() {
+    private function makeAppTokenResponse()
+    {
         return [
             'app_token' => $this->appToken,
             'refresh_token' => $this->refreshToken,

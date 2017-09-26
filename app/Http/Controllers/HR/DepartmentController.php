@@ -13,16 +13,19 @@ use App\Services\PluginService;
 use Authority;
 use DB;
 
-class DepartmentController extends Controller {
+class DepartmentController extends Controller
+{
 
     protected $model = 'App\Models\Department';
     protected $curdService;
 
-    public function __construct(CURD $curd) {
+    public function __construct(CURD $curd)
+    {
         $this->curdService = $curd->model($this->model);
     }
 
-    public function showManagePage() {
+    public function showManagePage()
+    {
         $data['position'] = Position::orderBy('level', 'asc')->get();
         return view('hr.department')->with($data);
     }
@@ -33,7 +36,8 @@ class DepartmentController extends Controller {
      * @param \App\Services\HRMService $HRM
      * @return type
      */
-    public function getOptionsById(Request $request, \App\Services\HRMService $HRM) {
+    public function getOptionsById(Request $request, \App\Services\HRMService $HRM)
+    {
         $id = $request->id ? $request->id : 0;
         return $HRM->getDepartmentOptionsById($id);
     }
@@ -44,11 +48,13 @@ class DepartmentController extends Controller {
      * @param PluginService $plugin
      * @return type
      */
-    public function getDepartmentList(Request $request, PluginService $plugin) {
+    public function getDepartmentList(Request $request, PluginService $plugin)
+    {
         return $plugin->dataTables($request, Department::visible());
     }
 
-    public function getInfo(Request $request) {
+    public function getInfo(Request $request)
+    {
         $id = $request->id;
         $department = Department::with('position')->find($id);
         return $department;
@@ -59,7 +65,8 @@ class DepartmentController extends Controller {
      * @param Request $request
      * @return type
      */
-    public function getTreeView(Request $request) {
+    public function getTreeView(Request $request)
+    {
         $checked = [];
         $hidden = [];
         if ($request->has('role_id')) {
@@ -83,7 +90,8 @@ class DepartmentController extends Controller {
      * @param Request $request
      * @return type
      */
-    public function addDepartmentByOne(Request $request) {
+    public function addDepartmentByOne(Request $request)
+    {
         return $this->addOrUpdate($request);
     }
 
@@ -92,7 +100,8 @@ class DepartmentController extends Controller {
      * @param Request $request
      * @return type
      */
-    public function editDepartmentByOne(Request $request) {
+    public function editDepartmentByOne(Request $request)
+    {
         return $this->addOrUpdate($request);
     }
 
@@ -101,7 +110,8 @@ class DepartmentController extends Controller {
      * @param Request $request
      * @return type
      */
-    protected function addOrUpdate(Request $request) {
+    protected function addOrUpdate(Request $request)
+    {
         $validateMsg = [
             'manager_name.exists' => '部门负责人 已离职或不存在',
         ];
@@ -116,7 +126,8 @@ class DepartmentController extends Controller {
      * @param Request $request
      * @return array
      */
-    public function deleteDepartment(Request $request) {
+    public function deleteDepartment(Request $request)
+    {
         $id = $request->id;
         $response = ['status' => 0, 'message' => '无效操作'];
         DB::beginTransaction();
@@ -134,13 +145,15 @@ class DepartmentController extends Controller {
      * @param Request $request
      * @return type
      */
-    public function reOrder(Request $request) {
+    public function reOrder(Request $request)
+    {
         $info = $request->info;
         Department::reOrder($info);
         return ['status' => 1, 'message' => '排序成功'];
     }
 
-    private function changeDepartmentsIntoZtreeNode($departments, $checked, $hidden) {
+    private function changeDepartmentsIntoZtreeNode($departments, $checked, $hidden)
+    {
         $data = [];
         $availableDepartments = Authority::getAvailableDepartments();
         foreach ($departments as $department) {
@@ -173,11 +186,12 @@ class DepartmentController extends Controller {
         return $data;
     }
 
-    protected function makeValidator(Request $request) {
+    protected function makeValidator(Request $request)
+    {
         return [
             'name' => ['required', 'unique:departments,name,' . $request->id . ',id,parent_id,' . $request->parent_id . ',deleted_at,NULL'],
             'parent_id' => ['required'],
-            'manager_name' => ['exists:staff,realname,status_id,>0'],
+            'manager_name' => ['exists:staff,realname'],
         ];
     }
 

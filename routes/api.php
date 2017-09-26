@@ -18,10 +18,12 @@ Route::group(['namespace' => 'Api', 'middleware' => 'apiPassport'], function () 
     Route::any('/get_user', ['uses' => 'HRMController@getUserInfo']); // 获取用户信息
     Route::any('/get_department', ['uses' => 'HRMController@getDepartmentInfo']); // 获取部门信息
     Route::any('/get_shop', ['uses' => 'HRMController@getShopInfo']); // 获取店铺信息
+    Route::post('set_shop', ['uses' => 'HRMController@setShopInfo']); // 配置店铺信息
     Route::any('/get_brand', ['uses' => 'HRMController@getBrandInfo']); // 获取品牌信息
     Route::any('/get_position', ['uses' => 'HRMController@getPositionInfo']); // 获取职位信息
     Route::any('/get_dingtalk_access_token', ['uses' => 'DingtalkController@getAccessToken']); //获取钉钉的accessToken
     Route::any('/get_dingtalk_js_api_ticket', ['uses' => 'DingtalkController@getJsApiTicket']); //获取钉钉的jsApiTicket
+    Route::any('/get_dingtalk_js_config', ['uses' => 'DingtalkController@getDingtalkConfig']); //获取钉钉的jsConfig
     Route::group(['prefix' => 'dingtalk'], function () {
         Route::any('/start_approval', ['uses' => 'DingtalkController@startApproval']); //发起钉钉审批
     });
