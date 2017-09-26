@@ -31,7 +31,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'apiPassport'], function () 
         Route::post('staff_update', ['uses' => 'HRMController@changeStaffInfo']);//修改员工信息
     });
     Route::group(['prefix' => 'appraise'], function () {//评价路由
-        Route::get('/appraiseFromSubmit', ['uses' => 'AppraiseController@appraiseFromSubmit']);
+        Route::post('/appraiseFromSubmit', ['uses' => 'AppraiseController@appraiseFromSubmit']);
     });
 });
 Route::get('/get_auth_code', ['uses' => 'Api\OAuthController@getAuthCode']);
