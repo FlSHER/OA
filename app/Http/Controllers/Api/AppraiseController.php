@@ -27,6 +27,7 @@ class AppraiseController extends Controller
         $data = $request->except(['_url']);
         $data['entry_staff_sn'] = app('CurrentUser')->staff_sn;
         $data['entry_name'] = app('CurrentUser')->realname;
+        return ['status'=>'success','message'=>$data];
         Appraise::insert($data);
         return ['status' => 'success'];
 //        return app('ApiResponse')->makeSuccessResponse('success', 200);
