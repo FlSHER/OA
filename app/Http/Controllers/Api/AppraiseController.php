@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\HR\Appraise;
+use App\Models\HR\Staff;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Validator;
@@ -24,9 +25,13 @@ class AppraiseController extends Controller
             return ['status' => 'error', 'message' => $validator->errors()->all()];
         }
 
+        $staff = Staff::find($request->staff_sn);
         $data = $request->only(['staff_sn', 'remark']);
         $data['entry_staff_sn'] = app('CurrentUser')->staff_sn;
         $data['entry_name'] = app('CurrentUser')->realname;
+        $data['position'] = $staff->position->name;
+        $data['department'] = $staff->department->name;
+        $data['shop'] = $staff->shop ? $staff->shop->name : '';
         Appraise::insert($data);
         return ['status' => 'success'];
     }
