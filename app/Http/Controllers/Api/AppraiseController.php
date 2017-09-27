@@ -26,12 +26,9 @@ class AppraiseController extends Controller
         }
 
         $data = $request->only(['staff_sn','remark']);
-        return ['status'=>'success','messahge'=>$data];
-        $appraise = new Appraise();
-        $appraise->create($request->only(['staff_sn','remark']));
-        $appraise->entry_staff_sn = app('CurrentUser')->staff_sn;
-        $appraise->entry_name = app('CurrentUser')->realname;
-        $appraise->save();
+        $data['entry_staff_sn'] = app('CurrentUser')->staff_sn;
+        $data['entry_name'] = app('CurrentUser')->realname;
+        Appraise::insert($data);
         return ['status' => 'success'];
 //        return app('ApiResponse')->makeSuccessResponse('success', 200);
     }
