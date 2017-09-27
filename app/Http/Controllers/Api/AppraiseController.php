@@ -15,13 +15,12 @@ class AppraiseController extends Controller
      */
     public function appraiseFromSubmit(Request $request)
     {
-        return ['status'=>'success','message'=>'wwwww'];
         $validator = Validator::make($request->all(), [
             'staff_sn' => 'required|exists:staff,staff_sn',
             'remark' => 'required|string',
         ], [], trans('fields.appraise'));
         if ($validator->fails()) {
-            return ['status' => 'error', 'response' => $validator->errors()];
+            return ['status' => 'error', 'message' => $validator->errors()];
 //            return app('ApiResponse')->makeErrorResponse('error', 500);
         }
         $data = $request->except(['_url']);
