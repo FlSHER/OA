@@ -21,7 +21,7 @@ class AppraiseController extends Controller
         ], [], trans('fields.appraise'));
 
         if ($validator->fails()) {
-            $errors = implode(array_values($validator->errors()),',');
+            $errors = array_values($validator->errors());
             return ['status' => 'error', 'message' => $errors];
         }
 
