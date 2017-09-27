@@ -25,9 +25,10 @@ class AppraiseController extends Controller
 //            return app('ApiResponse')->makeErrorResponse('error', 500);
         }
 
-        return ['status'=>'success','message'=>$request->input()];
+
         $appraise = new Appraise();
         $appraise->create($request->input());
+        return ['status'=>'success','message'=>'333'];
         $appraise->entry_staff_sn = app('CurrentUser')->staff_sn;
         $appraise->entry_name = app('CurrentUser')->realname;
         $appraise->save();
