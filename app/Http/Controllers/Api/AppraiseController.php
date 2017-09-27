@@ -22,14 +22,12 @@ class AppraiseController extends Controller
 
         if ($validator->fails()) {
             return ['status' => 'error', 'message' => $validator->errors()];
-//            return app('ApiResponse')->makeErrorResponse('error', 500);
         }
 
-        $data = $request->only(['staff_sn','remark']);
+        $data = $request->only(['staff_sn', 'remark']);
         $data['entry_staff_sn'] = app('CurrentUser')->staff_sn;
         $data['entry_name'] = app('CurrentUser')->realname;
         Appraise::insert($data);
         return ['status' => 'success'];
-//        return app('ApiResponse')->makeSuccessResponse('success', 200);
     }
 }
