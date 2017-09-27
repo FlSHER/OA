@@ -20,7 +20,7 @@ class AppraiseController extends Controller
             'remark' => 'required|string',
         ], [], trans('fields.appraise'));
 
-        if (!$validator->fails()) {
+        if ($validator->fails()) {
             return ['status' => 'error', 'message' => $validator->errors()];
 //            return app('ApiResponse')->makeErrorResponse('error', 500);
         }
