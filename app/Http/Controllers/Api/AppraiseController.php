@@ -21,7 +21,7 @@ class AppraiseController extends Controller
         ], [], trans('fields.appraise'));
 
         if ($validator->fails()) {
-            return ['status' => 'error', 'message' => $validator->errors()];
+            return ['status' => 'error', 'message' => $validator->errors()->all()];
         }
 
         $data = $request->only(['staff_sn', 'remark']);
