@@ -26,7 +26,7 @@ class AppraiseController extends Controller
         }
 
         $appraise = new Appraise();
-        $appraise->create($request);
+        $appraise->create($request->input());
         $appraise->entry_staff_sn = app('CurrentUser')->staff_sn;
         $appraise->entry_name = app('CurrentUser')->realname;
         $appraise->save();
