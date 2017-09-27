@@ -15,6 +15,7 @@ class AppraiseController extends Controller
      */
     public function appraiseFromSubmit(Request $request)
     {
+        return ['status'=>'success','message'=>'wwwww'];
         $validator = Validator::make($request->all(), [
             'staff_sn' => 'required|exists:staff,staff_sn',
             'remark' => 'required|string',
