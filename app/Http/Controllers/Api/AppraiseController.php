@@ -19,7 +19,7 @@ class AppraiseController extends Controller
             'staff_sn' => 'required|exists:staff,staff_sn',
             'remark' => 'required|string',
         ], [], trans('fields.appraise'));
-        return ['status'=>'error','message'=>$validator->errors()];
+        return ['status'=>'error','message'=>$validator->fails()];
 
         if ($validator->fails()) {
             return ['status' => 'error', 'message' => $validator->errors()];
