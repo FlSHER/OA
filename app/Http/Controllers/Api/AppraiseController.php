@@ -35,4 +35,29 @@ class AppraiseController extends Controller
         Appraise::insert($data);
         return ['status' => 'success'];
     }
+
+    /**
+     * 当前员工的评价列表
+     * @param Request $request
+     */
+    public function appraiseList(Request $request)
+    {
+        $page = $this->getPage($request);
+        $current_user = app('CurrentUser')->staff_sn;
+        $data = Appraise::where('entry_staff_sn', $current_user)->skip($page['start'])->take($page['length'])->get();
+        return ['status' => 'success', 'response' => $data];
+    }
+
+    private function getPage($request)
+    {
+        $length = 10;
+        $start = 0;
+        if (isset($request->length) && is_numeric($request->length)) {
+            $length = intval($request->length);
+        }
+        if (isset($request->start) && is_numeric($request->start)) {
+            $start = intval($request->start);
+        }
+        return ['start' => $start, 'length' => $length];
+    }
 }
