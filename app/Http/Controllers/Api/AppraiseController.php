@@ -44,7 +44,7 @@ class AppraiseController extends Controller
     {
         $page = $this->getPage($request);
         $current_user = app('CurrentUser')->staff_sn;
-        $data = Appraise::where('entry_staff_sn', $current_user)->skip($page['start'])->take($page['length'])->get();
+        $data = Appraise::where('entry_staff_sn', $current_user)->skip($page['start'])->take($page['length'])->orderBy('create_time','desc')->get();
         return ['status' => 'success', 'response' => $data];
     }
 
