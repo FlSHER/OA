@@ -30,6 +30,10 @@ Route::group(['namespace' => 'Api', 'middleware' => 'apiPassport'], function () 
     Route::group(['prefix' => 'hr'], function () {
         Route::post('staff_update', ['uses' => 'HRMController@changeStaffInfo']);//修改员工信息
     });
+    Route::group(['prefix' => 'appraise'], function () {//评价路由
+        Route::post('appraiseFromSubmit', ['uses' => 'AppraiseController@appraiseFromSubmit']);//评价表单提交处理
+        Route::post('appraiseList',['uses'=>'AppraiseController@appraiseList']);//当前员工的评价列表
+    });
 });
 Route::get('/get_auth_code', ['uses' => 'Api\OAuthController@getAuthCode']);
 Route::any('/get_token', ['uses' => 'Api\OAuthController@getAppToken']);
