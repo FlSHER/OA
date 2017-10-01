@@ -4,13 +4,16 @@ namespace App\Http\Middleware;
 
 use Closure;
 
-class AsyncBackstage {
+class AsyncBackstage
+{
 
     private $except = [
         'entrance',
         'reset_password',
         'finance/reimburse/print/',
+        'finance/check_reimburse/print/',
         'finance/reimburse/excel',
+        'finance/check_reimburse/excel',
         'personal/refresh_authority',
         'workflow/formDesignList',
         'workflow/formConfigExcelBlade',
@@ -30,11 +33,12 @@ class AsyncBackstage {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Closure $next
      * @return mixed
      */
-    public function handle($request, Closure $next) {
+    public function handle($request, Closure $next)
+    {
         $async = true;
         $uri = $request->path();
         foreach ($this->except as $value) {

@@ -67,9 +67,9 @@
                         ￥{{$v->audited_cost or 0}}</td>
                 </tr>
             <?php $bills_sum += count($v->bills);?>
-            @endif
         @endif
-    @endforeach
+    @endif
+@endforeach
 <!-- 总计 -->
     <tr class="row" style="border-top:2px solid #000;line-height:40px;">
         <td colspan="3">合计人民币（大写）：</td>
@@ -101,5 +101,23 @@
 
 <script>
     window.print();
-    setTimeout("window.top.close();", 400);
+
+    setTimeout(function () {
+        var seconds = 3;
+        windowCloseCountDown();
+        setInterval(windowCloseCountDown, 1000);
+
+        function windowCloseCountDown() {
+            if (seconds == 0) {
+                window.top.close();
+            }
+            var countDownDom = document.getElementById('count_down');
+            if (countDownDom == undefined) {
+                document.getElementsByTagName('body')[0].innerHTML = '<h1 style="text-align:center;margin-top:200px;color:#666;">页面将在 <span id="count_down" style="color:#333;">' + seconds + '</span> 秒后关闭<h1>';
+            } else {
+                countDownDom.innerHTML = seconds;
+            }
+            seconds--;
+        }
+    }, 400);
 </script>

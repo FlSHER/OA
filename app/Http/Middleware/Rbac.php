@@ -21,11 +21,6 @@ class Rbac {
         return $this->redirectToLoginPage();
     }
 
-    private function isLogin() {
-        $adminInfo = app();
-        return !empty($adminInfo);
-    }
-
     private function redirectToLoginPage() {
         $url = trim(url()->current(), '/');
         if ($url == trim(asset('/'), '/')) {
