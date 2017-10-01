@@ -10,7 +10,8 @@ namespace App\Services\Plugins;
 use Illuminate\Http\Request;
 use DB;
 
-class DataTablesService {
+class DataTablesService
+{
 
     protected $builder = [];
     protected $columns = [];
@@ -22,7 +23,8 @@ class DataTablesService {
     protected $start = 0;
     protected $length = 0;
 
-    public function get(Request $request, $tableName, $basicSql = 1) {
+    public function get(Request $request, $tableName, $basicSql = 1)
+    {
         $draw = $request->draw; //这个值直接返回给前台
         $this->builder = $this->makeBuiler($tableName)->whereRaw($basicSql);
         $this->columns = $this->getColumns($request);
@@ -36,27 +38,27 @@ class DataTablesService {
         $recordsTotal = $this->builder->count();
         /* 定义过滤条件查询过滤后的记录数 */
         $recordsFiltered = $this->builder
-                ->where(function($query) {
-                    $query = $this->dataTablesFilter($query);
-                })
-                ->where(function($query) {
-                    $query = $this->dataTablesSearch($query);
-                })
-                ->count();
+            ->where(function ($query) {
+                $query = $this->dataTablesFilter($query);
+            })
+            ->where(function ($query) {
+                $query = $this->dataTablesSearch($query);
+            })
+            ->count();
         /* 数据 */
         $data = $this->builder
-                ->with(array_flatten($this->relations))
-                ->when(!empty($this->order), function($query) {
-                    foreach ($this->order as $column => $dir) {
-                        $query->orderBy($column, $dir);
-                    }
-                    return $query;
-                })
-                ->when($this->length > 0, function($query) {
-                    return $query->skip($this->start)->take($this->length);
-                })
-                ->get()
-                ->toArray();
+            ->with(array_flatten($this->relations))
+            ->when(!empty($this->order), function ($query) {
+                foreach ($this->order as $column => $dir) {
+                    $query->orderBy($column, $dir);
+                }
+                return $query;
+            })
+            ->when($this->length > 0, function ($query) {
+                return $query->skip($this->start)->take($this->length);
+            })
+            ->get()
+            ->toArray();
         $this->makeResponseData($request, $data);
         /*
          * Output 包含的是必要的
@@ -69,7 +71,8 @@ class DataTablesService {
         ];
     }
 
-    protected function makeBuiler($tableName) {
+    protected function makeBuiler($tableName)
+    {
         if (is_object($tableName) && $tableName instanceof \Illuminate\Database\Eloquent\Builder) {
             $builder = $tableName;
         } else if (is_object($tableName) && $tableName instanceof \Illuminate\Database\Eloquent\Model) {
@@ -84,7 +87,8 @@ class DataTablesService {
         return $builder;
     }
 
-    protected function getColumns($request) {
+    protected function getColumns($request)
+    {
         $columns = [];
         foreach ($request->columns as $k => $v) {
             $column = [];
@@ -97,7 +101,8 @@ class DataTablesService {
         return $columns;
     }
 
-    protected function makeRelations() {
+    protected function makeRelations()
+    {
         $relations = [];
         foreach ($this->columns as $index => $columnGroup) {
             $relation = [];
@@ -113,7 +118,8 @@ class DataTablesService {
         return $relations;
     }
 
-    protected function makeFilter($request) {
+    protected function makeFilter($request)
+    {
         $filterOrigin = $request->filter ? $request->filter : [];
         $filter = [];
         foreach ($filterOrigin as $k => $v) {
@@ -122,7 +128,8 @@ class DataTablesService {
         return $filter;
     }
 
-    protected function makeSearchFilter($request) {
+    protected function makeSearchFilter($request)
+    {
         $this->searchValue = $request->search['value'];
         $searchFilter = [];
         if (!empty($this->searchValue)) {
@@ -137,7 +144,8 @@ class DataTablesService {
 
     /* -- order start -- */
 
-    protected function makeOrder($request) {
+    protected function makeOrder($request)
+    {
         $order = [];
         if (!empty($request->order)) {
             foreach ($request->order as $v) {
@@ -152,7 +160,8 @@ class DataTablesService {
         return $order;
     }
 
-    protected function getOrderColumns($index) {
+    protected function getOrderColumns($index)
+    {
         $columns = [];
         if (array_has($this->relations, $index)) {
             $relation = $this->relations[$index];
@@ -176,7 +185,8 @@ class DataTablesService {
 
     /* -- filter start -- */
 
-    private function dataTablesFilter($query) {
+    private function dataTablesFilter($query)
+    {
         $filter = $this->filter;
         foreach ($filter as $key => $value) {
             $query = $this->filterByTree($query, $key, $value);
@@ -184,17 +194,21 @@ class DataTablesService {
         return $query;
     }
 
-    private function filterByTree($query, $column, $filter) {
+    private function filterByTree($query, $column, $filter)
+    {
         if (is_string($filter)) {
             $filter = ['is' => $filter];
         }
         foreach ($filter as $k => $v) {
             switch ($k) {
                 case 'min':
-                    $query->where($column, '>', $v);
+                    $query->where($column, '>=', $v);
                     break;
                 case 'max':
-                    $query->where($column, '<', $v);
+                    if (preg_match('/^\d{4}[\/-]\d{2}[\/-]\d{2}$/', $v)) {
+                        $v = $v . ' 23:59:59';
+                    }
+                    $query->where($column, '<=', $v);
                     break;
                 case 'in':
                     $v = is_array($v) ? $v : explode(',', $v);
@@ -210,7 +224,7 @@ class DataTablesService {
                     $query->where($column, '=', $v);
                     break;
                 case 'or':
-                    $query->orWhere(function($q)use($column, $v) {
+                    $query->orWhere(function ($q) use ($column, $v) {
                         $this->filterByTree($q, $column, $v);
                     });
                     break;
@@ -231,7 +245,8 @@ class DataTablesService {
      * @param object $query
      * @return object
      */
-    private function dataTablesSearch($query) {
+    private function dataTablesSearch($query)
+    {
         foreach ($this->searchFilter as $column) {
             $this->searchByTree($query, $column, $this->searchValue);
         }
@@ -244,11 +259,12 @@ class DataTablesService {
      * @param array $column
      * @param string $search
      */
-    private function searchByTree(& $query, $column, $search) {
+    private function searchByTree(& $query, $column, $search)
+    {
         $first = array_shift($column);
         if (count($column) > 1) {
             $query->orWhereHas($first, function ($q) use ($column, $search) {
-                $q->where(function($qq)use($column, $search) {
+                $q->where(function ($qq) use ($column, $search) {
                     $this->searchByTree($qq, $column, $search);
                 });
             });
@@ -261,12 +277,13 @@ class DataTablesService {
         }
     }
 
-    private function makeResponseData($request, &$data) {
+    private function makeResponseData($request, &$data)
+    {
         foreach ($data as $index => $row) {
             foreach ($request->columns as $v) {
                 $column = $v['data'];
                 if (preg_match('/{[\w\.\*]+}/', $column)) {
-                    $code = preg_replace(['/{([\w\.]+)}/', '/{([\w\.]+)\.\*\.([\w\.]+)}/'], [ 'array_get($row, \'$1\')', 'array_pluck(array_get($row, \'$1\'),\'$2\')'], $column);
+                    $code = preg_replace(['/{([\w\.]+)}/', '/{([\w\.]+)\.\*\.([\w\.]+)}/'], ['array_get($row, \'$1\')', 'array_pluck(array_get($row, \'$1\'),\'$2\')'], $column);
                     eval('array_set($data[$index], $column, ' . $code . ');');
                 }
             }
