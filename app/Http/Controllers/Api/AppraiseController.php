@@ -45,11 +45,12 @@ class AppraiseController extends Controller
         $page = $this->getPage($request);
         $current_user = app('CurrentUser')->staff_sn;
         $data = Appraise::with('staff')->where('entry_staff_sn', $current_user)->skip($page['start'])->take($page['length'])->orderBy('create_time','desc')->get();
-        return ['status' => 'success', 'response' => $data];
+        return ['status' => 'success', 'response' => $data,'page'=>$page];
     }
 
     private function getPage($request)
     {
+        $current_user = app('CurrentUser')->staff_sn;
         $length = 10;
         $start = 0;
         if (isset($request->length) && is_numeric($request->length)) {
@@ -58,6 +59,8 @@ class AppraiseController extends Controller
         if (isset($request->start) && is_numeric($request->start)) {
             $start = intval($request->start);
         }
-        return ['start' => $start, 'length' => $length];
+        $total = Appraise::where('entry_staff_sn',$current_user)->count();//总条数
+        $pages = ceil($total/$length);//总页数
+        return ['start' => $start, 'length' => $length,'total'=>$total,'pages'=>$pages];
     }
 }
