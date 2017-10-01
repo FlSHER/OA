@@ -44,23 +44,24 @@ class AppraiseController extends Controller
     {
         $page = $this->getPage($request);
         $current_user = app('CurrentUser')->staff_sn;
-        $data = Appraise::with('staff')->where('entry_staff_sn', $current_user)->skip($page['start'])->take($page['length'])->orderBy('create_time','desc')->get();
-        return ['status' => 'success', 'response' => $data,'page'=>$page];
+        $data = Appraise::with('staff')->where('entry_staff_sn', $current_user)->skip($page['start'])->take($page['length'])->orderBy('create_time', 'desc')->get();
+        return ['status' => 'success', 'response' => $data, 'page' => $page];
     }
 
     private function getPage($request)
     {
         $current_user = app('CurrentUser')->staff_sn;
         $length = 10;
-        $start = 0;
+        $pageIndex = 1;//当前页
         if (isset($request->length) && is_numeric($request->length)) {
             $length = intval($request->length);
         }
-        if (isset($request->start) && is_numeric($request->start)) {
-            $start = intval($request->start);
+        if (isset($request->start) && is_numeric($request->pageIndex)) {
+            $pageIndex = intval($request->pageIndex);
         }
-        $total = Appraise::where('entry_staff_sn',$current_user)->count();//总条数
-        $pages = ceil($total/$length);//总页数
-        return ['start' => $start, 'length' => $length,'total'=>$total,'pages'=>$pages];
+        $total = Appraise::where('entry_staff_sn', $current_user)->count();//总条数
+        $pages = ceil($total / $length);//总页数
+        $start = ($pageIndex - 1) * $length;
+        return ['pageIndex' => $pageIndex, 'length' => $length, 'total' => $total, 'pages' => $pages,'start'=>$start];
     }
 }
