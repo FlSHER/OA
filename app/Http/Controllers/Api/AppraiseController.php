@@ -56,7 +56,7 @@ class AppraiseController extends Controller
         if (isset($request->length) && is_numeric($request->length)) {
             $length = intval($request->length);
         }
-        if (isset($request->start) && is_numeric($request->pageIndex)) {
+        if (isset($request->pageIndex) && is_numeric($request->pageIndex)) {
             $pageIndex = intval($request->pageIndex);
         }
         $total = Appraise::where('entry_staff_sn', $current_user)->count();//总条数
