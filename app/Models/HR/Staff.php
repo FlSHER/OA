@@ -113,6 +113,9 @@ class Staff extends Model {
         return $this->hasOne('App\Models\HR\StaffTmp', 'staff_sn');
     }
 
+    public function appraise(){//员工评价
+        return $this->hasMany('App\Models\HR\Appraise','staff_sn','staff_sn')->orderBy('create_time','desc');
+    }
     /* ----- 定义关联 End ----- */
 
     /* ----- 访问器 Start ----- */
