@@ -5,7 +5,8 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
-class Kernel extends ConsoleKernel {
+class Kernel extends ConsoleKernel
+{
 
     /**
      * The Artisan commands provided by your application.
@@ -14,17 +15,20 @@ class Kernel extends ConsoleKernel {
      */
     protected $commands = [
         'App\Console\Commands\TransferStaff',
-        'App\Console\Commands\UpdateDistrictJs'
+        'App\Console\Commands\UpdateDistrictJs',
+        \App\Console\Commands\MakeWorkingSchedule::class,
     ];
 
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param  \Illuminate\Console\Scheduling\Schedule $schedule
      * @return void
      */
-    protected function schedule(Schedule $schedule) {
-        $schedule->command('staff:transfer')->dailyAt('4:00');
+    protected function schedule(Schedule $schedule)
+    {
+        $schedule->command('attendance:makeSchedule')->dailyAt('4:00');
+        $schedule->command('staff:transfer')->dailyAt('4:30');
         $schedule->command('make:district-js')->dailyAt('4:05');
     }
 
@@ -33,7 +37,8 @@ class Kernel extends ConsoleKernel {
      *
      * @return void
      */
-    protected function commands() {
+    protected function commands()
+    {
         require base_path('routes/console.php');
     }
 
