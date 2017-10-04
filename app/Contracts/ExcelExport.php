@@ -9,7 +9,8 @@ namespace App\Contracts;
 
 use Excel;
 
-class ExcelExport {
+class ExcelExport
+{
 
     protected $filePath;
     protected $fileName;
@@ -23,7 +24,8 @@ class ExcelExport {
      * @param type $extension
      * @return \App\Contracts\ExcelExport
      */
-    public function extension($extension) {
+    public function extension($extension)
+    {
         if (in_array($extension, $this->availableExtension)) {
             $this->extension = $extension;
         } else {
@@ -37,7 +39,8 @@ class ExcelExport {
      * @param type $transPath
      * @return \App\Contracts\ExcelExport
      */
-    public function trans($transPath) {
+    public function trans($transPath)
+    {
         if (is_array($transPath) && array_keys($transPath) == range(0, count($transPath) - 1)) {
             foreach ($transPath as $v) {
                 $trans = array_dot(trans($v));
@@ -56,7 +59,8 @@ class ExcelExport {
      * @param type $filePath
      * @return \App\Contracts\ExcelExport
      */
-    public function setPath($filePath) {
+    public function setPath($filePath)
+    {
         $this->filePath = trim($filePath, '/') . '/';
         return $this;
     }
@@ -66,7 +70,8 @@ class ExcelExport {
      * @param type $baseName
      * @return \App\Contracts\ExcelExport
      */
-    public function setBaseName($baseName) {
+    public function setBaseName($baseName)
+    {
         $this->fileName = $baseName;
         return $this;
     }
@@ -76,7 +81,8 @@ class ExcelExport {
      * @param type $columns
      * @return \App\Contracts\ExcelExport
      */
-    public function setColumns(array $columns) {
+    public function setColumns(array $columns)
+    {
         $inSheet = false;
         foreach ($columns as $v) {
             if (!is_array($v)) {
@@ -95,7 +101,8 @@ class ExcelExport {
      * @param type $data
      * @return type
      */
-    public function export(array $data) {
+    public function export(array $data)
+    {
         $file = $this->makeFile($data);
         if (request()->isXmlHttpRequest()) {
             $file->save($this->extension);
@@ -105,18 +112,20 @@ class ExcelExport {
         }
     }
 
-    protected function makeFile(array $data) {
+    protected function makeFile(array $data)
+    {
         $fileName = $this->makeFileName();
-        $file = Excel::create($fileName, function($excel)use($data) {
-                    foreach ($data as $sheetName => $sheetData) {
-                        $this->makeSheet($excel, $sheetName, $sheetData);
-                    }
-                });
+        $file = Excel::create($fileName, function ($excel) use ($data) {
+            foreach ($data as $sheetName => $sheetData) {
+                $this->makeSheet($excel, $sheetName, $sheetData);
+            }
+        });
         return $file;
     }
 
-    protected function makeSheet($excel, $sheetName, array $data) {
-        $excel->sheet($sheetName, function($sheet)use($data, $sheetName) {
+    protected function makeSheet($excel, $sheetName, array $data)
+    {
+        $excel->sheet($sheetName, function ($sheet) use ($data, $sheetName) {
             if (!empty($this->columns[$sheetName]) || !empty($this->columns[0])) {
                 $sheetColumns = array_has($this->columns, $sheetName) ? $this->columns[$sheetName] : $this->columns[0];
                 $data = $this->filter($data, $sheetColumns);
@@ -129,12 +138,13 @@ class ExcelExport {
         });
     }
 
-    protected function filter(array $data, $columns) {
-        $filteredData = array_map(function($value)use($columns) {
+    protected function filter(array $data, $columns)
+    {
+        $filteredData = array_map(function ($value) use ($columns) {
             $response = [];
-            foreach ($columns as $k => $v) {
+            foreach ($columns as $name => $v) {
                 $column = is_array($v) ? $v['data'] : $v;
-                is_numeric($k) && $name = empty($v['name']) ? $column : $v['name'];
+                is_numeric($name) && $name = empty($v['name']) ? $column : $v['name'];
                 $cell = array_get($value, $column);
                 array_set($response, $name, is_array($cell) ? implode(',', $cell) : $cell);
             }
@@ -143,7 +153,8 @@ class ExcelExport {
         return $filteredData;
     }
 
-    protected function localize($sheetData) {
+    protected function localize($sheetData)
+    {
         $response = [];
         foreach ($sheetData as $row) {
             $newRow = [];
@@ -156,8 +167,9 @@ class ExcelExport {
         return $response;
     }
 
-    protected function makeBasicStyle($sheet) {
-        $sheet->row('1', function($row) {
+    protected function makeBasicStyle($sheet)
+    {
+        $sheet->row('1', function ($row) {
             $row->setBackground('#26651e');
             $row->setFontColor('#ffffff');
             $row->setFontWeight('bold');
@@ -166,7 +178,8 @@ class ExcelExport {
         $sheet->freezeFirstRow();
     }
 
-    protected function makeFileName() {
+    protected function makeFileName()
+    {
         $exportPath = storage_path('exports/' . $this->filePath);
         if (!is_dir($exportPath)) {
             mkdir($exportPath, 0777, true);
