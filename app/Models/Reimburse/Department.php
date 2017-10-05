@@ -4,7 +4,8 @@ namespace App\Models\Reimburse;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Department extends Model {
+class Department extends Model
+{
 
     public $timestamps = false;
     protected $connection = 'reimburse_mysql';
@@ -13,19 +14,28 @@ class Department extends Model {
         'reim_department_id',
     ];
 
-    public function reim_department() {
+    public function department()
+    {
+        return $this->belongsTo('App\Models\Department', 'department_id');
+    }
+
+    public function reim_department()
+    {
         return $this->belongsto('App\Models\Reimburse\Reim_department');
     }
 
-    public function approver1() {
+    public function approver1()
+    {
         return $this->hasMany('App\Models\Reimburse\Approver')->where('priority', 1);
     }
 
-    public function approver2() {
+    public function approver2()
+    {
         return $this->hasMany('App\Models\Reimburse\Approver')->where('priority', 2);
     }
 
-    public function approver3() {
+    public function approver3()
+    {
         return $this->hasMany('App\Models\Reimburse\Approver')->where('priority', 3);
     }
 
