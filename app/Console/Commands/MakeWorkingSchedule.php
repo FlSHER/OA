@@ -71,7 +71,7 @@ class MakeWorkingSchedule extends Command
                         ->where(['shop_sn' => $model->shop_sn, 'staff_sn' => $staffSn])
                         ->delete();
                 }
-
             });
+        DB::connection('attendance')->select('DROP TABLE IF EXISTS working_schedule_' . date('Ymd', strtotime("-7 day")));
     }
 }
