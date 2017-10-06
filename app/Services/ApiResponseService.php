@@ -42,6 +42,11 @@ class ApiResponseService
 
     public function getWeatherImage($cityCode)
     {
+        if ($cityCode = '000000') {
+            $image = imagecreate(310, 45);
+            imagecolorallocate($image, 255, 255, 255);
+            imagepng($image);
+        }
         $baseUrl = 'http://restapi.amap.com/v3/weather/weatherInfo?key=46649b37382db424a33e34f487c5f3b7&extensions=all&city=';
         $weatherData = app('Curl')->setUrl($baseUrl . $cityCode)->get();
         try {
