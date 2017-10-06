@@ -9,7 +9,8 @@ use App\Contracts\OperationLog;
 use App\Contracts\ExcelImport;
 use App\Contracts\CURD;
 
-class TransferController extends Controller {
+class TransferController extends Controller
+{
 
     protected $model = 'App\Models\HR\Attendance\StaffTransfer';
     protected $transPath = 'fields.transfer';
@@ -17,29 +18,34 @@ class TransferController extends Controller {
     protected $logService;
     protected $importService;
 
-    public function __construct(OperationLog $logService, ExcelImport $importService, CURD $curd) {
+    public function __construct(OperationLog $logService, ExcelImport $importService, CURD $curd)
+    {
         $this->logService = $logService;
         $this->importService = $importService->extension('xlsx')->trans($this->transPath);
         $this->curdService = $curd->model($this->model);
     }
 
-    public function showManagePage() {
+    public function showManagePage()
+    {
         return view('hr.attendance.transfer');
     }
 
-    public function getList(Request $request) {
+    public function getList(Request $request)
+    {
         $model = $this->model;
         return app('Plugin')->dataTables($request, $model::visible());
     }
 
-    public function getInfo(Request $request) {
+    public function getInfo(Request $request)
+    {
         $id = $request->id;
         $model = $this->model;
         $info = $model::with(['tag'])->find($id);
         return $info;
     }
 
-    public function addOrEdit(Request $request) {
+    public function addOrEdit(Request $request)
+    {
         $this->validate($request, $this->makeValidator($request), [], trans($this->transPath));
         if ($request->has('id')) {
             return $this->editByOne($request);
@@ -48,9 +54,10 @@ class TransferController extends Controller {
         }
     }
 
-    public function addByOne(Request $request) {
+    public function addByOne(Request $request)
+    {
         $model = $this->model;
-        $count = $model::where($request->only(['staff_sn', 'leaving_shop_sn', 'left_at', 'arriving_shop_sn', 'arriving_shop_duty']))->count();
+        $count = $model::where($request->only(['staff_sn', 'leaving_shop_sn', 'leaving_date', 'arriving_shop_sn', 'arriving_shop_duty_id']))->count();
         if ($count > 0) {
             $response['message'] = '调动已存在';
         } else {
@@ -62,13 +69,15 @@ class TransferController extends Controller {
         return $response;
     }
 
-    public function editByOne(Request $request) {
+    public function editByOne(Request $request)
+    {
         $data = $request->all();
         $response = $this->curdService->update($data);
         return $response;
     }
 
-    public function import(Request $request) {
+    public function import(Request $request)
+    {
         $excelData = $this->importService->load($request);
         $success = 0;
         $fails = [];
@@ -100,7 +109,8 @@ class TransferController extends Controller {
         return view('hr/staff/staff_import')->with($data);
     }
 
-    public function export(Request $request) {
+    public function export(Request $request)
+    {
         $exportData = $this->getList($request)['data'];
         $columns = [];
         foreach ($request->columns as $v) {
@@ -114,14 +124,15 @@ class TransferController extends Controller {
         return ['state' => 1, 'file_name' => $file];
     }
 
-    protected function makeValidator($input) {
+    protected function makeValidator($input)
+    {
         $validator = [
             'staff_sn' => ['required_with:staff_name'],
             'staff_name' => ['required', 'exists:staff,realname,staff_sn,' . $input['staff_sn']],
             'leaving_shop_sn' => ['exists:shops,shop_sn,deleted_at,NULL'],
             'arriving_shop_sn' => ['required', 'exists:shops,shop_sn,deleted_at,NULL'],
-            'arriving_shop_duty' => ['in:店长,店助,导购,协助'],
-            'left_at' => ['required', 'date', 'after:2000-1-1'],
+            'arriving_shop_duty_id' => ['exists:attendance.shop_duty,id'],
+            'leaving_date' => ['required', 'date', 'after:2000-1-1'],
             'remark' => ['max:200'],
         ];
         return $validator;
