@@ -53,13 +53,16 @@ class MakeWorkingSchedule extends Command
         $addCount = 0;
         $deleteCount = 0;
         DB::table('staff')
-            ->select(DB::raw('GROUP_CONCAT(staff_sn) AS staff_sn'), 'shop_sn')
-            ->where('shop_sn', '<>', '')->groupBy('shop_sn')
-            ->get()->each(function ($model) use ($addCount, $deleteCount) {
-                $BasicStaffSnList = explode(',', $model->staff_sn);
+            ->select('staff_sn', 'realname', 'shop_sn')
+            ->where('shop_sn', '<>', '')
+            ->get()->groupBy('shop_sn')->each(function ($staffGroup) use ($addCount, $deleteCount) {
+                $shopSn = $staffGroup->first()->shop_sn;
+                $BasicStaffSnList = $staffGroup->pluck('staff_sn')->toArray();
+                $BasicStaffNameList = $staffGroup->pluck('realname')->toArray();
+                $BasicStaffList = array_combine($BasicStaffSnList, $BasicStaffNameList);
                 $ScheduleStaffSnList = DB::connection('attendance')
                     ->table('working_schedule_' . date('Ymd'))
-                    ->where('shop_sn', $model->shop_sn)->get()->pluck('staff_sn');
+                    ->where('shop_sn', $shopSn)->get()->pluck('staff_sn');
                 $ScheduleStaffSnList = json_decode($ScheduleStaffSnList);
                 $addList = empty($ScheduleStaffSnList) ? $BasicStaffSnList : array_diff($BasicStaffSnList, $ScheduleStaffSnList);
                 $deleteList = empty($ScheduleStaffSnList) ? [] : array_diff($ScheduleStaffSnList, $BasicStaffSnList);
@@ -67,13 +70,13 @@ class MakeWorkingSchedule extends Command
                     $addCount++;
                     DB::connection('attendance')
                         ->table('working_schedule_' . date('Ymd'))
-                        ->insert(['shop_sn' => $model->shop_sn, 'staff_sn' => $staffSn]);
+                        ->insert(['shop_sn' => $shopSn, 'staff_sn' => $staffSn, 'staff_name' => $BasicStaffList[$staffSn]]);
                 }
                 foreach ($deleteList as $staffSn) {
                     $deleteCount++;
                     DB::connection('attendance')
                         ->table('working_schedule_' . date('Ymd'))
-                        ->where(['shop_sn' => $model->shop_sn, 'staff_sn' => $staffSn])
+                        ->where(['shop_sn' => $shopSn, 'staff_sn' => $staffSn])
                         ->delete();
                 }
             });
