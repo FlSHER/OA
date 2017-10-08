@@ -54,8 +54,12 @@ class MakeWorkingSchedule extends Command
         $deleteCount = 0;
         DB::table('staff')
             ->select('staff_sn', 'realname', 'shop_sn')
-            ->where('shop_sn', '<>', '')
-            ->get()->groupBy('shop_sn')->each(function ($staffGroup) use ($addCount, $deleteCount) {
+            ->where([
+                ['shop_sn', '<>', ''],
+                ['status_id', '>=', '0']
+            ])->whereNotNull('deleted_at')
+            ->get()->groupBy('shop_sn')
+            ->each(function ($staffGroup) use ($addCount, $deleteCount) {
                 $shopSn = $staffGroup->first()->shop_sn;
                 $BasicStaffSnList = $staffGroup->pluck('staff_sn')->toArray();
                 $BasicStaffNameList = $staffGroup->pluck('realname')->toArray();
