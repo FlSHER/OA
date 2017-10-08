@@ -46,20 +46,21 @@ class ApiResponseService
             $image = imagecreate(310, 45);
             imagecolorallocate($image, 255, 255, 255);
             imagepng($image);
-        }
-        $baseUrl = 'http://restapi.amap.com/v3/weather/weatherInfo?key=46649b37382db424a33e34f487c5f3b7&extensions=all&city=';
-        $weatherData = app('Curl')->setUrl($baseUrl . $cityCode)->get();
-        try {
-            $this->makeWeatherImage($weatherData);
-        } catch (\Exception $e) {
-            $cityCode = substr($cityCode, 0, 4) . '00';
+        } else {
+            $baseUrl = 'http://restapi.amap.com/v3/weather/weatherInfo?key=46649b37382db424a33e34f487c5f3b7&extensions=all&city=';
             $weatherData = app('Curl')->setUrl($baseUrl . $cityCode)->get();
             try {
                 $this->makeWeatherImage($weatherData);
             } catch (\Exception $e) {
-                $cityCode = substr($cityCode, 0, 2) . '0000';
+                $cityCode = substr($cityCode, 0, 4) . '00';
                 $weatherData = app('Curl')->setUrl($baseUrl . $cityCode)->get();
-                $this->makeWeatherImage($weatherData);
+                try {
+                    $this->makeWeatherImage($weatherData);
+                } catch (\Exception $e) {
+                    $cityCode = substr($cityCode, 0, 2) . '0000';
+                    $weatherData = app('Curl')->setUrl($baseUrl . $cityCode)->get();
+                    $this->makeWeatherImage($weatherData);
+                }
             }
         }
     }
