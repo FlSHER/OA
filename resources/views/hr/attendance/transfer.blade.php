@@ -111,7 +111,7 @@
             {data: "staff_name", title: "员工姓名"},
             {data: "staff_gender", title: "性别", visible: false, searchable: false},
             {data: "staff_department_name", title: "部门名称", defaultContent: "无"},
-            {data: "current_shop.name", title: "所属店铺", visible: false, defaultContent: "无"},
+            {data: "current_shop.name", title: "所属店铺", visible: false, defaultContent: "无", searchable: false},
             {data: "leaving_shop_sn", title: "调离店铺代码", visible: false},
             {data: "leaving_shop_name", title: "调离店铺名称", defaultContent: "无"},
             {
