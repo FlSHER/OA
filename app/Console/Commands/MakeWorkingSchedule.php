@@ -52,38 +52,41 @@ class MakeWorkingSchedule extends Command
         }
         $addCount = 0;
         $deleteCount = 0;
-        DB::table('staff')
-            ->select('staff_sn', 'realname', 'shop_sn')
+
+        $basicList = DB::table('staff')
+            ->select(DB::raw('CONCAT(`shop_sn`,"-",`staff_sn`) AS sn'), 'staff_sn', 'shop_sn', 'realname')
             ->where([
                 ['shop_sn', '<>', ''],
                 ['status_id', '>=', '0']
-            ])->whereNotNull('deleted_at')
-            ->get()->groupBy('shop_sn')
-            ->each(function ($staffGroup) use ($addCount, $deleteCount) {
-                $shopSn = $staffGroup->first()->shop_sn;
-                $BasicStaffSnList = $staffGroup->pluck('staff_sn')->toArray();
-                $BasicStaffNameList = $staffGroup->pluck('realname')->toArray();
-                $BasicStaffList = array_combine($BasicStaffSnList, $BasicStaffNameList);
-                $ScheduleStaffSnList = DB::connection('attendance')
-                    ->table('working_schedule_' . date('Ymd'))
-                    ->where('shop_sn', $shopSn)->get()->pluck('staff_sn');
-                $ScheduleStaffSnList = json_decode($ScheduleStaffSnList);
-                $addList = empty($ScheduleStaffSnList) ? $BasicStaffSnList : array_diff($BasicStaffSnList, $ScheduleStaffSnList);
-                $deleteList = empty($ScheduleStaffSnList) ? [] : array_diff($ScheduleStaffSnList, $BasicStaffSnList);
-                foreach ($addList as $staffSn) {
-                    $addCount++;
-                    DB::connection('attendance')
-                        ->table('working_schedule_' . date('Ymd'))
-                        ->insert(['shop_sn' => $shopSn, 'staff_sn' => $staffSn, 'staff_name' => $BasicStaffList[$staffSn]]);
-                }
-                foreach ($deleteList as $staffSn) {
-                    $deleteCount++;
-                    DB::connection('attendance')
-                        ->table('working_schedule_' . date('Ymd'))
-                        ->where(['shop_sn' => $shopSn, 'staff_sn' => $staffSn])
-                        ->delete();
-                }
-            });
+            ])->whereNull('deleted_at')->get();
+        $basicSnList = $basicList->pluck('sn')->all();
+        $basicStaffList = $basicList->pluck('realname', 'staff_sn')->all();
+
+        $scheduleSnList = DB::connection('attendance')
+            ->table('working_schedule_' . date('Ymd'))
+            ->select(DB::raw('CONCAT(`shop_sn`,"-",`staff_sn`) AS sn'))
+            ->pluck('sn')->all();
+
+        $addList = empty($scheduleSnList) ? $basicSnList : array_diff($basicSnList, $scheduleSnList);
+        $deleteList = empty($scheduleSnList) ? [] : array_diff($scheduleSnList, $basicSnList);
+
+        foreach ($addList as $sn) {
+            $addCount++;
+            $staffSn = substr($sn, -6);
+            $shopSn = substr($sn, 0, -7);
+            DB::connection('attendance')
+                ->table('working_schedule_' . date('Ymd'))
+                ->insert(['shop_sn' => $shopSn, 'staff_sn' => $staffSn, 'staff_name' => $basicStaffList[$staffSn]]);
+        }
+
+        foreach ($deleteList as $sn) {
+            $deleteCount++;
+            DB::connection('attendance')
+                ->table('working_schedule_' . date('Ymd'))
+                ->where(['shop_sn' => $shopSn, 'staff_sn' => $staffSn])
+                ->delete();
+        }
+
         Log::info('add:' . $addCount . ' delete:' . $deleteCount);
         DB::connection('attendance')->select('DROP TABLE IF EXISTS working_schedule_' . date('Ymd', strtotime("-7 day")));
         Log::info('End making working schedule');
