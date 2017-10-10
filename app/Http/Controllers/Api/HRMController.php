@@ -108,6 +108,17 @@ class HRMController extends Controller
     }
 
     /**
+     * 修改店铺信息
+     * @param Request $request
+     * @return mixed
+     */
+    public function changeShopInfo(Request $request)
+    {
+        $id = $request->has('id') ? $request->id : Shop::where('shop_sn', $request->shop_sn)->value('id');
+        return $this->changeInfo($request->input(), 'App\Models\HR\Shop', $id);
+    }
+
+    /**
      * 修改信息
      * @param $data
      * @param $model

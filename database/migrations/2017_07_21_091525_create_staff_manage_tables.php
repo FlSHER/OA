@@ -4,14 +4,16 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateStaffManageTables extends Migration {
+class CreateStaffManageTables extends Migration
+{
 
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up() {
+    public function up()
+    {
         /**
          * 员工主表
          */
@@ -30,7 +32,7 @@ class CreateStaffManageTables extends Migration {
             $table->tinyInteger('brand_id')->unsigned()->comment('品牌ID');
             $table->smallInteger('department_id')->unsigned()->comment('部门ID');
             $table->smallInteger('position_id')->unsigned()->comment('职位ID');
-            $table->smallInteger('shop_id')->unsigned()->comment('店铺ID');
+            $table->char('shop_sn', 10)->comment('店铺编码');
             $table->tinyInteger('status_id')->comment('状态ID');
             $table->tinyInteger('is_active')->unsigned()->comment('是否激活');
             $table->date('hired_at')->comment('入职日期');
@@ -97,7 +99,8 @@ class CreateStaffManageTables extends Migration {
      *
      * @return void
      */
-    public function down() {
+    public function down()
+    {
         Schema::dropIfExists('staff');
         Schema::dropIfExists('staff_info');
         Schema::dropIfExists('staff_relatives');

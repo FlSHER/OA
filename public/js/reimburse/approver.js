@@ -7,14 +7,10 @@
 var token = $('meta[name="_token"]').attr('content');
 var approverTable = $("#approverTable").oaTable({
     "columns": [
-        {"data": "department_id", "title": "部门",
-            "createdCell": function (nTd, sData, oData, iRow, iCol) {
-                $(nTd).attr('title', oData.department_name);
-                $(nTd).text(oData.department_name);
-            }
-        },
+        {"data": "department.full_name", "title": "部门", defaultContent: ""},
         {"data": "reim_department.name", "title": "资金归属"},
-        {"data": "approver1.realname", "title": "一级审批人", "defaultContent": "",
+        {
+            "data": "approver1.realname", "title": "一级审批人", "defaultContent": "", orderable: false,
             "createdCell": function (nTd, sData, oData, iRow, iCol) {
                 var html = '';
                 $.each(oData.approver1, function (k, v) {
@@ -25,7 +21,8 @@ var approverTable = $("#approverTable").oaTable({
                 $(nTd).attr('title', html);
             }
         },
-        {"data": "approver2.realname", "title": "二级审批人", "defaultContent": "",
+        {
+            "data": "approver2.realname", "title": "二级审批人", "defaultContent": "", orderable: false,
             "createdCell": function (nTd, sData, oData, iRow, iCol) {
                 var html = '';
                 $.each(oData.approver2, function (k, v) {
@@ -36,7 +33,8 @@ var approverTable = $("#approverTable").oaTable({
                 $(nTd).attr('title', html);
             }
         },
-        {"data": "approver3.realname", "title": "三级审批人", "defaultContent": "",
+        {
+            "data": "approver3.realname", "title": "三级审批人", "defaultContent": "", orderable: false,
             "createdCell": function (nTd, sData, oData, iRow, iCol) {
                 var html = '';
                 $.each(oData.approver3, function (k, v) {
@@ -47,7 +45,8 @@ var approverTable = $("#approverTable").oaTable({
                 $(nTd).attr('title', html);
             }
         },
-        {"data": "id", "title": "操作", "sortable": false,
+        {
+            "data": "id", "title": "操作", "sortable": false,
             "render": function (data, type, row, meta) {
                 return '<a href="javascript:editApprover(' + data + ')" title="编辑">编辑 </a> | <a href="javascript:delApprover(' + data + ');" title="删除">删除</a>';
             }
@@ -66,6 +65,7 @@ function addApprover() {
     $('#apporverTitle').text('添加审批');
     $('#approverForm')[0].reset();
 }
+
 //删除
 function delApprover(id) {
     if (confirm('确认删除？')) {
@@ -88,6 +88,7 @@ function editApprover(id) {
     $('#apporverTitle').text('编辑审批');
     $('#approverForm').oaForm()[0].fillData('/app/reimburse/editApprover', {id: id});
 }
+
 //表单配置数据
 var approverFormOption = {
     callback: {
@@ -107,6 +108,7 @@ var approverFormOption = {
 jQuery(function () {
     init();//初始化表单
 });
+
 //初始化表单
 function init() {
     $('#approverForm').oaForm(approverFormOption);
@@ -118,6 +120,7 @@ function approverFormSubmitSuccess(msg, obj) {
     $('.close').click();
     approverTable.draw();
 }
+
 //function auditorFormAfterReset(li, obj) {
 ////    li.oaSearch('auditor_realname');
 //}

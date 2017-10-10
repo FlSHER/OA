@@ -28,16 +28,18 @@ Route::group(['namespace' => 'Api', 'middleware' => 'apiPassport'], function () 
         Route::any('/start_approval', ['uses' => 'DingtalkController@startApproval']); //发起钉钉审批
     });
     Route::group(['prefix' => 'hr'], function () {
-        Route::post('staff_update', ['uses' => 'HRMController@changeStaffInfo']);//修改员工信息
+        Route::post('staff_update', ['uses' => 'HRMController@changeStaffInfo']); //修改员工信息
+        Route::post('shop_update', ['uses' => 'HRMController@changeShopInfo']); //修改店铺信息
     });
-    Route::group(['prefix' => 'appraise'], function () {//评价路由
-        Route::post('appraiseFromSubmit', ['uses' => 'AppraiseController@appraiseFromSubmit']);//评价表单提交处理
-        Route::post('appraiseList',['uses'=>'AppraiseController@appraiseList']);//当前员工的评价列表
+    //评价路由
+    Route::group(['prefix' => 'appraise'], function () {
+        Route::post('appraiseFromSubmit', ['uses' => 'AppraiseController@appraiseFromSubmit']); //评价表单提交处理
+        Route::post('appraiseList', ['uses' => 'AppraiseController@appraiseList']); //当前员工的评价列表
     });
 });
 Route::get('/get_auth_code', ['uses' => 'Api\OAuthController@getAuthCode']);
 Route::any('/get_token', ['uses' => 'Api\OAuthController@getAppToken']);
 Route::any('/refresh_token', ['uses' => 'Api\OAuthController@refreshAppToken']);
 
-Route::get('/dingtalk/register_approval_callback', ['uses' => 'Api\DingtalkController@registerApprovalCallback']);//注册钉钉审批回调
+Route::get('/dingtalk/register_approval_callback', ['uses' => 'Api\DingtalkController@registerApprovalCallback']); //注册钉钉审批回调
 Route::any('/dingtalk/approval_callback', ['uses' => 'Api\DingtalkController@approvalCallback']); //钉钉审批回调

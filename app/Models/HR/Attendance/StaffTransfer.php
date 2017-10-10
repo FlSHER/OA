@@ -4,22 +4,29 @@ namespace App\Models\HR\Attendance;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\HR\Staff;
+use App\Models\HR\Shop;
 
-class StaffTransfer extends Model {
+class StaffTransfer extends Model
+{
 
     use SoftDeletes;
 
-    protected $table = 'staff_transfer';
+    protected $connection = 'attendance';
+    protected $table = 'transfer';
     protected $fillable = [
         'staff_sn',
         'staff_name',
         'staff_gender',
         'staff_department',
         'current_shop_sn',
+        'leaving_date',
         'leaving_shop_sn',
+        'leaving_shop_name',
         'left_at',
         'arriving_shop_sn',
-        'arriving_shop_duty',
+        'arriving_shop_name',
+        'arriving_shop_duty_id',
         'arrived_at',
         'status',
         'maker_sn',
@@ -29,35 +36,53 @@ class StaffTransfer extends Model {
 
     /* ----- 定义关联 Start ----- */
 
-    public function staff() { //员工
+    //员工
+    public function staff()
+    {
         return $this->belongsTo('App\Models\HR\Staff', 'staff_sn');
     }
 
-    public function current_shop() { //当前店铺
+    //当前店铺
+    public function current_shop()
+    {
         return $this->belongsTo('App\Models\HR\Shop', 'current_shop_sn', 'shop_sn');
     }
 
-    public function leaving_shop() { //离开店铺
+    //离开店铺
+    public function leaving_shop()
+    {
         return $this->belongsTo('App\Models\HR\Shop', 'leaving_shop_sn', 'shop_sn');
     }
 
-    public function arriving_shop() { //到达店铺
+    //到达店铺
+    public function arriving_shop()
+    {
         return $this->belongsTo('App\Models\HR\Shop', 'arriving_shop_sn', 'shop_sn');
     }
 
-    public function tag() {
-        return $this->belongsToMany('App\Models\HR\Attendance\StaffTransferTag', 'staff_transfer_has_tags', 'transfer_id', 'tag_id');
+    //标签
+    public function tag()
+    {
+        return $this->belongsToMany('App\Models\HR\Attendance\StaffTransferTag', 'transfer_has_tags', 'transfer_id', 'tag_id');
+    }
+
+    //到店职务
+    public function arriving_shop_duty()
+    {
+        return $this->belongsTo('App\Models\HR\Attendance\ShopDuty', 'arriving_shop_duty_id');
     }
 
     /* ----- 定义关联 End ----- */
 
     /* ----- 修改器Start ----- */
 
-    public function setLeavingShopSnAttribute($value) {
+    public function setLeavingShopSnAttribute($value)
+    {
         $this->attributes['leaving_shop_sn'] = strtolower($value);
     }
 
-    public function setArrivingShopSnAttribute($value) {
+    public function setArrivingShopSnAttribute($value)
+    {
         $this->attributes['arriving_shop_sn'] = strtolower($value);
     }
 
@@ -65,20 +90,32 @@ class StaffTransfer extends Model {
 
     /* ----- 事件回调 Start ----- */
 
-    public function onSaving() {
+    public function onCreating()
+    {
+        $this->setAttribute('staff_name', $this->staff->realname);
         $this->setAttribute('staff_gender', $this->staff->gender->name);
-        $this->setAttribute('staff_department', $this->staff->department->name);
+        $this->setAttribute('staff_department_id', $this->staff->department_id);
+        $this->setAttribute('staff_department_name', $this->staff->department->name);
         $this->setAttribute('current_shop_sn', $this->staff->shop_sn);
-    }
-
-    public function onSaved() {
-        $leftAt = strtotime($this->left_at);
-        if ($leftAt <= time()) {
+        if ($this->leaving_shop_sn) {
+            $this->setAttribute('leaving_shop_name', $this->leaving_shop->name);
+        }
+        if ($this->arriving_shop_sn) {
+            $this->setAttribute('arriving_shop_name', $this->arriving_shop->name);
+        }
+        /* 直接切换所属店铺的调动状态 @TODO 考勤启用后删除 */
+        if (strtotime($this->leaving_date) <= time()) {
+            if ($this->arriving_shop_duty_id == 1) {
+                Shop::where('shop_sn', $this->arriving_shop_sn)->update([
+                    'manager_sn' => $this->staff_sn,
+                    'manager_name' => $this->staff_name,
+                ]);
+            }
+            $this->status = 2;
+            $this->left_at = date('Y-m-d H:i:s');
+            $this->arrived_at = date('Y-m-d H:i:s');
             $this->staff->shop_sn = $this->arriving_shop_sn;
             $this->staff->save();
-        } else {
-            $tmpData = ['operate_at' => date('Y-m-d', $leftAt), 'shop_sn' => $this->arriving_shop_sn];
-            $this->staff->tmp()->updateOrCreate(['operate_at' => date('Y-m-d', $leftAt)], $tmpData);
         }
     }
 
@@ -86,10 +123,10 @@ class StaffTransfer extends Model {
 
     /* ----- 本地作用域 Start ----- */
 
-    public function scopeVisible($query) {
-        $query->whereHas('staff', function($query) {
-            $query->visible();
-        });
+    public function scopeVisible($query)
+    {
+        $departments = app('Authority')->getAvailableDepartments();
+        $query->whereIn('staff_department_id', $departments);
     }
 
     /* ----- 本地作用域 End ----- */

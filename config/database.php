@@ -102,11 +102,11 @@ return [
         //考勤
         'attendance' => [
             'driver' => 'mysql',
-            'host' => '192.168.1.20',
-            'port' => '3306',
+            'host' => '120.77.14.132',
+            'port' => '13000',
             'database' => 'attendance',
-            'username' => 'root',
-            'password' => 'root',
+            'username' => 'attendance',
+            'password' => 'attendance',
             'charset' => 'utf8',
             'collation' => 'utf8_general_ci',
             'prefix' => '',
