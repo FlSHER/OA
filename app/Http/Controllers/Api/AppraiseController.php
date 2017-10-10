@@ -62,6 +62,6 @@ class AppraiseController extends Controller
         $total = Appraise::where('entry_staff_sn', $current_user)->count();//总条数
         $pages = ceil($total / $length);//总页数
         $start = ($pageIndex - 1) * $length;
-        return ['pageIndex' => $pageIndex, 'length' => $length, 'total' => $total, 'pages' => $pages,'start'=>$start];
+        return ['pageIndex' => $pageIndex, 'length' => $length, 'total' => $total, 'pages' => $pages, 'start' => $start];
     }
 }
