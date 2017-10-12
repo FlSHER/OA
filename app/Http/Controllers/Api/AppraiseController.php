@@ -43,7 +43,7 @@ class AppraiseController extends Controller
     public function selectedUserRemark(Request $request)
     {
         $start = ($request->pageIndex - 1) * $request->length;
-        $data = Appraise::with('staff')->where('staff', $request->searchName)->skip($start)->take($request->length)->orderBy('create_time', 'desc')->get();
+        $data = Appraise::with('staff')->where('staff_sn', $request->searchName)->skip($start)->take($request->length)->orderBy('create_time', 'desc')->get();
         return ['status' => 'success', 'response' => $data];
     }
 
