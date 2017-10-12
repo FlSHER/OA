@@ -37,6 +37,17 @@ class AppraiseController extends Controller
     }
 
     /**
+     * 选中员工的所有评价数据
+     * @param Request $request
+     */
+    public function selectedUserRemark(Request $request)
+    {
+        $start = ($request->pageIndex - 1) * $request->length;
+        $data = Appraise::with('staff')->where('staff', $request->searchName)->skip($start)->take($request->length)->orderBy('create_time', 'desc')->get();
+        return ['status' => 'success', 'response' => $data];
+    }
+
+    /**
      * 当前员工的评价列表
      * @param Request $request
      */
