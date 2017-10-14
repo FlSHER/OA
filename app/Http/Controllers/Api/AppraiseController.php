@@ -75,4 +75,13 @@ class AppraiseController extends Controller
         $start = ($pageIndex - 1) * $length;
         return ['pageIndex' => $pageIndex, 'length' => $length, 'total' => $total, 'pages' => $pages, 'start' => $start];
     }
+
+    /**
+     * 删除
+     * @param Request $request
+     */
+    public function delete(Request $request){
+        Appraise::where(['id'=>$request->id,'entry_staff_sn'=>app('CurrentUser')->staff_sn])->delete();
+        return ['status'=>'success','response'=>'success'];
+    }
 }
