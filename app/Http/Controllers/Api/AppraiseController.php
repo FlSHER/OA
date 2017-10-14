@@ -37,6 +37,17 @@ class AppraiseController extends Controller
     }
 
     /**
+     * 选中员工的所有评价数据
+     * @param Request $request
+     */
+    public function selectedUserRemark(Request $request)
+    {
+        $start = ($request->pageIndex - 1) * $request->length;
+        $data = Appraise::with('staff')->where('staff_sn', $request->searchName)->skip($start)->take($request->length)->orderBy('create_time', 'desc')->get();
+        return ['status' => 'success', 'response' => $data];
+    }
+
+    /**
      * 当前员工的评价列表
      * @param Request $request
      */
@@ -62,6 +73,15 @@ class AppraiseController extends Controller
         $total = Appraise::where('entry_staff_sn', $current_user)->count();//总条数
         $pages = ceil($total / $length);//总页数
         $start = ($pageIndex - 1) * $length;
-        return ['pageIndex' => $pageIndex, 'length' => $length, 'total' => $total, 'pages' => $pages,'start'=>$start];
+        return ['pageIndex' => $pageIndex, 'length' => $length, 'total' => $total, 'pages' => $pages, 'start' => $start];
+    }
+
+    /**
+     * 删除
+     * @param Request $request
+     */
+    public function delete(Request $request){
+//        Appraise::where(['id'=>$request->id,'entry_staff_sn'=>app('CurrentUser')->staff_sn])->delete();
+        return ['status'=>'success','response'=>$request->id];
     }
 }

@@ -33,8 +33,10 @@ Route::group(['namespace' => 'Api', 'middleware' => 'apiPassport'], function () 
     });
     //评价路由
     Route::group(['prefix' => 'appraise'], function () {
+        Route::post('selectedUserRemark',['uses'=>'AppraiseController@selectedUserRemark']);//选中员工的所有评价数据
         Route::post('appraiseFromSubmit', ['uses' => 'AppraiseController@appraiseFromSubmit']); //评价表单提交处理
         Route::post('appraiseList', ['uses' => 'AppraiseController@appraiseList']); //当前员工的评价列表
+        Route::post('delete','AppraiseController@delete');//删除
     });
 });
 Route::get('/get_auth_code', ['uses' => 'Api\OAuthController@getAuthCode']);
