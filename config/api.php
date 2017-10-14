@@ -83,15 +83,5 @@ return [
             'imports' => $holiday . 'imports', //导入
             'edit' => $holiday . 'edit',
         ],
-        'attendance' => [//考勤
-            'public' => preg_replace('/\/\w+?$/', '', $attendance),
-            'stafflist' => $attendance . '/attendance/getstafflist', //获取店铺员工考勤数据 
-        ],
-        'statistic' => [//考勤
-            'getlist' => $attendance . '/statistic/getlist', //获取员工考勤
-            'export' => '/hr/attendance/export', //获取店铺员工考勤数据 
-            'stafflist' => $attendance . '/statistic/getstatistic', //获取店铺员工考勤数据 
-            'getstaffdetail' => $attendance . '/statistic/getstaffdetail', //获取店铺员工考勤数据 
-        ],
     ],
 ];

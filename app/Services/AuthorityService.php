@@ -8,17 +8,20 @@
 namespace App\Services;
 
 use App\Models\Authority;
+use App\Models\HR\Shop;
 use App\Models\HR\Staff;
 use App\Models\Department;
 use App\Models\Brand;
 
-class AuthorityService {
+class AuthorityService
+{
 
     /**
      * 获取当前权限id
      * @return int
      */
-    public function getCurrentAuthorityId($url = null) {
+    public function getCurrentAuthorityId($url = null)
+    {
         $authorityIdArr = $this->getAuthorityIdArr($url);
         $authorityId = end($authorityIdArr);
         return $authorityId;
@@ -28,7 +31,8 @@ class AuthorityService {
      * 获取当前菜单名称
      * @return type
      */
-    public function getCurrentMenuName($url = null) {
+    public function getCurrentMenuName($url = null)
+    {
         return Authority::find($this->getCurrentAuthorityId($url))->menu_name;
     }
 
@@ -36,7 +40,8 @@ class AuthorityService {
      * 获取当前及所有上级权限id
      * @return array
      */
-    public function getAuthorityIdArr($url = null) {
+    public function getAuthorityIdArr($url = null)
+    {
         $url = empty($url) ? request()->path() : $url;
         $authorityUri = rtrim($url, '/');
         $authorityUriArr = $this->explodeToUriArr($authorityUri);
@@ -49,17 +54,20 @@ class AuthorityService {
      * @param int $authorityId
      * @return boolean
      */
-    public function checkAuthority($authorityId) {
+    public function checkAuthority($authorityId)
+    {
         $authorities = $this->getAvailableAuthorities();
         return in_array($authorityId, $authorities) ? true : false;
     }
 
-    public function checkDepartment($departmentId) {
+    public function checkDepartment($departmentId)
+    {
         $availableDepartments = $this->getAvailableDepartments();
         return in_array($departmentId, $availableDepartments) ? true : false;
     }
 
-    public function checkBrand($brandId) {
+    public function checkBrand($brandId)
+    {
         $availableBrands = $this->getAvailableBrands();
         return in_array($brandId, $availableBrands) ? true : false;
     }
@@ -69,7 +77,8 @@ class AuthorityService {
      * @param int $staffSn
      * @return array
      */
-    public function getAvailableAuthorities($staffSn = '') {
+    public function getAvailableAuthorities($staffSn = '')
+    {
         if (session()->has('authorities')) {
             $authorities = session('authorities');
         } else {
@@ -86,7 +95,8 @@ class AuthorityService {
      * @param int $staffSn
      * @return array
      */
-    public function getAvailableDepartments($staffSn = '') {
+    public function getAvailableDepartments($staffSn = '')
+    {
         if (session()->has('available_departments')) {
             $departments = session('available_departments');
         } else {
@@ -103,7 +113,8 @@ class AuthorityService {
      * @param int $staffSn
      * @return array
      */
-    public function getAvailableBrands($staffSn = '') {
+    public function getAvailableBrands($staffSn = '')
+    {
         if (session()->has('available_brands')) {
             $brands = session('available_brands');
         } else {
@@ -116,9 +127,28 @@ class AuthorityService {
     }
 
     /**
+     * 获取当前管理员可操作店铺
+     * @param string $staffSn
+     * @return mixed
+     */
+    public function getAvailableShops($staffSn = '')
+    {
+        if (session()->has('available_shops')) {
+            $shops = session('available_shops');
+        } else {
+            if (empty($staffSn))
+                $staffSn = app('CurrentUser')->getStaffSn();
+            $shops = Shop::visible($staffSn)->pluck('shop_sn');
+            session()->put('available_shops', $shops);
+        }
+        return $shops;
+    }
+
+    /**
      * 清除权限
      */
-    public function forgetAuthorities() {
+    public function forgetAuthorities()
+    {
         session()->forget('authorities');
         session()->forget('available_departments');
         session()->forget('available_brands');
@@ -129,7 +159,8 @@ class AuthorityService {
      * @param int $staffSn
      * @return array
      */
-    public function getAuthoritiesByStaffSn($staffSn) {
+    public function getAuthoritiesByStaffSn($staffSn)
+    {
         if ($this->isDeveloper($staffSn)) {
             $authorities = Authority::get()->pluck('id')->toArray();
             array_push($authorities, 0);
@@ -155,7 +186,8 @@ class AuthorityService {
      * @param int $staffSn
      * @return array
      */
-    public function getAvailableDepartmentsByStaffSn($staffSn) {
+    public function getAvailableDepartmentsByStaffSn($staffSn)
+    {
         if ($this->isDeveloper($staffSn)) {
             $departments = Department::withTrashed()->get()->pluck('id')->toArray();
             array_push($departments, 0);
@@ -176,7 +208,8 @@ class AuthorityService {
      * @param int $staffSn
      * @return array
      */
-    public function getAvailableBrandsByStaffSn($staffSn) {
+    public function getAvailableBrandsByStaffSn($staffSn)
+    {
         if ($this->isDeveloper($staffSn)) {
             $brands = Brand::get()->pluck('id')->toArray();
         } else {
@@ -191,12 +224,14 @@ class AuthorityService {
         return $brands;
     }
 
-    private function explodeToUriArr($authorityUri) {
+    private function explodeToUriArr($authorityUri)
+    {
         $authorityUriArr = explode('/', $authorityUri);
         return $authorityUriArr;
     }
 
-    private function getIdArrByUri($authorityUriArr) {
+    private function getIdArrByUri($authorityUriArr)
+    {
         $authorityId = 0;
         foreach ($authorityUriArr as $authorityUri) {
             $authorityId = $this->getIdByUri($authorityUri, $authorityId);
@@ -205,7 +240,8 @@ class AuthorityService {
         return $authorityIdArr;
     }
 
-    private function getIdByUri($uri, $parentId) {
+    private function getIdByUri($uri, $parentId)
+    {
         $authority = Authority::where(['access_url' => $uri, 'parent_id' => $parentId])->select('id')->first();
         if (!isset($authority->id)) {
             return 'none';
@@ -213,7 +249,8 @@ class AuthorityService {
         return $authority->id;
     }
 
-    private function isDeveloper($staffSn) {
+    private function isDeveloper($staffSn)
+    {
         return $staffSn == config('auth.developer.staff_sn');
     }
 
