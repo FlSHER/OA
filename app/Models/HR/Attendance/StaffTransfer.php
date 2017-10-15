@@ -97,12 +97,6 @@ class StaffTransfer extends Model
         $this->setAttribute('staff_department_id', $this->staff->department_id);
         $this->setAttribute('staff_department_name', $this->staff->department->name);
         $this->setAttribute('current_shop_sn', $this->staff->shop_sn);
-        if ($this->leaving_shop_sn) {
-            $this->setAttribute('leaving_shop_name', $this->leaving_shop->name);
-        }
-        if ($this->arriving_shop_sn) {
-            $this->setAttribute('arriving_shop_name', $this->arriving_shop->name);
-        }
         /* 直接切换所属店铺的调动状态 @TODO 考勤启用后删除 */
         if (strtotime($this->leaving_date) <= time()) {
             if ($this->arriving_shop_duty_id == 1) {
@@ -116,6 +110,16 @@ class StaffTransfer extends Model
             $this->arrived_at = date('Y-m-d H:i:s');
             $this->staff->shop_sn = $this->arriving_shop_sn;
             $this->staff->save();
+        }
+    }
+
+    public function onSaving()
+    {
+        if ($this->leaving_shop_sn) {
+            $this->setAttribute('leaving_shop_name', $this->leaving_shop->name);
+        }
+        if ($this->arriving_shop_sn) {
+            $this->setAttribute('arriving_shop_name', $this->arriving_shop->name);
         }
     }
 
