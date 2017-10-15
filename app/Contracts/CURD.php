@@ -226,7 +226,7 @@ class CURD {
     }
 
     /**
-     * 增加一对多关联 
+     * 增加一对多关联
      * @param type $attached
      * @param type $relationQuery
      * @param type $data
@@ -288,6 +288,7 @@ class CURD {
                 $model->setAttribute($foreignKey, null);
                 $model->save();
             } catch (\Illuminate\Database\QueryException $err) {
+                $model->setRawAttributes($model->getOriginal());
                 $model->delete();
             }
         });

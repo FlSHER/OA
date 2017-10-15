@@ -6,17 +6,20 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 /* 引入模型 start */
+
 use App\Models\HR\Staff;
 use App\Models\Department;
 use App\Models\HR\StaffStatus;
 use App\Models\Brand;
 use App\Models\HR\Shop;
 /* 引入模型 end */
+
 use App\Contracts\OperationLog;
 use App\Contracts\ExcelImport;
 use App\Contracts\CURD;
 
-class StaffController extends Controller {
+class StaffController extends Controller
+{
 
     protected $model = 'App\Models\HR\Staff';
     protected $transPath = 'fields.staff';
@@ -26,7 +29,8 @@ class StaffController extends Controller {
     protected $logService;
     protected $importService;
 
-    public function __construct(OperationLog $logService, ExcelImport $importService, CURD $curd) {
+    public function __construct(OperationLog $logService, ExcelImport $importService, CURD $curd)
+    {
         $this->logService = $logService;
         $this->importService = $importService->extension('xlsx')->trans($this->transPath);
         $this->curdService = $curd->log($this->logService)->where('staff_sn', '>', '110000');
@@ -36,7 +40,8 @@ class StaffController extends Controller {
      * 显示员工列表
      * @return view
      */
-    public function showManagePage() {
+    public function showManagePage()
+    {
         return view('hr/staff/staff');
     }
 
@@ -45,7 +50,8 @@ class StaffController extends Controller {
      * @param Request $request
      * @return json
      */
-    public function getStaffList(Request $request) {
+    public function getStaffList(Request $request)
+    {
         $staffModel = $this->model;
 //        //员工列表的权限验证
 //        if ($request->get('with_auth') !== false) {
@@ -59,7 +65,8 @@ class StaffController extends Controller {
      * @param Request $request
      * @return type
      */
-    public function exportStaff(Request $request) {
+    public function exportStaff(Request $request)
+    {
         $originalColumns = $request->columns;
         array_push($originalColumns, ['data' => 'info.id_card_number']);
         $request->offsetSet('columns', $originalColumns);
@@ -84,7 +91,8 @@ class StaffController extends Controller {
     /**
      * 显示离职对接界面
      */
-    public function showLeavingPage(Request $request) {
+    public function showLeavingPage(Request $request)
+    {
         $staff = $this->getInfo($request);
         return view('hr/staff/leaving')->with(['staff' => $staff]);
     }
@@ -94,7 +102,8 @@ class StaffController extends Controller {
      * @param Request $request
      * @return type
      */
-    public function showPersonalInfo(Request $request) {
+    public function showPersonalInfo(Request $request)
+    {
         $staff = $this->getInfo($request);
         return view('hr/staff/staff_info')->with(['staff' => $staff]);
     }
@@ -104,9 +113,10 @@ class StaffController extends Controller {
      * @param Request $request
      * @return type
      */
-    public function getInfo(Request $request) {
+    public function getInfo(Request $request)
+    {
         $staffSn = $request->staff_sn;
-        $staff = Staff::with(['info', 'relative','appraise'])->find($staffSn);
+        $staff = Staff::with(['info', 'relative', 'appraise'])->find($staffSn);
         foreach ($staff->info->toArray() as $k => $v) {
             $staff->{$k} = $v;
         }
@@ -118,7 +128,8 @@ class StaffController extends Controller {
      * @param \App\Http\Requests\StaffRequest $request
      * @return type
      */
-    public function addOrEditStaff(Requests\StaffRequest $request) {
+    public function addOrEditStaff(Requests\StaffRequest $request)
+    {
         if ($request->has('staff_sn')) {
             return $this->editStaffByOne($request);
         } else {
@@ -131,7 +142,8 @@ class StaffController extends Controller {
      * @param Request $request
      * @return view
      */
-    public function addStaffByOne(Requests\StaffRequest $request) {
+    public function addStaffByOne(Requests\StaffRequest $request)
+    {
         $curd = $this->curdService->create($request->all());
         return $curd;
     }
@@ -141,7 +153,8 @@ class StaffController extends Controller {
      * @param Request $request
      * @return type
      */
-    public function editStaffByOne(Requests\StaffRequest $request) {
+    public function editStaffByOne(Requests\StaffRequest $request)
+    {
         $curd = $this->curdService->update($request->all());
         return $curd;
     }
@@ -151,11 +164,12 @@ class StaffController extends Controller {
      * @param Request $request
      * @return type
      */
-    public function deleteStaff(Request $request) {
+    public function deleteStaff(Request $request)
+    {
         $request->offsetSet('operation_type', 'delete');
         $request->offsetSet('operate_at', date('Y-m-d'));
         $request->offsetSet('operation_remark', '');
-        $curd = $this->curdService->delete($request->all());
+        $curd = $this->curdService->delete($request->all(), ['info']);
         return $curd;
     }
 
@@ -164,7 +178,8 @@ class StaffController extends Controller {
      * @param Request $request
      * @return type
      */
-    public function leaving(Request $request) {
+    public function leaving(Request $request)
+    {
         $leaving = Staff::find($request->staff_sn)->leaving;
         if ($request->has('operate_at')) {
             $leavingInfo = [
@@ -201,7 +216,8 @@ class StaffController extends Controller {
      * @param Request $request
      * @return type
      */
-    public function importStaff(Request $request) {
+    public function importStaff(Request $request)
+    {
         $excelData = $this->importService->load($request);
         $this->saveImportData($excelData);
         $data = [
@@ -218,7 +234,8 @@ class StaffController extends Controller {
      * 存储导入数据
      * @param type $excelData
      */
-    private function saveImportData($excelData) {
+    private function saveImportData($excelData)
+    {
         foreach ($excelData as $v) {
             $fail = $v;
             $v = new Requests\StaffRequest($v);
@@ -250,7 +267,8 @@ class StaffController extends Controller {
      * 生成导入失败明细
      * @param type $fails
      */
-    private function makeFailReport(array $fails) {
+    private function makeFailReport(array $fails)
+    {
         return $file = app('App\Contracts\ExcelExport')->setPath('hr/staff/import_fail_report/')->setBaseName('员工导入失败明细')->trans($this->transPath)->export(['明细' => $fails]);
     }
 
@@ -259,7 +277,8 @@ class StaffController extends Controller {
      * @param Request $request
      * @return view
      */
-    public function searchResult(Request $request) {
+    public function searchResult(Request $request)
+    {
         $data['realname'] = $request->name;
         $data['target'] = json_encode($request->target);
         $data['mark'] = $request->has('mark') ? '_' . $request->mark : '';
@@ -271,7 +290,8 @@ class StaffController extends Controller {
      * @param Request $request
      * @return type
      */
-    public function getMultiSetModal(Request $request) {
+    public function getMultiSetModal(Request $request)
+    {
         $data = $request->except(['_url', '_token']);
         $model = new $request->eloquent;
         $value = $request->primary['value'];
@@ -286,7 +306,8 @@ class StaffController extends Controller {
      * @param Request $request
      * @return type
      */
-    public function multiSetStaff(Request $request) {
+    public function multiSetStaff(Request $request)
+    {
         if ($request->has('staff')) {
             $staff = $request->staff;
         } else {
@@ -301,7 +322,8 @@ class StaffController extends Controller {
      * Excel数据源Web
      * @return type
      */
-    public function showDataForExcel() {
+    public function showDataForExcel()
+    {
         $data = [
             'department' => Department::where('parent_id', 0)->orderBy('sort', 'asc')->get(),
             'status' => StaffStatus::orderBy('sort', 'asc')->get(),
@@ -316,7 +338,8 @@ class StaffController extends Controller {
      * @param Request $request
      * @return type
      */
-    private function getInfoFromIdCardNumber(Request $request) {
+    private function getInfoFromIdCardNumber(Request $request)
+    {
         $idCarkNumber = $request->info['id_card_number'];
         if (empty($request->gender['name']) && !empty($idCarkNumber)) {
             $gender = $request->gender;
