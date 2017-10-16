@@ -92,15 +92,13 @@ class Shop extends Model
 
     /* ----- 本地作用域 Start ----- */
 
-    public function scopeVisible($query)
+    public function scopeVisible($query, $staffSn = '')
     {
-        $brands = Authority::getAvailableBrands();
-        $departments = Authority::getAvailableDepartments();
-        $query->whereHas('brand', function ($q) use ($brands) {
-            $q->whereIn('id', $brands);
-        })->whereHas('department', function ($q) use ($departments) {
-            $q->whereIn('id', $departments)->withTrashed();
-        });
+        $brands = Authority::getAvailableBrands($staffSn);
+        $departments = Authority::getAvailableDepartments($staffSn);
+        $query->whereIn('brand_id', $brands);
+        if (!in_array('0', $departments))
+            $query->whereIn('department_id', $departments);
     }
 
     public function scopeApi($query)
