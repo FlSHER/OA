@@ -37,6 +37,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'apiPassport'], function () 
         Route::post('appraiseFromSubmit', ['uses' => 'AppraiseController@appraiseFromSubmit']); //评价表单提交处理
         Route::post('appraiseList', ['uses' => 'AppraiseController@appraiseList']); //当前员工的评价列表
         Route::post('delete','AppraiseController@delete');//删除
+        Route::post('update','AppraiseController@update');//修改
     });
 });
 Route::get('/get_auth_code', ['uses' => 'Api\OAuthController@getAuthCode']);

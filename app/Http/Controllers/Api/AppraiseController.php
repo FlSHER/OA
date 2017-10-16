@@ -31,6 +31,7 @@ class AppraiseController extends Controller
         $data['entry_name'] = app('CurrentUser')->realname;
         $data['position'] = $staff->position->name;
         $data['department'] = $staff->department->name;
+        $data['create_time'] = date('Y-m-d H:i:s', time());
         $data['shop'] = $staff->shop ? $staff->shop->name : '';
         Appraise::insert($data);
         return ['status' => 'success'];
@@ -80,8 +81,21 @@ class AppraiseController extends Controller
      * 删除
      * @param Request $request
      */
-    public function delete(Request $request){
-//        Appraise::where(['id'=>$request->id,'entry_staff_sn'=>app('CurrentUser')->staff_sn])->delete();
-        return ['status'=>'success','response'=>$request->id];
+    public function delete(Request $request)
+    {
+        Appraise::where(['id' => $request->id, 'entry_staff_sn' => app('CurrentUser')->staff_sn])->delete();
+        return ['status' => 'success', 'response' => 'success'];
+    }
+
+    /**
+     * 修改
+     * @param Request $request
+     */
+    public function update(Request $request)
+    {
+        $appraise = Appraise::find($request->id);
+        $appraise->remark = $request->remark;
+        $appraise->save();
+        return ['status' => 'success', 'response' => 'success'];
     }
 }
