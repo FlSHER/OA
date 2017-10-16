@@ -31,6 +31,7 @@ class AppraiseController extends Controller
         $data['entry_name'] = app('CurrentUser')->realname;
         $data['position'] = $staff->position->name;
         $data['department'] = $staff->department->name;
+        $data['create_time'] = date('Y-m-d H:i:s',time());
         $data['shop'] = $staff->shop ? $staff->shop->name : '';
         Appraise::insert($data);
         return ['status' => 'success'];
