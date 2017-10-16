@@ -40,55 +40,125 @@ class MakeWorkingSchedule extends Command
     public function handle()
     {
         Log::info('Start making working schedule');
-        $tableYesterday = DB::connection('attendance')->select('SELECT * FROM information_schema.TABLES WHERE table_name ="working_schedule_' . date('Ymd', strtotime("-1 day")) . '"');
-        $tableToday = DB::connection('attendance')->select('SELECT * FROM information_schema.TABLES WHERE table_name ="working_schedule_' . date('Ymd') . '"');
-        if (empty($tableToday) && !empty($tableYesterday)) {
-            DB::connection('attendance')->statement('CREATE TABLE working_schedule_' . date('Ymd') . ' LIKE working_schedule_' . date('Ymd', strtotime("-1 day")));
-            DB::connection('attendance')->statement('INSERT INTO working_schedule_' . date('Ymd') . ' SELECT * FROM working_schedule_' . date('Ymd', strtotime("-1 day")));
-        } elseif (empty($tableToday)) {
-            Log::error('Table working_schedule dosen\'t exists');
-            $this->info('Table working_schedule dosen\'t exists');
-            return false;
-        }
+        $this->copySchedule();
+
         $addCount = 0;
         $deleteCount = 0;
+        $managerCount = 0;
 
+        $basicList = $this->getBasicList();
+        $basicSnList = $basicList->pluck('sn')->all();
+        $basicStaffList = $basicList->pluck('realname', 'staff_sn')->all();
+
+        $scheduleList = $this->getScheduleList();
+        $scheduleSnList = $scheduleList->pluck('sn')->all();
+
+        $addList = array_diff($basicSnList, $scheduleSnList);
+        $deleteList = array_diff($scheduleSnList, $basicSnList);
+
+        $this->add($addList, $addCount, $basicStaffList);
+        $this->delete($deleteList, $deleteCount);
+
+        $shopManagerList = $this->getShopManagerList();
+        $shopManagerList->each(function ($shopManager) use (&$managerCount) {
+            $manager = DB::connection('attendance')
+                ->table('working_schedule_' . date('Ymd'))
+                ->where('shop_sn', $shopManager->shop_sn)
+                ->where('staff_sn', $shopManager->manager_sn)
+                ->first();
+            if ($manager && $manager->shop_duty_id != 1) {
+                DB::connection('attendance')
+                    ->table('working_schedule_' . date('Ymd'))
+                    ->where('shop_sn', $shopManager->shop_sn)
+                    ->where('shop_duty_id', 1)
+                    ->update(['shop_duty_id' => 3]);
+                DB::connection('attendance')
+                    ->table('working_schedule_' . date('Ymd'))
+                    ->where('shop_sn', $shopManager->shop_sn)
+                    ->where('staff_sn', $shopManager->manager_sn)
+                    ->update(['shop_duty_id' => 1]);
+                $managerCount++;
+            }
+        });
+
+        Log::info('add:' . $addCount . ' delete:' . $deleteCount . ' manager:' . $managerCount);
+        DB::connection('attendance')->select('DROP TABLE IF EXISTS working_schedule_' . date('Ymd', strtotime("-7 day")));
+        Log::info('End making working schedule');
+    }
+
+    protected function copySchedule()
+    {
+        $tableYesterday = DB::connection('attendance')
+            ->table('information_schema.TABLES')
+            ->where('table_name', 'working_schedule_' . date('Ymd', strtotime("-1 day")))
+            ->count();
+        $tableToday = DB::connection('attendance')
+            ->table('information_schema.TABLES')
+            ->where('table_name', 'working_schedule_' . date('Ymd'))
+            ->count();
+
+        if (!$tableToday && $tableYesterday) {
+            DB::connection('attendance')->statement('CREATE TABLE working_schedule_' . date('Ymd') . ' LIKE working_schedule_' . date('Ymd', strtotime("-1 day")));
+            DB::connection('attendance')->statement('INSERT INTO working_schedule_' . date('Ymd') . ' SELECT * FROM working_schedule_' . date('Ymd', strtotime("-1 day")));
+        } elseif (!$tableToday) {
+            Log::error('Table working_schedule dosen\'t exists');
+            $this->info('Table working_schedule dosen\'t exists');
+            die;
+        }
+    }
+
+    protected function getBasicList()
+    {
         $basicList = DB::table('staff')
             ->select(DB::raw('CONCAT(`shop_sn`,"-",`staff_sn`) AS sn'), 'staff_sn', 'shop_sn', 'realname')
             ->where([
                 ['shop_sn', '<>', ''],
                 ['status_id', '>=', '0']
             ])->whereNull('deleted_at')->get();
-        $basicSnList = $basicList->pluck('sn')->all();
-        $basicStaffList = $basicList->pluck('realname', 'staff_sn')->all();
+        return $basicList;
+    }
 
-        $scheduleSnList = DB::connection('attendance')
+    protected function getScheduleList()
+    {
+        $scheduleList = DB::connection('attendance')
             ->table('working_schedule_' . date('Ymd'))
             ->select(DB::raw('CONCAT(`shop_sn`,"-",`staff_sn`) AS sn'))
-            ->pluck('sn')->all();
+            ->get();
+        return $scheduleList;
+    }
 
-        $addList = empty($scheduleSnList) ? $basicSnList : array_diff($basicSnList, $scheduleSnList);
-        $deleteList = empty($scheduleSnList) ? [] : array_diff($scheduleSnList, $basicSnList);
 
+    protected function getShopManagerList()
+    {
+        $shopManagerList = DB::table('shops')
+            ->where('manager_sn', '>', 0)
+            ->get();
+        return $shopManagerList;
+    }
+
+    protected function add($addList, &$addCount, $basicStaffList)
+    {
         foreach ($addList as $sn) {
-            $addCount++;
             $staffSn = substr($sn, -6);
             $shopSn = substr($sn, 0, -7);
             DB::connection('attendance')
                 ->table('working_schedule_' . date('Ymd'))
                 ->insert(['shop_sn' => $shopSn, 'staff_sn' => $staffSn, 'staff_name' => $basicStaffList[$staffSn]]);
+            $addCount++;
         }
+    }
 
+    protected function delete($deleteList, &$deleteCount)
+    {
         foreach ($deleteList as $sn) {
-            $deleteCount++;
+            $staffSn = substr($sn, -6);
+            $shopSn = substr($sn, 0, -7);
             DB::connection('attendance')
                 ->table('working_schedule_' . date('Ymd'))
                 ->where(['shop_sn' => $shopSn, 'staff_sn' => $staffSn])
                 ->delete();
+            $deleteCount++;
         }
-
-        Log::info('add:' . $addCount . ' delete:' . $deleteCount);
-        DB::connection('attendance')->select('DROP TABLE IF EXISTS working_schedule_' . date('Ymd', strtotime("-7 day")));
-        Log::info('End making working schedule');
     }
+
 }
