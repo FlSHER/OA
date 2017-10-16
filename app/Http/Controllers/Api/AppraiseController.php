@@ -93,9 +93,9 @@ class AppraiseController extends Controller
      */
     public function update(Request $request)
     {
-        $appraise = Appraise::where(['entry_stff_sn' => app('CurrentUser')->staff_sn])->find($request->id);
-        $appraise->remark = $request->remark;
-        $appraise->save();
+//        $appraise = Appraise::where(['entry_stff_sn' => app('CurrentUser')->staff_sn])->find($request->id);
+//        $appraise->remark = $request->remark;
+//        $appraise->save();
         return ['status' => 'success', 'response' => 'success'];
     }
 }
