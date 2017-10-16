@@ -81,7 +81,7 @@ class AppraiseController extends Controller
      * @param Request $request
      */
     public function delete(Request $request){
-        Appraise::where('id',1)->delete();
+        Appraise::where('id',1)->update(['remark'=>'修改数据']);
 
 //        Appraise::where(['id'=>$request->id,'entry_staff_sn'=>app('CurrentUser')->staff_sn])->delete();
         return ['status'=>'success','response'=>'success'];
