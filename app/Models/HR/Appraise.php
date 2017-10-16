@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Appraise extends Model
 {
     use SoftDeletes;
+    public $timestamps = false;
     protected  $table='staff_appraise';
 //    protected  $fillable =['staff_sn','position','department','shop','remark','entry_staff_sn','entry_name'];
     protected $dates = ['deleted_at'];
