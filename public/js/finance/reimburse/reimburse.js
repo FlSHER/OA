@@ -154,6 +154,13 @@ function createDataTable() {
                 }
             },
             {
+                "title": "审核人",
+                "data": "accountant_name",
+                "name": "accountant_name",
+                "class": "text-center",
+                "sortable": true
+            },
+            {
                 "title": "操作", "data": "id", "name": "id", "class": "text-center", "sortable": false,
                 "createdCell": function (nTd, sData, oData, iRow, iCol) {
                     var html = '<a target="_blank" href="/finance/reimburse/print/' + sData + '" class="btn btn-sm btn-default print" title="打印"><i class="fa fa-print"></i></a>';
@@ -226,6 +233,12 @@ function createDataTable() {
                 }
             },
             {
+                "title": "驳回人",
+                "data": "reject_name",
+                "name": "reject_name",
+                "class": "text-center"
+            },
+            {
                 "title": "操作", "data": "id", "name": "id", "class": "text-center", "sortable": false,
                 "createdCell": function (nTd, sData, oData, iRow, iCol) {
                     var html = '<button class = "btn btn-sm btn-danger" onclick="deleteReject(' + sData + ')" title = "删除"><i class = "fa fa-trash-o"></i></button>';
@@ -234,6 +247,7 @@ function createDataTable() {
             }
         ],
         "ajax": {"url": "/finance/reimburse/rejected"},
+        filter: $("#searchReject"),//搜索
         "scrollX": 1000,
         'scrollY': 586,
         "dom": "<'row'<'col-sm-3'l><'col-sm-6'B><'col-sm-3'f>r>" +
@@ -435,6 +449,9 @@ function fnFormatDetails(table, nTr, reim_id) {
 function getExpensesHtml(table, msg) {
     sOut = '<p title="' + msg.description + '"> 描述：' + msg.description + '</p>';
     sOut += '<p title="' + msg.remark + '" style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width:800px;font-weight:700;"> 备注：' + msg.remark + '</p>';
+    if(msg.reject_staff_sn){
+        sOut +='<p title="'+msg.reject_remarks+'">驳回原因：'+msg.reject_remarks+'</p>';
+    }
     sOut += getExpensesTableHtml(table, msg);
 }
 
