@@ -152,14 +152,20 @@ class ReimburseController extends Controller
     {
         $staff_sn = app('CurrentUser')->staff_sn;
         $reim_deparment_arr = app('AuditService')->getReimDepartmentId();
-        $where = [
-            ['accountant_delete', '=', 0],
-            ['approve_time', '<>', ''],
-            ['reject_staff_sn', '<>', '']
-        ];
-//        $where = ['reject_staff_sn' => $staff_sn, 'accountant_delete' => 0];
-//        $whereNotNull = 'approve_time';
-        $result = app('Plugin')->dataTables($request, Reimbursement::where($where)->whereIn('reim_department_id', $reim_deparment_arr));
+        if (!$reim_deparment_arr) {
+            $result['data'] = [];
+            $result['draw'] = 2;
+            $result['recordsFiltered'] = 0;
+            $result['recordsTotal'] = 0;
+        } else {
+            $where = [
+                ['accountant_delete', '=', 0],
+                ['approve_time', '<>', ''],
+                ['reject_staff_sn', '<>', '']
+            ];
+            $result = app('Plugin')->dataTables($request, Reimbursement::where($where)->whereIn('reim_department_id', $reim_deparment_arr));
+        }
+
         return $result;
     }
 
