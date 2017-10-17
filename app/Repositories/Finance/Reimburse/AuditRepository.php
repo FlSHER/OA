@@ -160,8 +160,8 @@ class AuditRepository
         $path = 'finance/reimburse/export/';
         $trans = 'fields.reimburse';
         $fileName = app('CurrentUser')->realname . '已审核单';
-        if($request->type=='all'){
-            $fileName =app('CurrentUser')->realname .'导出的报销单';
+        if ($request->type == 'all') {
+            $fileName = app('CurrentUser')->realname . '导出的报销单';
         }
         $data = $this->getExportData($request);
         $export = new ReimburseExport();
@@ -177,16 +177,24 @@ class AuditRepository
 
     private function getReimburse($request)
     {
-        $staff_sn = app('CurrentUser')->staff_sn;
-        $where = ['accountant_staff_sn' => $staff_sn, 'status_id' => 4];
-        if (isset($request->type) && $request->type == 'all') {
-            $where = ['status_id' => 4];
-        }
+        $where = ['status_id' => 4];
+        $reim_deparment_arr = app('AuditService')->getReimDepartmentId();//当前的资金归属id（array）
         $expense_where = ['expenses' => function ($query) {
             $query->where('is_audited', '=', 1);
             $query->orderBy('date', 'asc');
         }];
-        $data = app('Plugin')->dataTables($request, Reimbursement::with('expenses.type')->with($expense_where)->where($where));
+
+        $data = app('Plugin')->dataTables(
+            $request,
+            Reimbursement::with('expenses.type')
+                ->with($expense_where)
+                ->where($where)
+                ->when(
+                    !$request->type,
+                    function ($query) use ($reim_deparment_arr) {
+                        return $query->whereIn('reim_department_id', $reim_deparment_arr);
+                    })
+        );
         return $data['data'];
     }
 
@@ -306,6 +314,7 @@ class AuditRepository
         Reimbursement::find($reim_id)->increment('print_count');//打印次数自增
         return $reimData;
     }
+
     /**
      * 撤回 （查看报销单）
      */
