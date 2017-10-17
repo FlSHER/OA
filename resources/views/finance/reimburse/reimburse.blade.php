@@ -87,7 +87,8 @@
                                 <table class="display table table-striped table-bordered reim_table" 
                                        id="history-table"></table> 
                             </div> 
-                            <div class="tab-pane" id="reject"> 
+                            <div class="tab-pane" id="reject">
+                                @include('finance.reimburse.search_reject')
                                 <table class="display table table-striped table-bordered reim_table" 
                                        id="reject-table"></table> 
                             </div> 
