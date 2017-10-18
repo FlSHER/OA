@@ -34,7 +34,7 @@ class ReimburseController extends Controller
         $reim_deparment_arr = app('AuditService')->getReimDepartmentId();
         if (!$reim_deparment_arr) {
             $result['data'] = [];
-            $result['draw'] = 2;
+//            $result['draw'] = 2;
             $result['recordsFiltered'] = 0;
             $result['recordsTotal'] = 0;
         } else {
@@ -131,7 +131,7 @@ class ReimburseController extends Controller
         $reim_deparment_arr = app('AuditService')->getReimDepartmentId();
         if (!$reim_deparment_arr) {
             $result['data'] = [];
-            $result['draw'] = 2;
+//            $result['draw'] = 2;
             $result['recordsFiltered'] = 0;
             $result['recordsTotal'] = 0;
         } else {
@@ -154,7 +154,7 @@ class ReimburseController extends Controller
         $reim_deparment_arr = app('AuditService')->getReimDepartmentId();
         if (!$reim_deparment_arr) {
             $result['data'] = [];
-            $result['draw'] = 2;
+//            $result['draw'] = 2;
             $result['recordsFiltered'] = 0;
             $result['recordsTotal'] = 0;
         } else {
