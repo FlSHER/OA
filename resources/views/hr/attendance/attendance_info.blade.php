@@ -44,10 +44,14 @@
                                 <span class="label label-danger">漏签</span>
                             @endif
                             @if($detail['late_time']>0)
-                                <span class="label label-danger">迟到{{round($detail['late_time'],1)}}小时</span>
+                                <span class="label label-danger">迟到
+                                    {{max(sprintf('%.1f',round($detail['late_time'],1)),0.1)}}
+                                    小时</span>
                             @endif
                             @if($detail['early_out_time']>0)
-                                <span class="label label-danger">早退{{round($detail['early_out_time'],1)}}小时</span>
+                                <span class="label label-danger">早退
+                                    {{max(sprintf('%.1f',round($detail['early_out_time'],1)),0.1)}}
+                                    小时</span>
                             @endif
                             <span style="float:right;font-weight:700;">
                                 ￥ {{sprintf('%.2f',$detail['sales_performance_lisha']+
