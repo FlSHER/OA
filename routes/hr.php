@@ -106,12 +106,12 @@ Route::group(['prefix' => 'hr', 'namespace' => 'HR', 'as' => 'hr'], function () 
         Route::post('/reject', ['uses' => 'AttendanceController@reject'])->name('.reject');
         Route::post('/export', ['uses' => 'AttendanceController@exportStaffData'])->name('.export');
     });
-    Route::group(['prefix' => 'working_schedule', 'as' => '.working_schedule'], function () {
+    Route::group(['prefix' => 'working_schedule', 'as' => '.working_schedule'], function () {//排班表
         Route::get('/', ['uses' => 'WorkingScheduleController@showManagePage']);
         Route::post('/list', ['uses' => 'WorkingScheduleController@getList'])->name('.list');
         Route::post('/info', ['uses' => 'WorkingScheduleController@getInfo'])->name('.info');
-        Route::post('/add', ['uses' => 'WorkingScheduleController@add'])->name('.add');
-        Route::post('/edit', ['uses' => 'WorkingScheduleController@edit'])->name('.edit');
+        Route::post('/submit', ['uses' => 'WorkingScheduleController@addOrEdit'])->name('.submit');
+        Route::post('/delete', ['uses' => 'WorkingScheduleController@delete'])->name('.delete');
     });
 });
 

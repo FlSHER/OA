@@ -42,6 +42,31 @@ function edit(id) {
     oaWaiting.hide();
 }
 
+function deleteByOne(id) {
+    var _confirm = confirm("确认删除？");
+    if (_confirm) {
+        oaWaiting.show();
+        var url = '/hr/working_schedule/delete';
+        var data = {'id': id};
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: data,
+            dataType: 'json',
+            success: function (msg) {
+                if (msg['status'] === 1) {
+                    table.draw();
+                    oaWaiting.hide();
+                } else if (msg['status'] === -1) {
+                    oaWaiting.hide(function () {
+                        alert(msg['message']);
+                    });
+                }
+            }
+        });
+    }
+}
+
 function oaFormAfterReset(obj) {
     var formType = $(this).attr("id").replace("Form", "");
     $('#' + formType + 'ByOne').modal('show');

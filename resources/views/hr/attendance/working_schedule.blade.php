@@ -42,7 +42,7 @@
             </div>
             <div class="modal-content">
                 <form id="addForm" name="addForm" class="form-horizontal" method="post"
-                      action="{{route('hr.working_schedule.add')}}">
+                      action="{{route('hr.working_schedule.submit')}}">
                     @include('hr/attendance/working_schedule_form',['type'=>'add'])
                 </form>
             </div>
@@ -58,7 +58,7 @@
             </div>
             <div class="modal-content">
                 <form id="editForm" name="editForm" class="form-horizontal" method="post"
-                      action="{{route('hr.working_schedule.edit')}}">
+                      action="{{route('hr.working_schedule.submit')}}">
                     @include('hr/attendance/working_schedule_form',['type'=>'edit'])
                     <input type="hidden" name="id">
                 </form>
@@ -82,10 +82,13 @@
             {data: "shop_sn", title: "店铺代码"},
             {data: "shop.name", title: "店铺名称", searchable: false},
             {data: "shop_duty.name", title: "当日职务", searchable: false},
+            {data: "clock_in", title: "上班时间", searchable: false},
+            {data: "clock_out", title: "下班时间", searchable: false},
             {
                 data: "{staff_sn}.'-'.{shop_sn}", title: "操作", sortable: false, width: "50px", searchable: false,
                 createdCell: function (nTd, sData, oData, iRow, iCol) {
                     var html = '<button class="btn btn-sm btn-default" title="编辑" onclick="edit(\'' + sData + '\')"><i class="fa fa-edit fa-fw"></i></button>';
+                    html += ' <button class="btn btn-sm btn-danger" title="删除" onclick="deleteByOne(\'' + sData + '\')"><i class="fa fa-trash-o fa-fw"></i></button>';
                     $(nTd).html(html).css({"padding": "5px", "text-align": "center"});
                 }
             }

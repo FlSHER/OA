@@ -38,30 +38,45 @@ class WorkingScheduleController extends Controller
         return $response;
     }
 
-    public function add(Request $request)
+    public function addOrEdit(Request $request)
     {
         $this->validate($request, $this->makeValidator($request), [], trans($this->transPath));
         $date = $request->date;
+        if (empty($request->clock_in)) $request->offsetSet('clock_in', null);
+        if (empty($request->clock_out)) $request->offsetSet('clock_out', null);
+        if ($request->has('id')) {
+            $id = $request->id;
+            $staffSn = preg_replace('/^(.*)\-.*$/', '$1', $id);
+            $shopSn = preg_replace('/^.*\-(.*)$/', '$1', $id);
+        } else {
+            $staffSn = $request->staff_sn;
+            $shopSn = $request->shop_sn;
+        }
         $model = new WorkingSchedule(['ymd' => str_replace('-', '', $date)]);
-        $scheduleExist = $model->where('staff_sn', $request->staff_sn)->where('shop_sn', $request->shop_sn)->count() > 0;
-        if ($scheduleExist) {
+        $request->offsetUnset('date');
+        $workingSchedule = $model->where('staff_sn', $staffSn)->where('shop_sn', $shopSn)->first();
+        if ($request->shop_duty_id == 1) {
+            $model->where('shop_sn', $shopSn)->where('shop_duty_id', 1)->update(['shop_duty_id' => 3]);
+        }
+        if ($request->has('id')) {
+            $request->offsetUnset('id');
+            $model->where('staff_sn', $staffSn)->where('shop_sn', $shopSn)->update($request->input());
+            return ['status' => 1, 'message' => '编辑成功'];
+        } else if (!empty($workingSchedule)) {
             return ['status' => -1, 'message' => '已有相同的排班存在'];
         } else {
-            $this->curdService->model($model)->createOrUpdate($request->input());
+            $model->insert($request->input());
+            return ['status' => 1, 'message' => '添加成功'];
         }
     }
 
-    public function edit(Request $request)
+    public function delete(Request $request)
     {
-        $this->validate($request, $this->makeValidator($request), [], trans($this->transPath));
-        $date = $request->date;
-        $model = new WorkingSchedule(['ymd' => str_replace('-', '', $date)]);
-        $scheduleExist = $model->where('staff_sn', $request->staff_sn)->where('shop_sn', $request->shop_sn)->count() > 0;
-        if ($scheduleExist) {
-            return ['status' => -1, 'message' => '已有相同的排班存在'];
-        } else {
-            $this->curdService->model($model)->createOrUpdate($request->input());
-        }
+        $id = $request->id;
+        $staffSn = preg_replace('/^(.*)\-.*$/', '$1', $id);
+        $shopSn = preg_replace('/^.*\-(.*)$/', '$1', $id);
+        WorkingSchedule::where('staff_sn', $staffSn)->where('shop_sn', $shopSn)->delete();
+        return ['status' => 1, 'message' => '删除成功'];
     }
 
     protected function makeValidator($input)
