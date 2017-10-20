@@ -170,6 +170,7 @@ class CURD
             $this->fillDataToHasOne($model);
             $this->fillDataToHasMany($model);
             $this->changeBelongsToMany($model);
+            $this->afterRelative($model, $data);
             if ($this->isDirty() && $this->hasLog()) {
                 $this->logService->model($model)->write($this->dirty, $data);
             }
@@ -200,7 +201,7 @@ class CURD
 
     /**
      * 修改一对一关联属性
-     * @param Illuminate\Database\Eloquent\Model $model
+     * @param  $model
      */
     protected function fillDataToHasOne($model)
     {
@@ -218,7 +219,7 @@ class CURD
 
     /**
      * 修改一对多关联属性
-     * @param Illuminate\Database\Eloquent\Model $model
+     * @param $model
      */
     protected function fillDataToHasMany($model)
     {
@@ -317,7 +318,7 @@ class CURD
 
     /**
      * 替换多对一归属
-     * @param Illuminate\Database\Eloquent\Model $model
+     * @param $model
      */
     protected function changeBelongsTo($model)
     {
@@ -335,7 +336,7 @@ class CURD
 
     /**
      * 多对多关联同步
-     * @param Illuminate\Database\Eloquent\Model $model
+     * @param $model
      */
     protected function changeBelongsToMany($model)
     {
@@ -358,7 +359,7 @@ class CURD
             }
             $dirty = $relationQuery->sync($input);
             $changed = $relationQuery->get();
-            if (array_filter($dirty)) {
+            if (!empty(array_filter($dirty))) {
                 $this->dirty[$relation] = $this->makeBelongsToManyDirty($dirty, $original, $changed);
             }
         }
@@ -525,24 +526,30 @@ class CURD
         return !empty($this->dirty);
     }
 
+    /* 继承回调 Start */
     protected function saving($model, $data)
     {
-//
+
     }
 
     protected function saved($model, $data)
     {
-//
+
+    }
+
+    protected function afterRelative($model, $data)
+    {
+
     }
 
     protected function deleting($model, $data)
     {
-//
+
     }
 
     protected function deleted($model, $data)
     {
-//
-    }
 
+    }
+    /* 继承回调 End */
 }

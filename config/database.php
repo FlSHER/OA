@@ -60,7 +60,7 @@ return [
             'strict' => true,
             'engine' => null,
         ],
-        'mysql_online'=>[
+        'mysql_online' => [
             'driver' => 'mysql',
             'host' => '120.77.14.132',
             'port' => '13000',
@@ -113,6 +113,19 @@ return [
             'strict' => true,
             'engine' => null,
         ],
+//        'attendance' => [
+//            'driver' => 'mysql',
+//            'host' => '192.168.1.117',
+//            'port' => '3306',
+//            'database' => 'attendance',
+//            'username' => 'root',
+//            'password' => 'root',
+//            'charset' => 'utf8',
+//            'collation' => 'utf8_general_ci',
+//            'prefix' => '',
+//            'strict' => true,
+//            'engine' => null,
+//        ],
     ],
     /*
       |--------------------------------------------------------------------------

@@ -10,31 +10,39 @@ namespace App\Services\Tools\CURDs;
 use App\Contracts\CURD;
 use Illuminate\Http\Exception\HttpResponseException;
 
-class StaffCurdService extends CURD {
+class StaffCurdService extends CURD
+{
 
     protected $model = 'App\Models\HR\Staff';
 
-    protected function saving($model, $data) {
+    protected function saving($model, $data)
+    {
         $this->operating($model, $data);
         $operationType = $data['operation_type'];
         if ($operationType == 'leave' && $model->status_id != -2) {
             $this->setLeaving($model);
-        } elseif (in_array($operationType, [ 'transfer', 'import_transfer']) && strtotime($data['operate_at']) > time()) {
+        } elseif (in_array($operationType, ['transfer', 'import_transfer']) && strtotime($data['operate_at']) > time()) {
             $this->transferLater($model, $data);
         }
     }
 
-    protected function saved($model, $data) {
-        if (array_has($this->dirty, 'relative')) {
-            $this->setAntiRelative($model);
-        }
+    protected function saved($model, $data)
+    {
         if ($data['operation_type'] == 'leave' && array_has($data, 'skip_leaving') && $data['skip_leaving']) {
             $data['operation_type'] = 'leaving';
             $this->save($data);
         }
     }
 
-    private function operating($model, $data) {
+    protected function afterRelative($model, $data)
+    {
+        if (array_has($this->dirty, 'relative')) {
+            $this->setAntiRelative($model);
+        }
+    }
+
+    private function operating($model, $data)
+    {
         $operationType = $data['operation_type'];
         $operateAt = $data['operate_at'];
         switch ($operationType) {
@@ -56,12 +64,14 @@ class StaffCurdService extends CURD {
         }
     }
 
-    private function setLeaving($model) {
+    private function setLeaving($model)
+    {
         $model->leaving()->create(['staff_sn' => $model->staff_sn, 'original_status_id' => $model->status_id]);
         $model->setAttribute('status_id', 0);
     }
 
-    private function transferLater($model, $data) {
+    private function transferLater($model, $data)
+    {
         if (!empty($model->tmp)) {
             throw new HttpResponseException(response('该员工有未执行操作', 403));
         } else {
@@ -73,16 +83,17 @@ class StaffCurdService extends CURD {
         }
     }
 
-    private function setAntiRelative($model) {
+    private function setAntiRelative($model)
+    {
         $antiRelative = [];
         foreach ($model->relative as $value) {
             $type = app('db')->table('staff_relative_type')->find($value['pivot']['relative_type']);
             $oppositeType = app('db')->table('staff_relative_type')
-                            ->where([['group_id', '=', $type->opposite_group_id]])
-                            ->where(function($query)use($model) {
-                                $query->where('gender_id', $model->gender_id)
-                                ->orWhere('gender_id', 0);
-                            })->value('id');
+                ->where([['group_id', '=', $type->opposite_group_id]])
+                ->where(function ($query) use ($model) {
+                    $query->where('gender_id', $model->gender_id)
+                        ->orWhere('gender_id', 0);
+                })->value('id');
             $antiRelative[$value['relative_sn']] = [
                 'relative_name' => $model->realname,
                 'relative_type' => $oppositeType
