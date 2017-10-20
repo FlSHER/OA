@@ -40,6 +40,19 @@
         <div class="form-group form-group-sm">
             <div class="col-lg-3">
                 <div class="row">
+                    <label class="control-label col-lg-4 col-sm-2">审核人</label>
+                    <div class="col-sm-8 input-group input-group-sm" oaSearch="staff">
+                        <input type="text" class="form-control" name="accountant_name.like"
+                               oaSearchColumn="realname"/>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" oaSearchShow><i
+                                        class="fa fa-search"></i></button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="row">
                     <label class="control-label col-lg-4 col-sm-2">资金归属</label>
                     <div class="col-sm-8">
                         <select class="form-control" name="reim_department.name">
