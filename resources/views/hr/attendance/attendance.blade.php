@@ -43,12 +43,6 @@
 
     <script>
 
-        var ATTENDANCE = {
-            getlist: "{{config('api.url.attendance.getlist')}}",
-            cancel: "{{config('api.url.attendance.cancel')}}",
-            get_staff_list: "{{config('api.url.attendance.stafflist')}}"
-        };
-
         var columns = [
             {data: "id", title: "编号", searchable: false},
             {data: "shop_sn", title: "店铺代码"},

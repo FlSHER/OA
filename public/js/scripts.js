@@ -38,6 +38,7 @@ $.fn.oaTime = oaTime;
 $.fn.oaFormList = oaFormList;
 $.fn.oaSearch = oaSearch;
 $.fn.oaTable = oaTable;
+
 /**
  * OA表单初始化
  * @returns {OAForm|oaForm.form}
@@ -200,7 +201,8 @@ function OAForm(dom, options) {
         // 回调函数,通过"_call"方法调用,this指向dom元素
         callback: {
             // 实例化回调
-            afterConstruct: function (obj) {},
+            afterConstruct: function (obj) {
+            },
             // 表单提交成功
             submitSuccess: function (msg, obj) {
                 alert(msg);
@@ -218,7 +220,8 @@ function OAForm(dom, options) {
                 obj.query.closest('.modal').modal('show');
             },
             // 数据渲染回调
-            afterFillData: function (obj) {}
+            afterFillData: function (obj) {
+            }
         },
         oaDate: {},
         oaDateTime: {},
@@ -305,9 +308,10 @@ function OAForm(dom, options) {
                 });
                 self.refreshUnits();
                 self.units.each(function () {
-                    var name = $(this).attr("name")
-                            .replace(/^(.*?)(\[.*\])*$/, '[$1]$2')
-                            .replace(/\[(\w+?)\]/g, '["$1"]');
+                    var name = $(this).attr("name");
+                    console.log(name);
+                    if (!name) return;
+                    name = name.replace(/^(.*?)(\[.*\])*$/, '[$1]$2').replace(/\[(\w+?)\]/g, '["$1"]');
                     var getValueCode = ('msg' + name).replace(/^(.*?)\[\](.*)$/, 'self.arrayPluck($1,\'$2\')');
                     try {
                         var value = eval(getValueCode);
@@ -407,6 +411,7 @@ function OAForm(dom, options) {
      * 验证提示
      */
     this.tooltip = new Tooltip(self.query);
+
     /*
      * 触发回调函数
      * @param {type} funName 函数名称
@@ -450,8 +455,10 @@ function OAFormList(dom, options) {
             deleteBtn: true
         },
         callback: {
-            afterReset: function () {},
-            afterAdd: function () {}
+            afterReset: function () {
+            },
+            afterAdd: function () {
+            }
         }
     };
     this.setting = $.extend(true, {}, optionOrigin, options);
@@ -554,13 +561,27 @@ function OAFormList(dom, options) {
         self.box = $('<div>').addClass('oaFormList-box');
         self.ul = $('<div>').addClass('oaFormList-list').appendTo(self.box);
         self.html.emptyInput = $('<input>').attr({type: 'hidden', locked: true});
-        self.html.addBtn = $('<button>').attr({type: 'button', title: '在下方插入', addBtn: ''}).addClass('btn btn-xs btn-success').html($('<i>').addClass('fa fa-plus'));
-        self.html.deleteBtn = $('<button>').attr({type: 'button', title: '删除', deleteBtn: ''}).addClass('btn btn-xs btn-danger').html($('<i>').addClass('fa fa-times'));
+        self.html.addBtn = $('<button>').attr({
+            type: 'button',
+            title: '在下方插入',
+            addBtn: ''
+        }).addClass('btn btn-xs btn-success').html($('<i>').addClass('fa fa-plus'));
+        self.html.deleteBtn = $('<button>').attr({
+            type: 'button',
+            title: '删除',
+            deleteBtn: ''
+        }).addClass('btn btn-xs btn-danger').html($('<i>').addClass('fa fa-times'));
 
         self.html.outerBtn = $('<p>').addClass('oaFormList-button text-center form-control-static').prependTo(self.box);
         self.setting.outerBtn.addBtn && self.html.outerBtn.append(self.html.addBtn.clone().on('click', self.add));
 
-        self.html.btnGroup = $('<div>').css({position: 'absolute', right: '10px', top: '50%', 'margin-top': '-11px', 'z-index': 100}).attr({btnGroup: ''}).addClass('text-right').html(' ');
+        self.html.btnGroup = $('<div>').css({
+            position: 'absolute',
+            right: '10px',
+            top: '50%',
+            'margin-top': '-11px',
+            'z-index': 100
+        }).attr({btnGroup: ''}).addClass('text-right').html(' ');
         self.setting.unit.addBtn && self.html.btnGroup.append(self.html.addBtn.clone().after(' '));
         self.setting.unit.deleteBtn && self.html.btnGroup.append(self.html.deleteBtn.clone());
 
@@ -648,6 +669,7 @@ function OAFormList(dom, options) {
         }
         return self.keyNames;
     };
+
     /**
      * 触发回调函数
      * @param {type} funName 函数名称
@@ -692,19 +714,19 @@ function Tooltip(form) {
         pos.left = $obj.width() + parseInt($obj.css('padding-left')) + parseInt($obj.css('padding-right')) + 18;
         pos.top = ($obj.height() + parseInt($obj.css('padding-top')) + parseInt($obj.css('padding-bottom'))) / 2 - 11;
         var tooltip = $(
-                '<div class="' + this.tooltipClass + '">' +
-                '<div class="' + this.tooltipClass + '-arrow"></div>' +
-                '<div class="' + this.tooltipClass + '-inner">' + msg + '</div>' +
-                '</div>'
-                )
-                .click(function () {
-                    $obj.focus();
-                    $(this).fadeOut().remove();
-                })
-                .css(pos)
-                .hide()
-                .appendTo($obj.parent())
-                .fadeIn();
+            '<div class="' + this.tooltipClass + '">' +
+            '<div class="' + this.tooltipClass + '-arrow"></div>' +
+            '<div class="' + this.tooltipClass + '-inner">' + msg + '</div>' +
+            '</div>'
+        )
+            .click(function () {
+                $obj.focus();
+                $(this).fadeOut().remove();
+            })
+            .css(pos)
+            .hide()
+            .appendTo($obj.parent())
+            .fadeIn();
         $obj.on("focus", function () {
             tooltip.fadeOut().remove();
         });
@@ -787,7 +809,8 @@ function OASearch(dom, options) {
                     {data: "province.name", title: "店铺地址(省)", visible: false, searchable: false, defaultContent: ""},
                     {data: "city.name", title: "店铺地址（市）", visible: false, searchable: false, defaultContent: ""},
                     {data: "county.name", title: "店铺地址（区）", visible: false, searchable: false, defaultContent: ""},
-                    {data: "address", title: "店铺地址", sortable: false, searchable: false,
+                    {
+                        data: "address", title: "店铺地址", sortable: false, searchable: false,
                         createdCell: function (nTd, sData, oData, iRow, iCol) {
                             var provinceName = oData.province ? oData.province.name + "-" : "";
                             var cityName = oData.city ? oData.city.name + "-" : "";
@@ -962,17 +985,31 @@ function OATable(dom, options) {
     };
     this.setting = $.extend(true, {}, optionOrigin, options);
     this.buttonLibrary = {
-        colvis: {extend: "colvis", text: "<i class='fa fa-eye-slash fa-fw'></i>", titleAttr: "可见字段", className: "btn-primary"},
-        reload: {text: "<i class='fa fa-refresh fa-fw'></i>", titleAttr: "刷新", className: "btn-primary", action: function (e, dt, node, config) {
+        colvis: {
+            extend: "colvis",
+            text: "<i class='fa fa-eye-slash fa-fw'></i>",
+            titleAttr: "可见字段",
+            className: "btn-primary"
+        },
+        reload: {
+            text: "<i class='fa fa-refresh fa-fw'></i>",
+            titleAttr: "刷新",
+            className: "btn-primary",
+            action: function (e, dt, node, config) {
                 dt.draw();
             }
         },
-        filter: {text: "<i class='fa fa-filter fa-fw'></i>", titleAttr: "筛选", className: "btn-primary", action: function () {
+        filter: {
+            text: "<i class='fa fa-filter fa-fw'></i>", titleAttr: "筛选", className: "btn-primary", action: function () {
                 self.filterBox.slideToggle();
             }
         },
         export: function (url) {
-            return {text: "<i class='fa fa-download fa-fw'></i>", titleAttr: "导出", className: "btn-default", action: function () {
+            return {
+                text: "<i class='fa fa-download fa-fw'></i>",
+                titleAttr: "导出",
+                className: "btn-default",
+                action: function () {
                     self.exportToExcel(url);
                 }
             };

@@ -10,7 +10,8 @@ namespace App\Contracts;
 use App\Contracts\OperationLog as OperationLog;
 use DB;
 
-class CURD {
+class CURD
+{
 
     protected $model;
     protected $logService;
@@ -19,7 +20,8 @@ class CURD {
     protected $relations = ['HasOne' => [], 'HasMany' => [], 'BelongsTo' => [], 'BelongsToMany' => []];
     protected $dirty = [];
 
-    public function __construct($model = null, $log = null) {
+    public function __construct($model = null, $log = null)
+    {
         if (empty($model) && !empty($this->model))
             $model = $this->model;
         $model && $this->model($model);
@@ -32,7 +34,8 @@ class CURD {
      * @param type $arguments
      * @return \App\Contracts\CURD
      */
-    public function __call($name, $arguments) {
+    public function __call($name, $arguments)
+    {
         call_user_func_array([$this->builder, $name], $arguments);
         return $this;
     }
@@ -42,12 +45,16 @@ class CURD {
      * @param type $model
      * @return \App\Contracts\CURD
      */
-    public function model($model) {
+    public function model($model)
+    {
         if (is_object($model)) {
-            $model = get_class($model);
+            $modelName = get_class($model);
+        } else {
+            $modelName = $model;
+            $model = new $modelName();
         }
         $this->model = $model;
-        $this->builder = $model::query();
+        $this->builder = $modelName::query();
         $this->primaryKey = $this->builder->getModel()->getKeyName();
         return $this;
     }
@@ -57,7 +64,8 @@ class CURD {
      * @param OperationLog $log
      * @return \App\Contracts\CURD
      */
-    public function log($log = null) {
+    public function log($log = null)
+    {
         if ($log instanceof OperationLog) {
             $this->logService = $log;
         } elseif (is_string($log)) {
@@ -72,14 +80,16 @@ class CURD {
      * 判断是否有关联的日志
      * @return type
      */
-    public function hasLog() {
+    public function hasLog()
+    {
         return !empty($this->logService);
     }
 
     /**
      * 重置 Dirty，LogService
      */
-    public function reset() {
+    public function reset()
+    {
         $this->dirty = [];
         $this->hasLog() && $this->log(get_class($this->logService));
     }
@@ -89,7 +99,8 @@ class CURD {
      * @param type $data
      * @return type
      */
-    public function createOrUpdate($data) {
+    public function createOrUpdate($data)
+    {
         if (array_has($data, $this->primaryKey)) {
             return $this->update($data);
         } else {
@@ -102,7 +113,8 @@ class CURD {
      * @param type $data
      * @return typeg
      */
-    public function create($data) {
+    public function create($data)
+    {
         $this->save($data);
         return ['status' => 1, 'message' => '添加成功'];
     }
@@ -112,7 +124,8 @@ class CURD {
      * @param type $data
      * @return type
      */
-    public function update($data) {
+    public function update($data)
+    {
         $this->save($data);
         if ($this->isDirty()) {
             return ['status' => 1, 'message' => '编辑成功'];
@@ -126,11 +139,12 @@ class CURD {
      * @param type $model
      * @param type $data
      */
-    protected function save($data) {
+    protected function save($data)
+    {
         if (array_has($data, $this->primaryKey) && !empty($data[$this->primaryKey])) {
             $model = $this->newBuilder()->find($data[$this->primaryKey]);
         } else {
-            $model = new $this->model();
+            $model = $this->model;
         }
         $this->fillDataAndSave($model, $data);
     }
@@ -141,7 +155,8 @@ class CURD {
      * @param type $data
      * @throws \Illuminate\Database\QueryException
      */
-    protected function fillDataAndSave($model, $data) {
+    protected function fillDataAndSave($model, $data)
+    {
         $this->reset();
         DB::beginTransaction();
         try {
@@ -170,7 +185,8 @@ class CURD {
      * @param type $model
      * @param type $data
      */
-    protected function getRelation($model, $data) {
+    protected function getRelation($model, $data)
+    {
         $this->relations = ['HasOne' => [], 'HasMany' => [], 'BelongsTo' => [], 'BelongsToMany' => []];
         foreach ($data as $k => $v) {
             if (method_exists($model, $k) && $model->$k() instanceof \Illuminate\Database\Eloquent\Relations\Relation) {
@@ -186,7 +202,8 @@ class CURD {
      * 修改一对一关联属性
      * @param Illuminate\Database\Eloquent\Model $model
      */
-    protected function fillDataToHasOne($model) {
+    protected function fillDataToHasOne($model)
+    {
         foreach ($this->relations['HasOne'] as $relation => $data) {
             $relationQuery = $model->$relation();
             $foreignKey = $relationQuery->getPlainForeignKey();
@@ -203,7 +220,8 @@ class CURD {
      * 修改一对多关联属性
      * @param Illuminate\Database\Eloquent\Model $model
      */
-    protected function fillDataToHasMany($model) {
+    protected function fillDataToHasMany($model)
+    {
         foreach ($this->relations['HasMany'] as $relation => $data) {
             $data = empty($data) ? [] : $data;
             $dirty = ['detached' => [], 'attached' => [], 'updated' => []];
@@ -232,7 +250,8 @@ class CURD {
      * @param type $data
      * @return type
      */
-    protected function attachHasManyRelations($attached, $relationQuery, $data) {
+    protected function attachHasManyRelations($attached, $relationQuery, $data)
+    {
         $foreignKey = $relationQuery->getPlainForeignKey();
         $foreignKeyValue = $relationQuery->getParentKey();
         $dirty = [];
@@ -259,7 +278,8 @@ class CURD {
      * @param type $relation
      * @return type
      */
-    protected function updateHasManyRelations($updated, $data, $model, $relation) {
+    protected function updateHasManyRelations($updated, $data, $model, $relation)
+    {
         $dirty = [];
         foreach ($updated as $k => $v) {
             $existedModel = $model->$relation()->find($v)->fill($data[$k]);
@@ -276,14 +296,15 @@ class CURD {
      * @param type $detached
      * @param type $relationQuery
      */
-    protected function detachHasManyRelations($detached, $relationQuery) {
+    protected function detachHasManyRelations($detached, $relationQuery)
+    {
         $foreignKey = $relationQuery->getPlainForeignKey();
         if (is_null($detached)) {
             $relationModels = $relationQuery->get();
         } else {
             $relationModels = $relationQuery->find($detached);
         }
-        $relationModels->each(function($model)use($foreignKey) {
+        $relationModels->each(function ($model) use ($foreignKey) {
             try {
                 $model->setAttribute($foreignKey, null);
                 $model->save();
@@ -298,7 +319,8 @@ class CURD {
      * 替换多对一归属
      * @param Illuminate\Database\Eloquent\Model $model
      */
-    protected function changeBelongsTo($model) {
+    protected function changeBelongsTo($model)
+    {
         foreach ($this->relations['BelongsTo'] as $relation => $data) {
             $relationQuery = $model->$relation();
             $newBuilder = $relationQuery->getModel()->newQuery();
@@ -315,7 +337,8 @@ class CURD {
      * 多对多关联同步
      * @param Illuminate\Database\Eloquent\Model $model
      */
-    protected function changeBelongsToMany($model) {
+    protected function changeBelongsToMany($model)
+    {
         foreach ($this->relations['BelongsToMany'] as $relation => $data) {
             $data = empty($data) ? [] : $data;
             $relationQuery = $model->$relation();
@@ -348,7 +371,8 @@ class CURD {
      * @param type $changed
      * @return type
      */
-    protected function makeBelongsToManyDirty($response, $original, $changed) {
+    protected function makeBelongsToManyDirty($response, $original, $changed)
+    {
         $newAttached = [];
         foreach ($response['attached'] as $v) {
             $pivot = $changed->find($v)->pivot;
@@ -378,7 +402,8 @@ class CURD {
      * @param type $pivot
      * @return type
      */
-    protected function getPivotAttribute($pivot) {
+    protected function getPivotAttribute($pivot)
+    {
         return array_except($pivot->toArray(), [$pivot->getForeignKey(), $pivot->getOtherKey()]);
     }
 
@@ -387,7 +412,8 @@ class CURD {
      * @param type $model
      * @param type $relation
      */
-    protected function addDirty($model, $relation = null) {
+    protected function addDirty($model, $relation = null)
+    {
         if (empty($relation)) {
             $newDirty = $this->getDirtyWithOriginal($model);
         } else {
@@ -401,7 +427,8 @@ class CURD {
      * @param type $model
      * @return type
      */
-    protected function getDirtyWithOriginal($model) {
+    protected function getDirtyWithOriginal($model)
+    {
         $dirty = [];
         foreach ($model->getDirty() as $key => $value) {
             $dirty[$key] = [
@@ -415,10 +442,11 @@ class CURD {
     /**
      * 删除
      */
-    public function delete($data = null, $relations = []) {
+    public function delete($data = null, $relations = [])
+    {
         $newBuilder = $this->makeDeleteBuilder($data);
 
-        $newBuilder->each(function($model)use($data, $relations) {
+        $newBuilder->each(function ($model) use ($data, $relations) {
             DB::beginTransaction();
             try {
                 $this->deleting($model, $data); //deleting 回调
@@ -442,7 +470,8 @@ class CURD {
      * @param type $data
      * @return type
      */
-    protected function makeDeleteBuilder($data) {
+    protected function makeDeleteBuilder($data)
+    {
         $newBuilder = $this->newBuilder();
         if (is_string($data)) {
             $newBuilder->where($this->primaryKey, $data);
@@ -459,7 +488,8 @@ class CURD {
      * @param type $model
      * @param type $relations
      */
-    protected function deleteRelations($model, $relations) {
+    protected function deleteRelations($model, $relations)
+    {
         foreach ($relations as $v) {
             $relationType = str_replace('Illuminate\Database\Eloquent\Relations\\', '', get_class($model->$v()));
             switch ($relationType) {
@@ -481,7 +511,8 @@ class CURD {
      * 返回一个新的Builder，与原Builder条件相同
      * @return type
      */
-    protected function newBuilder() {
+    protected function newBuilder()
+    {
         return clone $this->builder;
     }
 
@@ -489,23 +520,28 @@ class CURD {
      * 检查模型及其关联是否有Dirty（变动）
      * @return type
      */
-    protected function isDirty() {
+    protected function isDirty()
+    {
         return !empty($this->dirty);
     }
 
-    protected function saving($model, $data) {
+    protected function saving($model, $data)
+    {
 //
     }
 
-    protected function saved($model, $data) {
+    protected function saved($model, $data)
+    {
 //
     }
 
-    protected function deleting($model, $data) {
+    protected function deleting($model, $data)
+    {
 //
     }
 
-    protected function deleted($model, $data) {
+    protected function deleted($model, $data)
+    {
 //
     }
 

@@ -85,25 +85,31 @@
                         </div>
                         <div class="collapse" id="collapse_{{$detail['staff_sn']}}">
                             <div class="row">
-                                @foreach($detail['clocks'] as $clock)
-                                    <div class="col-sm-4 col-md-3">
-                                        <div class="thumbnail" onClick="viewMore({{json_encode($clock)}})">
-                                            <img src="{{$clock['thumb']}}">
-                                            <h4 style="text-align:center;color:
-                                            @if($clock['attendance_type'] == 1)
-                                                    #5cb85c
-                                            @elseif($clock['attendance_type'] == 2)
-                                                    #5bc0de
-                                            @elseif($clock['attendance_type'] == 3)
-                                                    #f0ad4e
-                                            @endif">
-                                                <i class="fa fa-caret-square-o-{{$clock['type'] == 1?'up':'down'}}"
-                                                ></i>
-                                                {{substr($clock['clock_at'],11,5)}}
-                                            </h4>
-                                        </div>
+                                @if(empty($detail['clocks']))
+                                    <div class="col-sm-12 col-md-12">
+                                        <h4 class="text-danger text-center">无打卡记录</h4>
                                     </div>
-                                @endforeach
+                                @else
+                                    @foreach($detail['clocks'] as $clock)
+                                        <div class="col-sm-4 col-md-3">
+                                            <div class="thumbnail" onClick="viewMore({{json_encode($clock)}})">
+                                                <img src="{{$clock['thumb']}}">
+                                                <h4 style="text-align:center;color:
+                                                @if($clock['attendance_type'] == 1)
+                                                        #5cb85c
+                                                @elseif($clock['attendance_type'] == 2)
+                                                        #5bc0de
+                                                @elseif($clock['attendance_type'] == 3)
+                                                        #f0ad4e
+                                                @endif">
+                                                    <i class="fa fa-caret-square-o-{{$clock['type'] == 1?'up':'down'}}"
+                                                    ></i>
+                                                    {{substr($clock['clock_at'],11,5)}}
+                                                </h4>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @endif
                             </div>
                         </div>
                     </li>
