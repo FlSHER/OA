@@ -60,7 +60,7 @@ class WorkingScheduleController extends Controller
         }
         if ($request->has('id')) {
             $request->offsetUnset('id');
-            $model->where('staff_sn', $staffSn)->where('shop_sn', $shopSn)->update($request->input());
+            $model->where('staff_sn', $staffSn)->where('shop_sn', $shopSn)->update($request->only(['clock_in', 'clock_out', 'shop_duty_id']));
             return ['status' => 1, 'message' => '编辑成功'];
         } else if (!empty($workingSchedule)) {
             return ['status' => -1, 'message' => '已有相同的排班存在'];
