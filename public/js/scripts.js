@@ -309,7 +309,6 @@ function OAForm(dom, options) {
                 self.refreshUnits();
                 self.units.each(function () {
                     var name = $(this).attr("name");
-                    console.log(name);
                     if (!name) return;
                     name = name.replace(/^(.*?)(\[.*\])*$/, '[$1]$2').replace(/\[(\w+?)\]/g, '["$1"]');
                     var getValueCode = ('msg' + name).replace(/^(.*?)\[\](.*)$/, 'self.arrayPluck($1,\'$2\')');
