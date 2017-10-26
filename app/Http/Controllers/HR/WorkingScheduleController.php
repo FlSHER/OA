@@ -65,7 +65,7 @@ class WorkingScheduleController extends Controller
         } else if (!empty($workingSchedule)) {
             return ['status' => -1, 'message' => '已有相同的排班存在'];
         } else {
-            $model->insert($request->input());
+            $model->insert($request->except(['_url']));
             return ['status' => 1, 'message' => '添加成功'];
         }
     }
