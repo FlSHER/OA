@@ -39,7 +39,6 @@ class MakeWorkingSchedule extends Command
      */
     public function handle()
     {
-        Log::info('Start making working schedule');
         $this->copySchedule();
 
         $addCount = 0;
@@ -80,10 +79,7 @@ class MakeWorkingSchedule extends Command
                 $managerCount++;
             }
         });
-
-        Log::info('add:' . $addCount . ' delete:' . $deleteCount . ' manager:' . $managerCount);
         DB::connection('attendance')->select('DROP TABLE IF EXISTS working_schedule_' . date('Ymd', strtotime("-7 day")));
-        Log::info('End making working schedule');
     }
 
     protected function copySchedule()
