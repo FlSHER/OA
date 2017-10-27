@@ -6,6 +6,8 @@
 @section('css')
     <!-- data table -->
     <link rel="stylesheet" href="{{source('plug_in/datatables/datatables.min.css')}}"/>
+    <!-- zTree css -->
+    <link rel="stylesheet" href="{{source('plug_in/ztree/css/metroStyle.css')}}"/>
     <!-- checkbox -->
     <link rel="stylesheet" href="{{source('css/checkbox.css')}}"/>
 @endsection
@@ -38,6 +40,8 @@
 @section('js')
     <!--data table-->
     <script type="text/javascript" src="{{source('plug_in/datatables/datatables.min.js')}}"></script>
+    <!-- zTree js -->
+    <script type="text/javascript" src="{{source('plug_in/ztree/js/jquery.ztree.all.js')}}"></script>
     <!--script for this view-->
     <script type="text/javascript" src="{{source('js/HR/attendance.js')}}"></script>
 
