@@ -67,6 +67,12 @@
                                 <div class="col-sm-8" style="padding:3px 0 0;">
                                     <div class="progress">
                                         <?php $workingTime = strtotime($detail['working_end_at']) - strtotime($detail['working_start_at']); ?>
+                                        {{--@if(!empty($detail['clock_log'][0]) && $detail['clock_log'][0]['start'] > $detail['working_start_at'])--}}
+                                            {{--<div class="progress-bar"--}}
+                                                 {{--style="width:{{--}}
+                                                 {{--(strtotime($detail['clock_log'][0]['start'])-strtotime($detail['working_start_at']))*100/$workingTime--}}
+                                                 {{--}}%"></div>--}}
+                                        {{--@endif--}}
                                         @foreach($detail['clock_log'] as $clockLog)
                                             <div class="progress-bar
 @if($clockLog['type'] == 'w')
@@ -76,7 +82,7 @@
 @elseif($clockLog['type'] == 'l')
                                                     progress-bar-warning
 @endif
-                                                    " style="width:{{$clockLog['duration']*100/$workingTime}}%">
+                                                    " style="width:{{$clockLog['duration']*100/$workingTime}}%;padding-right:0;">
 
                                             </div>
                                         @endforeach
