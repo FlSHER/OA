@@ -44,7 +44,7 @@ function pass(id) {
         data: {id: id},
         success: function (response) {
             if (response.state == 1) {
-                table.draw();
+                table.draw(false);
                 showPersonalInfo(id);
             } else if (response.state == -1) {
                 alert(response.message);
@@ -68,7 +68,7 @@ function reject(id) {
         data: {id: id},
         success: function (response) {
             if (response.state == 1) {
-                table.draw();
+                table.draw(false);
                 showPersonalInfo(id);
             } else if (response.state == -1) {
                 alert(response.message);

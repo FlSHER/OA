@@ -76,6 +76,16 @@ class TransferController extends Controller
         return $response;
     }
 
+    public function cancel(Request $request)
+    {
+        $data = [
+            'id' => $request->id,
+            'status' => -1,
+        ];
+        $response = $this->curdService->update($data);
+        return $response;
+    }
+
     public function import(Request $request)
     {
         $excelData = $this->importService->load($request);

@@ -22,6 +22,8 @@ class MakeWorkingSchedule extends Command
      */
     protected $description = 'Create working schedule with HR data.';
 
+    protected $holdDays = 40;
+
     /**
      * Create a new command instance.
      *
@@ -79,7 +81,7 @@ class MakeWorkingSchedule extends Command
                 $managerCount++;
             }
         });
-        DB::connection('attendance')->select('DROP TABLE IF EXISTS working_schedule_' . date('Ymd', strtotime("-7 day")));
+        DB::connection('attendance')->select('DROP TABLE IF EXISTS working_schedule_' . date('Ymd', strtotime('-' . $this->holdDays . ' day')));
     }
 
     protected function copySchedule()

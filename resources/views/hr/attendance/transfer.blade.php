@@ -72,7 +72,7 @@
                 <form id="addForm" name="addForm" class="form-horizontal" method="post"
                       action="{{route('hr.transfer.submit')}}">
                     @inject('HRM','HRM')
-                    @include('hr/attendance/transfer_form')
+                    @include('hr/attendance/transfer_form',['type'=>'add'])
                 </form>
             </div>
         </div>
@@ -88,7 +88,7 @@
             <div class="modal-content">
                 <form id="editForm" name="editForm" class="form-horizontal" method="post"
                       action="{{route('hr.transfer.submit')}}">
-                    @include('hr/attendance/transfer_form')
+                    @include('hr/attendance/transfer_form',['type'=>'edit'])
                     <input type="hidden" name="id">
                 </form>
             </div>
@@ -113,7 +113,7 @@
             {data: "staff_department_name", title: "部门名称", defaultContent: "无"},
             {data: "current_shop.name", title: "所属店铺", visible: false, defaultContent: "无", searchable: false},
             {data: "leaving_shop_sn", title: "调离店铺代码", visible: false},
-            {data: "leaving_shop_name", title: "调离店铺名称", defaultContent: "无"},
+            {data: "leaving_shop_name", title: "调离店铺名称", defaultContent: "无", visible: false},
             {
                 data: "{leaving_shop.province.name}.'-'.{leaving_shop.city.name}.'-'.{leaving_shop.county.name}.' '.{leaving_shop.address}",
                 name: "leaving_shop.address",
@@ -142,13 +142,18 @@
                 "width": "50px",
                 "createdCell": function (nTd, sData, oData, iRow, iCol) {
                     var html = '';
-                    <?php if ($authority->checkAuthority(81)): ?>
+                    @if ($authority->checkAuthority(81))
                     if (oData.maker_sn == "{{app('CurrentUser')->staff_sn}}" || "{{app('CurrentUser')->staff_sn}}" == "999999") {
-                        html += '<button class="btn btn-sm btn-default" title="编辑" onclick=\'edit(' + sData + ')\'><i class="fa fa-edit fa-fw"></i></button>';
+                        if (oData.status == -1) {
+                            html += '已取消';
+                        } else if (oData.status < 2 && oData.status >= 0) {
+                            html += '<button class="btn btn-sm btn-default" title="编辑" onclick="edit(' + sData + ')"><i class="fa fa-edit fa-fw"></i></button>';
+                        }
+                        if (oData.status == 0) {
+                            html += '&nbsp;<button class="btn btn-sm btn-danger" title="取消行程" onclick="cancel(' + sData + ')"><i class="fa fa-close fa-fw"></i></button>';
+                        }
                     }
-                    <?php endif; ?>
-
-                    //                html += '&nbsp;<button class="btn btn-sm btn-danger" title="取消行程" onclick="del(' + sData + ')"><i class="fa fa-trash-o fa-fw"></i></button>';
+                    @endif
 
                     $(nTd).html(html).css({"padding": "5px", "text-align": "center"});
                 }
