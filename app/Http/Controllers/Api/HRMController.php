@@ -30,8 +30,10 @@ class HRMController extends Controller
     {
         $request->offsetSet('staff_sn', $request->current_staff_sn);
         $currentUser = Staff::api()->find($request->staff_sn);
-        $currentUser->department->setAttribute('parentIds', $currentUser->department->parentIds);
-        $currentUser->department->setAttribute('childrenIds', $currentUser->department->childrenIds);
+        if (!empty($currentUser->department)) {
+            $currentUser->department->setAttribute('parentIds', $currentUser->department->parentIds);
+            $currentUser->department->setAttribute('childrenIds', $currentUser->department->childrenIds);
+        }
         return ApiResponse::makeSuccessResponse($currentUser, 200);
     }
 

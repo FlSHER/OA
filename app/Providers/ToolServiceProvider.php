@@ -9,7 +9,8 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-class ToolServiceProvider extends ServiceProvider {
+class ToolServiceProvider extends ServiceProvider
+{
 
     /**
      * 服务提供者加是否延迟加载.
@@ -23,7 +24,8 @@ class ToolServiceProvider extends ServiceProvider {
      *
      * @return void
      */
-    public function boot() {
+    public function boot()
+    {
         //
     }
 
@@ -32,7 +34,8 @@ class ToolServiceProvider extends ServiceProvider {
      *
      * @return void
      */
-    public function register() {
+    public function register()
+    {
         /**
          * 加密
          */
@@ -46,15 +49,18 @@ class ToolServiceProvider extends ServiceProvider {
          */
         $this->app->bind('App\Contracts\CURD', 'App\Contracts\CURD');
         $this->app->when('App\Http\Controllers\HR\StaffController')
-                ->needs('App\Contracts\CURD')
-                ->give('App\Services\Tools\CURDs\StaffCurdService');
+            ->needs('App\Contracts\CURD')
+            ->give('App\Services\Tools\CURDs\StaffCurdService');
+        $this->app->when('App\Http\Controllers\HR\TransferController')
+            ->needs('App\Contracts\CURD')
+            ->give('App\Services\Tools\CURDs\TransferCurdService');
         /**
          * 操作日志
          */
         $this->app->bind('App\Contracts\OperationLog', 'App\Contracts\OperationLog');
         $this->app->when('App\Http\Controllers\HR\StaffController')
-                ->needs('App\Contracts\OperationLog')
-                ->give('App\Services\Tools\OperationLogs\StaffOperationLogService');
+            ->needs('App\Contracts\OperationLog')
+            ->give('App\Services\Tools\OperationLogs\StaffOperationLogService');
         /**
          * Excel导入
          */
@@ -78,7 +84,8 @@ class ToolServiceProvider extends ServiceProvider {
      *
      * @return array
      */
-    public function provides() {
+    public function provides()
+    {
         return [
             'Encyption',
             'Curl',

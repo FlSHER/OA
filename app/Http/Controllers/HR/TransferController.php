@@ -22,7 +22,7 @@ class TransferController extends Controller
     {
         $this->logService = $logService;
         $this->importService = $importService->extension('xlsx')->trans($this->transPath);
-        $this->curdService = $curd->model($this->model);
+        $this->curdService = $curd;
     }
 
     public function showManagePage()
@@ -57,7 +57,7 @@ class TransferController extends Controller
     public function addByOne(Request $request)
     {
         $model = $this->model;
-        $count = $model::where($request->only(['staff_sn', 'leaving_shop_sn', 'leaving_date', 'arriving_shop_sn', 'arriving_shop_duty_id']))->count();
+        $count = $model::where($request->only(['staff_sn', 'leaving_date', 'arriving_shop_sn']))->count();
         if ($count > 0) {
             $response['message'] = '调动已存在';
         } else {
@@ -137,14 +137,16 @@ class TransferController extends Controller
     protected function makeValidator($input)
     {
         $validator = [
-            'staff_sn' => ['required_with:staff_name'],
-            'staff_name' => ['required', 'exists:staff,realname,staff_sn,' . $input['staff_sn']],
             'leaving_shop_sn' => ['exists:shops,shop_sn,deleted_at,NULL'],
             'arriving_shop_sn' => ['required', 'exists:shops,shop_sn,deleted_at,NULL'],
             'arriving_shop_duty_id' => ['exists:attendance.shop_duty,id'],
             'leaving_date' => ['required', 'date', 'after:2000-1-1'],
             'remark' => ['max:200'],
         ];
+        if (empty($input['id'])) {
+            $validator['staff_sn'] = ['required_with:staff_name'];
+            $validator['staff_name'] = ['required', 'exists:staff,realname,staff_sn,' . $input['staff_sn']];
+        }
         return $validator;
     }
 

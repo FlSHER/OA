@@ -15,7 +15,7 @@
         @elseif($type == 'edit')
             <label class="control-label col-sm-2">*调动员工</label>
             <div class="col-sm-4">
-                <input class="form-control" name="staff_name" type="text" title="调动员工" readonly/>
+                <input class="form-control" name="staff_name" type="text" title="调动员工" disabled/>
             </div>
         @endif
     </div>

@@ -145,16 +145,21 @@
                     @if ($authority->checkAuthority(81))
                     if (oData.maker_sn == "{{app('CurrentUser')->staff_sn}}" || "{{app('CurrentUser')->staff_sn}}" == "999999") {
                         if (oData.status == -1) {
-                            html += '已取消';
-                        } else if (oData.status < 2 && oData.status >= 0) {
+                            html += '<button class="btn btn-sm btn-danger" title="已取消">已取消</button>';
+                        } else if (oData.status == 2) {
+                            html += '<button class="btn btn-sm btn-success" title="已完成">已完成</button>';
+                        } else {
                             html += '<button class="btn btn-sm btn-default" title="编辑" onclick="edit(' + sData + ')"><i class="fa fa-edit fa-fw"></i></button>';
+                            if (oData.status == 0) {
+                                html += '&nbsp;<button class="btn btn-sm btn-danger" title="取消行程" onclick="cancel(' + sData + ')"><i class="fa fa-close fa-fw"></i></button>';
+                            }
                         }
-                        if (oData.status == 0) {
-                            html += '&nbsp;<button class="btn btn-sm btn-danger" title="取消行程" onclick="cancel(' + sData + ')"><i class="fa fa-close fa-fw"></i></button>';
-                        }
+
                     }
                     @endif
-
+                    if (html.length == 0) {
+                        html = '<button class="btn btn-sm btn-default" title="不可操作" disabled>不可操作</button>';
+                    }
                     $(nTd).html(html).css({"padding": "5px", "text-align": "center"});
                 }
             }
