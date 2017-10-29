@@ -68,10 +68,10 @@
                                     <div class="progress">
                                         <?php $workingTime = strtotime($detail['working_end_at']) - strtotime($detail['working_start_at']); ?>
                                         {{--@if(!empty($detail['clock_log'][0]) && $detail['clock_log'][0]['start'] > $detail['working_start_at'])--}}
-                                            {{--<div class="progress-bar"--}}
-                                                 {{--style="width:{{--}}
-                                                 {{--(strtotime($detail['clock_log'][0]['start'])-strtotime($detail['working_start_at']))*100/$workingTime--}}
-                                                 {{--}}%"></div>--}}
+                                        {{--<div class="progress-bar"--}}
+                                        {{--style="width:{{--}}
+                                        {{--(strtotime($detail['clock_log'][0]['start'])-strtotime($detail['working_start_at']))*100/$workingTime--}}
+                                        {{--}}%"></div>--}}
                                         {{--@endif--}}
                                         @foreach($detail['clock_log'] as $clockLog)
                                             <div class="progress-bar
@@ -82,7 +82,8 @@
 @elseif($clockLog['type'] == 'l')
                                                     progress-bar-warning
 @endif
-                                                    " style="width:{{$clockLog['duration']*100/$workingTime}}%;padding-right:0;">
+                                                    "
+                                                 style="width:{{$clockLog['duration']*100/$workingTime}}%;padding-right:0;">
 
                                             </div>
                                         @endforeach
@@ -153,10 +154,10 @@
         var titleGroup = {
             '11': '上班打卡',
             '12': '下班打卡',
-            '21': '调动出发',
-            '22': '调动到达',
-            '31': '请假离开',
-            '32': '请假返回',
+            '21': '调动到达',
+            '22': '调动出发',
+            '31': '请假返回',
+            '32': '请假离开',
         };
         var title = titleGroup[clock.attendance_type + '' + clock.type];
         $('#viewMore h4').html(title);
