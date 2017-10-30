@@ -152,6 +152,7 @@ class AuthorityService
         session()->forget('authorities');
         session()->forget('available_departments');
         session()->forget('available_brands');
+        session()->forget('available_shops');
     }
 
     /**
