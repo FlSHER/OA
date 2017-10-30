@@ -157,7 +157,8 @@
                                 </div>
                             </div>
                         @endif
-                        <div class="form-group <?php if ($type == 'edit') { ?>hidden<?php } ?>">
+                        <div class="form-group <?php if ($type == 'edit') { ?>hidden<?php } ?>"
+                             style="border-top: 1px dotted #e5e5e5;padding-top: 15px;">
                             <label class="control-label col-sm-2">*执行时间</label>
                             <div class="col-sm-3">
                                 <input class="form-control" name="operate_at" type="text" isDate title="执行时间"
