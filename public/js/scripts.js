@@ -225,7 +225,8 @@ function OAForm(dom, options) {
         },
         oaDate: {},
         oaDateTime: {},
-        oaFormList: {}
+        oaFormList: {},
+        oaSearch: {},
     };
     this.dom = dom;
     this.query = $(dom);
@@ -243,7 +244,14 @@ function OAForm(dom, options) {
         self.query.find('[isTime][isTime!=false]').oaTime(self.setting.oaTime);
         self.formList = self.query.find('[isFormList][isFormList!=false]').oaFormList(self.setting.oaFormList);
         self.query.find('[oaSearch][oaSearch!=false]').each(function () {
-            $(this).oaSearch($(this).attr('oaSearch'));
+            var searchType = $(this).attr('oaSearch');
+            var option;
+            if (searchType in self.setting.oaSearch) {
+                option = self.setting.oaSearch[searchType];
+            } else {
+                option = searchType;
+            }
+            $(this).oaSearch(option);
         });
         /* 关联插件初始化 end */
         self.query.on('submit', self.submitByAjax);
@@ -771,30 +779,33 @@ function OASearch(dom, options) {
         columns: [],
         params: [],
         target: [],
+        size: 'normal', // large,normal,small
         themes: {
             staff: {
                 url: '/hr/staff/list',
+                size: 'large',
                 columns: [
                     {data: "staff_sn", title: "编号"},
                     {data: "realname", title: "姓名"},
                     {data: "brand.name", title: "品牌", searchable: false},
                     {data: "department.full_name", title: "部门全称", searchable: false},
-                    {data: "shop.name", title: "所属店铺", visible: false, searchable: false, defaultContent: ""},
                     {data: "position.name", title: "职位", searchable: false},
-                    {data: "status.name", title: "状态", searchable: false}
+                    {data: "status.name", title: "状态", searchable: false},
+                    {data: "shop.name", title: "所属店铺", searchable: false, defaultContent: "无"}
                 ]
             },
             all_staff: {
                 url: '/hr/staff/list',
                 params: {with_auth: false},
+                size: 'large',
                 columns: [
                     {data: "staff_sn", title: "编号"},
                     {data: "realname", title: "姓名"},
                     {data: "brand.name", title: "品牌", searchable: false},
                     {data: "department.full_name", title: "部门全称", searchable: false},
-                    {data: "shop.name", title: "所属店铺", visible: false, searchable: false, defaultContent: ""},
                     {data: "position.name", title: "职位", searchable: false},
-                    {data: "status.name", title: "状态", searchable: false}
+                    {data: "status.name", title: "状态", searchable: false},
+                    {data: "shop.name", title: "所属店铺", searchable: false, defaultContent: "无"}
                 ]
             },
             shop: {
@@ -886,6 +897,11 @@ function OASearch(dom, options) {
     this.makeSearchPage = function () {
         var modal = self.modal = $('<div>').addClass('modal fade').on('hidden.bs.modal', self.hide);
         var modalDialog = $('<div>').addClass('modal-dialog').appendTo(modal);
+        if (self.setting.size == 'large') {
+            modalDialog.addClass('modal-lg');
+        } else if (self.setting.size == 'small') {
+            modalDialog.addClass('modal-sm');
+        }
         var modalContent = $('<div>').addClass('panel').appendTo(modalDialog);
         var modalBody = $('<div>').addClass('panel-body').appendTo(modalContent);
         var modalTable = self.table = $('<table>').addClass('table table-sm table-hover table-bordered');
@@ -901,7 +917,7 @@ function OASearch(dom, options) {
         $.each(self.setting.target, function () {
             var column = $(this).attr('oaSearchColumn');
             if (column && column.length > 0) {
-                $(this).val(data[column]);
+                $(this).val(data[column]).change();
             }
         });
     };
