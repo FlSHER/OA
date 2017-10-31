@@ -34,6 +34,22 @@
         </div>
         <section id="board-right"></section>
     </div>
+
+    <!-- makeClock -->
+    <div class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                <h4 class="modal-title">打卡补签</h4>
+            </div>
+            <div class="modal-content">
+                <form id="makeClock" name="addForm" class="form-horizontal" method="post"
+                      action="{{route('hr.working_schedule.submit')}}">
+                    @include('hr/attendance/make_clock_form')
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 
@@ -110,6 +126,11 @@
                 }
             }
         ];
+
+        var buttons = [];
+
+//        buttons.push({"text": '<i class="fa fa-clock-o fa-fw"></i>', "action": makeClock, "titleAttr": "补签"});
+        buttons.push('export:/hr/attendance/export');
 
     </script>
 @endsection

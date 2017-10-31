@@ -20,6 +20,11 @@ class AttendanceStaff extends Model
 
     /* 定义关联 Start */
 
+    public function staff()
+    {
+        return $this->belongsTo('App\Models\HR\Staff', 'staff_sn');
+    }
+
     public function attendance_shop()
     {
         return $this->belongsTo('App\Models\HR\Attendance\Attendance', 'attendance_shop_id');

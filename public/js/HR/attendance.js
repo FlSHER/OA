@@ -1,9 +1,29 @@
 var table;
 
 $(function () {
+    var oaFormOption = {
+        oaTime: {
+            enableSeconds: false
+        },
+        oaSearch: {
+            workingSchedule: {
+                url: '/hr/working_schedule/list',
+                columns: [
+                    {data: "staff_sn", title: "编号"},
+                    {data: "staff_name", title: "姓名"},
+                    {data: "shop_sn", title: "店铺代码"},
+                    {data: "shop.name", title: "所属店铺", searchable: false, defaultContent: ""},
+                    {data: "shop_duty.name", title: "当日职务", searchable: false}
+                ]
+            }
+        }
+    };
+    /* oaForm */
+    $(".modal form").oaForm(oaFormOption);
     /* dataTables start   */
     table = $('#transfer').oaTable({
         columns: columns,
+        buttons: buttons,
         filter: $("#filter"),
         ajax: {
             url: '/hr/attendance/list'
@@ -78,4 +98,14 @@ function reject(id) {
             document.write(err.responseText);
         }
     })
+}
+
+/**
+ * 打卡补签
+ */
+function makeClock() {
+    oaWaiting.show();
+    var form = $("#makeClock");
+    form.oaForm()[0].reset();
+    oaWaiting.hide();
 }
