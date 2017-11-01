@@ -91,7 +91,6 @@ class CURD
     public function reset()
     {
         $this->dirty = [];
-        $this->hasLog() && $this->log(get_class($this->logService));
     }
 
     /**

@@ -37,7 +37,7 @@ function getRequestAuthCode() {
                         }
                     },
                     error: function (err) {
-                        document.write(err.responseText);
+                        alert(err.responseText);
                     }
                 });
 

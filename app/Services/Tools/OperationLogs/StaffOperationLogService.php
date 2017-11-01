@@ -9,7 +9,8 @@ namespace App\Services\Tools\OperationLogs;
 
 use App\Contracts\OperationLog;
 
-class StaffOperationLogService extends OperationLog {
+class StaffOperationLogService extends OperationLog
+{
 
     protected $table = 'staff_log';
     protected $relationMap = [
@@ -29,14 +30,19 @@ class StaffOperationLogService extends OperationLog {
         'info.living_county_id' => 'info.living_county.name',
     ];
 
-    public function __construct($tableName = null, \Illuminate\Database\Eloquent\Model $model = null) {
+    public function __construct($tableName = null, \Illuminate\Database\Eloquent\Model $model = null)
+    {
         parent::__construct($tableName, $model);
         $this->trans('fields.staff');
     }
 
-    protected function makeBasicInfo($others) {
+    protected function makeBasicInfo($others)
+    {
         $data = parent::makeBasicInfo($others);
         $data['staff_sn'] = $this->model->staff_sn;
+        $data['operation_type'] = $others['operation_type'];
+        $data['operation_remark'] = $others['operation_remark'];
+        $data['operate_at'] = $others['operate_at'];
         return $data;
     }
 
