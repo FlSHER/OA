@@ -4,9 +4,11 @@ namespace App\Models\HR\Attendance;
 
 use App\Models\App;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Clock extends Model
 {
+    use SoftDeletes;
     protected $connection = 'attendance';
     protected $table = 'clock_';
     protected $guarded = ['ym'];
@@ -22,14 +24,22 @@ class Clock extends Model
 
     public function getPhotoAttribute($value)
     {
-        $url = App::find(5)->url;
-        return $url . $value;
+        if (!empty($value)) {
+            $url = App::find(5)->url;
+            return $url . $value;
+        } else {
+            return '';
+        }
     }
 
     public function getThumbAttribute($value)
     {
-        $url = App::find(5)->url;
-        return $url . $value;
+        if (!empty($value)) {
+            $url = App::find(5)->url;
+            return $url . $value;
+        } else {
+            return '';
+        }
     }
 
     /* 访问器 End */

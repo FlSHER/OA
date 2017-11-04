@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers\HR;
 
+use App\Models\HR\Attendance\AttendanceStaff;
 use App\Models\HR\Attendance\Attendance;
 use App\Models\HR\Attendance\Clock;
+use App\Models\HR\Attendance\LeaveRequest;
+use App\Models\HR\Attendance\WorkingSchedule;
+use App\Models\HR\Shop;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
+use DB;
 
 class AttendanceController extends Controller
 {
@@ -24,8 +29,10 @@ class AttendanceController extends Controller
         $shopSn = $info['shop_sn'];
         $startAt = $info['attendance_date'] . ' 04:00:00';
         $endAt = date('Y-m-d H:i:s', strtotime($startAt) + 24 * 3600);
+        $ym = date('Ym', strtotime($info['attendance_date']));
         foreach ($info['details'] as $k => $detail) {
-            $clock = Clock::where('shop_sn', $shopSn)
+            $clockModel = new Clock(['ym' => $ym]);
+            $clock = $clockModel->where('shop_sn', $shopSn)
                 ->where('staff_sn', $detail['staff_sn'])
                 ->where('is_abandoned', 0)
                 ->where('clock_at', '>', $startAt)
@@ -36,12 +43,9 @@ class AttendanceController extends Controller
         return view('hr.attendance.attendance_info')->with($info);
     }
 
-    public function getList(Request $request, $export = false)
+    public function getList(Request $request)
     {
         $model = Attendance::visible()->where('status', '<>', 0);
-        if ($export) {
-            $model->with('details.staff.position', 'details.staff.department');
-        }
         return app('Plugin')->dataTables($request, $model);
     }
 
@@ -49,7 +53,9 @@ class AttendanceController extends Controller
     {
         $id = $request->id;
         $model = $this->model;
-        return $model::with('details', 'shop')->find($id);
+        $response = $model::with('shop')->find($id);
+        $response->details;
+        return $response;
     }
 
     public function pass(Request $request)
@@ -89,11 +95,16 @@ class AttendanceController extends Controller
      */
     public function exportStaffData(Request $request)
     {
-        $listData = $this->getList($request, true)['data'];
+        $listData = $this->getList($request)['data'];
         $exportData = array_collapse(
             array_map(function ($item) {
                 $response = [];
-                foreach ($item['details'] as $detail) {
+                $ym = date('Ym', strtotime($item['attendance_date']));
+                $model = new AttendanceStaff(['ym' => $ym]);
+                $details = $model->where('attendance_shop_id', $item['id'])->get();
+                $details->load('staff.position', 'staff.department', 'shop_duty');
+                $details = $details->toArray();
+                foreach ($details as $detail) {
                     $response[] = array_collapse([$detail, [
                         'shop_sn' => $item['shop_sn'],
                         'shop_name' => $item['shop_name'],
@@ -141,6 +152,73 @@ class AttendanceController extends Controller
         ];
         $file = app('App\Contracts\ExcelExport')->setPath('hr/attendance/export/')->setBaseName('考勤数据')->setColumns($columns)->export(['sheet1' => $exportData]);
         return ['state' => 1, 'file_name' => $file];
+    }
+
+    function getClockRecords(Request $request)
+    {
+        $date = $request->date;
+        $staffSn = $request->staff_sn;
+        $startAt = $date . ' 04:00:00';
+        $endAt = date('Y-m-d H:i:s', strtotime($date . ' 04:00:00 +1 day'));
+        $ym = date('Ym', strtotime($date));
+        $clockModel = new Clock(['ym' => $ym]);
+        $clocks = $clockModel->where('staff_sn', $staffSn)
+            ->where('clock_at', '>', $startAt)
+            ->where('clock_at', '<=', $endAt)
+            ->where('is_abandoned', 0)
+            ->get();
+        return view('hr/attendance/clock_records')->with(['clocks' => $clocks]);
+    }
+
+    function makeClockRecord(Request $request)
+    {
+        $this->validate($request, [
+            'date' => ['required'],
+            'staff_sn' => ['required'],
+            'shop_sn' => ['required'],
+            'combine_type' => ['required'],
+            'clock_at' => ['required'],
+        ]);
+        $clockData = [
+            'staff_sn' => $request->staff_sn,
+            'shop_sn' => $request->shop_sn,
+            'attendance_type' => substr($request->combine_type, 0, 1),
+            'type' => substr($request->combine_type, 1),
+            'clock_at' => $request->date . ' ' . $request->clock_at,
+            'operator_sn' => app('CurrentUser')->staff_sn,
+        ];
+        if ($clockData['attendance_type'] == 1) {
+            $workingScheduleModel = new WorkingSchedule(['ymd' => date('Ymd', strtotime($request->date))]);
+            $workingSchedule = $workingScheduleModel->where(['staff_sn' => $request->staff_sn, 'shop_sn' => $request->shop_sn])->first();
+            if (empty($workingSchedule)) {
+                return ['status' => -1, 'message' => '对应排班表不存在'];
+            }
+            $punctualTime = $clockData['type'] == 1 ? $workingSchedule->clock_in : $workingSchedule->clock_out;
+            if (empty($punctualTime)) {
+                $shop = Shop::where('shop_sn', $request->shop_sn)->first();
+                $punctualTime = $clockData['type'] == 1 ? $shop->clock_in : $shop->clock_out;
+            }
+        } elseif ($clockData['attendance_type'] == 3) {
+            $clockData['parent_id'] = $request->leave_request;
+            $leaveRequest = LeaveRequest::find($request->leave_request);
+            if ($clockData['type'] == 2) {
+                $punctualTime = $leaveRequest->start_at;
+                $leaveRequest->clock_out_at = $clockData['clock_at'];
+            } elseif ($clockData['type'] == 1) {
+                $punctualTime = $leaveRequest->end_at;
+                $leaveRequest->clock_in_at = $clockData['clock_at'];
+            }
+            $leaveRequest->save();
+        }
+        $clockData['punctual_time'] = $request->date . ' ' . $punctualTime;
+        $ym = date('Ym', strtotime($request->date));
+        $clockModel = new Clock(['ym' => $ym]);
+        $clockTable = $clockModel->getTable();
+        $clockId = $clockModel->insertGetId($clockData);
+        $clockData['clock_table'] = $clockTable;
+        $clockData['clock_id'] = $clockId;
+        DB::connection('attendance')->table('clock_patch')->insert($clockData);
+        return ['status' => 1, 'message' => '补签成功'];
     }
 
 }

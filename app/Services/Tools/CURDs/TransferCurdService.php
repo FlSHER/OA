@@ -9,7 +9,7 @@ namespace App\Services\Tools\CURDs;
 
 use App\Contracts\CURD;
 use App\Models\HR\Staff;
-use App\Models\WorkingSchedule;
+use App\Models\HR\Attendance\WorkingSchedule;
 use Illuminate\Http\Exception\HttpResponseException;
 
 class TransferCurdService extends CURD

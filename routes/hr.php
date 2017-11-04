@@ -96,8 +96,7 @@ Route::group(['prefix' => 'hr', 'namespace' => 'HR', 'as' => 'hr'], function () 
         Route::get('/', ['uses' => 'LeaveController@showManagePage']);
         Route::post('/list', ['uses' => 'LeaveController@getList'])->name('.list');
         Route::post('/info', ['uses' => 'LeaveController@getInfo'])->name('.info');
-        Route::post('/excelhandel', ['uses' => 'LeaveController@excelHandel']);
-        Route::get('/excelhandel', ['uses' => 'LeaveController@excelHandel']);
+        Route::post('/person', ['uses' => 'LeaveController@getByPerson'])->name('.person');//获取单人的请假条
     });
     Route::group(['prefix' => 'attendance', 'as' => '.attendance'], function () {//考勤
         Route::get('/', ['uses' => 'AttendanceController@showManagePage']);
@@ -105,7 +104,9 @@ Route::group(['prefix' => 'hr', 'namespace' => 'HR', 'as' => 'hr'], function () 
         Route::post('/detail', ['uses' => 'AttendanceController@showDetailPage'])->name('.detail');
         Route::post('/pass', ['uses' => 'AttendanceController@pass'])->name('.pass');
         Route::post('/reject', ['uses' => 'AttendanceController@reject'])->name('.reject');
+        Route::post('/get_clock_records', ['uses' => 'AttendanceController@getClockRecords'])->name('.get_clock_records');
         Route::post('/export', ['uses' => 'AttendanceController@exportStaffData'])->name('.export');
+        Route::post('/make_clock', ['uses' => 'AttendanceController@makeClockRecord'])->name('.make_clock');
     });
     Route::group(['prefix' => 'working_schedule', 'as' => '.working_schedule'], function () {//排班表
         Route::get('/', ['uses' => 'WorkingScheduleController@showManagePage']);

@@ -5,17 +5,8 @@ $(function () {
         oaTime: {
             enableSeconds: false
         },
-        oaSearch: {
-            workingSchedule: {
-                url: '/hr/working_schedule/list',
-                columns: [
-                    {data: "staff_sn", title: "编号"},
-                    {data: "staff_name", title: "姓名"},
-                    {data: "shop_sn", title: "店铺代码"},
-                    {data: "shop.name", title: "所属店铺", searchable: false, defaultContent: ""},
-                    {data: "shop_duty.name", title: "当日职务", searchable: false}
-                ]
-            }
+        callback: {
+            submitSuccess: oaFormSubmitSuccess
         }
     };
     /* oaForm */
@@ -108,4 +99,8 @@ function makeClock() {
     var form = $("#makeClock");
     form.oaForm()[0].reset();
     oaWaiting.hide();
+}
+
+function oaFormSubmitSuccess(msg, obj) {
+    $(".close").click();
 }

@@ -44,7 +44,7 @@
             </div>
             <div class="modal-content">
                 <form id="makeClock" name="addForm" class="form-horizontal" method="post"
-                      action="{{route('hr.working_schedule.submit')}}">
+                      action="{{route('hr.attendance.make_clock')}}">
                     @include('hr/attendance/make_clock_form')
                 </form>
             </div>
@@ -76,6 +76,7 @@
             {data: "attendance_date", title: "考勤日期", className: 'text-center', searchable: false},
             {data: "manager_name", title: "店长"},
             {data: "submitted_at", title: "提交时间", className: 'text-center', searchable: false, visible: false},
+            {data: "auditor_name", title: "审核人", searchable: false, visible: false},
             {
                 data: "status", title: "状态", searchable: false,
                 render: function (data) {
@@ -129,8 +130,12 @@
 
         var buttons = [];
 
-//        buttons.push({"text": '<i class="fa fa-clock-o fa-fw"></i>', "action": makeClock, "titleAttr": "补签"});
+        @if($authority->checkAuthority(124))
+        buttons.push({"text": '<i class="fa fa-clock-o fa-fw"></i>', "action": makeClock, "titleAttr": "补签"});
+        @endif
+        @if($authority->checkAuthority(123))
         buttons.push('export:/hr/attendance/export');
+        @endif
 
     </script>
 @endsection

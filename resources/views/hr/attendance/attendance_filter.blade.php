@@ -62,8 +62,8 @@
                 <div class="row">
                     <label class="control-label col-lg-4 col-sm-2">店长</label>
                     <div class="col-sm-8 input-group input-group-sm" oaSearch="staff">
-                        <input class="form-control" oaSearchColumn="realname" type="text" title="店长"/>
-                        <input name="manager_sn.is" oaSearchColumn="staff_sn" type="hidden" title="店长编号"/>
+                        <input class="form-control" name="manager_name.is" oaSearchColumn="realname" type="text"
+                               title="店长"/>
                         <span class="input-group-btn">
                             <button type="button" class="btn btn-default" oaSearchShow>
                                 <i class="fa fa-search"></i>
@@ -90,6 +90,22 @@
                     </div>
                 </div>
             </div>
+            <div class="col-lg-3">
+                <div class="row">
+                    <label class="control-label col-lg-4 col-sm-2">审核人</label>
+                    <div class="col-sm-8 input-group input-group-sm" oaSearch="staff">
+                        <input class="form-control" name="auditor_name.is" oaSearchColumn="realname" type="text"
+                               title="审核人"/>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" oaSearchShow>
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group form-group-sm">
             <div class="col-lg-6">
                 <div class="row">
                     <label class="control-label col-sm-2">所属部门</label>
