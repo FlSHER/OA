@@ -92,6 +92,30 @@ function reject(id) {
 }
 
 /**
+ * 驳回
+ * @param id
+ */
+function revert(id) {
+    oaWaiting.show();
+    $.ajax({
+        type: 'POST',
+        url: '/hr/attendance/revert',
+        data: {id: id},
+        success: function (response) {
+            if (response.state == 1) {
+                table.draw(false);
+                showPersonalInfo(id);
+            } else if (response.state == -1) {
+                alert(response.message);
+            }
+        },
+        error: function (err) {
+            document.write(err.responseText);
+        }
+    })
+}
+
+/**
  * 打卡补签
  */
 function makeClock() {

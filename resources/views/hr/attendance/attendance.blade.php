@@ -50,6 +50,17 @@
             </div>
         </div>
     </div>
+
+    <!-- bigPhoto -->
+    <div class="modal fade" id="viewMore">
+        <div class="modal-dialog modal-sm">
+            <div class="thumbnail">
+                <img src="" width="100%">
+                <h4 style="font-weight:700;"></h4>
+                <p></p>
+            </div>
+        </div>
+    </div>
 @endsection
 
 

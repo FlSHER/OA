@@ -37,6 +37,7 @@ class AttendanceController extends Controller
                 ->where('is_abandoned', 0)
                 ->where('clock_at', '>', $startAt)
                 ->where('clock_at', '<=', $endAt)
+                ->orderBy('clock_at', 'asc')
                 ->get()->toArray();
             $info['details'][$k]['clocks'] = $clock;
         }
@@ -87,6 +88,22 @@ class AttendanceController extends Controller
             return ['state' => 1, 'message' => '驳回成功'];
         } else {
             return ['state' => -1, 'message' => '该考勤表已被受理'];
+        }
+    }
+
+    public function revert(Request $request)
+    {
+        $id = $request->id;
+        $attendance = Attendance::find($id);
+        if ($attendance->status == 2) {
+            $attendance->status = 1;
+            $attendance->auditor_sn = app('CurrentUser')->staff_sn;
+            $attendance->auditor_name = app('CurrentUser')->realname;
+            $attendance->audited_at = date('Y-m-d');
+            $attendance->save();
+            return ['state' => 1, 'message' => '反审核成功'];
+        } else {
+            return ['state' => -1, 'message' => '该考勤表未通过审核'];
         }
     }
 

@@ -1,4 +1,5 @@
 @inject('authority','Authority')
+@inject('currentUser','CurrentUser')
 <style>
     .label {
         margin-left: 4px;
@@ -108,6 +109,12 @@
                         </button>
                         <button class="btn btn-lg btn-success pull-right" onClick="pass({{$id}})">通过 <i
                                     class="fa fa-check"></i>
+                        </button>
+                    </div>
+                @elseif($status == 2 && $auditor_sn == $currentUser->staff_sn)
+                    <div style="padding:0 10%;">
+                        <button class="btn btn-lg btn-warning" onClick="revert({{$id}})">撤回 <i
+                                    class="fa fa-rotate-left"></i>
                         </button>
                     </div>
                 @endif
