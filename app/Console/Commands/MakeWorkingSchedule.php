@@ -81,6 +81,9 @@ class MakeWorkingSchedule extends Command
                 $managerCount++;
             }
         });
+
+        $this->saveClockInAndClockOutTime();
+
         DB::connection('attendance')->select('DROP TABLE IF EXISTS working_schedule_' . date('Ymd', strtotime('-' . $this->holdDays . ' day')));
     }
 
@@ -157,6 +160,22 @@ class MakeWorkingSchedule extends Command
                 ->delete();
             $deleteCount++;
         }
+    }
+
+    protected function saveClockInAndClockOutTime()
+    {
+        DB::table('shops')->each(function ($model) {
+            DB::connection('attendance')
+                ->table('working_schedule_' . date('Ymd', strtotime("-1 day")))
+                ->where('shop_sn', $model->shop_sn)
+                ->whereNull('clock_in')
+                ->update(['clock_in' => $model->clock_in]);
+            DB::connection('attendance')
+                ->table('working_schedule_' . date('Ymd', strtotime("-1 day")))
+                ->where('shop_sn', $model->shop_sn)
+                ->whereNull('clock_out')
+                ->update(['clock_out' => $model->clock_out]);
+        });
     }
 
 }
