@@ -95,6 +95,7 @@
         ];
 
         var buttons = [
+            {"text": "{{date('Y-m-d')}}", className: "working_schedule_date", "titleAttr": "选择日期"},
             {"text": "<i class='fa fa-plus fa-fw'></i>", "action": add, "titleAttr": "添加"},
         ];
 

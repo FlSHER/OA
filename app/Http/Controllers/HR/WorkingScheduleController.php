@@ -25,16 +25,21 @@ class WorkingScheduleController extends Controller
 
     public function getList(Request $request)
     {
-        return app('Plugin')->dataTables($request, WorkingSchedule::visible());
+        $date = $request->has('working_schedule_date') ? $request->working_schedule_date : date('Y-m-d');
+        $model = new WorkingSchedule(['ymd' => date('Ymd', strtotime($date))]);
+        return app('Plugin')->dataTables($request, $model->visible());
     }
 
     public function getInfo(Request $request)
     {
         $id = $request->id;
+        $date = $request->date;
+        $model = new WorkingSchedule(['ymd' => date('Ymd', strtotime($date))]);
         $staffSn = preg_replace('/^(.*)\-.*$/', '$1', $id);
         $shopSn = preg_replace('/^.*\-(.*)$/', '$1', $id);
-        $response = WorkingSchedule::where('staff_sn', $staffSn)->where('shop_sn', $shopSn)->first()->toArray();
+        $response = $model->where('staff_sn', $staffSn)->where('shop_sn', $shopSn)->first()->toArray();
         $response['id'] = $id;
+        $response['date'] = $date;
         return $response;
     }
 
@@ -73,9 +78,11 @@ class WorkingScheduleController extends Controller
     public function delete(Request $request)
     {
         $id = $request->id;
+        $date = $request->date;
+        $model = new WorkingSchedule(['ymd' => date('Ymd', strtotime($date))]);
         $staffSn = preg_replace('/^(.*)\-.*$/', '$1', $id);
         $shopSn = preg_replace('/^.*\-(.*)$/', '$1', $id);
-        WorkingSchedule::where('staff_sn', $staffSn)->where('shop_sn', $shopSn)->delete();
+        $model->where('staff_sn', $staffSn)->where('shop_sn', $shopSn)->delete();
         return ['status' => 1, 'message' => '删除成功'];
     }
 

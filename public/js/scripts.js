@@ -939,6 +939,7 @@ function OATable(dom, options) {
         }
         self.setting.buttons.unshift(self.buttonLibrary.colvis, self.buttonLibrary.reload);
         $.extend(this, this.query.DataTable(this.setting));
+        _call('loaded');
     };
     var optionOrigin = {
         columns: [
@@ -995,6 +996,11 @@ function OATable(dom, options) {
             for (var i in settings.ajax.data.filter) {
                 self.buttons().container().find('.fa-filter').css("color", "#65cea7");
                 break;
+            }
+        },
+        callback: {
+            loaded: function (self) {
+
             }
         }
     };
@@ -1130,5 +1136,22 @@ function OATable(dom, options) {
             }
         }
     };
+
+    /**
+     * 触发回调函数
+     * @param {type} funName 函数名称
+     * @returns {unresolved}
+     */
+    function _call(funName) {
+        var params = arguments[1] ? arguments[1] : [];
+        var paramText = '';
+        for (var i in params) {
+            paramText += 'params[' + i + '],';
+        }
+        paramText += 'self';
+        self.dom.o = eval('self.setting.callback.' + funName);
+        return eval('self.dom.o(' + paramText + ')');
+    }
+
     this._construct();
 }

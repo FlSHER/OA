@@ -43,8 +43,7 @@
             </div>
         @else
             <div class="col-sm-3">
-                <input class="form-control" name="date" type="text" value="{{date('Y-m-d')}}" locked="true"
-                       title="日期" readonly/>
+                <input class="form-control" name="date" type="text" title="日期" readonly/>
             </div>
         @endif
         <div class="col-sm-1"></div>
