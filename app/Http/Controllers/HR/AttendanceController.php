@@ -215,6 +215,7 @@ class AttendanceController extends Controller
                 $shop = Shop::where('shop_sn', $request->shop_sn)->first();
                 $punctualTime = $clockData['type'] == 1 ? $shop->clock_in : $shop->clock_out;
             }
+            $clockData['punctual_time'] = $request->date . ' ' . $punctualTime;
         } elseif ($clockData['attendance_type'] == 3) {
             $clockData['parent_id'] = $request->leave_request;
             $leaveRequest = LeaveRequest::find($request->leave_request);
@@ -226,8 +227,8 @@ class AttendanceController extends Controller
                 $leaveRequest->clock_in_at = $clockData['clock_at'];
             }
             $leaveRequest->save();
+            $clockData['punctual_time'] = $punctualTime;
         }
-        $clockData['punctual_time'] = $request->date . ' ' . $punctualTime;
         $ym = date('Ym', strtotime($request->date));
         $clockModel = new Clock(['ym' => $ym]);
         $clockTable = $clockModel->getTable();
