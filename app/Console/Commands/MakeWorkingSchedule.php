@@ -164,7 +164,7 @@ class MakeWorkingSchedule extends Command
 
     protected function saveClockInAndClockOutTime()
     {
-        DB::table('shops')->each(function ($model) {
+        DB::table('shops')->get()->each(function ($model) {
             DB::connection('attendance')
                 ->table('working_schedule_' . date('Ymd', strtotime("-1 day")))
                 ->where('shop_sn', $model->shop_sn)
