@@ -57,7 +57,8 @@ class TransferController extends Controller
     public function addByOne(Request $request)
     {
         $model = $this->model;
-        $count = $model::where($request->only(['staff_sn', 'leaving_date', 'arriving_shop_sn']))->count();
+        $count = $model::where($request->only(['staff_sn', 'leaving_date', 'arriving_shop_sn']))
+            ->where('status', '>=', 0)->count();
         if ($count > 0) {
             $response['message'] = '调动已存在';
         } else {
