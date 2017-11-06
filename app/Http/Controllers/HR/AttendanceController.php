@@ -32,8 +32,7 @@ class AttendanceController extends Controller
         $ym = date('Ym', strtotime($info['attendance_date']));
         foreach ($info['details'] as $k => $detail) {
             $clockModel = new Clock(['ym' => $ym]);
-            $clock = $clockModel->where('shop_sn', $shopSn)
-                ->where('staff_sn', $detail['staff_sn'])
+            $clock = $clockModel->where('staff_sn', $detail['staff_sn'])
                 ->where('is_abandoned', 0)
                 ->where('clock_at', '>', $startAt)
                 ->where('clock_at', '<=', $endAt)

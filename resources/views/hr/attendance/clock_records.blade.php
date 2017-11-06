@@ -16,6 +16,7 @@
                     @elseif($clock['attendance_type'] == 3)
                             #f0ad4e
                     @endif">
+                        {{$clock['shop_sn']==''?'无店铺':strtoupper($clock['shop_sn'])}}<br>
                         <i class="fa fa-caret-square-o-{{$clock['type'] == 1?'up':'down'}}"
                         ></i>
                         {{substr($clock['clock_at'],11,5)}}
