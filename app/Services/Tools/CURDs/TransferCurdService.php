@@ -8,6 +8,7 @@
 namespace App\Services\Tools\CURDs;
 
 use App\Contracts\CURD;
+use App\Models\HR\Attendance\Clock;
 use App\Models\HR\Staff;
 use App\Models\HR\Attendance\WorkingSchedule;
 use Illuminate\Http\Exception\HttpResponseException;
@@ -27,8 +28,15 @@ class TransferCurdService extends CURD
             WorkingSchedule::where('staff_sn', $staffSn)
                 ->where('shop_sn', $originalShopSn)
                 ->update(['shop_sn' => $newShopSn]);
+            if (!empty($model->left_at)) {
+                Clock::where([
+                    ['staff_sn', '=', $staffSn],
+                    ['clock_at', '>', $model->left_at],
+                    ['attendance_type', '=', 3],
+                    ['shop_sn', '=', $originalShopSn],
+                ])->update(['shop_sn' => $newShopSn]);
+            }
         }
     }
-
 
 }
