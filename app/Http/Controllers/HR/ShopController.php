@@ -83,7 +83,7 @@ class ShopController extends Controller
             'manager_sn' => ['required_with:manager_name'],
             'manager_name' => [],
         ];
-        if ($request->has('id')) {
+        if (!empty($request->id)) {
             $validator['shop_sn'][] = 'exists:shops,shop_sn,id,' . $request->id;
         } else {
             $validator['shop_sn'][] = 'unique:shops,shop_sn,NULL,id,deleted_at,NULL';
