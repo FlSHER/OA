@@ -120,7 +120,7 @@
                 title: "调离店铺地址",
                 visible: false
             },
-            {data: "arriving_shop_sn", title: "到达店铺代码", visible: false},
+            {data: "arriving_shop_sn", title: "到达店铺代码"},
             {data: "arriving_shop_name", title: "到达店铺名称", defaultContent: "无"},
             {
                 data: "{arriving_shop.province.name}.'-'.{arriving_shop.city.name}.'-'.{arriving_shop.county.name}.' '.{arriving_shop.address}",

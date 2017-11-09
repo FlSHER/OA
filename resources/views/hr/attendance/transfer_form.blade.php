@@ -20,15 +20,6 @@
         @endif
     </div>
     <div class="form-group">
-        {{--<label class="control-label col-sm-2">调离店铺</label>--}}
-        {{--<div class="col-sm-4">--}}
-        {{--<div class="input-group" oaSearch="shop">--}}
-        {{--<input class="form-control" name="leaving_shop_sn" oaSearchColumn="shop_sn" type="text" title="调离店铺"/>--}}
-        {{--<span class="input-group-btn">--}}
-        {{--<button type="button" class="btn btn-default" oaSearchShow><i class="fa fa-search"></i></button>--}}
-        {{--</span>--}}
-        {{--</div>--}}
-        {{--</div>--}}
         <label class="control-label col-sm-2">*到达店铺</label>
         <div class="col-sm-4">
             <div class="input-group" oaSearch="shop">
