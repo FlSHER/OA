@@ -1,8 +1,7 @@
-var table, editForm;
-var csrfToken = $("meta[name='_token']").attr("content");
+var table;
 
 $(function () {
-    editForm = $("#editForm").oaForm();
+    $(".modal form").oaForm();
 
     /* dataTables start  */
     table = $('#leave_table').oaTable({
@@ -15,17 +14,16 @@ $(function () {
     });
 });
 
-function imports() {
+function add() {
     oaWaiting.show();
-    // $("#addForm")[0].reset();
+    $("#addForm").oaForm()[0].reset();
     oaWaiting.hide();
-    $("#openAddByOne").click();
 }
 
 //编辑
 function edit(id) {
     oaWaiting.show();
-    editForm[0].fillData('/hr/leave/info', {id: id});
+    $("#editForm").oaForm()[0].fillData('/hr/leave/info', {id: id});
     oaWaiting.hide();
 }
 
@@ -33,7 +31,6 @@ function del(id) {
     var _confirm = confirm("确认撤销？");
     if (_confirm) {
         oaWaiting.show();
-        // var url = '/hr/shop/delete?_token=' + csrfToken;
         var data = {'id': id};
         $.ajax({
             type: "POST",

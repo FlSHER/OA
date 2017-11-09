@@ -10,7 +10,7 @@ use App\Http\Controllers\Controller;
 class LeaveController extends Controller
 {
 
-    protected $model = 'App\Models\HR\Attendance\Vacate';
+    protected $model = 'App\Models\HR\Attendance\LeaveRequest';
 
     public function showManagePage()
     {
