@@ -29,6 +29,8 @@
                         onchange="selectCombineType(this)">
                     <option value="11">上班</option>
                     <option value="12">下班</option>
+                    <option value="22">调动出发</option>
+                    <option value="21">调动到达</option>
                     <option value="32">请假离店</option>
                     <option value="31">请假返回</option>
                 </select>
@@ -38,6 +40,13 @@
             <label class="control-label col-sm-2">*假条</label>
             <div class="col-sm-8">
                 <select class="form-control" name="leave_request" title="假条" onchange="" id="leave_request_select">
+                </select>
+            </div>
+        </div>
+        <div class="form-group transfer">
+            <label class="control-label col-sm-2">*调动</label>
+            <div class="col-sm-8">
+                <select class="form-control" name="transfer" title="调动" onchange="" id="transfer_select">
                 </select>
             </div>
         </div>
@@ -66,6 +75,8 @@
 <script>
     function toggleWorkingSchedule() {
         if ($('#date_input').val() && $('#staff_input').val()) {
+            $('#combine_type').val(11).change();
+            oaWaiting.show();
             $.ajax({
                 type: 'POST',
                 url: '/hr/attendance/get_clock_records',
@@ -91,9 +102,9 @@
                     var leaveRequest;
                     var clockOut = false;
                     var clockIn = false;
+                    $('#leave_request_select option').remove();
                     for (var i in response) {
                         leaveRequest = response[i];
-                        $('#leave_request_select').html();
                         $('#leave_request_select').append('<option value="' + leaveRequest.id + '">' + leaveRequest.start_at + ' 至 ' + leaveRequest.end_at + '</option>');
                         if (!leaveRequest.clock_out_at)
                             clockOut = true;
@@ -115,6 +126,49 @@
                     document.write(err.responseText);
                 }
             });
+            $.ajax({
+                type: 'POST',
+                url: '/hr/transfer/person',
+                data: {
+                    date: $('#date_input').val(),
+                    staff_sn: $('#staff_input').val(),
+                },
+                success: function (response) {
+                    var transfer;
+                    var optionDom;
+                    var clockOut = false;
+                    var clockIn = false;
+                    $('#transfer_select option').remove();
+                    for (var i in response) {
+                        transfer = response[i];
+                        optionDom = '<option value="' + transfer.id + '" status="' + transfer.status + '">';
+                        if (transfer.leaving_shop_sn > 0) {
+                            optionDom += transfer.leaving_shop_name + '(' + transfer.leaving_shop_sn + ')';
+                        }
+                        optionDom += ' 至 ' + transfer.arriving_shop_name + '(' + transfer.arriving_shop_sn + ')'
+                            + ' ' + transfer.leaving_date + '</option>';
+                        $('#transfer_select').append(optionDom);
+                        if (transfer.status == 0)
+                            clockOut = true;
+                        if (transfer.status == 1)
+                            clockIn = true;
+                    }
+                    if (clockOut) {
+                        $('#combine_type option[value=22]').show();
+                    } else {
+                        $('#combine_type option[value=22]').hide();
+                    }
+                    if (clockIn) {
+                        $('#combine_type option[value=21]').show();
+                    } else {
+                        $('#combine_type option[value=21]').hide();
+                    }
+                    oaWaiting.hide();
+                },
+                error: function (err) {
+                    document.write(err.responseText);
+                }
+            });
         } else {
             $('.clock_content').hide();
         }
@@ -124,10 +178,20 @@
         var value = dom.value;
         if (value == 31 || value == 32) {
             $('.leave_request').show();
-//            $('.clock_info').hide();
+            $('.transfer').hide();
+        } else if (value == 21) {
+            $('#transfer_select option[status=1]').show();
+            $('#transfer_select option[status=0]').hide();
+            $('.transfer').show();
+            $('.leave_request').hide();
+        } else if (value == 22) {
+            $('#transfer_select option[status=0]').show();
+            $('#transfer_select option[status=1]').hide();
+            $('.transfer').show();
+            $('.leave_request').hide();
         } else {
             $('.leave_request').hide();
-//            $('.clock_info').show();
+            $('.transfer').hide();
         }
     }
 </script>

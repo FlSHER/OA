@@ -91,6 +91,7 @@ Route::group(['prefix' => 'hr', 'namespace' => 'HR', 'as' => 'hr'], function () 
         Route::post('/export', ['uses' => 'TransferController@export'])->name('.export');
         Route::post('/submit', ['uses' => 'TransferController@addOrEdit'])->name('.submit');
         Route::post('/cancel', ['uses' => 'TransferController@cancel'])->name('.cancel');
+        Route::post('/person', ['uses' => 'TransferController@getByPerson'])->name('.person');//获取单人的调动单
     });
     Route::group(['prefix' => 'leave', 'as' => '.leave'], function () {//人事请假
         Route::get('/', ['uses' => 'LeaveController@showManagePage']);

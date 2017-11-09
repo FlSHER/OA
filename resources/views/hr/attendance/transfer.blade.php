@@ -128,7 +128,7 @@
                 title: "到达店铺地址",
                 visible: false
             },
-            {data: "arriving_shop_duty.name", title: "到店职务", visible: false, defaultContent: "待定", searchable: false},
+            {data: "arriving_shop_duty.name", title: "到店职务", defaultContent: "待定", searchable: false},
             {data: "leaving_date", title: "出发日期", searchable: false},
             {data: "left_at", title: "出发时间", searchable: false},
             {data: "arrived_at", title: "到达时间", searchable: false},

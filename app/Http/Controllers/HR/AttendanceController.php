@@ -6,6 +6,7 @@ use App\Models\HR\Attendance\AttendanceStaff;
 use App\Models\HR\Attendance\Attendance;
 use App\Models\HR\Attendance\Clock;
 use App\Models\HR\Attendance\LeaveRequest;
+use App\Models\HR\Attendance\StaffTransfer;
 use App\Models\HR\Attendance\WorkingSchedule;
 use App\Models\HR\Shop;
 use Illuminate\Http\Request;
@@ -188,13 +189,17 @@ class AttendanceController extends Controller
 
     function makeClockRecord(Request $request)
     {
-        $this->validate($request, [
+        $validator = [
             'date' => ['required'],
             'staff_sn' => ['required'],
-            'shop_sn' => ['required'],
+            'shop_sn' => [],
             'combine_type' => ['required'],
-            'clock_at' => ['required'],
-        ]);
+            'clock_at' => ['required', 'regex:/^\d{2}:\d{2}$/'],
+        ];
+        if (empty($request->combine_type) || substr($request->combine_type, 0, 1) != 2) {
+            $validator['shop_sn'][] = 'required';
+        }
+        $this->validate($request, $validator);
         $clockData = [
             'staff_sn' => $request->staff_sn,
             'shop_sn' => $request->shop_sn,
@@ -203,18 +208,31 @@ class AttendanceController extends Controller
             'clock_at' => $request->date . ' ' . $request->clock_at,
             'operator_sn' => app('CurrentUser')->staff_sn,
         ];
-        if ($clockData['attendance_type'] == 1) {
+        if (!empty($request->shop_sn)) {
             $workingScheduleModel = new WorkingSchedule(['ymd' => date('Ymd', strtotime($request->date))]);
             $workingSchedule = $workingScheduleModel->where(['staff_sn' => $request->staff_sn, 'shop_sn' => $request->shop_sn])->first();
             if (empty($workingSchedule)) {
                 return ['status' => -1, 'message' => '对应排班表不存在'];
             }
+        }
+        if ($clockData['attendance_type'] == 1) {
             $punctualTime = $clockData['type'] == 1 ? $workingSchedule->clock_in : $workingSchedule->clock_out;
             if (empty($punctualTime)) {
                 $shop = Shop::where('shop_sn', $request->shop_sn)->first();
                 $punctualTime = $clockData['type'] == 1 ? $shop->clock_in : $shop->clock_out;
             }
             $clockData['punctual_time'] = $request->date . ' ' . $punctualTime;
+        } elseif ($clockData['attendance_type'] == 2) {
+            $clockData['parent_id'] = $request->transfer;
+            $transfer = StaffTransfer::find($request->transfer);
+            if ($clockData['type'] == 2) {
+                $transfer->left_at = $clockData['clock_at'];
+                $transfer->status = 1;
+            } elseif ($clockData['type'] == 1) {
+                $transfer->arrived_at = $clockData['clock_at'];
+                $transfer->status = 2;
+            }
+            $transfer->save();
         } elseif ($clockData['attendance_type'] == 3) {
             $clockData['parent_id'] = $request->leave_request;
             $leaveRequest = LeaveRequest::find($request->leave_request);

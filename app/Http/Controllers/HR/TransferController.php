@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\HR;
 
+use App\Models\HR\Attendance\StaffTransfer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
@@ -133,6 +134,21 @@ class TransferController extends Controller
         }
         $file = app('App\Contracts\ExcelExport')->setPath('hr/transfer/export/')->setBaseName('店铺人员调动')->setColumns($columns)->trans($this->transPath)->export(['sheet1' => $exportData]);
         return ['state' => 1, 'file_name' => $file];
+    }
+
+    /**
+     * 获取某一员工的待执行调动单
+     * @param Request $request
+     */
+    public function getByPerson(Request $request)
+    {
+        $staffSn = $request->staff_sn;
+        $date = $request->date;
+        $leaves = StaffTransfer::where('staff_sn', $staffSn)
+            ->where('status', '<', 2)
+            ->where('leaving_date', '<=', $date)
+            ->get();
+        return $leaves;
     }
 
     protected function makeValidator($input)
