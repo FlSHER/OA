@@ -25,7 +25,7 @@ class CreateAppTokenTable extends Migration {
             $table->mediumInteger('staff_sn')->unsigned();
             $table->smallInteger('app_id')->unsigned();
             $table->char('app_auth_code', 32)->comment('授权码');
-            $table->char('redirect_uri', 50)->comment('重定向地址');
+            $table->char('redirect_uri', 100)->comment('重定向地址');
             $table->integer('expiration')->comment('过期时间');
             $table->primary(['staff_sn', 'app_id']);
         });

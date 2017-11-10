@@ -91,6 +91,8 @@ class WorkingScheduleController extends Controller
         $validator = [
             'shop_duty_id' => ['required', 'exists:attendance.shop_duty,id'],
             'date' => ['required'],
+            'clock_in' => ['regex:/^\d{2}:\d{2}$/'],
+            'clock_out' => ['regex:/^\d{2}:\d{2}$/'],
         ];
         if (empty($input['id'])) {
             $validator['shop_sn'] = ['required', 'exists:shops,shop_sn,deleted_at,NULL'];

@@ -27,7 +27,6 @@ class AttendanceController extends Controller
     public function showDetailPage(Request $request)
     {
         $info = $this->getInfo($request)->toArray();
-        $shopSn = $info['shop_sn'];
         $startAt = $info['attendance_date'] . ' 04:00:00';
         $endAt = date('Y-m-d H:i:s', strtotime($startAt) + 24 * 3600);
         $ym = date('Ym', strtotime($info['attendance_date']));
