@@ -50,13 +50,12 @@ class StaffController extends Controller
      * @param Request $request
      * @return json
      */
-    public function getStaffList(Request $request)
+    public function getStaffList(Request $request, $withAuth = false)
     {
         $staffModel = $this->model;
-//        //员工列表的权限验证
-//        if ($request->get('with_auth') !== false) {
-//            $staffModel = $staffModel::visible();
-//        }
+        if ($withAuth) {
+            $staffModel = $staffModel::visible();
+        }
         return app('Plugin')->dataTables($request, $staffModel);
     }
 
@@ -83,7 +82,7 @@ class StaffController extends Controller
         array_push($columns, 'info.account_number');
         array_push($columns, 'info.account_name');
         array_push($columns, 'info.education');
-        $exportData = $this->getStaffList($request)['data'];
+        $exportData = $this->getStaffList($request, true)['data'];
         $file = app('App\Contracts\ExcelExport')->setPath('hr/staff/export/')->setBaseName('员工信息')->setColumns($columns)->trans($this->transPath)->export(['sheet1' => $exportData]);
         return ['state' => 1, 'file_name' => $file];
     }
