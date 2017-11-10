@@ -95,8 +95,8 @@
             {data: "id", title: "编号"},
             {data: "staff_sn", title: "员工编号"},
             {data: "staff_name", title: "员工姓名"},
-            {data: "start_at", title: "开始时间"},
-            {data: "end_at", title: "结束时间"},
+            {data: "start_at", title: "开始时间", searchable: false},
+            {data: "end_at", title: "结束时间", searchable: false},
             {data: "duration", title: "请假时长"},
             {
                 data: "status", title: "状态",
@@ -117,8 +117,8 @@
                     }
                 }
             },
-            {data: "clock_out_at", title: "开始打卡时间"},
-            {data: "clock_in_at", title: "结束打卡时间"},
+            {data: "clock_out_at", title: "开始打卡时间", searchable: false},
+            {data: "clock_in_at", title: "结束打卡时间", searchable: false},
             {data: "approver_name", title: "审批人"},
 //            {
 //                data: "id", title: "操作",
