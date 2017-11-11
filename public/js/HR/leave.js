@@ -5,12 +5,14 @@ $(function () {
 
     /* dataTables start  */
     table = $('#leave_table').oaTable({
-        "columns": columns,
-        "ajax": {
+        columns: columns,
+        ajax: {
             url: '/hr/leave/list'
         },
-        "scrollX": 746,
-        "buttons": buttons
+        order: [['0', 'desc']],
+        scrollX: 746,
+        filter: $("#filter"),
+        buttons: buttons
     });
 });
 
@@ -20,28 +22,19 @@ function add() {
     oaWaiting.hide();
 }
 
-//编辑
-function edit(id) {
-    oaWaiting.show();
-    $("#editForm").oaForm()[0].fillData('/hr/leave/info', {id: id});
-    oaWaiting.hide();
-}
-
-function del(id) {
+function cancel(id) {
     var _confirm = confirm("确认撤销？");
     if (_confirm) {
         oaWaiting.show();
         var data = {'id': id};
         $.ajax({
             type: "POST",
-            url: HOLIDAY.cancel,
+            url: '/hr/leave/cancel',
             data: data,
-            async: false,
             dataType: 'json',
             success: function (msg) {
-                console.log(msg);
                 if (msg['status'] == 1) {
-                    table.fnDraw();
+                    table.draw();
                     oaWaiting.hide();
                 } else if (msg['status'] === -1) {
                     oaWaiting.hide(function () {

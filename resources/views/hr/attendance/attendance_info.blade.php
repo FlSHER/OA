@@ -31,6 +31,9 @@
                     店铺业绩：￥
                     {{sprintf('%.2f',$sales_performance_lisha+$sales_performance_go+$sales_performance_group+$sales_performance_partner)}}
                 </p>
+                <p>
+                    提交时间：{{$submitted_at}}
+                </p>
             </b>
             <ul class="list-group">
                 @foreach($details as $detail)

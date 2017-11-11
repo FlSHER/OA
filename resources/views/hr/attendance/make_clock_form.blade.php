@@ -3,7 +3,7 @@
         <label class="control-label col-sm-2">*日期</label>
         <div class="col-sm-4">
             <input class="form-control" name="date" type="text" isDate title="日期" id="date_input"
-                   onchange="toggleWorkingSchedule()"/>
+                   onchange="toggleWorkingSchedule()" maxdate="{{date('Y-m-d H:i:s')}}"/>
         </div>
         <label class="control-label col-sm-2">*员工</label>
         <div class="col-sm-4" oaSearch="staff">
@@ -103,6 +103,8 @@
                     var clockOut = false;
                     var clockIn = false;
                     $('#leave_request_select option').remove();
+                    $('#combine_type option[value=32]').hide();
+                    $('#combine_type option[value=31]').hide();
                     for (var i in response) {
                         leaveRequest = response[i];
                         $('#leave_request_select').append('<option value="' + leaveRequest.id + '">' + leaveRequest.start_at + ' 至 ' + leaveRequest.end_at + '</option>');
@@ -113,13 +115,9 @@
                     }
                     if (clockOut) {
                         $('#combine_type option[value=32]').show();
-                    } else {
-                        $('#combine_type option[value=32]').hide();
                     }
                     if (clockIn) {
                         $('#combine_type option[value=31]').show();
-                    } else {
-                        $('#combine_type option[value=31]').hide();
                     }
                 },
                 error: function (err) {
@@ -139,6 +137,8 @@
                     var clockOut = false;
                     var clockIn = false;
                     $('#transfer_select option').remove();
+                    $('#combine_type option[value=22]').hide();
+                    $('#combine_type option[value=21]').hide();
                     for (var i in response) {
                         transfer = response[i];
                         optionDom = '<option value="' + transfer.id + '" status="' + transfer.status + '">';
@@ -155,13 +155,9 @@
                     }
                     if (clockOut) {
                         $('#combine_type option[value=22]').show();
-                    } else {
-                        $('#combine_type option[value=22]').hide();
                     }
                     if (clockIn) {
                         $('#combine_type option[value=21]').show();
-                    } else {
-                        $('#combine_type option[value=21]').hide();
                     }
                     oaWaiting.hide();
                 },

@@ -98,6 +98,7 @@ Route::group(['prefix' => 'hr', 'namespace' => 'HR', 'as' => 'hr'], function () 
         Route::post('/list', ['uses' => 'LeaveController@getList'])->name('.list');
         Route::post('/info', ['uses' => 'LeaveController@getInfo'])->name('.info');
         Route::post('/person', ['uses' => 'LeaveController@getByPerson'])->name('.person');//获取单人的请假条
+        Route::post('/cancel', ['uses' => 'LeaveController@cancel'])->name('.cancel');//撤销请假条
     });
     Route::group(['prefix' => 'attendance', 'as' => '.attendance'], function () {//考勤
         Route::get('/', ['uses' => 'AttendanceController@showManagePage']);
