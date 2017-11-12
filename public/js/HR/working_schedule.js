@@ -30,6 +30,8 @@ $(function () {
                 self.settings()[0].ajax.data.working_schedule_date = $('.working_schedule_date').text();
                 $('.working_schedule_date').oaDate({
                     defaultDate: 'today',
+                    maxDate: 'today',
+                    minDate: new Date().fp_incr(-40),
                     onChange: function (selectedDates, dateStr, instance) {
                         $('.working_schedule_date').html(dateStr);
                         self.settings()[0].ajax.data.working_schedule_date = dateStr;

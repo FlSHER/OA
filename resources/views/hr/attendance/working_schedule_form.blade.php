@@ -39,7 +39,7 @@
         @if($type=='add')
             <div class="col-sm-3">
                 <input class="form-control" name="date" type="text" isDate value="{{date('Y-m-d')}}" locked="true"
-                       title="日期"/>
+                       maxDate="today" minDate="{{date('Y-m-d',strtotime('-40 days'))}}" title="日期"/>
             </div>
         @else
             <div class="col-sm-3">
