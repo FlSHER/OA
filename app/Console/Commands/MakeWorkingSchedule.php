@@ -140,25 +140,33 @@ class MakeWorkingSchedule extends Command
     protected function add($addList, &$addCount, $basicStaffList)
     {
         foreach ($addList as $sn) {
-            $staffSn = substr($sn, -6);
-            $shopSn = substr($sn, 0, -7);
-            DB::connection('attendance')
-                ->table('working_schedule_' . date('Ymd'))
-                ->insert(['shop_sn' => $shopSn, 'staff_sn' => $staffSn, 'staff_name' => $basicStaffList[$staffSn]]);
-            $addCount++;
+            try {
+                $staffSn = substr($sn, -6);
+                $shopSn = substr($sn, 0, -7);
+                DB::connection('attendance')
+                    ->table('working_schedule_' . date('Ymd'))
+                    ->insert(['shop_sn' => $shopSn, 'staff_sn' => $staffSn, 'staff_name' => $basicStaffList[$staffSn]]);
+                $addCount++;
+            } catch (\Exception $e) {
+                Log::error($e->getMessage());
+            }
         }
     }
 
     protected function delete($deleteList, &$deleteCount)
     {
         foreach ($deleteList as $sn) {
-            $staffSn = substr($sn, -6);
-            $shopSn = substr($sn, 0, -7);
-            DB::connection('attendance')
-                ->table('working_schedule_' . date('Ymd'))
-                ->where(['shop_sn' => $shopSn, 'staff_sn' => $staffSn])
-                ->delete();
-            $deleteCount++;
+            try {
+                $staffSn = substr($sn, -6);
+                $shopSn = substr($sn, 0, -7);
+                DB::connection('attendance')
+                    ->table('working_schedule_' . date('Ymd'))
+                    ->where(['shop_sn' => $shopSn, 'staff_sn' => $staffSn])
+                    ->delete();
+                $deleteCount++;
+            } catch (\Exception $e) {
+                Log::error($e->getMessage());
+            }
         }
     }
 
