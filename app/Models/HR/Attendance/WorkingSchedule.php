@@ -38,6 +38,17 @@ class WorkingSchedule extends Model
 
     /* ----- 定义关联 End ----- */
 
+    /* ----- 修改器 Start ----- */
+
+    public function setShopSnAttribute($value)
+    {
+        if (is_string($value)) {
+            $this->attributes['shop_sn'] = strtolower($value);
+        }
+    }
+
+    /* ----- 修改器 End ----- */
+
     /* ----- 本地作用域 Start ----- */
 
     public function scopeVisible($query, $staffSn = '')
