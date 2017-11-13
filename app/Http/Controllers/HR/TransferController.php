@@ -145,7 +145,9 @@ class TransferController extends Controller
         $staffSn = $request->staff_sn;
         $date = $request->date;
         $leaves = StaffTransfer::where('staff_sn', $staffSn)
-            ->where('status', '<', 2)
+            ->where(function ($query) {
+                $query->whereNull('left_at')->orWhereNull('arrived_at');
+            })
             ->where('leaving_date', '<=', $date)
             ->get();
         return $leaves;

@@ -100,6 +100,7 @@
                 },
                 success: function (response) {
                     var leaveRequest;
+                    var optionDom;
                     var clockOut = false;
                     var clockIn = false;
                     $('#leave_request_select option').remove();
@@ -107,7 +108,11 @@
                     $('#combine_type option[value=31]').hide();
                     for (var i in response) {
                         leaveRequest = response[i];
-                        $('#leave_request_select').append('<option value="' + leaveRequest.id + '">' + leaveRequest.start_at + ' 至 ' + leaveRequest.end_at + '</option>');
+                        optionDom = '<option value="' + leaveRequest.id +
+                            '" clock_out_at="' + leaveRequest.clock_out_at +
+                            '" clock_in_at="' + leaveRequest.clock_in_at + '">';
+                        optionDom += leaveRequest.start_at + ' 至 ' + leaveRequest.end_at + '</option>';
+                        $('#leave_request_select').append(optionDom);
                         if (!leaveRequest.clock_out_at)
                             clockOut = true;
                         if (!leaveRequest.clock_in_at)
@@ -141,16 +146,18 @@
                     $('#combine_type option[value=21]').hide();
                     for (var i in response) {
                         transfer = response[i];
-                        optionDom = '<option value="' + transfer.id + '" status="' + transfer.status + '">';
+                        optionDom = '<option value="' + transfer.id +
+                            '" left_at="' + transfer.left_at +
+                            '" arrived_at="' + transfer.arrived_at + '">';
                         if (transfer.leaving_shop_sn > 0) {
                             optionDom += transfer.leaving_shop_name + '(' + transfer.leaving_shop_sn + ')';
                         }
                         optionDom += ' 至 ' + transfer.arriving_shop_name + '(' + transfer.arriving_shop_sn + ')'
                             + ' ' + transfer.leaving_date + '</option>';
                         $('#transfer_select').append(optionDom);
-                        if (transfer.status == 0)
+                        if (!transfer.left_at)
                             clockOut = true;
-                        if (transfer.status == 1)
+                        if (!transfer.arrived_at)
                             clockIn = true;
                     }
                     if (clockOut) {
@@ -172,17 +179,29 @@
 
     function selectCombineType(dom) {
         var value = dom.value;
-        if (value == 31 || value == 32) {
+        var selectedId;
+        if (value == 31) {
+            selectedId = $('#leave_request_select option[clock_in_at="null"]').show().eq(0).val();
+            $('#leave_request_select option[clock_in_at!="null"]').hide();
+            $('#leave_request_select').val(selectedId);
+            $('.leave_request').show();
+            $('.transfer').hide();
+        } else if (value == 32) {
+            selectedId = $('#leave_request_select option[clock_out_at="null"]').show().eq(0).val();
+            $('#leave_request_select option[clock_out_at!="null"]').hide();
+            $('#leave_request_select').val(selectedId);
             $('.leave_request').show();
             $('.transfer').hide();
         } else if (value == 21) {
-            $('#transfer_select option[status=1]').show();
-            $('#transfer_select option[status=0]').hide();
+            selectedId = $('#transfer_select option[arrived_at="null"]').show().eq(0).val();
+            $('#transfer_select option[arrived_at!="null"]').hide();
+            $('#transfer_select').val(selectedId);
             $('.transfer').show();
             $('.leave_request').hide();
         } else if (value == 22) {
-            $('#transfer_select option[status=0]').show();
-            $('#transfer_select option[status=1]').hide();
+            selectedId = $('#transfer_select option[left_at="null"]').show().eq(0).val();
+            $('#transfer_select option[left_at!="null"]').hide();
+            $('#transfer_select').val(selectedId);
             $('.transfer').show();
             $('.leave_request').hide();
         } else {
