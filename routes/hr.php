@@ -83,6 +83,7 @@ Route::group(['prefix' => 'hr', 'namespace' => 'HR', 'as' => 'hr'], function () 
             Route::post('/delete', ['uses' => 'ViolationController@deleteReasonByOne'])->name('.delete'); //删除大爱原因
         });
     });
+    /* 考勤 Start */
     Route::group(['prefix' => 'transfer', 'as' => '.transfer'], function () { //人事调动
         Route::get('/', ['uses' => 'TransferController@showManagePage']);
         Route::post('/list', ['uses' => 'TransferController@getList'])->name('.list');
@@ -118,5 +119,11 @@ Route::group(['prefix' => 'hr', 'namespace' => 'HR', 'as' => 'hr'], function () 
         Route::post('/submit', ['uses' => 'WorkingScheduleController@addOrEdit'])->name('.submit');
         Route::post('/delete', ['uses' => 'WorkingScheduleController@delete'])->name('.delete');
     });
+    Route::group(['prefix' => 'clock', 'as' => '.clock'], function () {//打卡记录
+        Route::get('/', ['uses' => 'ClockController@showManagePage']);
+        Route::post('/list', ['uses' => 'ClockController@getList'])->name('.list');
+        Route::post('/abandon', ['uses' => 'ClockController@abandon'])->name('.abandon');
+    });
+    /* 考勤 End */
 });
 

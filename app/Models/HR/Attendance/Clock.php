@@ -20,6 +20,25 @@ class Clock extends Model
         $this->table .= $ym;
     }
 
+    /* 定义关联 Start */
+
+    public function staff()
+    {
+        return $this->belongsTo('App\Models\HR\Staff', 'staff_sn');
+    }
+
+    public function shop()
+    {
+        return $this->belongsTo('App\Models\HR\Shop', 'shop_sn', 'shop_sn');
+    }
+
+    public function operator()
+    {
+        return $this->belongsTo('App\Models\HR\Staff', 'operator_sn');
+    }
+
+    /* 定义关联 End */
+
     /* 访问器 Start */
 
     public function getPhotoAttribute($value)
