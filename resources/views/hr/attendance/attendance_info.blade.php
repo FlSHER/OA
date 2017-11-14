@@ -48,6 +48,9 @@
                             @if($detail['is_assistor']==1)
                                 <span class="label label-info">协助</span>
                             @endif
+                            @if($detail['is_shift']==1)
+                                <span class="label label-warning">倒班</span>
+                            @endif
                             @if($detail['is_missing']==1)
                                 <span class="label label-danger">漏签</span>
                             @endif
