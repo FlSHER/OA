@@ -45,6 +45,9 @@
                             @else
                                 <span class="label label-default">{{$detail['shop_duty']['name']}}</span>
                             @endif
+                            @if($detail['is_assistor']==1)
+                                <span class="label label-info">协助</span>
+                            @endif
                             @if($detail['is_missing']==1)
                                 <span class="label label-danger">漏签</span>
                             @endif
