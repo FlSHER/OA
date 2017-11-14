@@ -10,7 +10,7 @@ namespace App\Repositories\Finance\Reimburse;
 
 use App\Models\Reimburse\Auditor;
 use App\Models\Reimburse\Expense;
-use App\Models\Reimburse\Reim_department;
+use App\Models\Reimburse\ReimDepartment;
 use App\Models\Reimburse\Reimbursement;
 use App\Services\EncyptionService;
 use DB;

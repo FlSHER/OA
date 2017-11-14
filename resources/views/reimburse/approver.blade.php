@@ -30,7 +30,7 @@
                                 <label  class="col-lg-2 col-sm-2 control-label">资金归属<span style="color: red;">*</span></label>
                                 <div class="col-lg-10">
                                     <select name="reim_department_id" class="form-control">
-                                        {!! get_options('reimburse_mysql.reim_departments','name','id')!!}
+                                        {!! get_options('App\Models\Reimburse\ReimDepartment','name','id')!!}
                                     </select>
                                 </div>
                             </div>

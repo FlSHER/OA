@@ -5,7 +5,7 @@ namespace App\Http\Controllers\app\Reimburse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Reimburse\Department;
-use App\Models\Reimburse\Reim_department;
+use App\Models\Reimburse\ReimDepartment;
 use Curl;
 
 class ReimburseController extends Controller
@@ -16,7 +16,7 @@ class ReimburseController extends Controller
 
     public function __construct()
     {
-        $this->auditorCURD = app('App\Contracts\CURD')->model('App\Models\Reimburse\Reim_department');
+        $this->auditorCURD = app('App\Contracts\CURD')->model('App\Models\Reimburse\ReimDepartment');
         $this->approverCURD = app('App\Contracts\CURD')->model('App\Models\Reimburse\Department');
     }
 
@@ -106,7 +106,7 @@ class ReimburseController extends Controller
      */
     public function auditorInfo(Request $request)
     {
-        $result = app('Plugin')->dataTables($request, new Reim_department);
+        $result = app('Plugin')->dataTables($request, new ReimDepartment);
         return $result;
     }
 
@@ -142,7 +142,7 @@ class ReimburseController extends Controller
     public function editAuditor(Request $request)
     {
         $id = $request->id;
-        $data = Reim_department::with('auditor')->find($id);
+        $data = ReimDepartment::with('auditor')->find($id);
         return $data;
     }
 

@@ -9,7 +9,7 @@ namespace App\Services\Finance\Reimburse;
  * @author admin
  */
 use App\Models\Reimburse\Auditor;
-use App\Models\Reimburse\Reim_department;
+use App\Models\Reimburse\ReimDepartment;
 use App\Models\Reimburse\Reimbursement;
 use DB;
 use Illuminate\Http\Request;
@@ -50,7 +50,7 @@ class AuditService
      */
     public function getReimDepartmentName()
     {
-        return Reim_department::withTrashed()->get();
+        return ReimDepartment::withTrashed()->get();
     }
 
 } 

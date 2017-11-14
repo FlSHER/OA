@@ -9,7 +9,7 @@ namespace App\Services\App;
  * @author admin
  */
 use App\Models\Reimburse\Auditor;
-use App\Models\Reimburse\Reim_department;
+use App\Models\Reimburse\ReimDepartment;
 use App\Models\Reimburse\Reimbursement;
 use DB;
 use Illuminate\Http\Request;

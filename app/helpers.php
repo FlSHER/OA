@@ -16,7 +16,16 @@ if (!function_exists('get_options')) {
 
     function get_options($table, $showColumn, $valueColumn = null, $where = [], $order = null)
     {
-        if (preg_match('/\./', $table)) {
+        if (is_object($table) || class_exists($table)) {
+            $instance = is_object($table) ? $table : new $table;
+            $data = $instance->where($where)
+                ->when(!empty($order), function ($query) use ($order) {
+                    foreach ($order as $column => $dir) {
+                        $query->orderBy($column, $dir);
+                    }
+                    return $query;
+                })->get()->all();
+        } elseif (preg_match('/\./', $table)) {
             list($connection, $table) = explode('.', $table);
             $data = DB::connection($connection)->table($table)->where($where)
                 ->when(!empty($order), function ($query) use ($order) {
