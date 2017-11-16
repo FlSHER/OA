@@ -64,6 +64,12 @@
                                     {{max(sprintf('%.1f',round($detail['early_out_time'],1)),0.1)}}
                                     小时</span>
                             @endif
+                            @if($detail['is_leaving'] == 1)
+                                <span class="label label-warning">请假</span>
+                            @endif
+                            @if($detail['is_transferring'] == 1)
+                                <span class="label label-info">调动</span>
+                            @endif
                             <span style="float:right;font-weight:700;">
                                 ￥ {{sprintf('%.2f',$detail['sales_performance_lisha']+
                                 $detail['sales_performance_go']+
