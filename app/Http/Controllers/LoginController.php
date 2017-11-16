@@ -152,7 +152,7 @@ class LoginController extends Controller
         return Staff::where(function ($query) use ($username) {
             $query->orWhere(['username' => $username])
                 ->orWhere(['mobile' => $username]);
-        })->where([['is_active', '=', 1], ['status_id', '>', 0]])->first();
+        })->where([['is_active', '=', 1], ['status_id', '>=', 0]])->first();
     }
 
     /**
