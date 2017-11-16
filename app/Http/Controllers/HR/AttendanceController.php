@@ -226,7 +226,7 @@ class AttendanceController extends Controller
             $transfer = StaffTransfer::find($request->transfer);
             if ($clockData['type'] == 2) {
                 $transfer->left_at = $clockData['clock_at'];
-                $transfer->status = 1;
+                $transfer->status = empty($transfer->arrived_at) ? 1 : 2;
             } elseif ($clockData['type'] == 1) {
                 $transfer->arrived_at = $clockData['clock_at'];
                 $transfer->status = 2;
@@ -248,7 +248,7 @@ class AttendanceController extends Controller
         $ym = date('Ym', strtotime($request->date));
         $clockModel = new Clock(['ym' => $ym]);
         $clockTable = $clockModel->getTable();
-        $clockId = $clockModel->insertGetId($clockData);
+        $clockId = $clockModel->create($clockData)->id;
         $clockData['clock_table'] = $clockTable;
         $clockData['clock_id'] = $clockId;
         DB::connection('attendance')->table('clock_patch')->insert($clockData);
