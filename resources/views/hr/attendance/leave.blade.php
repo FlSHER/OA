@@ -93,7 +93,7 @@
             {data: "clock_out_at", title: "开始打卡时间", searchable: false},
             {data: "clock_in_at", title: "结束打卡时间", searchable: false},
             {data: "approver_name", title: "审批人"},
-            {data: "created_at", title: "提交时间", visible: false},
+            {data: "created_at", title: "提交时间", visible: false, searchable: false},
             {
                 data: "id", title: "操作",
                 createdCell: function (nTd, sData, oData, iRow, iCol) {
