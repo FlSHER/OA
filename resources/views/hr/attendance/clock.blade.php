@@ -39,9 +39,27 @@
                 <h4 class="modal-title">打卡补签</h4>
             </div>
             <div class="modal-content">
-                <form id="makeClock" name="addForm" class="form-horizontal" method="post"
+                <form id="makeClock" class="form-horizontal" method="post"
                       action="{{route('hr.attendance.make_clock')}}">
                     @include('hr/attendance/make_clock_form')
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- edit -->
+    <div class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                <h4 class="modal-title">编辑</h4>
+            </div>
+            <div class="modal-content">
+                <form id="editForm" name="editForm" class="form-horizontal" method="post"
+                      action="{{route('hr.clock.edit')}}">
+                    @include('hr/attendance/clock_form')
+                    <input type="hidden" name="id">
+                    <input type="hidden" name="ym">
                 </form>
             </div>
         </div>
@@ -101,15 +119,17 @@
                 createdCell: function (nTd, sData, oData, iRow, iCol) {
                     var html = '';
                     var month = $('.clock_month').val();
-                    @if($authority->checkAuthority(130))
+                    @if($authority->checkAuthority(131))
+                        html += '<button class="btn btn-sm btn-default" title="编辑" onclick="edit(' + sData + ',\'' + month + '\')"><i class="fa fa-edit fa-fw"></i></button>';
+                    @endif
+                            @if($authority->checkAuthority(130))
                     if (oData.is_abandoned == 0) {
                         html += '&nbsp;<button class="btn btn-sm btn-danger" title="作废" onclick="abandon(' + sData + ',\'' + month + '\')"><i class="fa fa-trash-o fa-fw"></i></button>';
-                        $(nTd).html(html).css({"padding": "5px", "text-align": "center"});
                     } else {
-                        html += '已作废';
-                        $(nTd).html(html).css({"text-align": "center"});
+                        html += '&nbsp;<button class="btn btn-sm btn-default" title="作废" disabled><i class="fa fa-trash-o fa-fw"></i></button>';
                     }
                     @endif
+                    $(nTd).html(html).css({"padding": "5px", "text-align": "center"});
 
                 }
             }

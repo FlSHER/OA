@@ -2,8 +2,7 @@ var table;
 $(function () {
     var oaFormOption = {
         callback: {
-            submitSuccess: oaFormSubmitSuccess,
-            afterReset: oaFormAfterReset
+            submitSuccess: oaFormSubmitSuccess
         }
     };
     /* oaForm */
@@ -91,11 +90,6 @@ function edit(id) {
     var form = $("#editForm");
     form.oaForm()[0].fillData('/hr/transfer/info', {'id': id});
     oaWaiting.hide();
-}
-
-function oaFormAfterReset(obj) {
-    var formType = $(this).attr("id").replace("Form", "");
-    $('#' + formType + 'ByOne').modal('show');
 }
 
 function oaFormSubmitSuccess(msg, obj) {

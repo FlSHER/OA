@@ -122,6 +122,8 @@ Route::group(['prefix' => 'hr', 'namespace' => 'HR', 'as' => 'hr'], function () 
     Route::group(['prefix' => 'clock', 'as' => '.clock'], function () {//打卡记录
         Route::get('/', ['uses' => 'ClockController@showManagePage']);
         Route::post('/list', ['uses' => 'ClockController@getList'])->name('.list');
+        Route::post('/info', ['uses' => 'ClockController@getInfo'])->name('.info');
+        Route::post('/edit', ['uses' => 'ClockController@editByOne'])->name('.edit');
         Route::post('/abandon', ['uses' => 'ClockController@abandon'])->name('.abandon');
     });
     /* 考勤 End */

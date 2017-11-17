@@ -26,6 +26,35 @@ class ClockController extends Controller
         return app('Plugin')->dataTables($request, $clockModel);
     }
 
+    public function getInfo(Request $request)
+    {
+        $month = $request->has('clock_month') ? $request->clock_month : date('Y-m');
+        $ym = app('AttendanceService')->getAttendanceDate('Ym', $month . '-5');
+        $clockModel = new Clock(['ym' => $ym]);
+        $clock = $clockModel->with('staff', 'operator')->find($request->id);
+        $clock->setAttribute('combine_type', $clock->attendance_type . $clock->type);
+        $clock->setAttribute('ym', $ym);
+        return $clock;
+    }
+
+    public function editByOne(Request $request)
+    {
+        $this->validate($request, ['shop_sn' => 'exists:shops,shop_sn,deleted_at,NULL']);
+        $id = $request->id;
+        $ym = $request->ym;
+        $shopSn = strtolower($request->shop_sn);
+        ClockLog::create([
+            'clock_id' => $id,
+            'ym' => $ym,
+            'action' => 3,
+            'operator_sn' => app('CurrentUser')->staff_sn,
+        ]);
+        $clockModel = new Clock(['ym' => $ym]);
+        $clock = $clockModel->find($id);
+        $clock->update(['shop_sn' => $shopSn]);
+        return ['status' => 1, 'message' => '编辑成功'];
+    }
+
     public function abandon(Request $request)
     {
         $id = $request->id;

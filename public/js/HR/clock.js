@@ -1,7 +1,12 @@
 var table;
 
 $(function () {
-    $(".modal form").oaForm();
+    var oaFormOption = {
+        callback: {
+            submitSuccess: oaFormSubmitSuccess
+        }
+    };
+    $(".modal form").oaForm(oaFormOption);
 
     /* dataTables start  */
     table = $('#clock_table').oaTable({
@@ -55,4 +60,16 @@ function abandon(id, month) {
             }
         });
     }
+}
+
+function edit(id, month) {
+    oaWaiting.show();
+    var form = $("#editForm");
+    form.oaForm()[0].fillData('/hr/clock/info', {'id': id, 'month': month});
+    oaWaiting.hide();
+}
+
+function oaFormSubmitSuccess(msg, obj) {
+    table.draw(false);
+    $(".close").click();
 }
