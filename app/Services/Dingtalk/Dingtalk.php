@@ -78,7 +78,7 @@ class Dingtalk
             Cache::store('database')->put('jsApiTicketExpiration', $expiration, 116);
             return $jsApiTicket;
         });
-        $expiration = Cache::get('jsApiTicketExpiration');
+        $expiration = Cache::store('database')->get('jsApiTicketExpiration');
         return ['api_ticket' => $jsApiTicket, 'expiration' => $expiration];
     }
 
