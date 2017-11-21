@@ -148,6 +148,7 @@ class TransferController extends Controller
             ->where(function ($query) {
                 $query->whereNull('left_at')->orWhereNull('arrived_at');
             })
+            ->where('status', '<>', -1)
             ->where('leaving_date', '<=', $date)
             ->get();
         return $leaves;
