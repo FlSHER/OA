@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\HR;
 
+use App\Models\App;
 use App\Models\HR\Attendance\AttendanceStaff;
 use App\Models\HR\Attendance\Attendance;
 use App\Models\HR\Attendance\Clock;
@@ -13,6 +14,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
 use DB;
+use Curl;
 
 class AttendanceController extends Controller
 {
@@ -58,6 +60,11 @@ class AttendanceController extends Controller
         return $response;
     }
 
+    /**
+     * 通过
+     * @param Request $request
+     * @return array
+     */
     public function pass(Request $request)
     {
         $id = $request->id;
@@ -74,6 +81,11 @@ class AttendanceController extends Controller
         }
     }
 
+    /**
+     * 驳回
+     * @param Request $request
+     * @return array
+     */
     public function reject(Request $request)
     {
         $id = $request->id;
@@ -90,6 +102,11 @@ class AttendanceController extends Controller
         }
     }
 
+    /**
+     * 通过后撤回
+     * @param Request $request
+     * @return array
+     */
     public function revert(Request $request)
     {
         $id = $request->id;
@@ -103,6 +120,20 @@ class AttendanceController extends Controller
             return ['state' => 1, 'message' => '反审核成功'];
         } else {
             return ['state' => -1, 'message' => '该考勤表未通过审核'];
+        }
+    }
+
+    public function refresh(Request $request)
+    {
+        $id = $request->id;
+        $attendanceAppHost = App::find(5)->url;
+        $response = Curl::setUrl($attendanceAppHost . '/api/attendance/refresh')->sendMessageByPost(['id' => $id]);
+        if ($response['status'] == 1) {
+            return ['state' => 1, 'message' => $response['message']];
+        } elseif ($response['status'] == -1) {
+            return ['state' => -1, 'message' => $response['message']];
+        } else {
+            return ['state' => -1, 'message' => '刷新失败，未知原因'];
         }
     }
 

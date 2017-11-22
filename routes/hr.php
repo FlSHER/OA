@@ -108,6 +108,7 @@ Route::group(['prefix' => 'hr', 'namespace' => 'HR', 'as' => 'hr'], function () 
         Route::post('/pass', ['uses' => 'AttendanceController@pass'])->name('.pass');
         Route::post('/reject', ['uses' => 'AttendanceController@reject'])->name('.reject');
         Route::post('/revert', ['uses' => 'AttendanceController@revert'])->name('.revert');
+        Route::post('/refresh', ['uses' => 'AttendanceController@refresh'])->name('.refresh');
         Route::post('/get_clock_records', ['uses' => 'AttendanceController@getClockRecords'])->name('.get_clock_records');
         Route::post('/export', ['uses' => 'AttendanceController@exportStaffData'])->name('.export');
         Route::post('/make_clock', ['uses' => 'AttendanceController@makeClockRecord'])->name('.make_clock');

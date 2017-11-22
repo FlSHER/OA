@@ -118,21 +118,34 @@
                 @endforeach
             </ul>
             @if($authority->checkAuthority(122))
-                @if($status == 1)
-                    <div style="padding:0 10%;">
-                        <button class="btn btn-lg btn-danger" onClick="reject({{$id}})">驳回 <i class="fa fa-times"></i>
-                        </button>
-                        <button class="btn btn-lg btn-success pull-right" onClick="pass({{$id}})">通过 <i
-                                    class="fa fa-check"></i>
-                        </button>
-                    </div>
-                @elseif($status == 2 && $auditor_sn == $currentUser->staff_sn)
-                    <div style="padding:0 10%;">
-                        <button class="btn btn-lg btn-warning" onClick="revert({{$id}})">撤回 <i
-                                    class="fa fa-rotate-left"></i>
-                        </button>
-                    </div>
-                @endif
+                <div style="padding:0 10%;" class="row">
+                    @if($status != 2 || $auditor_sn == $currentUser->staff_sn)
+                        <div class="col-sm-4">
+                            <button class="btn btn-default"
+                                    onClick="refresh({{$id}})">
+                                刷新 <i class="fa fa-refresh"></i>
+                            </button>
+                        </div>
+                    @endif
+                    @if($status == 1)
+                        <div class="col-sm-4">
+                            <button class="btn btn-danger" onClick="reject({{$id}})">
+                                驳回 <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="col-sm-4">
+                            <button class="btn btn-success pull-right" onClick="pass({{$id}})">
+                                通过 <i class="fa fa-check"></i>
+                            </button>
+                        </div>
+                    @elseif($status == 2 && $auditor_sn == $currentUser->staff_sn)
+                        <div class="col-sm-4">
+                            <button class="btn btn-lg btn-warning" onClick="revert({{$id}})">
+                                撤回 <i class="fa fa-rotate-left"></i>
+                            </button>
+                        </div>
+                    @endif
+                </div>
             @endif
         </div>
     </div>

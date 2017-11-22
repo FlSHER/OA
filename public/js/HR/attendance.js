@@ -82,6 +82,7 @@ function reject(id) {
                 table.draw(false);
                 showPersonalInfo(id);
             } else if (response.state == -1) {
+                oaWaiting.hide();
                 alert(response.message);
             }
         },
@@ -106,11 +107,38 @@ function revert(id) {
                 table.draw(false);
                 showPersonalInfo(id);
             } else if (response.state == -1) {
+                oaWaiting.hide();
                 alert(response.message);
             }
         },
         error: function (err) {
             document.write(err.responseText);
+        }
+    })
+}
+
+/**
+ * 刷新
+ * @param id
+ * @param attendanceHost
+ */
+function refresh(id) {
+    oaWaiting.show();
+    $.ajax({
+        type: 'POST',
+        url: '/hr/attendance/refresh',
+        data: {id: id},
+        success: function (response) {
+            if (response.state == 1) {
+                table.draw(false);
+                showPersonalInfo(id);
+            } else if (response.state == -1) {
+                oaWaiting.hide();
+                alert(response.message);
+            }
+        },
+        error: function (err) {
+            document.write(JSON.stringify(err).responseText);
         }
     })
 }
