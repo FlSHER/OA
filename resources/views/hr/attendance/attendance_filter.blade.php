@@ -44,20 +44,21 @@
                     </div>
                 </div>
             </div>
-            {{--<div class="col-lg-3">--}}
-            {{--<div class="row">--}}
-            {{--<label class="control-label col-lg-4 col-sm-2">包含店员</label>--}}
-            {{--<div class="col-sm-8 input-group input-group-sm" oaSearch="staff">--}}
-            {{--<input class="form-control" oaSearchColumn="realname" type="text" title="包含店员"/>--}}
-            {{--<input name="details.staff_sn.is" oaSearchColumn="staff_sn" type="hidden" title="员工编号"/>--}}
-            {{--<span class="input-group-btn">--}}
-            {{--<button type="button" class="btn btn-default" oaSearchShow>--}}
-            {{--<i class="fa fa-search"></i>--}}
-            {{--</button>--}}
-            {{--</span>--}}
-            {{--</div>--}}
-            {{--</div>--}}
-            {{--</div>--}}
+            <div class="col-lg-3">
+                <div class="row">
+                    <label class="control-label col-lg-4 col-sm-2">包含店员</label>
+                    <div class="col-sm-8 input-group input-group-sm" oaSearch="staff">
+                        <input class="form-control" oaSearchColumn="realname" type="text" title="包含店员"
+                               style="background-color:#fff;" readonly/>
+                        <input name="staff_sn" oaSearchColumn="staff_sn" type="hidden" title="员工编号"/>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" oaSearchShow>
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
             <div class="col-lg-3">
                 <div class="row">
                     <label class="control-label col-lg-4 col-sm-2">店长</label>

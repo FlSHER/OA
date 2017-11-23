@@ -28,12 +28,14 @@ class ClockController extends Controller
 
     public function getInfo(Request $request)
     {
-        $month = $request->has('clock_month') ? $request->clock_month : date('Y-m');
+        $month = $request->has('month') ? $request->month : date('Y-m');
         $ym = app('AttendanceService')->getAttendanceDate('Ym', $month . '-5');
         $clockModel = new Clock(['ym' => $ym]);
-        $clock = $clockModel->with('staff', 'operator')->find($request->id);
+        $clock = $clockModel->find($request->id);
         $clock->setAttribute('combine_type', $clock->attendance_type . $clock->type);
         $clock->setAttribute('ym', $ym);
+        $clock->staff;
+        $clock->operator;
         return $clock;
     }
 
@@ -61,7 +63,6 @@ class ClockController extends Controller
         $ym = str_replace('-', '', $request->month);
         $clockModel = new Clock(['ym' => $ym]);
         $clockRecord = $clockModel->find($id);
-        $clockRecord->is_abandoned = 1;
 
         ClockLog::create([
             'clock_id' => $id,
@@ -98,7 +99,7 @@ class ClockController extends Controller
             }
             $leave->save();
         }
-        $clockRecord->save();
+        $clockModel->where(['id' => $id])->update(['is_abandoned' => 1]);
         return ['status' => 1, 'message' => '作废成功'];
     }
 }

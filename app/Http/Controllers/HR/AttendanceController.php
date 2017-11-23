@@ -47,7 +47,24 @@ class AttendanceController extends Controller
 
     public function getList(Request $request)
     {
-        $model = Attendance::visible()->where('status', '<>', 0);
+        $idGroup = [];
+
+        if (array_has($request->filter, 'staff_sn')) {
+            DB::connection('attendance')->table('information_schema.TABLES')
+                ->where('table_name', 'like', 'attendance_staff_%')
+                ->get()->each(function ($model) use (&$idGroup, $request) {
+                    $idTmpGroup = DB::connection('attendance')->table($model->TABLE_NAME)
+                        ->where('staff_sn', $request->filter['staff_sn'])
+                        ->get()->pluck('attendance_shop_id')->toArray();
+                    $idGroup = array_collapse([$idGroup, $idTmpGroup]);
+                });
+            $value = array_except($request->filter, ['staff_sn']);
+            $request->offsetSet('filter', $value);
+        }
+
+        $model = Attendance::visible()->when(!empty($idGroup), function ($query) use ($idGroup) {
+            return $query->whereIn('id', $idGroup);
+        })->where('status', '<>', 0);
         return app('Plugin')->dataTables($request, $model);
     }
 

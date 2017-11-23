@@ -140,7 +140,7 @@
                         </div>
                     @elseif($status == 2 && $auditor_sn == $currentUser->staff_sn)
                         <div class="col-sm-4">
-                            <button class="btn btn-lg btn-warning" onClick="revert({{$id}})">
+                            <button class="btn btn-warning" onClick="revert({{$id}})">
                                 撤回 <i class="fa fa-rotate-left"></i>
                             </button>
                         </div>
