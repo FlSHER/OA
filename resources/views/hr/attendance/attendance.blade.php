@@ -36,20 +36,7 @@
     </div>
 
     <!-- makeClock -->
-    <div class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-header">
-                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
-                <h4 class="modal-title">打卡补签</h4>
-            </div>
-            <div class="modal-content">
-                <form id="makeClock" name="addForm" class="form-horizontal" method="post"
-                      action="{{route('hr.attendance.make_clock')}}">
-                    @include('hr/attendance/make_clock_form')
-                </form>
-            </div>
-        </div>
-    </div>
+    @include('hr/attendance/make_clock_form')
 
     <!-- bigPhoto -->
     <div class="modal fade" id="viewMore">
@@ -141,12 +128,33 @@
 
         var buttons = [];
 
+        var multibutton = [];
+
+        multibutton.push({
+            "text": "月报表", "action": function () {
+                //
+            }
+        });
+
+        multibutton.push({
+            "text": "结束报表", "action": function () {
+                //
+            }
+        });
+
         @if($authority->checkAuthority(124))
         buttons.push({"text": '<i class="fa fa-clock-o fa-fw"></i>', "action": makeClock, "titleAttr": "补签"});
         @endif
         @if($authority->checkAuthority(123))
         buttons.push('export:/hr/attendance/export');
         @endif
+
+        if (multibutton.length > 0) {
+            buttons.push({
+                "text": "<i class='fa fa-table fa-fw'></i>", "titleAttr": "报表", "extend": "collection",
+                "buttons": multibutton
+            });
+        }
 
     </script>
 @endsection

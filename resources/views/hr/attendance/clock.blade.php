@@ -32,20 +32,7 @@
     </div>
 
     <!-- makeClock -->
-    <div class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-header">
-                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
-                <h4 class="modal-title">打卡补签</h4>
-            </div>
-            <div class="modal-content">
-                <form id="makeClock" class="form-horizontal" method="post"
-                      action="{{route('hr.attendance.make_clock')}}">
-                    @include('hr/attendance/make_clock_form')
-                </form>
-            </div>
-        </div>
-    </div>
+    @include('hr/attendance/make_clock_form')
 
     <!-- edit -->
     <div class="modal fade">
@@ -138,8 +125,9 @@
         var buttons = [
             {"text": "{{date('Y-m')}}", className: "clock_month", "titleAttr": "选择月份"},
         ];
-        @if($authority->checkAuthority(125))
-        //        buttons.push({"text": '<i class="fa fa-plus fa-fw"></i>', "action": add, "titleAttr": "创建"});
+
+        @if($authority->checkAuthority(124))
+        buttons.push({"text": '<i class="fa fa-clock-o fa-fw"></i>', "action": makeClock, "titleAttr": "补签"});
         @endif
 
     </script>

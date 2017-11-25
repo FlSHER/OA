@@ -1,78 +1,129 @@
-<div class="modal-body">
-    <div class="form-group">
-        <label class="control-label col-sm-2">*日期</label>
-        <div class="col-sm-4">
-            <input class="form-control" name="date" type="text" isDate title="日期" id="date_input"
-                   onchange="toggleWorkingSchedule()" maxdate="{{date('Y-m-d H:i:s')}}"/>
+<div class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+            <h4 class="modal-title">打卡补签</h4>
         </div>
-        <label class="control-label col-sm-2">*员工</label>
-        <div class="col-sm-4" oaSearch="staff">
-            <div class="input-group">
-                <input class="form-control" oaSearchColumn="realname" type="text" title="员工"
-                       style="background-color:#fff;" readonly/>
-                <span class="input-group-btn">
-                    <button type="button" class="btn btn-default" oaSearchShow><i class="fa fa-search"></i></button>
-                </span>
-            </div>
-            <input class="form-control" name="staff_sn" id="staff_input" oaSearchColumn="staff_sn" type="hidden"
-                   onchange="toggleWorkingSchedule()"/>
-        </div>
-    </div>
-    <div class="clock_content" style="display:none;">
-        <div id="clock_records_box">
+        <div class="modal-content">
+            <form id="makeClock" name="makeClock" class="form-horizontal" method="post"
+                  action="{{route('hr.attendance.make_clock')}}">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">*日期</label>
+                        <div class="col-sm-4">
+                            <input class="form-control" name="date" type="text" isDate title="日期" id="date_input"
+                                   onchange="toggleWorkingSchedule()" maxdate="{{date('Y-m-d H:i:s')}}"/>
+                        </div>
+                        <label class="control-label col-sm-2">*员工</label>
+                        <div class="col-sm-4" oaSearch="staff">
+                            <div class="input-group">
+                                <input class="form-control" oaSearchColumn="realname" type="text" title="员工"
+                                       style="background-color:#fff;" readonly/>
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-default" oaSearchShow>
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <input class="form-control" name="staff_sn" id="staff_input" oaSearchColumn="staff_sn"
+                                   type="hidden"
+                                   onchange="toggleWorkingSchedule()"/>
+                        </div>
+                    </div>
+                    <div class="clock_content" style="display:none;">
+                        <div id="clock_records_box">
 
-        </div>
-        <div class="form-group">
-            <label class="control-label col-sm-2">*打卡类型</label>
-            <div class="col-sm-4">
-                <select class="form-control" name="combine_type" id="combine_type" title="打卡类型"
-                        onchange="selectCombineType(this)">
-                    <option value="11">上班</option>
-                    <option value="12">下班</option>
-                    <option value="22">调动出发</option>
-                    <option value="21">调动到达</option>
-                    <option value="32">请假离店</option>
-                    <option value="31">请假返回</option>
-                </select>
-            </div>
-        </div>
-        <div class="form-group leave_request">
-            <label class="control-label col-sm-2">*假条</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="leave_request" title="假条" onchange="" id="leave_request_select">
-                </select>
-            </div>
-        </div>
-        <div class="form-group transfer">
-            <label class="control-label col-sm-2">*调动</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transfer" title="调动" onchange="" id="transfer_select">
-                </select>
-            </div>
-        </div>
-        <div class="form-group clock_info">
-            <label class="control-label col-sm-2">*店铺</label>
-            <div class="col-sm-4">
-                <div class="input-group" oaSearch="shop">
-                    <input class="form-control" name="shop_sn" oaSearchColumn="shop_sn" type="text" title="店铺"/>
-                    <span class="input-group-btn">
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">*打卡类型</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" name="combine_type" id="combine_type" title="打卡类型"
+                                        onchange="selectCombineType(this)">
+                                    <option value="11">上班</option>
+                                    <option value="12">下班</option>
+                                    <option value="22">调动出发</option>
+                                    <option value="21">调动到达</option>
+                                    <option value="32">请假离店</option>
+                                    <option value="31">请假返回</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group leave_request">
+                            <label class="control-label col-sm-2">*假条</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="leave_request" title="假条" onchange=""
+                                        id="leave_request_select">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group transfer">
+                            <label class="control-label col-sm-2">*调动</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="transfer" title="调动" onchange=""
+                                        id="transfer_select">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group clock_info">
+                            <label class="control-label col-sm-2">*店铺</label>
+                            <div class="col-sm-4">
+                                <div class="input-group" oaSearch="shop">
+                                    <input class="form-control" name="shop_sn" oaSearchColumn="shop_sn" type="text"
+                                           title="店铺"/>
+                                    <span class="input-group-btn">
                     <button type="button" class="btn btn-default" oaSearchShow><i class="fa fa-search"></i></button>
                 </span>
+                                </div>
+                            </div>
+                            <label class="control-label col-sm-2">*打卡时间</label>
+                            <div class="col-sm-4">
+                                <input class="form-control" name="clock_at" type="text" isTime title="打卡时间"/>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <label class="control-label col-sm-2">*打卡时间</label>
-            <div class="col-sm-4">
-                <input class="form-control" name="clock_at" type="text" isTime title="打卡时间"/>
-            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-success">确认</button>
+                </div>
+            </form>
         </div>
     </div>
-</div>
-<div class="modal-footer">
-    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-    <button type="submit" class="btn btn-success">确认</button>
 </div>
 
 <script>
+    $(function () {
+
+        var makeClockFormOptions = {
+            oaTime: {
+                enableSeconds: false
+            },
+            callback: {
+                submitSuccess: makeClockFormSubmitSuccess
+            }
+        };
+
+        $("#makeClock").oaForm(makeClockFormOptions);
+
+    });
+
+    /**
+     * 打卡补签
+     */
+    function makeClock() {
+        oaWaiting.show();
+        var form = $("#makeClock");
+        form.oaForm()[0].reset();
+        oaWaiting.hide();
+    }
+
+    function makeClockFormSubmitSuccess() {
+        $("#makeClock input").not('#date_input,#staff_input').val('').change();
+        $("#makeClock select").find('option').eq(0).select();
+        $("#makeClock select").change();
+        toggleWorkingSchedule();
+    }
+
     function toggleWorkingSchedule() {
         if ($('#date_input').val() && $('#staff_input').val()) {
             $('#combine_type').val(11).change();

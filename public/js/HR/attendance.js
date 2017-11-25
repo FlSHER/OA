@@ -1,16 +1,6 @@
 var table;
 
 $(function () {
-    var oaFormOption = {
-        oaTime: {
-            enableSeconds: false
-        },
-        callback: {
-            submitSuccess: oaFormSubmitSuccess
-        }
-    };
-    /* oaForm */
-    $(".modal form").oaForm(oaFormOption);
     /* dataTables start   */
     table = $('#transfer').oaTable({
         columns: columns,
@@ -141,18 +131,4 @@ function refresh(id) {
             document.write(JSON.stringify(err).responseText);
         }
     })
-}
-
-/**
- * 打卡补签
- */
-function makeClock() {
-    oaWaiting.show();
-    var form = $("#makeClock");
-    form.oaForm()[0].reset();
-    oaWaiting.hide();
-}
-
-function oaFormSubmitSuccess(msg, obj) {
-    $(".close").click();
 }
