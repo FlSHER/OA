@@ -36,6 +36,10 @@ class EventServiceProvider extends ServiceProvider
         \App\Models\HR\Attendance\StaffTransfer::saving(function ($model) {
             $model->onSaving();
         });
+        //Attendance
+        \App\Models\HR\Attendance\Attendance::saving(function ($model) {
+            $model->onSaving();
+        });
 
         /* Model End */
     }

@@ -182,6 +182,8 @@ class AttendanceController extends Controller
                         'is_missing' => $detail['is_missing'] ? '是' : '否',
                         'is_leaving' => $detail['is_leaving'] ? '是' : '否',
                         'is_transferring' => $detail['is_transferring'] ? '是' : '否',
+                        'is_assistor' => $detail['is_assistor'] ? '是' : '否',
+                        'is_shift' => $detail['is_shift'] ? '是' : '否',
                     ]]);
                 }
                 return $response;
@@ -208,8 +210,10 @@ class AttendanceController extends Controller
             '是否漏签' => 'is_missing',
             '迟到时长' => 'late_time',
             '早退时长' => 'early_out_time',
-            '是否有请假' => 'is_leaving',
-            '是否有调动' => 'is_transferring',
+            '请假' => 'is_leaving',
+            '调动' => 'is_transferring',
+            '协助' => 'is_assistor',
+            '倒班' => 'is_shift',
             '考勤日期' => 'attendance_date',
             '审核状态' => 'status',
             '审核人' => 'auditor_name',

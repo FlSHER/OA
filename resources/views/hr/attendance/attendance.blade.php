@@ -149,12 +149,12 @@
         buttons.push('export:/hr/attendance/export');
         @endif
 
-        if (multibutton.length > 0) {
-            buttons.push({
-                "text": "<i class='fa fa-table fa-fw'></i>", "titleAttr": "报表", "extend": "collection",
-                "buttons": multibutton
-            });
-        }
+//        if (multibutton.length > 0) {
+//            buttons.push({
+//                "text": "<i class='fa fa-table fa-fw'></i>", "titleAttr": "报表", "extend": "collection",
+//                "buttons": multibutton
+//            });
+//        }
 
     </script>
 @endsection
