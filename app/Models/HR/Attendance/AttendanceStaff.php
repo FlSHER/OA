@@ -10,14 +10,9 @@ class AttendanceStaff extends Model
     protected $connection = 'attendance';
     protected $table = 'attendance_staff_';
     protected $fillable = [
-        'attendance_shop_id',
         'staff_sn',
         'staff_name',
         'shop_duty_id',
-        'sales_performance_lisha',
-        'sales_performance_go',
-        'sales_performance_group',
-        'sales_performance_partner',
         'working_days',
         'working_hours',
         'leaving_days',
@@ -33,14 +28,10 @@ class AttendanceStaff extends Model
         'clock_log',
         'working_start_at',
         'working_end_at',
-        'staff_position_id',
-        'staff_position',
-        'staff_department_id',
-        'staff_department',
-        'staff_status_id',
-        'staff_status',
         'is_assistor',
         'is_shift',
+        'status',
+        'auditor_sn',
     ];
 
     public function __construct(array $attributes = [])
