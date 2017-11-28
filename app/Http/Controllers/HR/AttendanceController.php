@@ -49,16 +49,16 @@ class AttendanceController extends Controller
     {
         $idGroup = [];
 
-        if (array_has($request->filter, 'staff_sn')) {
+        if (array_has($request->filter, 'staff_sn.is')) {
             DB::connection('attendance')->table('information_schema.TABLES')
                 ->where('table_name', 'like', 'attendance_staff_%')
                 ->get()->each(function ($model) use (&$idGroup, $request) {
                     $idTmpGroup = DB::connection('attendance')->table($model->TABLE_NAME)
-                        ->where('staff_sn', $request->filter['staff_sn'])
+                        ->where('staff_sn', $request->filter['staff_sn.is'])
                         ->get()->pluck('attendance_shop_id')->toArray();
                     $idGroup = array_collapse([$idGroup, $idTmpGroup]);
                 });
-            $value = array_except($request->filter, ['staff_sn']);
+            $value = array_except($request->filter, ['staff_sn.is']);
             $request->offsetSet('filter', $value);
         }
 
@@ -159,36 +159,58 @@ class AttendanceController extends Controller
      */
     public function exportStaffData(Request $request)
     {
-        $listData = $this->getList($request)['data'];
-        $exportData = array_collapse(
-            array_map(function ($item) {
-                $response = [];
-                $ym = date('Ym', strtotime($item['attendance_date']));
-                $model = new AttendanceStaff(['ym' => $ym]);
-                $details = $model->where('attendance_shop_id', $item['id'])->get();
-                $details->load('staff.position', 'staff.department', 'shop_duty');
-                $details = $details->toArray();
-                foreach ($details as $detail) {
-                    $response[] = array_collapse([$detail, [
-                        'shop_sn' => $item['shop_sn'],
-                        'shop_name' => $item['shop_name'],
-                        'sales_performance_total' => sprintf('%.2f', $detail['sales_performance_lisha'] +
-                            $detail['sales_performance_go'] +
-                            $detail['sales_performance_group'] +
-                            $detail['sales_performance_partner']),
-                        'status' => [1 => '待审核', 2 => '已通过', -1 => '已驳回'][$item['status']],
-                        'auditor_name' => $item['auditor_name'],
-                        'attendance_date' => $item['attendance_date'],
-                        'is_missing' => $detail['is_missing'] ? '是' : '否',
-                        'is_leaving' => $detail['is_leaving'] ? '是' : '否',
-                        'is_transferring' => $detail['is_transferring'] ? '是' : '否',
-                        'is_assistor' => $detail['is_assistor'] ? '是' : '否',
-                        'is_shift' => $detail['is_shift'] ? '是' : '否',
-                    ]]);
-                }
-                return $response;
-            }, $listData)
-        );
+        $requestColumns = $request->columns;
+        $requestColumns[] = ['data' => '{is_missing}?\'是\' : \'否\'', 'searchable' => false];
+        $requestColumns[] = ['data' => '{is_leaving}?\'是\' : \'否\'', 'searchable' => false];
+        $requestColumns[] = ['data' => '{is_transferring}?\'是\' : \'否\'', 'searchable' => false];
+        $requestColumns[] = ['data' => '{is_assistor}?\'是\' : \'否\'', 'searchable' => false];
+        $requestColumns[] = ['data' => '{is_shift}?\'是\' : \'否\'', 'searchable' => false];
+        $requestColumns[] = ['data' => '[1 => \'待审核\', 2 => \'已通过\', -1 => \'已驳回\'][{status}]', 'searchable' => false];
+        $requestColumns[] = ['data' => 'shop_duty.name', 'searchable' => false];
+        $requestColumns[] = ['data' => '{working_days}+{transferring_days}+{leaving_days}', 'searchable' => false];
+        $requestColumns[] = ['data' => '{working_days}+{transferring_days}', 'searchable' => false];
+        $request->offsetSet('columns', $requestColumns);
+        $exportData = [];
+        DB::connection('attendance')->table('information_schema.TABLES')
+            ->where('table_name', 'like', 'attendance_staff_%')
+            ->get()->each(function ($model) use ($request, &$exportData) {
+                $tableName = $model->TABLE_NAME;
+                $attendanceModel = new AttendanceStaff();
+                $attendanceModel->setTable($tableName);
+                $response = app('Plugin')->dataTables($request, $attendanceModel)['data'];
+                $exportData = array_collapse([$exportData, $response]);
+            });
+//
+//        $listData = $this->getList($request)['data'];
+//        $exportData = array_collapse(
+//            array_map(function ($item) {
+//                $response = [];
+//                $ym = date('Ym', strtotime($item['attendance_date']));
+//                $model = new AttendanceStaff(['ym' => $ym]);
+//                $details = $model->where('attendance_shop_id', $item['id'])->get();
+//                $details->load('staff.position', 'staff.department', 'shop_duty');
+//                $details = $details->toArray();
+//                foreach ($details as $detail) {
+//                    $response[] = array_collapse([$detail, [
+//                        'shop_sn' => $item['shop_sn'],
+//                        'shop_name' => $item['shop_name'],
+//                        'sales_performance_total' => sprintf('%.2f', $detail['sales_performance_lisha'] +
+//                            $detail['sales_performance_go'] +
+//                            $detail['sales_performance_group'] +
+//                            $detail['sales_performance_partner']),
+//                        'status' => [1 => '待审核', 2 => '已通过', -1 => '已驳回'][$item['status']],
+//                        'auditor_name' => $item['auditor_name'],
+//                        'attendance_date' => $item['attendance_date'],
+//                        'is_missing' => $detail['is_missing'] ? '是' : '否',
+//                        'is_leaving' => $detail['is_leaving'] ? '是' : '否',
+//                        'is_transferring' => $detail['is_transferring'] ? '是' : '否',
+//                        'is_assistor' => $detail['is_assistor'] ? '是' : '否',
+//                        'is_shift' => $detail['is_shift'] ? '是' : '否',
+//                    ]]);
+//                }
+//                return $response;
+//            }, $listData)
+//        );
         $columns = [
             '流水号' => 'id',
             '考勤表ID' => 'attendance_shop_id',
@@ -196,26 +218,28 @@ class AttendanceController extends Controller
             '店铺名称' => 'shop_name',
             '员工编号' => 'staff_sn',
             '员工姓名' => 'staff_name',
-            '职位' => 'staff.position.name',
-            '部门' => 'staff.department.name',
+            '职位' => 'staff_position',
+            '部门' => 'staff_department',
             '工作时长' => 'working_days',
             '请假时长' => 'leaving_days',
             '调动时长' => 'transferring_days',
+            '有效时长' => '{working_days}+{transferring_days}',
+            '总时长' => '{working_days}+{transferring_days}+{leaving_days}',
             '当日职务' => 'shop_duty.name',
             '利鲨货品' => 'sales_performance_lisha',
             'GO货品' => 'sales_performance_go',
             '公司货品' => 'sales_performance_group',
             '合作方货品' => 'sales_performance_partner',
-            '总业绩' => 'sales_performance_total',
-            '是否漏签' => 'is_missing',
+            '总业绩' => 'sprintf(\'%.2f\',{sales_performance_lisha}+{sales_performance_go}+{sales_performance_group}+{sales_performance_partner})',
+            '是否漏签' => '{is_missing}?\'是\' : \'否\'',
             '迟到时长' => 'late_time',
             '早退时长' => 'early_out_time',
-            '请假' => 'is_leaving',
-            '调动' => 'is_transferring',
-            '协助' => 'is_assistor',
-            '倒班' => 'is_shift',
+            '请假' => '{is_leaving}?\'是\' : \'否\'',
+            '调动' => '{is_transferring}?\'是\' : \'否\'',
+            '协助' => '{is_assistor}?\'是\' : \'否\'',
+            '倒班' => '{is_shift}?\'是\' : \'否\'',
             '考勤日期' => 'attendance_date',
-            '审核状态' => 'status',
+            '审核状态' => '[1 => \'待审核\', 2 => \'已通过\', -1 => \'已驳回\'][{status}]',
             '审核人' => 'auditor_name',
         ];
         $file = app('App\Contracts\ExcelExport')->setPath('hr/attendance/export/')->setBaseName('考勤数据')->setColumns($columns)->export(['sheet1' => $exportData]);

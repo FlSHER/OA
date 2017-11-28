@@ -50,7 +50,7 @@
                     <div class="col-sm-8 input-group input-group-sm" oaSearch="staff">
                         <input class="form-control" oaSearchColumn="realname" type="text" title="包含店员"
                                style="background-color:#fff;" readonly/>
-                        <input name="staff_sn" oaSearchColumn="staff_sn" type="hidden" title="员工编号"/>
+                        <input name="staff_sn.is" oaSearchColumn="staff_sn" type="hidden" title="员工编号"/>
                         <span class="input-group-btn">
                             <button type="button" class="btn btn-default" oaSearchShow>
                                 <i class="fa fa-search"></i>

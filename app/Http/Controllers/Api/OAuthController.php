@@ -249,7 +249,7 @@ class OAuthController extends Controller
         $this->refreshToken = $this->makeRefreshToken();
         $expiration = time() + $this->appTokenExpiration * 60;
         $app = App::find($this->appId);
-        $app->app_token()->detach($this->staffSn);
+        DB::table('app_token')->where(['app_id' => $this->appId, 'staff_sn' => $this->staffSn])->delete();
         $app->app_token()->attach($this->staffSn, ['app_token' => $this->appToken, 'refresh_token' => $this->refreshToken, 'expiration' => $expiration]);
     }
 

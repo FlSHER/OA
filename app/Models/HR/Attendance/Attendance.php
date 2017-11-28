@@ -42,12 +42,11 @@ class Attendance extends Model
 
     public function onSaving()
     {
-        $state = $this->getAttribute('status');
-        $staffSn = $this->getAttribute('auditor_sn');
-        $this->details->each(function ($staffAttendance) use ($state, $staffSn) {
-            $staffAttendance->setMonth($staffAttendance->attendance_date)->fill([
-                'status' => $state,
-                'auditor_sn' => $staffSn,
+        $this->details->each(function ($staffAttendance) {
+            $staffAttendance->setMonth($this->getAttribute('attendance_date'))->fill([
+                'status' => $this->getAttribute('status'),
+                'auditor_sn' => $this->getAttribute('auditor_sn'),
+                'auditor_name' => $this->getAttribute('auditor_name'),
             ])->save();
         });
     }
