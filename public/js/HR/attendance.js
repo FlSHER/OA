@@ -11,6 +11,16 @@ $(function () {
         },
         scrollX: 746
     });
+
+    $('#makeAttendance').oaForm({
+        callback: {
+            submitSuccess: function (msg, obj) {
+                showPersonalInfo(msg.id);
+                table.draw(false);
+                obj.query.closest('.modal').modal('hide');
+            }
+        }
+    });
 });
 
 /**
@@ -131,4 +141,11 @@ function refresh(id) {
             document.write(JSON.stringify(err).responseText);
         }
     })
+}
+
+/**
+ * 手动生成考勤表
+ */
+function makeAttendance() {
+    $('#makeAttendance')[0].reset();
 }

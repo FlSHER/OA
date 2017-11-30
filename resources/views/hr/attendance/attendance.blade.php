@@ -48,6 +48,45 @@
             </div>
         </div>
     </div>
+
+    <!-- makeAttendance -->
+    <div class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                <h4 class="modal-title">手动生成考勤表</h4>
+            </div>
+            <div class="modal-content">
+                <form id="makeAttendance" name="makeAttendance" class="form-horizontal" method="post"
+                      action="{{route('hr.attendance.make_attendance')}}">
+                    <div class="modal-body">
+                        <div class="form-group clock_info">
+                            <label class="control-label col-sm-2">*店铺</label>
+                            <div class="col-sm-4">
+                                <div class="input-group" oaSearch="shop">
+                                    <input class="form-control" name="shop_sn" oaSearchColumn="shop_sn" type="text"
+                                           title="店铺"/>
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-default" oaSearchShow>
+                                            <i class="fa fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <label class="control-label col-sm-2">*考勤日期</label>
+                            <div class="col-sm-4">
+                                <input class="form-control" name="date" type="text" isDate title="考勤日期"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-success">确认</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 
@@ -148,13 +187,16 @@
         @if($authority->checkAuthority(123))
         buttons.push('export:/hr/attendance/export');
         @endif
+        @if($authority->checkAuthority(132))
+        buttons.push({"text": '<i class="fa fa-plus fa-fw"></i>', "action": makeAttendance, "titleAttr": "生成考勤表"});
+        @endif
 
-//        if (multibutton.length > 0) {
-//            buttons.push({
-//                "text": "<i class='fa fa-table fa-fw'></i>", "titleAttr": "报表", "extend": "collection",
-//                "buttons": multibutton
-//            });
-//        }
+        //        if (multibutton.length > 0) {
+        //            buttons.push({
+        //                "text": "<i class='fa fa-table fa-fw'></i>", "titleAttr": "报表", "extend": "collection",
+        //                "buttons": multibutton
+        //            });
+        //        }
 
     </script>
 @endsection

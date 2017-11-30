@@ -140,6 +140,11 @@ class AttendanceController extends Controller
         }
     }
 
+    /**
+     * 刷新考勤时间
+     * @param Request $request
+     * @return array
+     */
     public function refresh(Request $request)
     {
         $id = $request->id;
@@ -147,7 +152,7 @@ class AttendanceController extends Controller
         $response = Curl::setUrl($attendanceAppHost . '/api/attendance/refresh')->sendMessageByPost(['id' => $id]);
         if ($response['status'] == 1) {
             return ['state' => 1, 'message' => $response['message']];
-        } elseif ($response['status'] == -1) {
+        } elseif ($response['status'] != 1) {
             return ['state' => -1, 'message' => $response['message']];
         } else {
             return ['state' => -1, 'message' => '刷新失败，未知原因'];
@@ -340,6 +345,15 @@ class AttendanceController extends Controller
         $clockData['clock_id'] = $clockId;
         DB::connection('attendance')->table('clock_patch')->insert($clockData);
         return ['status' => 1, 'message' => '补签成功'];
+    }
+
+    public function makeAttendance(Request $request)
+    {
+        $date = $request->date;
+        $shop = Shop::where('shop_sn', $request->shop_sn)->first()->toArray();
+        $attendanceAppHost = App::find(5)->url;
+        return Curl::setUrl($attendanceAppHost . '/api/attendance/make')
+            ->sendMessageByPost(['date' => $date, 'shop' => $shop, 'user' => app('CurrentUser')->getInfo()]);
     }
 
 }

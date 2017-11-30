@@ -70,9 +70,11 @@
                                 <div class="input-group" oaSearch="shop">
                                     <input class="form-control" name="shop_sn" oaSearchColumn="shop_sn" type="text"
                                            title="店铺"/>
-                                    <span class="input-group-btn">
-                    <button type="button" class="btn btn-default" oaSearchShow><i class="fa fa-search"></i></button>
-                </span>
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-default" oaSearchShow>
+                                            <i class="fa fa-search"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <label class="control-label col-sm-2">*打卡时间</label>
