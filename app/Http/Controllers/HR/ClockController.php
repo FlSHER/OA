@@ -53,7 +53,7 @@ class ClockController extends Controller
         ]);
         $clockModel = new Clock(['ym' => $ym]);
         $clock = $clockModel->find($id);
-        $clock->update(['shop_sn' => $shopSn]);
+        $clock->setMonth($ym)->fill(['shop_sn' => $shopSn])->save();
         return ['status' => 1, 'message' => '编辑成功'];
     }
 

@@ -340,7 +340,8 @@ class AttendanceController extends Controller
         $ym = date('Ym', strtotime($request->date));
         $clockModel = new Clock(['ym' => $ym]);
         $clockTable = $clockModel->getTable();
-        $clockId = $clockModel->create($clockData)->id;
+        $clockModel->fill($clockData)->save();
+        $clockId = $clockModel->id;
         $clockData['clock_table'] = $clockTable;
         $clockData['clock_id'] = $clockId;
         DB::connection('attendance')->table('clock_patch')->insert($clockData);
