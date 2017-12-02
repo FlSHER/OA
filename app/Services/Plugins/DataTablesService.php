@@ -118,6 +118,11 @@ class DataTablesService
         return $relations;
     }
 
+    /**
+     * 生成筛选条件
+     * @param $request
+     * @return array
+     */
     protected function makeFilter($request)
     {
         $filterOrigin = $request->filter ? $request->filter : [];
@@ -128,13 +133,18 @@ class DataTablesService
         return $filter;
     }
 
+    /**
+     * 根据模糊搜索生成筛选条件
+     * @param $request
+     * @return array
+     */
     protected function makeSearchFilter($request)
     {
         $this->searchValue = $request->search['value'];
         $searchFilter = [];
         if (!empty($this->searchValue)) {
             foreach ($request->columns as $v) {
-                if ($v['searchable'] == "true" && preg_match('/^[\w\.]+$/', $v['data'])) {
+                if ((empty($v['searchable']) || $v['searchable'] == "true") && preg_match('/^[\w\.]+$/', $v['data'])) {
                     $searchFilter[] = explode('.', $v['data']);
                 }
             }

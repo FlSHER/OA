@@ -72,7 +72,7 @@
                 <form id="addForm" name="addForm" class="form-horizontal" method="post"
                       action="{{route('hr.transfer.submit')}}">
                     @inject('HRM','HRM')
-                    @include('hr/attendance/transfer_form')
+                    @include('hr/attendance/transfer_form',['type'=>'add'])
                 </form>
             </div>
         </div>
@@ -88,7 +88,7 @@
             <div class="modal-content">
                 <form id="editForm" name="editForm" class="form-horizontal" method="post"
                       action="{{route('hr.transfer.submit')}}">
-                    @include('hr/attendance/transfer_form')
+                    @include('hr/attendance/transfer_form',['type'=>'edit'])
                     <input type="hidden" name="id">
                 </form>
             </div>
@@ -113,14 +113,14 @@
             {data: "staff_department_name", title: "部门名称", defaultContent: "无"},
             {data: "current_shop.name", title: "所属店铺", visible: false, defaultContent: "无", searchable: false},
             {data: "leaving_shop_sn", title: "调离店铺代码", visible: false},
-            {data: "leaving_shop_name", title: "调离店铺名称", defaultContent: "无"},
+            {data: "leaving_shop_name", title: "调离店铺名称", defaultContent: "无", visible: false},
             {
                 data: "{leaving_shop.province.name}.'-'.{leaving_shop.city.name}.'-'.{leaving_shop.county.name}.' '.{leaving_shop.address}",
                 name: "leaving_shop.address",
                 title: "调离店铺地址",
                 visible: false
             },
-            {data: "arriving_shop_sn", title: "到达店铺代码", visible: false},
+            {data: "arriving_shop_sn", title: "到达店铺代码"},
             {data: "arriving_shop_name", title: "到达店铺名称", defaultContent: "无"},
             {
                 data: "{arriving_shop.province.name}.'-'.{arriving_shop.city.name}.'-'.{arriving_shop.county.name}.' '.{arriving_shop.address}",
@@ -128,10 +128,10 @@
                 title: "到达店铺地址",
                 visible: false
             },
-            {data: "arriving_shop_duty.name", title: "到店职务", visible: false, defaultContent: "待定", searchable: false},
+            {data: "arriving_shop_duty.name", title: "到店职务", defaultContent: "待定", searchable: false},
             {data: "leaving_date", title: "出发日期", searchable: false},
-            {data: "left_at", title: "出发时间", searchable: false},
-            {data: "arrived_at", title: "到达时间", searchable: false},
+            {data: "left_at", title: "出发打卡时间", searchable: false},
+            {data: "arrived_at", title: "到达打卡时间", searchable: false},
             {data: "created_at", title: "创建时间", searchable: false},
             {data: "maker_name", title: "建单人", visible: false},
             {data: "implode(',',{tag.*.name}).' '.{remark}", name: "remark", title: "备注"},
@@ -142,14 +142,24 @@
                 "width": "50px",
                 "createdCell": function (nTd, sData, oData, iRow, iCol) {
                     var html = '';
-                    <?php if ($authority->checkAuthority(81)): ?>
+                    @if ($authority->checkAuthority(81))
                     if (oData.maker_sn == "{{app('CurrentUser')->staff_sn}}" || "{{app('CurrentUser')->staff_sn}}" == "999999") {
-                        html += '<button class="btn btn-sm btn-default" title="编辑" onclick=\'edit(' + sData + ')\'><i class="fa fa-edit fa-fw"></i></button>';
+                        if (oData.status == -1) {
+                            html += '<button class="btn btn-sm btn-danger" title="已取消">已取消</button>';
+                        } else if (oData.status == 2) {
+                            html += '<button class="btn btn-sm btn-success" title="已完成">已完成</button>';
+                        } else {
+                            html += '<button class="btn btn-sm btn-default" title="编辑" onclick="edit(' + sData + ')"><i class="fa fa-edit fa-fw"></i></button>';
+                            if (oData.status == 0) {
+                                html += '&nbsp;<button class="btn btn-sm btn-danger" title="取消行程" onclick="cancel(' + sData + ')"><i class="fa fa-close fa-fw"></i></button>';
+                            }
+                        }
+
                     }
-                    <?php endif; ?>
-
-                    //                html += '&nbsp;<button class="btn btn-sm btn-danger" title="取消行程" onclick="del(' + sData + ')"><i class="fa fa-trash-o fa-fw"></i></button>';
-
+                    @endif
+                    if (html.length == 0) {
+                        html = '<button class="btn btn-sm btn-default" title="不可操作" disabled>不可操作</button>';
+                    }
                     $(nTd).html(html).css({"padding": "5px", "text-align": "center"});
                 }
             }

@@ -2,8 +2,7 @@ var table;
 $(function () {
     var oaFormOption = {
         callback: {
-            submitSuccess: oaFormSubmitSuccess,
-            afterReset: oaFormAfterReset
+            submitSuccess: oaFormSubmitSuccess
         }
     };
     /* oaForm */
@@ -93,33 +92,25 @@ function edit(id) {
     oaWaiting.hide();
 }
 
-function oaFormAfterReset(obj) {
-    var formType = $(this).attr("id").replace("Form", "");
-    $('#' + formType + 'ByOne').modal('show');
-}
-
 function oaFormSubmitSuccess(msg, obj) {
     table.draw(false);
     $(".close").click();
 }
 
-function del(id) {
+function cancel(id) {
     var _confirm = confirm("确认取消调动？");
     if (_confirm) {
         oaWaiting.show();
-        var url = '';
+        var url = '/hr/transfer/cancel';
         var data = {'id': id};
         $.ajax({
-            type: "GET",
+            type: "POST",
             url: url,
             data: data,
-            dataType: 'jsonp',
-            // async: false,
+            dataType: 'json',
             success: function (msg) {
-
-                table.fnDraw();
+                table.draw(false);
                 oaWaiting.hide();
-                console.log(msg);
             }
         });
     }

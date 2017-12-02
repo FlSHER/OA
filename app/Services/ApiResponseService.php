@@ -42,7 +42,7 @@ class ApiResponseService
 
     public function getWeatherImage($cityCode)
     {
-        if ($cityCode == '000000') {
+        if ($cityCode == '000000' || $cityCode == 000000) {
             $image = imagecreate(310, 45);
             imagecolorallocate($image, 255, 255, 255);
             imagepng($image);

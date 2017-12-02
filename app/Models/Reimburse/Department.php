@@ -21,7 +21,7 @@ class Department extends Model
 
     public function reim_department()
     {
-        return $this->belongsto('App\Models\Reimburse\Reim_department');
+        return $this->belongsto('App\Models\Reimburse\ReimDepartment');
     }
 
     public function approver1()

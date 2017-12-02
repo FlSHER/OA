@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\HR;
 
+use App\Models\HR\Attendance\StaffTransfer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
@@ -22,7 +23,7 @@ class TransferController extends Controller
     {
         $this->logService = $logService;
         $this->importService = $importService->extension('xlsx')->trans($this->transPath);
-        $this->curdService = $curd->model($this->model);
+        $this->curdService = $curd;
     }
 
     public function showManagePage()
@@ -57,7 +58,8 @@ class TransferController extends Controller
     public function addByOne(Request $request)
     {
         $model = $this->model;
-        $count = $model::where($request->only(['staff_sn', 'leaving_shop_sn', 'leaving_date', 'arriving_shop_sn', 'arriving_shop_duty_id']))->count();
+        $count = $model::where($request->only(['staff_sn', 'leaving_date', 'arriving_shop_sn']))
+            ->where('status', '>=', 0)->count();
         if ($count > 0) {
             $response['message'] = '调动已存在';
         } else {
@@ -72,6 +74,16 @@ class TransferController extends Controller
     public function editByOne(Request $request)
     {
         $data = $request->all();
+        $response = $this->curdService->update($data);
+        return $response;
+    }
+
+    public function cancel(Request $request)
+    {
+        $data = [
+            'id' => $request->id,
+            'status' => -1,
+        ];
         $response = $this->curdService->update($data);
         return $response;
     }
@@ -124,17 +136,37 @@ class TransferController extends Controller
         return ['state' => 1, 'file_name' => $file];
     }
 
+    /**
+     * 获取某一员工的待执行调动单
+     * @param Request $request
+     */
+    public function getByPerson(Request $request)
+    {
+        $staffSn = $request->staff_sn;
+        $date = $request->date;
+        $leaves = StaffTransfer::where('staff_sn', $staffSn)
+            ->where(function ($query) {
+                $query->whereNull('left_at')->orWhereNull('arrived_at');
+            })
+            ->where('status', '<>', -1)
+            ->where('leaving_date', '<=', $date)
+            ->get();
+        return $leaves;
+    }
+
     protected function makeValidator($input)
     {
         $validator = [
-            'staff_sn' => ['required_with:staff_name'],
-            'staff_name' => ['required', 'exists:staff,realname,staff_sn,' . $input['staff_sn']],
             'leaving_shop_sn' => ['exists:shops,shop_sn,deleted_at,NULL'],
             'arriving_shop_sn' => ['required', 'exists:shops,shop_sn,deleted_at,NULL'],
             'arriving_shop_duty_id' => ['exists:attendance.shop_duty,id'],
             'leaving_date' => ['required', 'date', 'after:2000-1-1'],
             'remark' => ['max:200'],
         ];
+        if (empty($input['id'])) {
+            $validator['staff_sn'] = ['required_with:staff_name'];
+            $validator['staff_name'] = ['required', 'exists:staff,realname,staff_sn,' . $input['staff_sn']];
+        }
         return $validator;
     }
 

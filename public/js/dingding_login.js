@@ -5,6 +5,7 @@ dd.ready(function () {
 dd.error(function (msg) {
     alert(JSON.stringify(msg));
 });
+
 //获取微应用免登授权码requestAuthCode
 function getRequestAuthCode() {
     dd.runtime.permission.requestAuthCode({
@@ -32,12 +33,16 @@ function getRequestAuthCode() {
                         } else if (status === -1) {
                             alert(msg['message']);
                         } else if (status === -2) {
-                            var bindInput = $('<input>').attr({'name': 'dingding', 'type': 'hidden'}).val(msg['dingding']);
+                            var bindInput = $('<input>').attr({
+                                'name': 'dingding',
+                                'type': 'hidden'
+                            }).val(msg['dingding']);
                             $('.form-signin').append(bindInput);
                         }
                     },
                     error: function (err) {
-                        document.write(err.responseText);
+                        oaWaiting.hide();
+                        alert(JSON.stringify(err));
                     }
                 });
 

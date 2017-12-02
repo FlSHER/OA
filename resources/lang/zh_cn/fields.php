@@ -169,6 +169,19 @@ return [
     ],
     /* 店铺人员调动 End */
 
+    /* 排班表 Start */
+
+    'working_schedule' => [
+        'shop_sn' => '店铺代码',
+        'staff_sn' => '员工编号',
+        'staff_name' => '员工姓名',
+        'clock_in' => '上班时间',
+        'clock_out' => '下班时间',
+        'shop_duty_id' => '当日职务',
+    ],
+
+    /* 排班表 End */
+
     /* ----------工作流start-------------- */
     'database_manage' => [//数据源管理
         'name' => '连接名',

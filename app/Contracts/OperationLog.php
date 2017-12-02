@@ -10,14 +10,16 @@ namespace App\Contracts;
 use Illuminate\Database\Eloquent\Model;
 use DB;
 
-class OperationLog {
+class OperationLog
+{
 
     protected $table;
     protected $model;
     protected $localization = [];
     protected $relationMap = [];
 
-    public function __construct($tableName = null, Model $model = null) {
+    public function __construct($tableName = null, Model $model = null)
+    {
         $tableName && $this->table($tableName);
         $model && $this->model($model);
     }
@@ -26,7 +28,8 @@ class OperationLog {
      * 配置关联映射
      * @param type $relationMap
      */
-    public function map($relationMap) {
+    public function map($relationMap)
+    {
         $this->relationMap = $relationMap;
     }
 
@@ -35,7 +38,8 @@ class OperationLog {
      * @param type $field
      * @return type
      */
-    protected function relationHas($field) {
+    protected function relationHas($field)
+    {
         return $this->hasMap() && array_has($this->relationMap, $field);
     }
 
@@ -43,7 +47,8 @@ class OperationLog {
      * 判断是否配置了关联映射
      * @return type
      */
-    protected function hasMap() {
+    protected function hasMap()
+    {
         return !empty($this->relationMap);
     }
 
@@ -52,7 +57,8 @@ class OperationLog {
      * @param type $transPath
      * @return \App\Contracts\OperationLog
      */
-    public function trans($transPath) {
+    public function trans($transPath)
+    {
         if (is_array($transPath)) {
             foreach ($transPath as $v) {
                 $trans = array_dot(trans($v));
@@ -64,17 +70,20 @@ class OperationLog {
         return $this;
     }
 
-    public function table($tableName) {
+    public function table($tableName)
+    {
         $this->table = $tableName;
         return $this;
     }
 
-    public function model(Model $model) {
+    public function model(Model $model)
+    {
         $this->model = $model;
         return $this;
     }
 
-    public function write($dirty, $others = []) {
+    public function write($dirty, $others = [])
+    {
         $data = $this->makeBasicInfo($others);
         if (!empty($dirty)) {
             $changes = $this->makeChanges($dirty);
@@ -85,7 +94,8 @@ class OperationLog {
         $this->getTable()->insert($data);
     }
 
-    protected function getTable() {
+    protected function getTable()
+    {
         if (class_exists($this->table)) {
             $model = new $this->table();
             return $model->newQuery();
@@ -94,7 +104,8 @@ class OperationLog {
         }
     }
 
-    protected function makeChanges($dirty, $parentsKey = '') {
+    protected function makeChanges($dirty, $parentsKey = '')
+    {
         $changes = [];
         foreach ($dirty as $key => $value) {
             if ($this->relationHas($parentsKey . $key)) {
@@ -119,19 +130,21 @@ class OperationLog {
         return $changes;
     }
 
-    protected function makeBasicInfo($others) {
+    protected function makeBasicInfo($others)
+    {
         $data = [
             'admin_sn' => app('CurrentUser')->getStaffSn(),
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),
-            'operation_type' => $others['operation_type'],
-            'operation_remark' => $others['operation_remark'],
-            'operate_at' => $others['operate_at'],
         ];
+        if (!empty($this->model->id)) {
+            $data['target_id'] = $this->model->id;
+        }
         return $data;
     }
 
-    protected function setRelationWithMap($originalKey, $originalValue) {
+    protected function setRelationWithMap($originalKey, $originalValue)
+    {
         $relations = explode('.', $originalKey);
         $originalField = array_pop($relations);
         $relationKey = $this->relationMap[$originalKey];
@@ -154,7 +167,8 @@ class OperationLog {
         return [$relationKey, $relationValue];
     }
 
-    protected function makeBelongsToManyChanges($dirty, $relation) {
+    protected function makeBelongsToManyChanges($dirty, $relation)
+    {
         $realKey = $this->getRealKey($relation);
         $changes = [];
         foreach ($dirty['attached'] as $key => $value) {
@@ -178,11 +192,19 @@ class OperationLog {
         return $changes;
     }
 
-    protected function transPivotAttributeName($k, $relation) {
+    /**
+     * 多对多关联生成pivot的属性名
+     * @param $k
+     * @param $relation
+     * @return mixed
+     */
+    protected function transPivotAttributeName($k, $relation)
+    {
         return $this->getRealKey($relation . '.*.pivot.' . $k);
     }
 
-    protected function getRealKey($key) {
+    protected function getRealKey($key)
+    {
         $realKey = array_get($this->localization, $key, $key);
         if (is_array($realKey) && array_has($realKey, 'name')) {
             return $realKey['name'];

@@ -29,16 +29,15 @@ class EventServiceProvider extends ServiceProvider
         parent::boot();
         /* Model Start */
 
-        //Staff
-        \App\Models\HR\Staff::saved(function ($model) {
-            $model->onSaved();
-        });
-
         //StaffTransfer
         \App\Models\HR\Attendance\StaffTransfer::creating(function ($model) {
             $model->onCreating();
         });
         \App\Models\HR\Attendance\StaffTransfer::saving(function ($model) {
+            $model->onSaving();
+        });
+        //Attendance
+        \App\Models\HR\Attendance\Attendance::saving(function ($model) {
             $model->onSaving();
         });
 

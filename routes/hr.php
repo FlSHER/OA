@@ -83,6 +83,7 @@ Route::group(['prefix' => 'hr', 'namespace' => 'HR', 'as' => 'hr'], function () 
             Route::post('/delete', ['uses' => 'ViolationController@deleteReasonByOne'])->name('.delete'); //删除大爱原因
         });
     });
+    /* 考勤 Start */
     Route::group(['prefix' => 'transfer', 'as' => '.transfer'], function () { //人事调动
         Route::get('/', ['uses' => 'TransferController@showManagePage']);
         Route::post('/list', ['uses' => 'TransferController@getList'])->name('.list');
@@ -90,13 +91,15 @@ Route::group(['prefix' => 'hr', 'namespace' => 'HR', 'as' => 'hr'], function () 
         Route::post('/import', ['uses' => 'TransferController@import'])->name('.import');
         Route::post('/export', ['uses' => 'TransferController@export'])->name('.export');
         Route::post('/submit', ['uses' => 'TransferController@addOrEdit'])->name('.submit');
+        Route::post('/cancel', ['uses' => 'TransferController@cancel'])->name('.cancel');
+        Route::post('/person', ['uses' => 'TransferController@getByPerson'])->name('.person');//获取单人的调动单
     });
     Route::group(['prefix' => 'leave', 'as' => '.leave'], function () {//人事请假
         Route::get('/', ['uses' => 'LeaveController@showManagePage']);
         Route::post('/list', ['uses' => 'LeaveController@getList'])->name('.list');
         Route::post('/info', ['uses' => 'LeaveController@getInfo'])->name('.info');
-        Route::post('/excelhandel', ['uses' => 'LeaveController@excelHandel']);
-        Route::get('/excelhandel', ['uses' => 'LeaveController@excelHandel']);
+        Route::post('/person', ['uses' => 'LeaveController@getByPerson'])->name('.person');//获取单人的请假条
+        Route::post('/cancel', ['uses' => 'LeaveController@cancel'])->name('.cancel');//撤销请假条
     });
     Route::group(['prefix' => 'attendance', 'as' => '.attendance'], function () {//考勤
         Route::get('/', ['uses' => 'AttendanceController@showManagePage']);
@@ -104,7 +107,27 @@ Route::group(['prefix' => 'hr', 'namespace' => 'HR', 'as' => 'hr'], function () 
         Route::post('/detail', ['uses' => 'AttendanceController@showDetailPage'])->name('.detail');
         Route::post('/pass', ['uses' => 'AttendanceController@pass'])->name('.pass');
         Route::post('/reject', ['uses' => 'AttendanceController@reject'])->name('.reject');
+        Route::post('/revert', ['uses' => 'AttendanceController@revert'])->name('.revert');
+        Route::post('/refresh', ['uses' => 'AttendanceController@refresh'])->name('.refresh');
+        Route::post('/get_clock_records', ['uses' => 'AttendanceController@getClockRecords'])->name('.get_clock_records');
         Route::post('/export', ['uses' => 'AttendanceController@exportStaffData'])->name('.export');
+        Route::post('/make_clock', ['uses' => 'AttendanceController@makeClockRecord'])->name('.make_clock');
+        Route::post('/make_attendance', ['uses' => 'AttendanceController@makeAttendance'])->name('.make_attendance');
     });
+    Route::group(['prefix' => 'working_schedule', 'as' => '.working_schedule'], function () {//排班表
+        Route::get('/', ['uses' => 'WorkingScheduleController@showManagePage']);
+        Route::post('/list', ['uses' => 'WorkingScheduleController@getList'])->name('.list');
+        Route::post('/info', ['uses' => 'WorkingScheduleController@getInfo'])->name('.info');
+        Route::post('/submit', ['uses' => 'WorkingScheduleController@addOrEdit'])->name('.submit');
+        Route::post('/delete', ['uses' => 'WorkingScheduleController@delete'])->name('.delete');
+    });
+    Route::group(['prefix' => 'clock', 'as' => '.clock'], function () {//打卡记录
+        Route::get('/', ['uses' => 'ClockController@showManagePage']);
+        Route::post('/list', ['uses' => 'ClockController@getList'])->name('.list');
+        Route::post('/info', ['uses' => 'ClockController@getInfo'])->name('.info');
+        Route::post('/edit', ['uses' => 'ClockController@editByOne'])->name('.edit');
+        Route::post('/abandon', ['uses' => 'ClockController@abandon'])->name('.abandon');
+    });
+    /* 考勤 End */
 });
 

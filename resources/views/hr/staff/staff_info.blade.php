@@ -309,7 +309,7 @@
             <!-- 员工权限 end -->
                 <!-- 员工评价 start -->
                 @if($authority->checkAuthority(120))
-                    <div class="form-horizontal tab-pane active" id="info-remark">
+                    <div class="form-horizontal tab-pane" id="info-remark">
                         @foreach($staff->appraise as $v)
                             <div class="form-group">
                                 <div class="clearfix">

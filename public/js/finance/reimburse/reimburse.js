@@ -126,19 +126,19 @@ function createDataTable() {
             {"title": "审批人", "data": "approver_name", "name": "approver_name", "sortable": true},
             {"title": "资金归属", "data": "reim_department.name", "name": "reim_department.name", "sortable": true},
             {
-                "title": "申请时间", "data": "send_time", "name": "send_time", "sortable": true,
+                "title": "申请时间", "data": "send_time", "name": "send_time", "sortable": true,searchable: false,
                 "createdCell": function (nTd, sData, oData, iRow, iCol) {
                     $(nTd).html(sData.substring(0, 10)).attr("title", sData);
                 }
             },
             {
-                "title": "审批时间", "data": "approve_time", "name": "approve_time", "sortable": true,
+                "title": "审批时间", "data": "approve_time", "name": "approve_time", "sortable": true,searchable: false,
                 "createdCell": function (nTd, sData, oData, iRow, iCol) {
                     $(nTd).html(sData.substring(0, 10)).attr("title", sData);
                 }
             },
             {
-                "title": "审核时间", "data": "audit_time", "name": "audit_time", "sortable": true,
+                "title": "审核时间", "data": "audit_time", "name": "audit_time", "sortable": true,searchable: false,
                 "createdCell": function (nTd, sData, oData, iRow, iCol) {
                     $(nTd).html(sData.substring(0, 10)).attr("title", sData);
                 }
@@ -209,19 +209,19 @@ function createDataTable() {
             },
             {"title": "资金归属", "data": "reim_department.name", "name": "reim_department_id", "sortable": true},
             {
-                "title": "申请时间", "data": "send_time", "name": "send_time", "sortable": true,
+                "title": "申请时间", "data": "send_time", "name": "send_time", "sortable": true,searchable: false,
                 "createdCell": function (nTd, sData, oData, iRow, iCol) {
                     $(nTd).html(sData.substring(0, 10)).attr("title", sData);
                 }
             },
             {
-                "title": "审批时间", "data": "approve_time", "name": "approve_time", "sortable": true,
+                "title": "审批时间", "data": "approve_time", "name": "approve_time", "sortable": true,searchable: false,
                 "createdCell": function (nTd, sData, oData, iRow, iCol) {
                     $(nTd).html(sData.substring(0, 10)).attr("title", sData);
                 }
             },
             {
-                "title": "驳回时间", "data": "reject_time", "name": "reject_time", "sortable": true,
+                "title": "驳回时间", "data": "reject_time", "name": "reject_time", "sortable": true,searchable: false,
                 "createdCell": function (nTd, sData, oData, iRow, iCol) {
                     $(nTd).html(sData.substring(0, 10)).attr("title", sData);
                 }

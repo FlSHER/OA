@@ -4,11 +4,22 @@ $(function () {
     /* dataTables start   */
     table = $('#transfer').oaTable({
         columns: columns,
+        buttons: buttons,
         filter: $("#filter"),
         ajax: {
             url: '/hr/attendance/list'
         },
         scrollX: 746
+    });
+
+    $('#makeAttendance').oaForm({
+        callback: {
+            submitSuccess: function (msg, obj) {
+                showPersonalInfo(msg.id);
+                table.draw(false);
+                obj.query.closest('.modal').modal('hide');
+            }
+        }
     });
 });
 
@@ -44,7 +55,7 @@ function pass(id) {
         data: {id: id},
         success: function (response) {
             if (response.state == 1) {
-                table.draw();
+                table.draw(false);
                 showPersonalInfo(id);
             } else if (response.state == -1) {
                 alert(response.message);
@@ -68,9 +79,10 @@ function reject(id) {
         data: {id: id},
         success: function (response) {
             if (response.state == 1) {
-                table.draw();
+                table.draw(false);
                 showPersonalInfo(id);
             } else if (response.state == -1) {
+                oaWaiting.hide();
                 alert(response.message);
             }
         },
@@ -78,4 +90,62 @@ function reject(id) {
             document.write(err.responseText);
         }
     })
+}
+
+/**
+ * 驳回
+ * @param id
+ */
+function revert(id) {
+    oaWaiting.show();
+    $.ajax({
+        type: 'POST',
+        url: '/hr/attendance/revert',
+        data: {id: id},
+        success: function (response) {
+            if (response.state == 1) {
+                table.draw(false);
+                showPersonalInfo(id);
+            } else if (response.state == -1) {
+                oaWaiting.hide();
+                alert(response.message);
+            }
+        },
+        error: function (err) {
+            document.write(err.responseText);
+        }
+    })
+}
+
+/**
+ * 刷新
+ * @param id
+ * @param attendanceHost
+ */
+function refresh(id) {
+    oaWaiting.show();
+    $.ajax({
+        type: 'POST',
+        url: '/hr/attendance/refresh',
+        data: {id: id},
+        success: function (response) {
+            if (response.state == 1) {
+                table.draw(false);
+                showPersonalInfo(id);
+            } else if (response.state == -1) {
+                oaWaiting.hide();
+                alert(response.message);
+            }
+        },
+        error: function (err) {
+            document.write(JSON.stringify(err).responseText);
+        }
+    })
+}
+
+/**
+ * 手动生成考勤表
+ */
+function makeAttendance() {
+    $('#makeAttendance')[0].reset();
 }

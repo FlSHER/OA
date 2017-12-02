@@ -22,6 +22,8 @@ class MakeWorkingSchedule extends Command
      */
     protected $description = 'Create working schedule with HR data.';
 
+    protected $holdDays = 40;
+
     /**
      * Create a new command instance.
      *
@@ -39,7 +41,6 @@ class MakeWorkingSchedule extends Command
      */
     public function handle()
     {
-        Log::info('Start making working schedule');
         $this->copySchedule();
 
         $addCount = 0;
@@ -81,9 +82,9 @@ class MakeWorkingSchedule extends Command
             }
         });
 
-        Log::info('add:' . $addCount . ' delete:' . $deleteCount . ' manager:' . $managerCount);
-        DB::connection('attendance')->select('DROP TABLE IF EXISTS working_schedule_' . date('Ymd', strtotime("-7 day")));
-        Log::info('End making working schedule');
+        $this->saveClockInAndClockOutTime();
+
+        DB::connection('attendance')->select('DROP TABLE IF EXISTS working_schedule_' . date('Ymd', strtotime('-' . $this->holdDays . ' day')));
     }
 
     protected function copySchedule()
@@ -139,26 +140,50 @@ class MakeWorkingSchedule extends Command
     protected function add($addList, &$addCount, $basicStaffList)
     {
         foreach ($addList as $sn) {
-            $staffSn = substr($sn, -6);
-            $shopSn = substr($sn, 0, -7);
-            DB::connection('attendance')
-                ->table('working_schedule_' . date('Ymd'))
-                ->insert(['shop_sn' => $shopSn, 'staff_sn' => $staffSn, 'staff_name' => $basicStaffList[$staffSn]]);
-            $addCount++;
+            try {
+                $staffSn = substr($sn, -6);
+                $shopSn = substr($sn, 0, -7);
+                DB::connection('attendance')
+                    ->table('working_schedule_' . date('Ymd'))
+                    ->insert(['shop_sn' => $shopSn, 'staff_sn' => $staffSn, 'staff_name' => $basicStaffList[$staffSn]]);
+                $addCount++;
+            } catch (\Exception $e) {
+                Log::error($e->getMessage());
+            }
         }
     }
 
     protected function delete($deleteList, &$deleteCount)
     {
         foreach ($deleteList as $sn) {
-            $staffSn = substr($sn, -6);
-            $shopSn = substr($sn, 0, -7);
-            DB::connection('attendance')
-                ->table('working_schedule_' . date('Ymd'))
-                ->where(['shop_sn' => $shopSn, 'staff_sn' => $staffSn])
-                ->delete();
-            $deleteCount++;
+            try {
+                $staffSn = substr($sn, -6);
+                $shopSn = substr($sn, 0, -7);
+                DB::connection('attendance')
+                    ->table('working_schedule_' . date('Ymd'))
+                    ->where(['shop_sn' => $shopSn, 'staff_sn' => $staffSn])
+                    ->delete();
+                $deleteCount++;
+            } catch (\Exception $e) {
+                Log::error($e->getMessage());
+            }
         }
+    }
+
+    protected function saveClockInAndClockOutTime()
+    {
+        DB::table('shops')->get()->each(function ($model) {
+            DB::connection('attendance')
+                ->table('working_schedule_' . date('Ymd', strtotime("-1 day")))
+                ->where('shop_sn', $model->shop_sn)
+                ->whereNull('clock_in')
+                ->update(['clock_in' => $model->clock_in]);
+            DB::connection('attendance')
+                ->table('working_schedule_' . date('Ymd', strtotime("-1 day")))
+                ->where('shop_sn', $model->shop_sn)
+                ->whereNull('clock_out')
+                ->update(['clock_out' => $model->clock_out]);
+        });
     }
 
 }
