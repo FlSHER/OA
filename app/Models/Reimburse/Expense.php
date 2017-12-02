@@ -3,9 +3,12 @@
 namespace App\Models\Reimburse;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Expense extends Model
 {
+    use SoftDeletes;
+
     protected $connection = 'reimburse_mysql';
     public $timestamps =false;
 
