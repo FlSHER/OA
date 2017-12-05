@@ -187,11 +187,6 @@
                     <?php } ?>
                     <div class="form-group">
                         <div class="clearfix">
-                            <label class="control-label col-lg-3"><strong>关系人：</strong></label>
-                            <div class="col-lg-3">
-                                <p class="form-control-static">{{$staff->info->relative_name}}@if($staff->info->relative_type)
-                                        （{{$staff->info->relative_type}}） @endif</p>
-                            </div>
                             <label class="control-label col-lg-3"><strong>招聘人员：</strong></label>
                             <div class="col-lg-3">
                                 <p class="form-control-static">{{$staff->info->recruiter_name}}</p>
@@ -201,6 +196,15 @@
                             <label class="control-label col-lg-3"><strong>紧急联系人：</strong></label>
                             <div class="col-lg-9">
                                 <p class="form-control-static">{{$staff->info->concat_name}}<?php echo $staff->info->concat_type ? '（' . $staff->info->concat_type . '）' : '' ?> {{$staff->info->concat_tel}}</p>
+                            </div>
+                        </div>
+                        <div class="clearfix">
+                            <label class="control-label col-lg-3"><strong>关系人：</strong></label>
+                            <div class="col-lg-9 row">
+                                @foreach($staff->relative as $relative)
+                                    <p class="form-control-static col-sm-5">{{$relative->realname}}@if($relative->pivot['relative_type'])
+                                            （{{$relativeType[$relative->pivot['relative_type']]->name}}） @endif</p>
+                                @endforeach
                             </div>
                         </div>
                     </div>

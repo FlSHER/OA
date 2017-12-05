@@ -17,6 +17,7 @@ use App\Models\HR\Shop;
 use App\Contracts\OperationLog;
 use App\Contracts\ExcelImport;
 use App\Contracts\CURD;
+use DB;
 
 class StaffController extends Controller
 {
@@ -104,7 +105,8 @@ class StaffController extends Controller
     public function showPersonalInfo(Request $request)
     {
         $staff = $this->getInfo($request);
-        return view('hr/staff/staff_info')->with(['staff' => $staff]);
+        $staffRelativeType = DB::table('staff_relative_type')->get()->pluck([], 'id')->all();
+        return view('hr/staff/staff_info')->with(['staff' => $staff, 'relativeType' => $staffRelativeType]);
     }
 
     /**

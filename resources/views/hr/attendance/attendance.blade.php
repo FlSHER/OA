@@ -111,7 +111,7 @@
                 className: 'text-right'
             },
             {data: "attendance_date", title: "考勤日期", className: 'text-center', searchable: false},
-            {data: "manager_name", title: "店长"},
+            {data: "manager_name", title: "提交人"},
             {data: "submitted_at", title: "提交时间", className: 'text-center', searchable: false, visible: false},
             {data: "auditor_name", title: "审核人", searchable: false, visible: false},
             {
