@@ -218,6 +218,7 @@ class Dingtalk
             foreach ($approvers as $v) {
                 $response[] = Staff::find($v)->dingding;
             }
+            $response = implode(',', $response);
         } else {
             $response = Staff::find($approvers)->dingding;
         }

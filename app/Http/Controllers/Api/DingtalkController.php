@@ -52,12 +52,10 @@ class DingtalkController extends Controller
     public function approvalCallback(Request $request)
     {
         $requestMsg = app('Dingtalk')->decryptMsg($request->signature, $request->timestamp, $request->nonce, $request->encrypt);
-        if ($requestMsg['EventType'] == 'bpms_task_change' || $requestMsg['type'] == 'terminate') {
-            DB::table('test')->insert(['time' => date('Y-m-d H:i:s'), 'remark' => json_encode($requestMsg)]);
-            $callbackUrl = DB::table('dingtalk_approval_process')->where('process_instance_id', $requestMsg['processInstanceId'])->value('callback_url');
-            $appResponse = app('Curl')->setUrl($callbackUrl)->sendMessageByPost($requestMsg);
-            DB::table('test')->insert(['time' => date('Y-m-d H:i:s'), 'remark' => (string)$appResponse]);
-        }
+        DB::table('test')->insert(['time' => date('Y-m-d H:i:s'), 'remark' => json_encode($requestMsg)]);
+        $callbackUrl = DB::table('dingtalk_approval_process')->where('process_instance_id', $requestMsg['processInstanceId'])->value('callback_url');
+        $appResponse = app('Curl')->setUrl($callbackUrl)->sendMessageByPost($requestMsg);
+        DB::table('test')->insert(['time' => date('Y-m-d H:i:s'), 'remark' => (string)$appResponse]);
         $responseMsg = app('Dingtalk')->encryptMsg('success', $request->timestamp, $request->nonce);
         return $responseMsg;
     }
