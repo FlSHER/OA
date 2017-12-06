@@ -106,12 +106,14 @@ class AttendanceController extends Controller
     public function reject(Request $request)
     {
         $id = $request->id;
+        $auditorRemark = $request->auditor_remark;
         $attendance = Attendance::find($id);
         if ($attendance->status == 1) {
             $attendance->status = -1;
             $attendance->auditor_sn = app('CurrentUser')->staff_sn;
             $attendance->auditor_name = app('CurrentUser')->realname;
             $attendance->audited_at = date('Y-m-d');
+            $attendance->auditor_remark = $auditorRemark;
             $attendance->save();
             return ['state' => 1, 'message' => '驳回成功'];
         } else {

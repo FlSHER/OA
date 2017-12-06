@@ -72,28 +72,31 @@ function pass(id) {
  * @param id
  */
 function reject(id) {
-    oaWaiting.show();
-    $.ajax({
-        type: 'POST',
-        url: '/hr/attendance/reject',
-        data: {id: id},
-        success: function (response) {
-            if (response.state == 1) {
-                table.draw(false);
-                showPersonalInfo(id);
-            } else if (response.state == -1) {
-                oaWaiting.hide();
-                alert(response.message);
+    var remark = prompt("请输入原因（不超过200字）", "");
+    if (remark != null) {
+        oaWaiting.show();
+        $.ajax({
+            type: 'POST',
+            url: '/hr/attendance/reject',
+            data: {id: id, 'auditor_remark': remark},
+            success: function (response) {
+                if (response.state == 1) {
+                    table.draw(false);
+                    showPersonalInfo(id);
+                } else if (response.state == -1) {
+                    oaWaiting.hide();
+                    alert(response.message);
+                }
+            },
+            error: function (err) {
+                document.write(err.responseText);
             }
-        },
-        error: function (err) {
-            document.write(err.responseText);
-        }
-    })
+        });
+    }
 }
 
 /**
- * 驳回
+ * 已通过撤回
  * @param id
  */
 function revert(id) {

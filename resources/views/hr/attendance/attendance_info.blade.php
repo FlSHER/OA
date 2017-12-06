@@ -34,6 +34,11 @@
                 <p>
                     提交时间：{{$submitted_at}}
                 </p>
+                @if($manager_remark)
+                    <p>
+                        备注：{{$manager_remark}}
+                    </p>
+                @endif
             </b>
             <ul class="list-group">
                 @foreach($details as $detail)
