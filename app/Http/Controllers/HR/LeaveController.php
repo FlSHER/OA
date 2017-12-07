@@ -31,6 +31,22 @@ class LeaveController extends Controller
         return $model::find($id);
     }
 
+    public function export(Request $request)
+    {
+        $exportData = $this->getList($request)['data'];
+        foreach ($request->columns as $v) {
+            if (empty($v['name'])) {
+                $columns[$v['data']] = $v['data'];
+            } else {
+                $columns[$v['name']] = $v['data'];
+            }
+        }
+        $file = app('App\Contracts\ExcelExport')->setPath('hr/leave/export/')
+            ->setBaseName('请假条')->setColumns($columns)->trans('fields.leave')
+            ->export(['sheet1' => $exportData]);
+        return ['state' => 1, 'file_name' => $file];
+    }
+
     /**
      * 撤销假条
      * @param Request $request

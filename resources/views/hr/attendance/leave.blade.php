@@ -71,25 +71,7 @@
             {data: "start_at", title: "开始时间", searchable: false},
             {data: "end_at", title: "结束时间", searchable: false},
             {data: "duration", title: "请假时长"},
-            {
-                data: "status", title: "状态",
-                render: function (data) {
-                    switch (data) {
-                        case -2:
-                            return '已撤回';
-                            break;
-                        case -1:
-                            return '已驳回';
-                            break;
-                        case 0:
-                            return '审批中';
-                            break;
-                        case 1:
-                            return '已通过';
-                            break;
-                    }
-                }
-            },
+            {data: "(['-2'=>'已撤回','-1'=>'已驳回','0'=>'审批中','1'=>'已通过'][{status}])", name: "status", title: "状态"},
             {data: "clock_out_at", title: "开始打卡时间", searchable: false},
             {data: "clock_in_at", title: "结束打卡时间", searchable: false},
             {data: "approver_name", title: "审批人"},
@@ -113,6 +95,7 @@
         @if($authority->checkAuthority(125))
         //        buttons.push({"text": '<i class="fa fa-plus fa-fw"></i>', "action": add, "titleAttr": "创建"});
         @endif
+        buttons.push('export:/hr/leave/export');
 
     </script>
 @endsection

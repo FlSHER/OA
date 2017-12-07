@@ -167,19 +167,19 @@
 
         var buttons = [];
 
-        var multibutton = [];
-
-        multibutton.push({
-            "text": "月报表", "action": function () {
-                //
-            }
-        });
-
-        multibutton.push({
-            "text": "结束报表", "action": function () {
-                //
-            }
-        });
+//        var multibutton = [];
+//
+//        multibutton.push({
+//            "text": "月报表", "action": function () {
+//                //
+//            }
+//        });
+//
+//        multibutton.push({
+//            "text": "结束报表", "action": function () {
+//                //
+//            }
+//        });
 
         @if($authority->checkAuthority(124))
         buttons.push({"text": '<i class="fa fa-clock-o fa-fw"></i>', "action": makeClock, "titleAttr": "补签"});

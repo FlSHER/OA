@@ -169,6 +169,24 @@ return [
     ],
     /* 店铺人员调动 End */
 
+    /* 请假条 Start */
+
+    'leave' => [
+        'id' => '店铺代码',
+        'staff_sn' => '员工编号',
+        'staff_name' => '员工姓名',
+        'start_at' => '开始时间',
+        'end_at' => '结束时间',
+        'duration' => '请假时长',
+        'status' => '状态',
+        'clock_out_at' => '开始打卡时间',
+        'clock_in_at' => '结束打卡时间',
+        'approver_name' => '审批人',
+        'created_at' => '提交时间',
+    ],
+
+    /* 请假条 End */
+
     /* 排班表 Start */
 
     'working_schedule' => [
