@@ -124,7 +124,7 @@
             </ul>
             @if($authority->checkAuthority(122))
                 <div style="padding:0 10%;" class="row">
-                    @if($status != 2 || $auditor_sn == $currentUser->staff_sn)
+                    @if($status == 1 || ($status == 2 && $auditor_sn == $currentUser->staff_sn))
                         <div class="col-sm-4">
                             <button class="btn btn-default"
                                     onClick="refresh({{$id}})">
