@@ -48,7 +48,7 @@ class AttendanceController extends Controller
     public function getList(Request $request)
     {
         $idGroup = [];
-
+        $where = '';
         if (array_has($request->filter, 'staff_sn.is')) {
             DB::connection('attendance')->table('information_schema.TABLES')
                 ->where('table_name', 'like', 'attendance_staff_%')
@@ -62,8 +62,18 @@ class AttendanceController extends Controller
             $request->offsetSet('filter', $value);
         }
 
+        if (array_has($request->filter, 'sales_performance_issue')) {
+            $where .= 'sales_performance_lisha+sales_performance_go+sales_performance_group+sales_performance_partner';
+            $where .= $request->filter['sales_performance_issue'] ? '<>' : '=';
+            $where .= 'tdoa_sales_performance';
+            $value = array_except($request->filter, ['sales_performance_issue']);
+            $request->offsetSet('filter', $value);
+        }
+
         $model = Attendance::visible()->when(!empty($idGroup), function ($query) use ($idGroup) {
             return $query->whereIn('id', $idGroup);
+        })->when(!empty($where), function ($query) use ($where) {
+            return $query->whereRaw($where);
         })->where('status', '<>', 0);
         return app('Plugin')->dataTables($request, $model);
     }

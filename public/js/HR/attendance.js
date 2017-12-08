@@ -160,6 +160,7 @@ function syncSalesPerformance() {
         url: '/hr/attendance/sync_sales_performance',
         success: function (response) {
             if (response.status == 1) {
+                table.draw(false);
                 oaWaiting.hide();
             }
         },

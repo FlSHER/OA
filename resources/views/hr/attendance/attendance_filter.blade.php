@@ -105,6 +105,18 @@
                     </div>
                 </div>
             </div>
+            <div class="col-lg-3">
+                <div class="row">
+                    <label class="control-label col-lg-4 col-sm-2">业绩差异</label>
+                    <div class="col-sm-8">
+                        <select class="form-control" name="sales_performance_issue">
+                            <option value="">全部</option>
+                            <option value="0">正常</option>
+                            <option value="1">异常</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="form-group form-group-sm">
             <div class="col-lg-6">
