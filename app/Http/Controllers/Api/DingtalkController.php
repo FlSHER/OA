@@ -33,7 +33,8 @@ class DingtalkController extends Controller
             $processCode = $request->process_code;
             $approvers = $request->approvers;
             $formData = $request->form_data;
-            $response = app('Dingtalk')->startApprovalProcess($agentId, $processCode, $approvers, $formData);
+            $initiatorSn = $request->has('initiator_sn') ? $request->initiator_sn : null;
+            $response = app('Dingtalk')->startApprovalProcess($agentId, $processCode, $approvers, $formData, $initiatorSn);
             if (!empty($response->result) && $response->result->ding_open_errcode == 0) {
                 DB::table('dingtalk_approval_process')->insert([
                     'app_id' => $request->app_id,

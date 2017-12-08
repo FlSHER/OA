@@ -173,9 +173,9 @@ class Dingtalk
         return $response;
     }
 
-    public function startApprovalProcess($agentId, $processCode, $approvers_sn, $formData)
+    public function startApprovalProcess($agentId, $processCode, $approvers_sn, $formData, $initiatorSn = null)
     {
-        $dingId = app('CurrentUser')->dingding;
+        $dingId = empty($initiatorSn) ? app('CurrentUser')->dingding : Staff::find($initiatorSn)->dingding;
         $accessToken = $this->getAccessToken();
         $userInfo = app('Curl')->setUrl('https://oapi.dingtalk.com/user/get?access_token=' . $accessToken . '&userid=' . $dingId)->get();
         $departmentId = (string)$userInfo['department'][0];
