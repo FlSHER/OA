@@ -12,8 +12,6 @@
     <link rel="stylesheet" href="{{source('css/checkbox.css')}}"/>
 @endsection
 
-
-
 @section('content')
     <div class="row">
         <div class="col-lg-8">
@@ -106,9 +104,20 @@
             {data: "shop_name", title: "店铺名称"},
             {
                 data: "sprintf('%.2f',{sales_performance_lisha}+{sales_performance_go}+{sales_performance_group}+{sales_performance_partner})",
-                name: "sales_performance",
-                title: "总业绩",
-                className: 'text-right'
+                name: "sales_performance", title: "总业绩", className: 'text-right', searchable: false,
+                createdCell: function (nTd, sData, oData) {
+                    if (sData != oData.tdoa_sales_performance) {
+                        $(nTd).css('color', 'red');
+                    }
+                }
+            },
+            {
+                data: "tdoa_sales_performance", title: "外汇表业绩", className: 'text-right', searchable: false,
+                createdCell: function (nTd, sData, oData) {
+                    if (sData != oData["sprintf('%"]["2f',{sales_performance_lisha}+{sales_performance_go}+{sales_performance_group}+{sales_performance_partner})"]) {
+                        $(nTd).css('color', 'red');
+                    }
+                }
             },
             {data: "attendance_date", title: "考勤日期", className: 'text-center', searchable: false},
             {data: "manager_name", title: "提交人"},
@@ -167,19 +176,19 @@
 
         var buttons = [];
 
-//        var multibutton = [];
-//
-//        multibutton.push({
-//            "text": "月报表", "action": function () {
-//                //
-//            }
-//        });
-//
-//        multibutton.push({
-//            "text": "结束报表", "action": function () {
-//                //
-//            }
-//        });
+        //        var multibutton = [];
+        //
+        //        multibutton.push({
+        //            "text": "月报表", "action": function () {
+        //                //
+        //            }
+        //        });
+        //
+        //        multibutton.push({
+        //            "text": "结束报表", "action": function () {
+        //                //
+        //            }
+        //        });
 
         @if($authority->checkAuthority(124))
         buttons.push({"text": '<i class="fa fa-clock-o fa-fw"></i>', "action": makeClock, "titleAttr": "补签"});
@@ -190,6 +199,11 @@
         @if($authority->checkAuthority(132))
         buttons.push({"text": '<i class="fa fa-plus fa-fw"></i>', "action": makeAttendance, "titleAttr": "生成考勤表"});
         @endif
+        buttons.push({
+            "text": '<i class="fa fa-exchange fa-fw"></i>',
+            "action": syncSalesPerformance,
+            "titleAttr": "同步外汇表业绩"
+        });
 
         //        if (multibutton.length > 0) {
         //            buttons.push({

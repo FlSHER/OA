@@ -152,3 +152,19 @@ function refresh(id) {
 function makeAttendance() {
     $('#makeAttendance')[0].reset();
 }
+
+function syncSalesPerformance() {
+    oaWaiting.show();
+    $.ajax({
+        type: 'POST',
+        url: '/hr/attendance/sync_sales_performance',
+        success: function (response) {
+            if (response.status == 1) {
+                oaWaiting.hide();
+            }
+        },
+        error: function (err) {
+            document.write(JSON.stringify(err).responseText);
+        }
+    });
+}

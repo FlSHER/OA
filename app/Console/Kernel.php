@@ -17,6 +17,7 @@ class Kernel extends ConsoleKernel
         'App\Console\Commands\TransferStaff',
         'App\Console\Commands\UpdateDistrictJs',
         \App\Console\Commands\MakeWorkingSchedule::class,
+        \App\Console\Commands\GetSalePerformanceFromTDOA::class,
     ];
 
     /**

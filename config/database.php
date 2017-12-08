@@ -126,6 +126,20 @@ return [
 //            'strict' => true,
 //            'engine' => null,
 //        ],
+        //215服务器
+        'TDOA' => [
+            'driver' => 'mysql',
+            'host' => '125.64.17.215',
+            'port' => '1305',
+            'database' => 'TD_OA',
+            'username' => 'root',
+            'password' => 'Sy880318',
+            'charset' => 'gbk',
+            'collation' => 'gbk_chinese_ci',
+            'prefix' => '',
+            'strict' => true,
+            'engine' => null,
+        ],
     ],
     /*
       |--------------------------------------------------------------------------

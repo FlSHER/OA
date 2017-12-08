@@ -114,6 +114,7 @@ Route::group(['prefix' => 'hr', 'namespace' => 'HR', 'as' => 'hr'], function () 
         Route::post('/export', ['uses' => 'AttendanceController@exportStaffData'])->name('.export');
         Route::post('/make_clock', ['uses' => 'AttendanceController@makeClockRecord'])->name('.make_clock');
         Route::post('/make_attendance', ['uses' => 'AttendanceController@makeAttendance'])->name('.make_attendance');
+        Route::post('/sync_sales_performance', ['uses' => 'AttendanceController@syncSalesPerformance'])->name('.sync_sales_performance');
     });
     Route::group(['prefix' => 'working_schedule', 'as' => '.working_schedule'], function () {//排班表
         Route::get('/', ['uses' => 'WorkingScheduleController@showManagePage']);

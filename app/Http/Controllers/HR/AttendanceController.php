@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\HR;
 
 use App\Models\App;
-use App\Models\HR\Attendance\AttendanceStaff;
 use App\Models\HR\Attendance\Attendance;
 use App\Models\HR\Attendance\Clock;
 use App\Models\HR\Attendance\LeaveRequest;
@@ -15,6 +14,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests;
 use DB;
 use Curl;
+use Artisan;
 
 class AttendanceController extends Controller
 {
@@ -359,4 +359,9 @@ class AttendanceController extends Controller
             ->sendMessageByPost(['date' => $date, 'shop' => $shop, 'user' => app('CurrentUser')->getInfo()]);
     }
 
+    public function syncSalesPerformance()
+    {
+        Artisan::call('attendance:getSalePerformance');
+        return ['status' => 1, 'message' => '同步成功'];
+    }
 }
