@@ -3,6 +3,7 @@
 namespace App\Models\HR\Attendance;
 
 use App\Models\App;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -75,4 +76,13 @@ class Clock extends Model
     }
 
     /* 自定义方法 End */
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope('clockOnly', function (Builder $builder) {
+            $builder->where('type', '<', 3);
+        });
+    }
 }
