@@ -157,10 +157,9 @@ class HRMController extends Controller
 
             $recordsTotal = $model::api()->count();
             $recordsFiltered = $this->model->count();
-            if ($recordsFiltered > 500 && $this->length == 0) {
-                abort(500, '获取数据过多（' . $recordsFiltered . '条），请添加分页或筛选条件');
-//                throw new \Exception('获取数据过多（' . $recordsFiltered . '条），请添加分页或筛选条件', 500);
-            }
+//            if ($recordsFiltered > 500 && $this->length == 0) {
+//                abort(500, '获取数据过多（' . $recordsFiltered . '条），请添加分页或筛选条件');
+//            }
 
             $data = $this->model->when($this->length > 0, function ($query) {
                 return $query->skip($this->start)->take($this->length);
