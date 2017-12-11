@@ -32,6 +32,10 @@
                     {{sprintf('%.2f',$sales_performance_lisha+$sales_performance_go+$sales_performance_group+$sales_performance_partner)}}
                 </p>
                 <p>
+                    外汇表业绩：￥
+                    {{$tdoa_sales_performance}}
+                </p>
+                <p>
                     提交时间：{{$submitted_at}}
                 </p>
                 @if($manager_remark)
@@ -44,7 +48,9 @@
                 @foreach($details as $detail)
                     <li class="list-group-item">
                         <div href="#collapse_{{$detail['staff_sn']}}" data-toggle="collapse">
-                            <b>{{$detail['staff_name']}}</b> <span style="color:#999">{{$detail['staff_sn']}}</span>
+                            <b>{{$detail['staff_name']}}</b>
+                            <span>{{$detail['staff_position']}}</span>
+                            <span style="color:#999">{{$detail['staff_sn']}}</span>
                             @if($detail['shop_duty_id']==1)
                                 <span class="label label-success">{{$detail['shop_duty']['name']}}</span>
                             @else
