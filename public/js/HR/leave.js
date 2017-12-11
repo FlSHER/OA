@@ -1,7 +1,11 @@
 var table;
 
 $(function () {
-    $(".modal form").oaForm();
+    $(".modal form").oaForm({
+        callback: {
+            submitSuccess: oaFormSubmitSuccess
+        }
+    });
 
     /* dataTables start  */
     table = $('#leave_table').oaTable({
@@ -16,9 +20,9 @@ $(function () {
     });
 });
 
-function add() {
+function edit(id) {
     oaWaiting.show();
-    $("#addForm").oaForm()[0].reset();
+    $("#editForm").oaForm()[0].fillData('/hr/leave/info', {id: id});
     oaWaiting.hide();
 }
 
@@ -44,4 +48,9 @@ function cancel(id) {
             }
         });
     }
+}
+
+function oaFormSubmitSuccess(msg, obj) {
+    table.draw(false);
+    $(".close").click();
 }

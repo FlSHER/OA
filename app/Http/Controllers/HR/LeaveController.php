@@ -31,6 +31,21 @@ class LeaveController extends Controller
         return $model::find($id);
     }
 
+    public function editByOne(Request $request)
+    {
+        $id = $request->id;
+        $leaveRequest = LeaveRequest::find($id);
+        $this->validate($request, ['end_at' => ['required', 'before:' . $leaveRequest->end_at]], [], ['end_at' => '结束时间']);
+        if (!empty($leaveRequest->clock_in_at)) {
+            $clockModel = new Clock(['ym' => $leaveRequest->clock_in_at]);
+            $endClock = $clockModel->where(['attendance_type' => 3, 'type' => 1, 'parent_id' => $id])->first();
+            $endClock->setMonth($leaveRequest->clock_in_at)->fill(['punctual_time' => $request->end_at])->save();
+        }
+        $leaveRequest->end_at = $request->end_at;
+        $leaveRequest->save();
+        return ['status' => 1, 'message' => '修改成功'];
+    }
+
     public function export(Request $request)
     {
         $exportData = $this->getList($request)['data'];

@@ -30,6 +30,27 @@
         </div>
         <section id="board-right"></section>
     </div>
+
+    <!-- Edit -->
+    <div class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                <h4 class="modal-title">提前结束</h4>
+            </div>
+            <div class="modal-content">
+                <form id="editForm" class="form-horizontal" method="post" action="/hr/leave/edit">
+                    @include('hr/attendance/leave_from')
+                    <input type="hidden" name="id">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-success" id="daoruid">确认</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 
@@ -57,8 +78,12 @@
                 data: "id", title: "操作",
                 createdCell: function (nTd, sData, oData, iRow, iCol) {
                     var html = '';
-//                    html += '<button class="btn btn-sm btn-default" title="编辑" onclick="edit(' + sData + ')"><i class="fa fa-edit fa-fw"></i></button>';
-                    @if($authority->checkAuthority(126))
+
+                    @if($authority->checkAuthority(125))
+                        html += '<button class="btn btn-sm btn-default" title="提前结束" onclick="edit(' + sData + ')"><i class="fa fa-edit fa-fw"></i></button>';
+                    @endif
+
+                            @if($authority->checkAuthority(126))
                     if (oData.status == 1) {
                         html += '&nbsp;<button class="btn btn-sm btn-danger" title="撤销" onclick="cancel(' + sData + ')"><i class="fa fa-times fa-fw"></i></button>';
                     }
