@@ -86,6 +86,6 @@ return [
     |
     */
 
-    'prefix' => 'OA_',
+    'prefix' => 'OA',
 
 ];

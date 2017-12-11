@@ -30,29 +30,6 @@
         </div>
         <section id="board-right"></section>
     </div>
-
-    <!-- Import -->
-    <button id="openAddByOne" data-toggle="modal" href="#addByOne" class="hidden"></button>
-    <div id="addByOne" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-header">
-                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
-                <h4 class="modal-title">创建假条</h4>
-            </div>
-            <div class="modal-content">
-                <form id="addForm" name="addForm" class="form-horizontal" method="post" enctype="multipart/form-data"
-                      action="/">
-                    @inject('HRM','HRM')
-                    @include('hr/attendance/leave_from')
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                        <button type="submit" class="btn btn-success" id="daoruid">确认</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
 @endsection
 
 
@@ -92,9 +69,6 @@
         ];
 
         var buttons = [];
-        @if($authority->checkAuthority(125))
-        //        buttons.push({"text": '<i class="fa fa-plus fa-fw"></i>', "action": add, "titleAttr": "创建"});
-        @endif
         buttons.push('export:/hr/leave/export');
 
     </script>
