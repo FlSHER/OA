@@ -39,6 +39,7 @@ class GetSalePerformanceFromTDOA extends Command
      */
     public function handle()
     {
+        $startDate = date('Y-m-d', strtotime('-20 days'));
         $data = DB::connection('TDOA')->table('flow_data_42 AS a')
             ->join('flow_run AS b', 'a.run_id', '=', 'b.run_id')
             ->select(
@@ -49,13 +50,13 @@ class GetSalePerformanceFromTDOA extends Command
             )
             ->groupBy('a.data_7', 'a.data_8')
             ->where('b.DEL_FLAG', '=', 0)
-            ->where(DB::raw('STR_TO_DATE(a.data_8,"%Y-%m-%d")'), '>', date('Y-m-d', strtotime('-20 days')))
+            ->where(DB::raw('STR_TO_DATE(a.data_8,"%Y-%m-%d")'), '>', $startDate)
             ->get()->toJson();
         DB::connection('attendance')->table('tdoa_sale_performance')->delete();
         DB::connection('attendance')->table('tdoa_sale_performance')->insert(json_decode($data, true));
         $updateSql = 'UPDATE attendance_shop a 
-INNER JOIN tdoa_sale_performance b ON a.shop_sn = b.shop_sn AND a.attendance_date = b.attendance_date 
-SET a.tdoa_sales_performance = b.sale_performance';
+LEFT JOIN tdoa_sale_performance b ON a.shop_sn = b.shop_sn AND a.attendance_date = b.attendance_date 
+SET a.tdoa_sales_performance = IFNULL(b.sale_performance,0) WHERE a.attendance_date > "' . $startDate . '"';
         DB::connection('attendance')->update($updateSql);
     }
 }
