@@ -38,8 +38,10 @@ class LeaveController extends Controller
         $this->validate($request, ['end_at' => ['required', 'before:' . $leaveRequest->end_at]], [], ['end_at' => '结束时间']);
         if (!empty($leaveRequest->clock_in_at)) {
             $clockModel = new Clock(['ym' => $leaveRequest->clock_in_at]);
-            $endClock = $clockModel->where(['attendance_type' => 3, 'type' => 1, 'parent_id' => $id])->first();
-            $endClock->setMonth($leaveRequest->clock_in_at)->fill(['punctual_time' => $request->end_at])->save();
+            $clockModel->where(['attendance_type' => 3, 'type' => 1, 'parent_id' => $id])
+                ->update(
+                    ['punctual_time' => $request->end_at]
+                );
         }
         $leaveRequest->end_at = $request->end_at;
         $leaveRequest->save();
