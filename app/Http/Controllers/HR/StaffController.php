@@ -68,11 +68,20 @@ class StaffController extends Controller
     public function exportStaff(Request $request)
     {
         $originalColumns = $request->columns;
-        array_push($originalColumns, ['data' => 'info.id_card_number']);
+        if (app('Authority')->checkAuthority(59)) {
+            array_push($originalColumns, ['data' => 'info.id_card_number']);
+            array_push($originalColumns, ['name' => 'info.household_province', 'data' => 'info.household_province.name']);
+            array_push($originalColumns, ['name' => 'info.household_city', 'data' => 'info.household_city.name']);
+            array_push($originalColumns, ['name' => 'info.household_county', 'data' => 'info.household_county.name']);
+            array_push($originalColumns, ['data' => 'info.household_address']);
+            array_push($originalColumns, ['data' => 'info.account_number']);
+            array_push($originalColumns, ['data' => 'info.account_name']);
+            array_push($originalColumns, ['data' => 'info.education']);
+        }
         $request->offsetSet('columns', $originalColumns);
         $columns = [];
         foreach ($request->columns as $v) {
-            if (!in_array($v['data'], ['mobile', 'username', 'info.id_card_number']) || app('Authority')->checkAuthority(59)) {
+            if (!in_array($v['data'], ['mobile', 'username'])) {
                 if (empty($v['name'])) {
                     $columns[$v['data']] = $v['data'];
                 } else {
@@ -80,9 +89,10 @@ class StaffController extends Controller
                 }
             }
         }
-        array_push($columns, 'info.account_number');
-        array_push($columns, 'info.account_name');
-        array_push($columns, 'info.education');
+
+        if (app('Authority')->checkAuthority(59)) {
+            array_push($columns, 'mobile');
+        }
         $exportData = $this->getStaffList($request, true)['data'];
         $file = app('App\Contracts\ExcelExport')->setPath('hr/staff/export/')->setBaseName('员工信息')->setColumns($columns)->trans($this->transPath)->export(['sheet1' => $exportData]);
         return ['state' => 1, 'file_name' => $file];
