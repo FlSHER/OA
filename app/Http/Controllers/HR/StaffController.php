@@ -253,6 +253,7 @@ class StaffController extends Controller
         foreach ($excelData as $v) {
             $fail = $v;
             $v = new Requests\StaffRequest($v);
+            $response = [];
             try {
                 $operationType = $v->has('staff_sn') ? 'import_transfer' : 'import_entry';
                 $v->offsetSet('operation_type', $operationType);

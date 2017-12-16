@@ -173,11 +173,11 @@ class CURD
             if ($this->isDirty() && $this->hasLog()) {
                 $this->logService->model($model)->write($this->dirty, $data);
             }
+            DB::commit();
         } catch (\Exception $err) {
             DB::rollBack();
             throw $err;
         }
-        DB::commit();
     }
 
     /**
