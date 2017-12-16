@@ -233,7 +233,7 @@ class Dingtalk
         if ($requestErrCode == 0) {
             return json_decode($msg, true);
         } else {
-            abort(500, 'Can\'t decrypt');
+            abort(500, 'Can\'t decrypt,error code : ' . $requestErrCode);
         }
     }
 
