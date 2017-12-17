@@ -226,7 +226,6 @@ class AttendanceController extends Controller
 	a.sales_performance_group AS "公司货品",
 	a.sales_performance_partner AS "合作方货品",
 	a.sales_performance_lisha + a.sales_performance_go + a.sales_performance_group + a.sales_performance_partner AS "总业绩",
-	a.tdoa_sales_performance AS "外汇表业绩",
     IF (a.is_missing, "是", "否") AS "漏签",
     late_time AS "迟到时长",
     early_out_time AS "早退时长",
