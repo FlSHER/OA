@@ -140,7 +140,13 @@ class OAuthController extends Controller
      */
     private function getAuthCodeFromDatabase()
     {
-        $authCode = DB::table('app_auth_code')->where([['staff_sn', '=', $this->staffSn], ['app_id', '=', $this->appId], ['redirect_uri', '=', $this->redirectUri], ['expiration', '>', time()]])->value('app_auth_code');
+        $authCode = DB::table('app_auth_code')
+            ->where([
+                ['staff_sn', '=', $this->staffSn],
+                ['app_id', '=', $this->appId],
+                ['redirect_uri', '=', $this->redirectUri],
+                ['expiration', '>', time()]
+            ])->value('app_auth_code');
         return $authCode;
     }
 
@@ -186,11 +192,22 @@ class OAuthController extends Controller
             abort(500, '缺少auth_code');
         }
         $redirectUri = $request->redirect_uri;
-        $appAuth = DB::table('app_auth_code')->where([['app_auth_code', '=', $authCode], ['redirect_uri', '=', $redirectUri], ['expiration', '>', time()]])->first();
+        $appAuth = DB::table('app_auth_code')
+            ->where([
+                ['app_auth_code', '=', $authCode],
+                ['redirect_uri', '=', $redirectUri],
+                ['expiration', '>', time()]
+            ])
+            ->first();
         if (!empty($appAuth)) {
             $this->appId = $appAuth->app_id;
             $this->staffSn = $appAuth->staff_sn;
-            DB::table('app_auth_code')->where([['app_auth_code', '=', $authCode], ['redirect_uri', '=', $redirectUri], ['expiration', '>', time()]])->delete();
+            DB::table('app_auth_code')
+                ->where([
+                    ['app_auth_code', '=', $authCode],
+                    ['redirect_uri', '=', $redirectUri],
+                    ['expiration', '>', time()]
+                ])->delete();
             return true;
         } else {
             abort(500, '无效授权码');
@@ -230,7 +247,9 @@ class OAuthController extends Controller
         } else {
             abort(500, '缺少refresh_token');
         }
-        $app = DB::table('app_token')->where([['refresh_token', '=', $refreshToken], ['expiration', '<', time() + 600]])->first();
+        $app = DB::table('app_token')
+            ->where([['refresh_token', '=', $refreshToken], ['expiration', '<', time() + 600]])
+            ->first();
         if (!empty($app)) {
             $this->appId = $app->app_id;
             $this->staffSn = $app->staff_sn;
@@ -249,8 +268,9 @@ class OAuthController extends Controller
         $this->refreshToken = $this->makeRefreshToken();
         $expiration = time() + $this->appTokenExpiration * 60;
         $app = App::find($this->appId);
-        $app->app_token()->detach($this->staffSn);
-        $app->app_token()->attach($this->staffSn, ['app_token' => $this->appToken, 'refresh_token' => $this->refreshToken, 'expiration' => $expiration]);
+        $app->app_token()->syncWithoutDetaching([
+            $this->staffSn => ['app_token' => $this->appToken, 'refresh_token' => $this->refreshToken, 'expiration' => $expiration]
+        ]);
     }
 
     /**

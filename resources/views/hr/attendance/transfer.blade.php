@@ -134,7 +134,7 @@
             {data: "arrived_at", title: "到达打卡时间", searchable: false},
             {data: "created_at", title: "创建时间", searchable: false},
             {data: "maker_name", title: "建单人", visible: false},
-            {data: "implode(',',{tag.*.name}).' '.{remark}", name: "remark", title: "备注"},
+            {data: "implode(',',{tag.*.name}).' '.{remark}", name: "remark", title: "备注", orderable: false},
             {
                 data: "id",
                 title: "操作",
