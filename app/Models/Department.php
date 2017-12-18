@@ -8,7 +8,8 @@ use App\Services\AuthorityService;
 use App\Models\HR\Staff;
 use DB;
 
-class Department extends Model {
+class Department extends Model
+{
 
     use SoftDeletes;
 
@@ -16,35 +17,43 @@ class Department extends Model {
 
     /* ----- 定义关联Start ----- */
 
-    public function _parent() { //上级部门
+    public function _parent()
+    { //上级部门
         return $this->belongsTo('App\Models\Department', 'parent_id');
     }
 
-    public function _children() { //下级部门
+    public function _children()
+    { //下级部门
         return $this->hasMany('App\Models\Department', 'parent_id')->orderBy('sort', 'asc');
     }
 
-    public function manager() { //部门主管
+    public function manager()
+    { //部门主管
         return $this->belongsTo('App\Models\HR\Staff', 'manager_sn', 'staff_sn');
     }
 
-    public function position() { //关联职位
+    public function position()
+    { //关联职位
         return $this->belongsToMany('App\Models\Position', 'department_has_positions');
     }
 
-    public function authority() { //权限
+    public function authority()
+    { //权限
         return $this->belongsToMany('App\Models\Authority', 'department_has_authorities')->orderBy('parent_id', 'asc');
     }
 
-    public function staff() { //员工
+    public function staff()
+    { //员工
         return $this->hasMany('App\Models\HR\Staff')->orderBy('staff_sn', 'asc');
     }
 
-    public function role() { //所属角色
+    public function role()
+    { //所属角色
         return $this->belongsToMany('App\Models\Role', 'role_has_departments')->orderBy('id', 'asc');
     }
 
-    public function brand() { //品牌
+    public function brand()
+    { //品牌
         return $this->belongsTo('App\Models\Brand');
     }
 
@@ -53,7 +62,8 @@ class Department extends Model {
 
     /* ----- 访问器Start ----- */
 
-    public function getParentIdsAttribute() {
+    public function getParentIdsAttribute()
+    {
         $parent = $this->_parent;
         if (empty($parent)) {
             $parentIds = [];
@@ -64,10 +74,11 @@ class Department extends Model {
         return $parentIds;
     }
 
-    public function getAllChildrenAttribute() {
+    public function getAllChildrenAttribute()
+    {
         $children = $this->_children;
         if (!empty($children)) {
-            $children = array_map(function($value) {
+            $children = array_map(function ($value) {
                 $value['all_children'] = $value->all_children;
                 return $value;
             }, $children);
@@ -75,7 +86,8 @@ class Department extends Model {
         return $children;
     }
 
-    public function getChildrenIdsAttribute() {
+    public function getChildrenIdsAttribute()
+    {
         $children = $this->_children;
         $childrenIds = $this->_children->pluck('id');
         foreach ($children as $child) {
@@ -84,7 +96,8 @@ class Department extends Model {
         return $childrenIds;
     }
 
-    public function getTopAttribute() { //获取顶级部门
+    public function getTopAttribute()
+    { //获取顶级部门
         if ($this->parent_id == 0) {
             return $this;
         } else {
@@ -92,7 +105,8 @@ class Department extends Model {
         }
     }
 
-    public function getOptionAttribute($level = 0) { //获取option
+    public function getOptionAttribute($level = 0)
+    { //获取option
         $data = '<option value="' . $this->id . '">';
         $data .= $this->full_name . '</option>';
         foreach ($this->_children as $v) {
@@ -101,7 +115,8 @@ class Department extends Model {
         return $data;
     }
 
-    public function getExcelTdAttribute($level = 0) {
+    public function getExcelTdAttribute($level = 0)
+    {
         $data = '<tr><td>' . $this->full_name . '</td><td>' . $this->id . '</td></tr>';
         foreach ($this->_children as $v) {
             $data .= $v->getExcelTdAttribute($level + 1);
@@ -113,7 +128,8 @@ class Department extends Model {
 
     /* ----- 修改器Start ----- */
 
-    public function setManagerSnAttribute($value) {
+    public function setManagerSnAttribute($value)
+    {
         if (!empty($value)) {
             $this->attributes['manager_sn'] = $value;
             $this->attributes['manager_name'] = Staff::find($value)->realname;
@@ -124,29 +140,33 @@ class Department extends Model {
 
     /* ----- 本地作用域 Start ----- */
 
-    public function scopeVisible($query) {
+    public function scopeVisible($query)
+    {
         $authorityService = new AuthorityService;
         $departments = $authorityService->getAvailableDepartments();
         $query->whereIn('id', $departments);
     }
 
-    public function scopeApi($query) {
+    public function scopeApi($query)
+    {
         $query->with('brand', '_parent', '_children');
     }
 
     /* ----- 本地作用域 End ----- */
 
-    public function __construct(array $attributes = []) {
+    public function __construct(array $attributes = [])
+    {
         parent::__construct($attributes);
-        self::saving(function($post) {
+        self::saving(function ($post) {
             $post->changeFullName();
         });
-        self::saved(function($post) {
+        self::saved(function ($post) {
             $post->changeRoleAuthority();
         });
     }
 
-    public static function deleteByTrees($departmentId) {
+    public static function deleteByTrees($departmentId)
+    {
         $self = self::find($departmentId);
         if ($self->is_locked) {
             return ['status' => -1, 'message' => '包含已锁定部门,请联系技术人员'];
@@ -164,7 +184,8 @@ class Department extends Model {
         }
     }
 
-    public static function reOrder($departments, $parentId = 0) {
+    public static function reOrder($departments, $parentId = 0)
+    {
         foreach ($departments as $k => $v) {
             $department = self::find($v['id']);
             $department->parent_id = $parentId;
@@ -179,7 +200,8 @@ class Department extends Model {
     /**
      * 更新部门全称
      */
-    private function changeFullName() {
+    private function changeFullName()
+    {
         if ($this->isDirty('parent_id') || $this->isDirty('name')) {
             $newFullName = $this->parent_id > 0 ? $this->_parent->full_name . '-' . $this->name : $this->name;
             $this->full_name = $newFullName;
@@ -190,8 +212,9 @@ class Department extends Model {
         }
     }
 
-    private function changeChildrenFullName($fullName) {
-        $this->_children->each(function($item) use($fullName) {
+    private function changeChildrenFullName($fullName)
+    {
+        $this->_children->each(function ($item) use ($fullName) {
             $item->full_name = $fullName . '-' . $item->name;
             $item->save();
         });
@@ -200,23 +223,25 @@ class Department extends Model {
     /**
      * 根据父级继承部门权限
      */
-    private function changeRoleAuthority() {
+    private function changeRoleAuthority()
+    {
         if ($this->isDirty('parent_id')) {
             $originalParentId = $this->getOriginal('parent_id');
             $rolesOrigin = DB::table('role_has_departments')->where('department_id', $originalParentId)->pluck('role_id')->toArray();
             $rolesNew = DB::table('role_has_departments')->where('department_id', $this->parent_id)->pluck('role_id')->toArray();
             if ($rolesOrigin != $rolesNew) {
-                $this->role()->detach($rolesOrigin);
-                $this->role()->attach($rolesNew);
+                $this->role()->detach(array_diff($rolesOrigin, $rolesNew));
+                $this->role()->attach(array_diff($rolesNew, $rolesOrigin));
                 $this->changeChildrenRoleAuthority($rolesOrigin, $rolesNew);
             }
         }
     }
 
-    private function changeChildrenRoleAuthority($rolesOrigin, $rolesNew) {
-        $this->_children->each(function($item) use($rolesOrigin, $rolesNew) {
-            $item->role()->detach($rolesOrigin);
-            $item->role()->attach($rolesNew);
+    private function changeChildrenRoleAuthority($rolesOrigin, $rolesNew)
+    {
+        $this->_children->each(function ($item) use ($rolesOrigin, $rolesNew) {
+            $item->role()->detach(array_diff($rolesOrigin, $rolesNew));
+            $item->role()->attach(array_diff($rolesNew, $rolesOrigin));
             $item->changeChildrenRoleAuthority($rolesOrigin, $rolesNew);
         });
     }
