@@ -12,7 +12,9 @@
                         <label class="control-label col-sm-2">*日期</label>
                         <div class="col-sm-4">
                             <input class="form-control" name="date" type="text" isDate title="日期" id="date_input"
-                                   onchange="toggleWorkingSchedule()" maxdate="{{date('Y-m-d H:i:s')}}"/>
+                                   onchange="toggleWorkingSchedule()"
+                                   mindate="{{date('Y-m-d H:i:s',strtotime('-40 days'))}}"
+                                   maxdate="{{date('Y-m-d H:i:s')}}"/>
                         </div>
                         <label class="control-label col-sm-2">*员工</label>
                         <div class="col-sm-4" oaSearch="staff">
