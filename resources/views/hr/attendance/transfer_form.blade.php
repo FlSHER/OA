@@ -48,7 +48,7 @@
         <label class="control-label col-sm-2"></label>
         <div class="col-sm-8">
             <input name="tag" type="hidden" value="" locked="true">
-            {!! $HRM->getCheckBox('tag[][id]','staff_transfer_tags') !!}
+            {!! $HRM->getCheckBox('tag[][id]',new \App\Models\HR\Attendance\StaffTransferTag) !!}
         </div>
     </div>
     <div class="form-group">
