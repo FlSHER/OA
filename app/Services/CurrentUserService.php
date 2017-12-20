@@ -9,11 +9,13 @@ namespace App\Services;
 
 use App\Models\HR\Staff;
 
-class CurrentUserService {
+class CurrentUserService
+{
 
     protected $userInfo;
 
-    public function __construct() {
+    public function __construct()
+    {
         if ($this->isLogin()) {
             $this->userInfo = session('admin');
         } elseif (request()->has('current_staff_sn')) {
@@ -26,7 +28,8 @@ class CurrentUserService {
         }
     }
 
-    public function __get($name) {
+    public function __get($name)
+    {
         return isset($this->userInfo[$name]) ? $this->userInfo[$name] : '无效属性';
     }
 
@@ -34,7 +37,8 @@ class CurrentUserService {
      * 获取员工编号
      * @return int
      */
-    public function getStaffSn() {
+    public function getStaffSn()
+    {
         return $this->userInfo['staff_sn'];
     }
 
@@ -42,7 +46,8 @@ class CurrentUserService {
      * 获取姓名
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->userInfo['realname'];
     }
 
@@ -50,15 +55,17 @@ class CurrentUserService {
      * 获取当前员工信息
      * @return array
      */
-    public function getInfo() {
-        return array_except($this->userInfo, ['user_token', 'user_token_expiration']);
+    public function getInfo()
+    {
+        return $this->userInfo;
     }
 
     /**
      * 检查员工是否登录
      * @return type
      */
-    public function isLogin() {
+    public function isLogin()
+    {
         return session()->has('admin');
     }
 
@@ -66,7 +73,8 @@ class CurrentUserService {
      * 判断当前员工是否为开发者
      * @return boolean
      */
-    public function isDeveloper() {
+    public function isDeveloper()
+    {
         return $this->userInfo['username'] == 'developer' ? true : false;
     }
 

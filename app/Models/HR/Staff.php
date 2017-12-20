@@ -42,7 +42,7 @@ class Staff extends Model
         'left_at',
         'is_active'
     ];
-    protected $hidden = ['password', 'salt', 'user_token', 'user_token_expiration', 'created_at', 'updated_at', 'deleted_at'];
+    protected $hidden = ['password', 'salt', 'created_at', 'updated_at', 'deleted_at'];
 
     /* ----- 定义关联 Start ----- */
 
@@ -252,15 +252,5 @@ class Staff extends Model
     }
 
     /* ----- 本地作用域 End ----- */
-
-    public static function checkUserToken($userToken, $staffSn)
-    {
-        $user = self::where(['staff_sn' => $staffSn, 'user_token' => $userToken])->first();
-        if (empty($user)) {
-            return false;
-        } else {
-            return true;
-        }
-    }
 
 }

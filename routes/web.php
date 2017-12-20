@@ -52,8 +52,6 @@ Route::post('/login/{url?}', ['uses' => 'LoginController@loginCheck']);
 Route::get('/logout/{url?}', ['uses' => 'LoginController@logout'])->name('logout');
 Route::get('/error', ['uses' => 'ResponseController@showErrorPage'])->name('error'); //报错界面
 Route::get('/blank', ['uses' => 'HomeController@showBlankPage'])->name('blank'); //空白页面
-/* -- API相关 -- */
-Route::get('/get_user_token/{url?}', ['uses' => 'Api\UserController@getUserToken']); //获取当前用户的user_token
 
 /* -- Excel数据源 -- */
 Route::group(['prefix' => 'excel'], function () {
