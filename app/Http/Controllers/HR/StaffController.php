@@ -131,9 +131,6 @@ class StaffController extends Controller
     {
         $staffSn = $request->staff_sn;
         $staff = Staff::with(['info', 'relative', 'appraise'])->find($staffSn);
-        foreach ($staff->info->toArray() as $k => $v) {
-            $staff->{$k} = $v;
-        }
         return $staff;
     }
 

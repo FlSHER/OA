@@ -222,11 +222,6 @@ class Staff extends Model
         $this->attributes['left_at'] = empty($value) ? null : $value;
     }
 
-    public function setOperatedAtAttribute($value)
-    {
-        $this->attributes['operated_at'] = empty($value) ? null : $value;
-    }
-
     public function setBirthdayAttribute($value)
     {
         $this->attributes['birthday'] = empty($value) ? null : $value;

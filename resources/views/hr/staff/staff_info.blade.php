@@ -61,12 +61,16 @@
                         </div>
                         <div class="clearfix">
                             <label class="control-label col-lg-3"><strong>品牌-职位：</strong></label>
-                            <div class="col-lg-3" style="white-space: nowrap;">
-                                <p class="form-control-static">{{$staff->brand->name}} - {{$staff->position->name}}
-                                    <span class="badge badge-important">{{$staff->position->level}}</span></p>
+                            <div class="col-lg-9" style="white-space: nowrap;">
+                                <p class="form-control-static">
+                                    {{$staff->brand->name}} - {{$staff->position->name}}
+                                    <span class="badge badge-important">{{$staff->position->level}}</span>
+                                </p>
                             </div>
+                        </div>
+                        <div class="clearfix">
                             <label class="control-label col-lg-3"><strong>员工状态：</strong></label>
-                            <div class="col-lg-3">
+                            <div class="col-lg-9">
                                 <p class="form-control-static">{{$staff->status->name}}</p>
                             </div>
                         </div>
@@ -174,10 +178,6 @@
                     <?php if ($authority->checkAuthority(59)) { ?>
                     <div class="form-group">
                         <div class="clearfix">
-                            <label class="control-label col-lg-3"><strong>微商城编码：</strong></label>
-                            <div class="col-lg-3">
-                                <p class="form-control-static">{{$staff->info->mini_shop_sn}}</p>
-                            </div>
                             <label class="control-label col-lg-3"><strong>钉钉编码：</strong></label>
                             <div class="col-lg-3">
                                 <p class="form-control-static">{{$staff->dingding}}</p>
