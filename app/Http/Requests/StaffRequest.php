@@ -6,7 +6,8 @@ use Illuminate\Foundation\Http\FormRequest;
 use App\Models\HR\Staff;
 use Illuminate\Http\Exception\HttpResponseException;
 
-class StaffRequest extends FormRequest {
+class StaffRequest extends FormRequest
+{
 
     protected $validator;
 
@@ -15,7 +16,8 @@ class StaffRequest extends FormRequest {
      *
      * @return bool
      */
-    public function authorize() {
+    public function authorize()
+    {
         $staffSn = $this->staff_sn;
         $staff = Staff::visible()->find($staffSn);
         $authority = app('Authority');
@@ -33,7 +35,8 @@ class StaffRequest extends FormRequest {
         return true;
     }
 
-    protected function failedAuthorization() {
+    protected function failedAuthorization()
+    {
         throw new HttpResponseException(response('无操作权限', 403));
     }
 
@@ -42,12 +45,14 @@ class StaffRequest extends FormRequest {
      *
      * @return array
      */
-    public function rules() {
+    public function rules()
+    {
         $this->setValidator($this->operation_type);
         return $this->validator;
     }
 
-    public function attributes() {
+    public function attributes()
+    {
         return array_dot(trans('fields.staff'));
     }
 
@@ -55,7 +60,8 @@ class StaffRequest extends FormRequest {
      * 配置表单验证
      * @param string $operationType 操作类型
      */
-    private function setValidator($operationType) {
+    private function setValidator($operationType)
+    {
         if (preg_match('/import_/', $operationType)) {
             $this->makeImportValidator($operationType);
         } else {
@@ -67,7 +73,8 @@ class StaffRequest extends FormRequest {
      * 生成导入验证规则
      * @param string $operationType
      */
-    private function makeImportValidator($operationType) {
+    private function makeImportValidator($operationType)
+    {
         $this->makeBasicValidator($operationType);
         $importValidator = [];
         if (!$this->operationMatch($operationType, ['edit'])) {
@@ -89,9 +96,6 @@ class StaffRequest extends FormRequest {
         if ($this->operationMatch($operationType, ['edit', 'entry', 'reinstate'])) {
             $importValidatorPersonal = [
                 'gender.name' => ['required', 'exists:i_gender,name'],
-                'national.name' => ['exists:i_national,name'],
-                'politics.name' => ['exists:i_politics,name'],
-                'marital_status.name' => ['exists:i_marital_status,name'],
                 'info.household_province.name' => ['exists:i_district,name,level,1'],
                 'info.household_city.name' => ['exists:i_district,name,level,2'],
                 'info.household_county.name' => ['exists:i_district,name,level,3'],
@@ -107,7 +111,8 @@ class StaffRequest extends FormRequest {
      * 生成表单提交验证规则
      * @param string $operationType
      */
-    private function makeFormValidator($operationType) {
+    private function makeFormValidator($operationType)
+    {
         $this->makeBasicValidator($operationType);
         $formValidator = [];
         $formValidatorOrganic = [];
@@ -130,9 +135,6 @@ class StaffRequest extends FormRequest {
         if ($this->operationMatch($operationType, ['edit', 'entry', 'reinstate'])) {
             $formValidatorPersonal = [
                 'gender_id' => ['required', 'exists:i_gender,id'],
-                'national_id' => ['exists:i_national,id'],
-                'politics_id' => ['exists:i_politics,id'],
-                'marital_status_id' => ['exists:i_marital_status,id'],
                 'info.household_province_id' => $this->info['household_province_id'] == 0 ? [] : ['exists:i_district,id,level,1'],
                 'info.household_city_id' => $this->info['household_city_id'] == 0 ? [] : ['exists:i_district,id,level,2'],
                 'info.household_county_id' => $this->info['household_county_id'] == 0 ? [] : ['exists:i_district,id,level,3'],
@@ -154,11 +156,12 @@ class StaffRequest extends FormRequest {
      * 生成基本验证规则
      * @param type $operationType
      */
-    private function makeBasicValidator($operationType) {
+    private function makeBasicValidator($operationType)
+    {
         $this->validator = [
             'staff_sn' => ['exists:staff,staff_sn,deleted_at,NULL'],
             'shop_sn' => empty($this->shop_sn) ? [] : ['nullable', 'exists:shops,shop_sn,deleted_at,NULL'],
-            'operate_at' => [ 'date', 'after:2000-1-1', 'before:2038-1-1'],
+            'operate_at' => ['date', 'after:2000-1-1', 'before:2038-1-1'],
             'operation_remark' => ['max:100'],
         ];
         if ($this->operationMatch($operationType, ['edit', 'entry', 'reinstate'])) {
@@ -175,7 +178,8 @@ class StaffRequest extends FormRequest {
     /**
      * 加入个人信息验证
      */
-    private function addPersonalValidator() {
+    private function addPersonalValidator()
+    {
         $staffSn = empty($this->staff_sn) ? 'NULL' : $this->staff_sn;
         $validatorPersonal = [
             'realname' => ['required', 'between:2,10'],
@@ -190,6 +194,9 @@ class StaffRequest extends FormRequest {
             'info.qq_number' => ['between:5,11', 'unique:staff_info,qq_number,' . $staffSn . ',staff_sn,deleted_at,NULL'],
             'wechat_number' => ['between:6,20', 'unique:staff,NULL,' . $staffSn . ',staff_sn,deleted_at,NULL'],
             'info.email' => ['max:40', 'unique:staff_info,email,' . $staffSn . ',staff_sn,deleted_at,NULL'],
+            'info.national' => ['exists:i_national,name'],
+            'info.politics' => ['exists:i_politics,name'],
+            'info.marital_status' => ['exists:i_marital_status,name'],
             'info.height' => ['integer', 'between:140,220'],
             'info.weight' => ['integer', 'between:30,150'],
             'info.native_place' => ['max:30'],
@@ -205,7 +212,8 @@ class StaffRequest extends FormRequest {
         $this->validator = array_collapse([$this->validator, $validatorPersonal]);
     }
 
-    private function confirmIdentityValidator() {
+    private function confirmIdentityValidator()
+    {
         $staffSn = empty($this->staff_sn) ? 'NULL' : $this->staff_sn;
         $this->validator['realname'][] = 'exists:staff,realname,staff_sn,' . $staffSn;
     }
@@ -213,10 +221,11 @@ class StaffRequest extends FormRequest {
     /**
      * 匹配操作类型
      * @param string $operationType 操作类型
-     * @param string/array $match 匹配规则
+     * @param string /array $match 匹配规则
      * @return boolean
      */
-    private function operationMatch($operationType, $match) {
+    private function operationMatch($operationType, $match)
+    {
         if (empty($operationType)) {
             return true;
         } elseif (is_array($match)) {

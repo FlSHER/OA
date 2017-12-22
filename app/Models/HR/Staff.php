@@ -28,9 +28,6 @@ class Staff extends Model
         'wechat_number',
         'gender_id',
         'birthday',
-        'national_id',
-        'marital_status_id',
-        'politics_id',
         'brand_id',
         'department_id',
         'shop_sn',
@@ -89,21 +86,6 @@ class Staff extends Model
     public function gender()
     { //性别
         return $this->belongsTo('App\Models\I\Gender');
-    }
-
-    public function marital_status()
-    { //婚姻状况
-        return $this->belongsTo('App\Models\I\MaritalStatus');
-    }
-
-    public function national()
-    { //民族
-        return $this->belongsTo('App\Models\I\National');
-    }
-
-    public function politics()
-    { //政治面貌
-        return $this->belongsTo('App\Models\I\Politics');
     }
 
     public function change_log()

@@ -111,7 +111,7 @@
                             </div>
                             <label class="control-label col-lg-3"><strong>民族：</strong></label>
                             <div class="col-lg-3">
-                                <p class="form-control-static">{{$staff->national->name}}</p>
+                                <p class="form-control-static">{{$staff->info->national}}</p>
                             </div>
                         </div>
                         <div class="clearfix">
@@ -137,13 +137,13 @@
                             </div>
                             <label class="control-label col-lg-3"><strong>政治面貌：</strong></label>
                             <div class="col-lg-3">
-                                <p class="form-control-static">{{$staff->politics->name}}</p>
+                                <p class="form-control-static">{{$staff->info->politics}}</p>
                             </div>
                         </div>
                         <div class="clearfix">
                             <label class="control-label col-lg-3"><strong>婚姻状况：</strong></label>
                             <div class="col-lg-3">
-                                <p class="form-control-static">{{$staff->marital_status->name}}</p>
+                                <p class="form-control-static">{{$staff->info->marital_status}}</p>
                             </div>
                             <label class="control-label col-lg-3"><strong>身高/体重：</strong></label>
                             <div class="col-lg-3">

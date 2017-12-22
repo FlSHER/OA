@@ -34,7 +34,7 @@ class StaffController extends Controller
     {
         $this->logService = $logService;
         $this->importService = $importService->extension('xlsx')->trans($this->transPath);
-        $this->curdService = $curd->log($this->logService)->where('staff_sn', '>', '110000');
+        $this->curdService = $curd->log($this->logService);
     }
 
     /**

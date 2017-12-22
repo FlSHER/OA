@@ -277,8 +277,8 @@
                                 <div class="col-sm-1"></div>
                                 <label class="control-label col-sm-2">民族</label>
                                 <div class="col-sm-3">
-                                    <select class="form-control" name="national_id" title="民族">
-                                        {!! get_options('i_national','name','id') !!}
+                                    <select class="form-control" name="info[national]" title="民族">
+                                        {!! get_options('i_national','name','name') !!}
                                     </select>
                                 </div>
                             </div>
@@ -292,16 +292,16 @@
                                 <div class="col-sm-1"></div>
                                 <label class="control-label col-sm-2">政治面貌</label>
                                 <div class="col-sm-3">
-                                    <select class="form-control" name="politics_id" title="政治面貌">
-                                        {!! get_options('i_politics','name','id') !!}
+                                    <select class="form-control" name="info[politics]" title="政治面貌">
+                                        {!! get_options('i_politics','name','name') !!}
                                     </select>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-sm-2">婚姻状况</label>
                                 <div class="col-sm-3">
-                                    <select class="form-control" name="marital_status_id" title="婚姻状况">
-                                        {!! get_options('i_marital_status','name','id') !!}
+                                    <select class="form-control" name="info[marital_status]" title="婚姻状况">
+                                        {!! get_options('i_marital_status','name','name') !!}
                                     </select>
                                 </div>
                             </div>
