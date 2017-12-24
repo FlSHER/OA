@@ -190,7 +190,7 @@
         <script src="{{source('js/jquery-3.1.1.min.js')}}"></script>
         <script src="{{source('js/bootstrap.min.js')}}"></script>
         <script src="{{source('js/scripts.js')}}"></script>
-        <script src="http://g.alicdn.com/dingding/open-develop/1.5.1/dingtalk.js"></script>
+        <script src="{{source('js/dingtalk.js')}}"></script>
         <script src="{{source('js/dingding_login.js')}}"></script>
 
     </body>
