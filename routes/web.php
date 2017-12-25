@@ -59,7 +59,7 @@ Route::group(['prefix' => 'excel'], function () {
 });
 
 Route::get('weather_image', function () {
-    app('ApiResponse')->getWeatherImage(request('city'));
+    app('ApiResponse')->getWeatherImage(request()->input('city'));
     return response('')
         ->header('Content-Type', 'image/png');
 });

@@ -131,7 +131,7 @@ class OAuthController extends Controller
     {
         $apiRequest = $request->only(['app_id', 'redirect_uri']);
         $url = url()->current() . '?' . http_build_query($apiRequest);
-        return redirect()->route('login')->with(['url' => $url]);
+        return redirect()->to('/login?url=' . urlencode($url))->with(['url' => $url]);
     }
 
     /**

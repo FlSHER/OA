@@ -5,7 +5,8 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use DB;
 
-class UpdateDistrictJs extends Command {
+class UpdateDistrictJs extends Command
+{
 
     protected $tableName = 'i_district';
     protected $province;
@@ -30,10 +31,9 @@ class UpdateDistrictJs extends Command {
      *
      * @return void
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
-        $this->province = DB::table($this->tableName)->where('level', 1)->get();
-        $this->city = DB::table($this->tableName)->where('level', 2)->get();
     }
 
     /**
@@ -41,18 +41,23 @@ class UpdateDistrictJs extends Command {
      *
      * @return mixed
      */
-    public function handle() {
+    public function handle()
+    {
+        $this->province = DB::table($this->tableName)->where('level', 1)->get();
+        $this->city = DB::table($this->tableName)->where('level', 2)->get();
         $this->makeBladeFile();
         $this->makeJavascriptFile();
     }
 
-    private function makeBladeFile() {
+    private function makeBladeFile()
+    {
         $content = $this->makeBladeContent();
         $fileName = resource_path('views/layouts/district_group.blade.php');
         $this->makeFile($fileName, $content);
     }
 
-    private function makeJavascriptFile() {
+    private function makeJavascriptFile()
+    {
         $bindContent = $this->makeBindContent();
         $objectContent = $this->makeObjectContent();
         $jsContent = $bindContent . $objectContent;
@@ -60,14 +65,16 @@ class UpdateDistrictJs extends Command {
         $this->makeFile($fileName, $jsContent);
     }
 
-    private function makeFile($fileName, $content) {
+    private function makeFile($fileName, $content)
+    {
         if (!file_exists($fileName)) {
             fopen($fileName, 'w');
         }
         file_put_contents($fileName, $content);
     }
 
-    private function makeBladeContent() {
+    private function makeBladeContent()
+    {
         $content = '<div class="input-3level-group">
     <select class="form-control" name="{{$provinceName}}" title="省">
         <option value=0>-- 无 --</option>';
@@ -89,7 +96,8 @@ class UpdateDistrictJs extends Command {
         return $content;
     }
 
-    private function makeBindContent() {
+    private function makeBindContent()
+    {
         $bindContent = '
 $(function () {
     $(".input-3level-group select:not(:last)").on("change", new District().getOptions);
@@ -98,7 +106,8 @@ $(function () {
         return $bindContent;
     }
 
-    private function makeObjectContent() {
+    private function makeObjectContent()
+    {
         $functionContent = $this->makeFunctionContent();
         $optionsContent = $this->makeDistrictOptions();
         $objectContent = '
@@ -110,7 +119,8 @@ function District() {
         return $objectContent;
     }
 
-    private function makeFunctionContent() {
+    private function makeFunctionContent()
+    {
         // 获取区划选项
         $funGetDistrictOptions = 'function (e) {
         if (e instanceof HTMLSelectElement) {
@@ -141,21 +151,23 @@ function District() {
         return $functionContent;
     }
 
-    private function makeDistrictOptions() {
+    private function makeDistrictOptions()
+    {
         $districtContent = $this->makeSubDistrictContent(array_collapse([$this->province, $this->city]));
         $districtData = $districtContent;
         return $districtData;
     }
 
-    private function makeSubDistrictContent($parent) {
+    private function makeSubDistrictContent($parent)
+    {
         $subContent = '{';
         foreach ($parent as $v) {
             $parentId = $v->id;
             $options = DB::table($this->tableName)->where('parent_id', $parentId)
 //                            ->orderByRaw('convert( `name` USING gbk ) COLLATE gbk_chinese_ci')
-                            ->get()->map(function($value) {
-                        return '<option value="' . $value->id . '">' . $value->name . '</option>';
-                    })->all();
+                ->get()->map(function ($value) {
+                    return '<option value="' . $value->id . '">' . $value->name . '</option>';
+                })->all();
             $subContent .= '
         ' . $parentId . ': \'' . implode('', $options) . '\',';
         }

@@ -130,7 +130,7 @@ class HRMController extends Controller
     protected function changeInfo($data, $model, $primaryKey = null)
     {
         try {
-            $primaryKey = empty($primaryKey) ? request('id') : $primaryKey;
+            $primaryKey = empty($primaryKey) ? request()->input('id') : $primaryKey;
             if (!is_array($primaryKey)) {
                 $primaryKey = [$primaryKey];
             }
