@@ -30,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('AttendanceService', 'App\Services\App\AttendanceService');//考勤
+        $this->app->singleton('AttendanceService', \App\Services\App\AttendanceService::class);//考勤
         $this->app->singleton('AuditService', \App\Services\Finance\Reimburse\AuditService::class);//报销审核
     }
 

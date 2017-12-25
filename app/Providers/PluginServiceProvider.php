@@ -3,9 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Services\PluginService;
 
-class PluginServiceProvider extends ServiceProvider {
+class PluginServiceProvider extends ServiceProvider
+{
 
     /**
      * 服务提供者加是否延迟加载.
@@ -19,7 +19,8 @@ class PluginServiceProvider extends ServiceProvider {
      *
      * @return void
      */
-    public function boot() {
+    public function boot()
+    {
         //
     }
 
@@ -28,8 +29,9 @@ class PluginServiceProvider extends ServiceProvider {
      *
      * @return void
      */
-    public function register() {
-        $this->app->instance('Plugin', new PluginService);
+    public function register()
+    {
+        $this->app->singleton('Plugin', \App\Services\PluginService::class);
         $this->app->singleton('Dingtalk', \App\Services\Dingtalk\Dingtalk::class);
     }
 
@@ -38,7 +40,8 @@ class PluginServiceProvider extends ServiceProvider {
      *
      * @return array
      */
-    public function provides() {
+    public function provides()
+    {
         return ['Plugin', 'Dingtalk'];
     }
 

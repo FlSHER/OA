@@ -39,28 +39,28 @@ class ToolServiceProvider extends ServiceProvider
         /**
          * 加密
          */
-        $this->app->singleton('Encyption', 'App\Services\EncyptionService');
+        $this->app->singleton('Encyption', \App\Services\EncyptionService::class);
         /**
          * curl
          */
-        $this->app->bind('Curl', 'App\Services\CurlService');
+        $this->app->bind('Curl', \App\Services\CurlService::class);
         /**
          * 增删改查
          */
         $this->app->bind('App\Contracts\CURD', 'App\Contracts\CURD');
         $this->app->when('App\Http\Controllers\HR\StaffController')
             ->needs('App\Contracts\CURD')
-            ->give('App\Services\Tools\CURDs\StaffCurdService');
+            ->give(\App\Services\Tools\CURDs\StaffCurdService::class);
         $this->app->when('App\Http\Controllers\HR\TransferController')
             ->needs('App\Contracts\CURD')
-            ->give('App\Services\Tools\CURDs\TransferCurdService');
+            ->give(\App\Services\Tools\CURDs\TransferCurdService::class);
         /**
          * 操作日志
          */
-        $this->app->bind('App\Contracts\OperationLog', 'App\Contracts\OperationLog');
+        $this->app->bind('App\Contracts\OperationLog', \App\Contracts\OperationLog::class);
         $this->app->when('App\Http\Controllers\HR\StaffController')
             ->needs('App\Contracts\OperationLog')
-            ->give('App\Services\Tools\OperationLogs\StaffOperationLogService');
+            ->give(\App\Services\Tools\OperationLogs\StaffOperationLogService::class);
         /**
          * Excel导入
          */
@@ -72,11 +72,11 @@ class ToolServiceProvider extends ServiceProvider
         /**
          * HRM系统工具服务
          */
-        $this->app->singleton('HRM', 'App\Services\HRMService');
+        $this->app->singleton('HRM', \App\Services\HRMService::class);
         /**
          * API响应
          */
-        $this->app->singleton('ApiResponse', 'App\Services\ApiResponseService');
+        $this->app->singleton('ApiResponse', \App\Services\ApiResponseService::class);
     }
 
     /**

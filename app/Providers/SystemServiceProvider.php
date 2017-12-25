@@ -7,18 +7,17 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Services\AuthorityService;
-use App\Services\MenuService;
-use App\Services\CurrentUserService;
 
-class SystemServiceProvider extends ServiceProvider {
+class SystemServiceProvider extends ServiceProvider
+{
 
     /**
      * Bootstrap the application services.
      *
      * @return void
      */
-    public function boot() {
+    public function boot()
+    {
         //
     }
 
@@ -27,19 +26,20 @@ class SystemServiceProvider extends ServiceProvider {
      *
      * @return void
      */
-    public function register() {
+    public function register()
+    {
         /**
          * 权限
          */
-        $this->app->instance('Authority', new AuthorityService);
+        $this->app->singleton('Authority', \App\Services\AuthorityService::class);
         /**
          * 菜单
          */
-        $this->app->instance('Menu', new MenuService);
+        $this->app->singleton('Menu', \App\Services\MenuService::class);
         /**
          * 当前用户
          */
-        $this->app->singleton('CurrentUser', CurrentUserService::class);
+        $this->app->singleton('CurrentUser', \App\Services\CurrentUserService::class);
     }
 
 }
