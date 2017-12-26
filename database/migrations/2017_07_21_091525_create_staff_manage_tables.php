@@ -49,8 +49,29 @@ class CreateStaffManageTables extends Migration
             $table->char('account_number', 19)->comment('银行卡号');
             $table->char('account_bank', 20)->comment('开户行');
             $table->char('account_name', 10)->comment('开户人');
+            $table->char('email', 40)->comment('电子邮箱');
+            $table->char('qq_number', 11)->comment('QQ号码');
+            $table->mediumInteger('recruiter_sn')->unsigned()->comment('招聘人员工编号');
+            $table->char('recruiter_name', 10)->comment('招聘人姓名');
             $table->char('height', 3)->comment('身高');
             $table->char('weight', 3)->comment('体重');
+            $table->char('national', 10)->comment('民族');
+            $table->char('marital_status', 10)->comment('婚姻状况');
+            $table->char('politics', 10)->comment('政治面貌');
+            $table->mediumInteger('household_province_id')->unsigned()->comment('户口所在地(省)');
+            $table->mediumInteger('household_city_id')->unsigned()->comment('户口所在地(市)');
+            $table->mediumInteger('household_county_id')->unsigned()->comment('户口所在地(区/县)');
+            $table->char('household_address', 30)->comment('户口所在地(详细地址)');
+            $table->mediumInteger('living_province_id')->unsigned()->comment('现居住地(省)');
+            $table->mediumInteger('living_city_id')->unsigned()->comment('现居住地(市)');
+            $table->mediumInteger('living_county_id')->unsigned()->comment('现居住地(区/县)');
+            $table->char('living_address', 30)->comment('现居住地(详细地址)');
+            $table->char('native_place', 30)->comment('籍贯');
+            $table->char('education', 5)->comment('学历');
+            $table->char('remark', 200)->comment('备注');
+            $table->char('concat_name', 10)->comment('紧急联系人(姓名)');
+            $table->char('concat_tel', 13)->comment('紧急联系人(电话)');
+            $table->char('concat_type', 5)->comment('紧急联系人(关系类型)');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -69,28 +90,12 @@ class CreateStaffManageTables extends Migration
          * 关系类型表
          */
         Schema::create('staff_relative_type', function (Blueprint $table) {
-            $table->tinyInteger('id', true)->unsigned()->primary();
+            $table->tinyIncrements('id', true)->unsigned();
             $table->char('name', 5);
             $table->tinyInteger('group_id')->unsigned()->comment('关系分组');
             $table->tinyInteger('opposite_group_id')->unsigned()->comment('对立分组');
             $table->tinyInteger('gender_id')->unsigned()->default(0)->comment('性别限制');
             $table->tinyInteger('sort')->unsigned()->default(0)->comment('排序');
-        });
-        /**
-         * 预约调动临时表
-         */
-        Schema::create('staff_tmp', function (Blueprint $table) {
-            $table->mediumInteger('staff_sn')->unsigned()->primary();
-            $table->smallInteger('department_id')->unsigned()->nullable()->comment('所属部门');
-            $table->smallInteger('position_id')->unsigned()->nullable()->comment('职位');
-            $table->tinyInteger('brand_id')->unsigned()->nullable()->comment('品牌');
-            $table->tinyInteger('status_id')->nullable()->comment('员工状态');
-            $table->char('shop_sn', 10)->nullable()->comment('店铺代码');
-            $table->date('employed_at')->nullable()->comment('转正时间');
-            $table->date('left_at')->nullable()->comment('离职时间');
-            $table->date('operate_at')->nullable()->comment('变动时间');
-            $table->tinyInteger('is_active')->unsigned()->default(1)->comment('是否激活');
-            $table->timestamps();
         });
     }
 
@@ -105,7 +110,6 @@ class CreateStaffManageTables extends Migration
         Schema::dropIfExists('staff_info');
         Schema::dropIfExists('staff_relatives');
         Schema::dropIfExists('staff_relative_type');
-        Schema::dropIfExists('staff_tmp');
     }
 
 }
