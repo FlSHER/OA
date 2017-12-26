@@ -42,18 +42,21 @@ class LoginController extends Controller
      * 后台登录验证
      * @param Request $request
      */
-    public function loginCheck()
+    public function loginCheck(Request $request)
     {
-        $this->validateLogin();
-        if ($this->loginAsDeveloper()) {
-            return $this->loginSuccess();
-        }
-        if ($this->checkUsername()) {
-            if ($this->checkPassword()) {
+        if ($request->has('dingtalk_auth_code')) {
+            return $this->loginByDingtalkAuthCode($request);
+        } else {
+            $this->validateLogin();
+            if ($this->loginAsDeveloper()) {
                 return $this->loginSuccess();
+            } else if ($this->checkUsername()) {
+                if ($this->checkPassword()) {
+                    return $this->loginSuccess();
+                }
             }
+            return $this->sendFailedLoginResponse();
         }
-        return $this->sendFailedLoginResponse();
     }
 
     /**
@@ -183,8 +186,8 @@ class LoginController extends Controller
      */
     private function loginSuccess()
     {
-        if (request()->has('dingding')) {
-            $this->admin->dingding = request()->get('dingding');
+        if (request()->has('dingding') && !empty(request()->input('dingding'))) {
+            $this->admin->dingding = request()->input('dingding');
         }
         $this->putAdminInfoInSession($this->admin);
         $this->updateLoginInfo();
@@ -256,10 +259,10 @@ class LoginController extends Controller
      */
     public function loginByDingtalkAuthCode(Request $request)
     {
-        $code = $request->code;
+        $code = $request->dingtalk_auth_code;
         $userInfo = app('Dingtalk')->passCodeGetUserInfo($code); //通过CODE换取用户身份
         if (empty($userInfo['userid'])) {
-            return ['status' => -1, 'dingding' => '钉钉免登失败，请手动登录'];
+            return ['status' => -1, 'message' => '钉钉免登失败，请手动登录'];
         }
         $dingtalkId = $userInfo['userid'];
         $dingDingUser = Staff::where('dingding', $dingtalkId)->first();
@@ -270,8 +273,7 @@ class LoginController extends Controller
             }
             return $this->sendFailedLoginResponse();
         } else {
-            session()->keep(['url']);
-            return ['status' => -2, 'dingding' => $dingtalkId];
+            return ['status' => -2, 'message' => '钉钉账号未同步，请手动登录', 'dingding' => $dingtalkId];
         }
     }
 
