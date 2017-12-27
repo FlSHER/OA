@@ -26,9 +26,9 @@ class Rbac
     private function redirectToLoginPage()
     {
         $url = trim(url()->current(), '/');
-        if ($url == trim(asset('/'), '/')) {
-            $url .= '/entrance';
-        }
+//        if ($url == trim(asset('/'), '/')) {
+//            $url .= '/entrance';
+//        }
         return redirect()->to('/login?url=' . urlencode($url))->with(['url' => $url, 'status' => 401]);
     }
 

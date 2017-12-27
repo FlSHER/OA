@@ -192,7 +192,7 @@ class LoginController extends Controller
         $this->putAdminInfoInSession($this->admin);
         $this->updateLoginInfo();
         if (empty(request()->url)) {
-            $url = route('entrance');
+            $url = route('home');
         } else {
             $url = request()->url;
             $url = str_replace('*', '/', $url);
