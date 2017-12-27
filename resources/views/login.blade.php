@@ -6,7 +6,7 @@
     <link rel="shortcut icon" href="{{source('images/logo_icon.png')}}" type="image/png">
     <title>喜歌实业</title>
 </head>
-<body style="background:#ccc url('/images/login-bg.jpg') no-repeat fixed;background-size: cover;">
+<body style="background:#f0f2f6 url('/images/login-bg.svg') center no-repeat fixed;background-size: cover;">
 <div id="view"></div>
 <script>
     window.CorpId = '{{config('dingding.CorpId')}}';

@@ -14,15 +14,18 @@ class NormalLoginForm extends Component {
         const {getFieldDecorator} = this.props.form;
         return (
             <Row>
-                <Col xs={0} lg={24} style={{height: '50px'}}> </Col>
-                <Col xs={0} xl={24} style={{height: '50px'}}> </Col>
-                <Col xs={0} xxl={24} style={{height: '50px'}}> </Col>
+                <Col xs={0} lg={24} style={{height: '60px'}}> </Col>
+                <Col xs={0} xl={24} style={{height: '60px'}}> </Col>
+                <Col xs={0} xxl={24} style={{height: '60px'}}> </Col>
                 <Col span={24} style={{padding: '40px 10px 0'}}>
-                    <Card style={{margin: '0 auto', maxWidth: '340px', border: 'none'}}>
+                    <div style={{margin: '0 auto', maxWidth: '360px', border: 'none'}}>
                         <Spin spinning={this.state.loading}>
                             <Form onSubmit={(e) => this.handleSubmit(e)}>
                                 <FormItem style={{textAlign: 'center'}}>
-                                    <img src="/images/login-logo.png"/>
+                                    <img src="/images/login-logo.png?v=0.0.1" height={70}/>
+                                    <p style={{fontSize: '18px',color:'#9e9e9e'}}>
+                                        让我们一起实现梦想
+                                    </p>
                                 </FormItem>
                                 <FormItem>
                                     {getFieldDecorator('username', {
@@ -56,7 +59,7 @@ class NormalLoginForm extends Component {
                                 </FormItem>
                             </Form>
                         </Spin>
-                    </Card>
+                    </div>
                 </Col>
             </Row>
         );
@@ -64,6 +67,7 @@ class NormalLoginForm extends Component {
 
     componentDidMount() {
         dd.ready(() => {
+            dd.ui.webViewBounce.disable();
             this.getDingtalkAuthCode();
         });
         dd.error((msg) => {
