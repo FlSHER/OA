@@ -35,7 +35,9 @@ class LeaveController extends Controller
     {
         $id = $request->id;
         $leaveRequest = LeaveRequest::find($id);
-        $this->validate($request, ['end_at' => ['required', 'before:' . $leaveRequest->end_at]], [], ['end_at' => '结束时间']);
+        $this->validate($request, [
+            'end_at' => ['required', 'before:' . $leaveRequest->end_at, 'after:' . $leaveRequest->start_at]
+        ], [], ['end_at' => '结束时间']);
         if (!empty($leaveRequest->clock_in_at)) {
             $clockModel = new Clock(['ym' => $leaveRequest->clock_in_at]);
             $clockModel->where(['attendance_type' => 3, 'type' => 1, 'parent_id' => $id])
