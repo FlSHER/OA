@@ -35,7 +35,7 @@ class LoginForm extends Component {
                                 <FormItem name="password">
                                     <Input size="large"
                                            prefix={<Icon type="lock" style={{color: 'rgba(0,0,0,.25)'}}/>}
-                                           type="password" placeholder="密码"/>
+                                           type="password" placeholder="密码（123456）"/>
                                 </FormItem>
                                 <Input type="hidden" name="dingding"/>
                                 <FormItem>
@@ -90,7 +90,7 @@ class LoginForm extends Component {
                                 this.setState({loading: false})
                             }, 500);
                         }).catch((err) => {
-                            message.error('登录异常');
+                            message.error('自动登录异常');
                             this.setState({loading: false});
                         });
                     } else {

@@ -87,7 +87,7 @@ class LoginController extends Controller
         } else {
             return ['status' => -1, 'message' => $this->response];
         }
-        $url = session()->has('url') ? session()->get('url') : '/';
+        $url = session()->has('url') ? session()->get('url') : $request->has('redirect_uri') ? $request->redirect_uri : '/';
         return ['status' => 1, 'url' => $url];
     }
 
