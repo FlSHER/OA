@@ -85,9 +85,10 @@ class LoginController extends Controller
             $this->admin->salt = $newSalt;
             $this->admin->save();
         } else {
-            return redirect()->back()->withInput()->withErrors('原' . $this->response);
+            return ['status' => -1, 'message' => $this->response];
         }
-        return redirect()->to(session()->get('url'));
+        $url = session()->has('url') ? session()->get('url') : '/';
+        return ['status' => 1, 'url' => $url];
     }
 
     /**

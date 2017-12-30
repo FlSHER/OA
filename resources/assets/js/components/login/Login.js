@@ -1,9 +1,10 @@
-import {Form, Icon, Input, Button, Card, Row, Col, Spin, message} from 'antd';
+import {Icon, Input, Button, Row, Col, Spin, message} from 'antd';
 import '../../public/dingtalk';
+import Form from '../modules/OAForm';
 
 const FormItem = Form.Item;
 
-class NormalLoginForm extends Component {
+class LoginForm extends Component {
 
     constructor(props) {
         super(props);
@@ -11,7 +12,6 @@ class NormalLoginForm extends Component {
     }
 
     render() {
-        const {getFieldDecorator} = this.props.form;
         return (
             <Row>
                 <Col xs={0} lg={24} style={{height: '60px'}}> </Col>
@@ -20,42 +20,29 @@ class NormalLoginForm extends Component {
                 <Col span={24} style={{padding: '40px 10px 0'}}>
                     <div style={{margin: '0 auto', maxWidth: '360px', border: 'none'}}>
                         <Spin spinning={this.state.loading}>
-                            <Form onSubmit={(e) => this.handleSubmit(e)}>
+                            <Form onSuccess={this.onSuccess} bindSelf={(self) => this.form = self}>
                                 <FormItem style={{textAlign: 'center'}}>
                                     <img src="/images/login-logo.png?v=0.0.1" height={70}/>
-                                    <p style={{fontSize: '18px',color:'#9e9e9e'}}>
+                                    <p style={{fontSize: '18px', color: '#9e9e9e'}}>
                                         让我们一起实现梦想
                                     </p>
                                 </FormItem>
-                                <FormItem>
-                                    {getFieldDecorator('username', {
-                                        rules: [{required: true, message: '请输入用户名!'}],
-                                    })(
-                                        <Input size="large"
-                                               prefix={<Icon type="user" style={{color: 'rgba(0,0,0,.25)'}}/>}
-                                               placeholder="用户名/手机号"/>
-                                    )}
+                                <FormItem name="username">
+                                    <Input size="large"
+                                           prefix={<Icon type="user" style={{color: 'rgba(0,0,0,.25)'}}/>}
+                                           placeholder="用户名/手机号"/>
                                 </FormItem>
-                                <FormItem>
-                                    {getFieldDecorator('password', {
-                                        rules: [{required: true, message: '请输入密码!'}],
-                                    })(
-                                        <Input size="large"
-                                               prefix={<Icon type="lock" style={{color: 'rgba(0,0,0,.25)'}}/>}
-                                               type="password" placeholder="密码"/>
-                                    )}
+                                <FormItem name="password">
+                                    <Input size="large"
+                                           prefix={<Icon type="lock" style={{color: 'rgba(0,0,0,.25)'}}/>}
+                                           type="password" placeholder="密码"/>
                                 </FormItem>
-                                {getFieldDecorator('dingding', {
-                                    initialValue: '',
-                                })(
-                                    <Input type="hidden"/>
-                                )}
+                                <Input type="hidden" name="dingding"/>
                                 <FormItem>
                                     {/*<a style={{float: 'right'}} href="">忘记密码</a>*/}
                                     <Button type="primary" size="large" htmlType="submit" style={{width: '100%'}}>
                                         登 录
                                     </Button>
-
                                 </FormItem>
                             </Form>
                         </Spin>
@@ -75,24 +62,8 @@ class NormalLoginForm extends Component {
         });
     }
 
-    handleSubmit(e) {
-        e.preventDefault();
-        this.setState({loading: true});
-        let formData = this.props.form.getFieldsValue();
-        axios.post('', formData).then((response) => {
-            let status = response.data.status;
-            if (status == 1) {
-                location.href = response.data.url;
-            } else if (status == -1) {
-                message.error(response.data.message);
-            }
-            setTimeout(() => {
-                this.setState({loading: false})
-            }, 500);
-        }).catch(function (err) {
-            this.setState({loading: false});
-            message.error('登录异常');
-        });
+    onSuccess(response) {
+        location.href = response.url;
     }
 
     getDingtalkAuthCode() {
@@ -113,14 +84,14 @@ class NormalLoginForm extends Component {
                                 message.error(response.data.message);
                             } else if (status == -2) {
                                 message.error(response.data.message);
-                                this.props.form.setFieldsValue({dingding: response.data.dingding});
+                                this.form.props.form.setFieldsValue({dingding: response.data.dingding});
                             }
                             setTimeout(() => {
                                 this.setState({loading: false})
                             }, 500);
-                        }).catch(function (err) {
-                            this.setState({loading: false});
+                        }).catch((err) => {
                             message.error('登录异常');
+                            this.setState({loading: false});
                         });
                     } else {
                         this.setState({loading: false});
@@ -139,10 +110,8 @@ class NormalLoginForm extends Component {
     }
 }
 
-const WrappedNormalLoginForm = Form.create()(NormalLoginForm);
-
 if (document.getElementById('view')) {
-    ReactDOM.render(<WrappedNormalLoginForm/>, document.getElementById('view'));
+    ReactDOM.render(<LoginForm/>, document.getElementById('view'));
 }
 
 

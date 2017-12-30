@@ -11,5 +11,7 @@ let mix = require('laravel-mix');
  |
  */
 
-mix.react('resources/assets/js/login.js', 'public/js');
+mix.react('resources/assets/js/login.js', 'public/js')
+    .react('resources/assets/js/reset_password.js', 'public/js')
+    .react('resources/assets/js/app.js', 'public/js');
 // .sass('resources/assets/sass/app.scss', 'public/css');
