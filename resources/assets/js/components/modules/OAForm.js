@@ -162,8 +162,10 @@ OAForm.Item = Form.Item;
 export default Form.create({
     onFieldsChange: (props, fields) => {
         for (let i in fields) {
-            OAFormFields[i].validateStatus = "";
-            OAFormFields[i].validateMessage = "";
+            if (OAFormFields[i]) {
+                OAFormFields[i].validateStatus = "";
+                OAFormFields[i].validateMessage = "";
+            }
         }
     }
 })(OAForm);

@@ -83,14 +83,14 @@ class LoginForm extends Component {
                             } else if (status == -1) {
                                 message.error(response.data.message);
                             } else if (status == -2) {
-                                message.error(response.data.message);
+                                message.info(response.data.message);
                                 this.form.props.form.setFieldsValue({dingding: response.data.dingding});
                             }
                             setTimeout(() => {
                                 this.setState({loading: false})
                             }, 500);
                         }).catch((err) => {
-                            message.error('自动登录异常');
+                            message.error('自动登录异常:'+err.message);
                             this.setState({loading: false});
                         });
                     } else {
