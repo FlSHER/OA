@@ -140,6 +140,20 @@ return [
             'strict' => true,
             'engine' => null,
         ],
+        //工作任务
+        'work_mission' => [
+            'driver' => 'mysql',
+            'host' => '192.168.1.6',
+            'port' => '3306',
+            'database' => 'work_mission',
+            'username' => 'root',
+            'password' => 'root',
+            'charset' => 'utf8',
+            'collation' => 'utf8_general_ci',
+            'prefix' => '',
+            'strict' => true,
+            'engine' => null,
+        ],
     ],
     /*
       |--------------------------------------------------------------------------

@@ -6,6 +6,7 @@ $workflow = 'http://192.168.1.63:802/';
 $transfer = 'http://192.168.1.117:8002/api/transfer/';  //调动
 $holiday = 'http://192.168.1.117:8002/api/holiday/'; //请假
 $attendance = 'http://192.168.1.117:8002/api';  //考勤
+$workMission = 'http://192.168.1.6:8006/api/';//工作任务
 return [
     /*
      * 各系统接口地址
@@ -82,6 +83,9 @@ return [
             'cancel' => $holiday . 'cancel',
             'imports' => $holiday . 'imports', //导入
             'edit' => $holiday . 'edit',
+        ],
+        'workMission'=>[//工作任务
+            'user_info_cache_clear'=>$workMission.'user_info_cache_clear',//清楚分配数据缓存
         ],
     ],
 ];
