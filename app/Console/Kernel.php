@@ -14,10 +14,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        \App\Console\Commands\TransferStaff::class,
-        \App\Console\Commands\UpdateDistrictJs::class,
-        \App\Console\Commands\MakeWorkingSchedule::class,
-        \App\Console\Commands\GetSalePerformanceFromTDOA::class,
+        //
     ];
 
     /**
@@ -40,6 +37,8 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
+        $this->load(__DIR__ . '/Commands');
+
         require base_path('routes/console.php');
     }
 
