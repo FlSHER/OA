@@ -15,6 +15,20 @@ Route::group(['prefix' => 'app', 'namespace' => 'app', 'as' => 'app'], function 
         Route::post('/editAuditor', ['uses' => 'ReimburseController@editAuditor']); //审核数据修改
     });
 
+    /**
+     * 工作任务
+     */
+    Route::group(['prefix'=>'work_mission','namespace'=>'WorkMission'],function(){
+        /**
+         * 分配人员配置
+         */
+        Route::get('/allotment_user','AllotmentUserController@index');//分配人员配置视图
+        Route::post('/allotment_user/list','AllotmentUserController@listData');//获取列表数据
+        Route::post('/allotment_user/save','AllotmentUserController@save');//保存
+        Route::post('/allotment_user/update','AllotmentUserController@update');//修改
+        Route::post('/allotment_user/delete','AllotmentUserController@delete');//删除
+    });
+
     /*CRM*/
     Route::get('/crm', function () {//客户CRM
         return redirect(config('api.url.crm.admin'));
