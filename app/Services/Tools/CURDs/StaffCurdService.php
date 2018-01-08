@@ -54,9 +54,13 @@ class StaffCurdService extends CURD
                 $model->setAttribute('hired_at', $operateAt);
                 $model->setAttribute('employed_at', null);
                 $model->setAttribute('left_at', null);
+                $model->setAttribute('is_active', 1);
                 break;
-            case'leave':
+            case 'leave':
                 $model->setAttribute('left_at', $operateAt);
+                break;
+            case 'leaving':
+                $model->setAttribute('is_active', 0);
                 break;
         }
         if (empty($model->employed_at) && $model->status_id > 1) {
