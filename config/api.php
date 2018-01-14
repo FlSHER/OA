@@ -6,7 +6,8 @@ $workflow = 'http://192.168.1.63:802/';
 $transfer = 'http://192.168.1.117:8002/api/transfer/';  //调动
 $holiday = 'http://192.168.1.117:8002/api/holiday/'; //请假
 $attendance = 'http://192.168.1.117:8002/api';  //考勤
-$workMission = 'http://192.168.1.6:8006/api/';//工作任务
+$workMission = 'http://120.77.14.132:8009/api/';//工作任务
+//$workMission = 'http://192.168.1.6:8006/api/';//工作任务
 return [
     /*
      * 各系统接口地址
