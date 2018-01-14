@@ -301,9 +301,16 @@ return [
 
     /*-----------------工作任务start-------------*/
 
+    //分配人员配置
     'allotment_user' => [
         'staff_sn' => '员工',
         'department.*.department_id'=>'分配部门',
+    ],
+    //任务统计配置
+    'statistic'=>[
+        'staff_sn' => '员工',
+        'statistic_department'=>'统计部门数据',
+        'statistic_department.*.department_id'=>'统计部门',
     ],
     /*-----------------工作任务end-------------*/
 ];

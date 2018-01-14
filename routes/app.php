@@ -27,6 +27,15 @@ Route::group(['prefix' => 'app', 'namespace' => 'app', 'as' => 'app'], function 
         Route::post('/allotment_user/save','AllotmentUserController@save');//保存
         Route::post('/allotment_user/update','AllotmentUserController@update');//修改
         Route::post('/allotment_user/delete','AllotmentUserController@delete');//删除
+
+        /**
+         * 任务统计配置
+         */
+        Route::get('/statistic','StatisticController@index');//首页
+        Route::post('/statistic/list','StatisticController@listData');//获取列表数据
+        Route::post('/statistic/save','StatisticController@save');//保存
+        Route::post('/statistic/update','StatisticController@update');//修改
+        Route::post('/statistic/delete','StatisticController@delete');//删除
     });
 
     /*CRM*/
