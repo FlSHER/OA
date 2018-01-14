@@ -52,7 +52,7 @@ class StatisticController extends Controller
             $department->department_name = $v->full_name;
             $department->save();
         }
-        Curl::setUrl(config('api.url.workMission.statistic_clear'))->get();//清楚统计数据缓存
+        $this->clearStatisticUserInfo();//清楚统计数据缓存
         return ['status' => 1, 'message' => 'success'];
     }
 
@@ -66,6 +66,7 @@ class StatisticController extends Controller
     {
         StatisticDepartment:: where('statistic_user_id', $request->input('id'))->delete();
         StatisticUser::where('id', $request->input('id'))->delete();
+        $this->clearStatisticUserInfo();
         return ['status' => 1, 'message' => 'success'];
     }
 
@@ -86,5 +87,12 @@ class StatisticController extends Controller
             $rules['statistic_department.*.department_id'] = 'required|exists:departments,id';
         }
         $this->validate($request, $rules, [], trans('fields.statistic'));
+    }
+
+    /**
+     * 清楚统计人员缓存数据
+     */
+    private function clearStatisticUserInfo(){
+        Curl::setUrl(config('api.url.workMission.statistic_clear'))->get();//清楚统计数据缓存
     }
 }

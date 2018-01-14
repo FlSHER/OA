@@ -40,8 +40,15 @@ class AllotmentUserController extends Controller
     {
         $this->validation($request);
         $this->saveToTable($request);
-        Curl::setUrl(config('api.url.workMission.user_info_cache_clear'))->get();//清楚分配数据缓存
+        $this->clearAllotmentUserInfo();//清楚分配数据缓存
         return ['status' => 1, 'message' => 'success'];
+    }
+
+    /**
+     * 清楚分配人员缓存数据
+     */
+    private function clearAllotmentUserInfo(){
+        Curl::setUrl(config('api.url.workMission.user_info_cache_clear'))->get();//清楚分配数据缓存
     }
 
     /**
@@ -83,6 +90,7 @@ class AllotmentUserController extends Controller
             Department:: where('user_id', $request->input('id'))->delete();
             User::where('id', $request->input('id'))->delete();
         });
+        $this->clearAllotmentUserInfo();//清楚分配数据缓存
         return ['status' => 1, 'message' => 'success'];
     }
 
