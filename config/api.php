@@ -86,6 +86,7 @@ return [
         ],
         'workMission'=>[//工作任务
             'user_info_cache_clear'=>$workMission.'user_info_cache_clear',//清楚分配数据缓存
+            'statistic_clear'=>$workMission.'statistic_clear',//清楚统计人数据缓存
         ],
     ],
 ];
