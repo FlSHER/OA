@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 /* model start */
 
@@ -78,6 +79,7 @@ class OAuthController extends Controller
             $response = $this->makeAppTokenResponse();
             return app('ApiResponse')->makeSuccessResponse($response);
         } catch (HttpException $e) {
+            Log::info('refresh_token error : ' . $e->getMessage());
             return app('ApiResponse')->makeErrorResponse($e->getMessage(), 501, $e->getStatusCode());
         }
     }
@@ -248,7 +250,7 @@ class OAuthController extends Controller
             abort(500, '缺少refresh_token');
         }
         $app = DB::table('app_token')
-            ->where([['refresh_token', '=', $refreshToken], ['expiration', '<', time() + 600]])
+            ->where([['refresh_token', '=', $refreshToken]])
             ->first();
         if (!empty($app)) {
             $this->appId = $app->app_id;
