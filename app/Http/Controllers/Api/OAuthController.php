@@ -24,7 +24,7 @@ class OAuthController extends Controller
     protected $appToken;
     protected $refreshToken;
     protected $authCodeExpiration = 10;
-    protected $appTokenExpiration = 120;
+    protected $appTokenExpiration = 1440;
 
     /**
      * 获取授权码
