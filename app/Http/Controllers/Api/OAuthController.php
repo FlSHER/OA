@@ -37,11 +37,11 @@ class OAuthController extends Controller
         $this->checkRedirectUri($request);
         if (app('CurrentUser')->isLogin()) {
             $this->staffSn = app('CurrentUser')->getStaffSn();
-            $this->authCode = $this->getAuthCodeFromDatabase();
-            if (empty($this->authCode)) {
-                $this->authCode = $this->makeAuthCode();
-                $this->saveAuthCode($request);
-            }
+//            $this->authCode = $this->getAuthCodeFromDatabase();
+//            if (empty($this->authCode)) {
+            $this->authCode = $this->makeAuthCode();
+            $this->saveAuthCode($request);
+//            }
             return $this->redirectToApp($request);
         } else {
             return $this->redirectToLoginPage($request);
