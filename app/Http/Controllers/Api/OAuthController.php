@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 /* model start */
@@ -37,11 +38,8 @@ class OAuthController extends Controller
         $this->checkRedirectUri($request);
         if (app('CurrentUser')->isLogin()) {
             $this->staffSn = app('CurrentUser')->getStaffSn();
-//            $this->authCode = $this->getAuthCodeFromDatabase();
-//            if (empty($this->authCode)) {
             $this->authCode = $this->makeAuthCode();
             $this->saveAuthCode($request);
-//            }
             return $this->redirectToApp($request);
         } else {
             return $this->redirectToLoginPage($request);
@@ -137,34 +135,15 @@ class OAuthController extends Controller
     }
 
     /**
-     * 从数据库获取授权码
-     * @return type
-     */
-    private function getAuthCodeFromDatabase()
-    {
-        $authCode = DB::table('app_auth_code')
-            ->where([
-                ['staff_sn', '=', $this->staffSn],
-                ['app_id', '=', $this->appId],
-                ['redirect_uri', '=', $this->redirectUri],
-                ['expiration', '>', time()]
-            ])->value('app_auth_code');
-        return $authCode;
-    }
-
-    /**
      * 保存授权码
      */
     private function saveAuthCode($request)
     {
-        $expiration = time() + $this->authCodeExpiration * 60;
-        $redirectUri = trim($request->redirect_uri, '/');
-        $app = App::find($this->appId);
-        if (empty($app)) {
-            abort(500, '应用不存在');
-        }
-        $app->auth_code()->detach($this->staffSn);
-        $app->auth_code()->attach($this->staffSn, ['app_auth_code' => $this->authCode, 'expiration' => $expiration, 'redirect_uri' => $redirectUri]);
+        Cache::put(
+            'app_auth_code_' . $this->authCode,
+            ['app_id' => $this->appId, 'staff_sn' => $this->staffSn],
+            $this->authCodeExpiration
+        );
     }
 
     /**
@@ -193,23 +172,10 @@ class OAuthController extends Controller
         } else {
             abort(500, '缺少auth_code');
         }
-        $redirectUri = $request->redirect_uri;
-        $appAuth = DB::table('app_auth_code')
-            ->where([
-                ['app_auth_code', '=', $authCode],
-                ['redirect_uri', '=', $redirectUri],
-                ['expiration', '>', time()]
-            ])
-            ->first();
+        $appAuth = Cache::pull('app_auth_code_' . $authCode);
         if (!empty($appAuth)) {
-            $this->appId = $appAuth->app_id;
-            $this->staffSn = $appAuth->staff_sn;
-            DB::table('app_auth_code')
-                ->where([
-                    ['app_auth_code', '=', $authCode],
-                    ['redirect_uri', '=', $redirectUri],
-                    ['expiration', '>', time()]
-                ])->delete();
+            $this->appId = $appAuth['app_id'];
+            $this->staffSn = $appAuth['staff_sn'];
             return true;
         } else {
             abort(500, '无效授权码');
