@@ -70,8 +70,12 @@
                         </div>
                         <div class="clearfix">
                             <label class="control-label col-lg-3"><strong>员工状态：</strong></label>
-                            <div class="col-lg-9">
+                            <div class="col-lg-3">
                                 <p class="form-control-static">{{$staff->status->name}}</p>
+                            </div>
+                            <label class="control-label col-lg-3"><strong>员工属性：</strong></label>
+                            <div class="col-lg-3">
+                                <p class="form-control-static">{{['无','108将','36天罡','24金刚','18罗汉'][$staff->property]}}</p>
                             </div>
                         </div>
                     </div>
@@ -351,7 +355,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <hr style="margin:0;"/>
+                            <hr style="margin:0;" />
                         @endforeach
                     </div>
             @endif
@@ -360,34 +364,34 @@
         </div>
     </section>
     <script>
-        $(function () {
-            var authorityZTreeSetting = {
-                async: {
-                    url: "/system/authority/treeview?_token={{csrf_token()}}",
-                    otherParam: {"staff_sn":<?php echo $staff->staff_sn ?>}
-                },
-                check: {
-                    enable: true
-                },
-                view: {
-                    showIcon: false
-                },
-                callback: {
-                    beforeCheck: function () {
-                        return false;
-                    }
-                }
-            };
-
-            $.fn.zTree.init($("#authority_treeview"), authorityZTreeSetting);
-        });
-
-        function showLogDetail(target) {
-            var logDetail = $(target).parent().next(".log_detail");
-            if (logDetail.is(":hidden")) {
-                $(".log_detail").hide();
+      $(function () {
+        var authorityZTreeSetting = {
+          async: {
+            url: "/system/authority/treeview?_token={{csrf_token()}}",
+            otherParam: { "staff_sn":<?php echo $staff->staff_sn ?>}
+          },
+          check: {
+            enable: true
+          },
+          view: {
+            showIcon: false
+          },
+          callback: {
+            beforeCheck: function () {
+              return false;
             }
-            logDetail.toggle();
+          }
+        };
+
+        $.fn.zTree.init($("#authority_treeview"), authorityZTreeSetting);
+      });
+
+      function showLogDetail(target) {
+        var logDetail = $(target).parent().next(".log_detail");
+        if (logDetail.is(":hidden")) {
+          $(".log_detail").hide();
         }
+        logDetail.toggle();
+      }
     </script>
 </div>

@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Authority;
 use App\Models\Department;
 use App\Models\Position;
-use App\Models\HR\StaffStatus;
-use App\Models\HR\Shop;
 use App\Models\Brand;
 use App\Models\I\Gender;
 use App\Models\I\National;
@@ -37,7 +35,8 @@ class Staff extends Model
         'hired_at',
         'employed_at',
         'left_at',
-        'is_active'
+        'is_active',
+        'property',
     ];
     protected $hidden = ['password', 'salt', 'created_at', 'updated_at', 'deleted_at'];
 

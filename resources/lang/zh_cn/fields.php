@@ -32,6 +32,7 @@ return [
         'hired_at' => '入职时间',
         'employed_at' => '转正时间',
         'left_at' => '离职时间',
+        'property' => '员工属性',
         'info' => [
             'id_card_number' => '身份证号',
             'account_number' => '银行卡号',
@@ -304,13 +305,13 @@ return [
     //分配人员配置
     'allotment_user' => [
         'staff_sn' => '员工',
-        'department.*.department_id'=>'分配部门',
+        'department.*.department_id' => '分配部门',
     ],
     //任务统计配置
-    'statistic'=>[
+    'statistic' => [
         'staff_sn' => '员工',
-        'statistic_department'=>'统计部门数据',
-        'statistic_department.*.department_id'=>'统计部门',
+        'statistic_department' => '统计部门数据',
+        'statistic_department.*.department_id' => '统计部门',
     ],
     /*-----------------工作任务end-------------*/
 ];

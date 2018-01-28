@@ -3,7 +3,7 @@
         <div class="modal-content">
             <form id="{{$type}}Form" class="form-horizontal" method="post"
                   action="{{source(route('hr.staff.submit'))}}">
-                <input name="operation_type" value="{{$type}}" type="hidden" title="操作类型" locked="true"/>
+                <input name="operation_type" value="{{$type}}" type="hidden" title="操作类型" locked="true" />
                 <div class="modal-header">
                     <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
                     <h4 class="modal-title">{{trans('fields.staff.operation_type.'.$type)}}</h4>
@@ -18,7 +18,7 @@
                 @endif
                 <div class="tab-content modal-body" style="padding-bottom:0px;">
                     @if(!in_array($type, ['entry']))
-                        <input name="staff_sn" type="hidden" title="员工编号"/>
+                        <input name="staff_sn" type="hidden" title="员工编号" />
                     @endif
                 <!-- 基本信息 start -->
                     <div class="tab-pane fade in active basicInfo">
@@ -100,7 +100,7 @@
                                 <div class="col-sm-3">
                                     <div class="input-group" oaSearch="shop">
                                         <input class="form-control" name="shop_sn" oaSearchColumn="shop_sn" type="text"
-                                               title="店铺编号"/>
+                                               title="店铺编号" />
                                         <span class="input-group-btn">
                                         <button type="button" class="btn btn-default" oaSearchShow><i
                                                     class="fa fa-search"></i></button>
@@ -163,7 +163,7 @@
                             <div class="col-sm-3">
                                 <input class="form-control" name="operate_at" type="text" isDate title="执行时间"
                                        <?php if ($type == 'edit') { ?>value="{{date('Y-m-d')}}"
-                                       <?php } ?> locked="true"/>
+                                       <?php } ?> locked="true" />
                             </div>
                             <div class="col-sm-1"></div>
                         </div>
@@ -182,18 +182,18 @@
                             <div class="form-group">
                                 <label class="control-label col-sm-2">银行卡号</label>
                                 <div class="col-sm-5">
-                                    <input class="form-control" name="info[account_number]" type="text" title="银行卡号"/>
+                                    <input class="form-control" name="info[account_number]" type="text" title="银行卡号" />
                                 </div>
                                 <label class="control-label col-sm-2">开户人</label>
                                 <div class="col-sm-3">
-                                    <input class="form-control" name="info[account_name]" type="text" title="开户人"/>
+                                    <input class="form-control" name="info[account_name]" type="text" title="开户人" />
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-sm-2">开户行</label>
                                 <div class="col-sm-6">
                                     <input class="form-control" name="info[account_bank]" type="text" title="开户行"
-                                           placeholder="如：中国农业银行成都荷花池支行"/>
+                                           placeholder="如：中国农业银行成都荷花池支行" />
                                 </div>
                                 <div class="col-sm-4  form-control-static">
                                     <input name="info[account_active]" type="hidden" value="0" locked="true">
@@ -237,31 +237,31 @@
                             <div class="form-group">
                                 <label class="control-label col-sm-2">紧急联系人</label>
                                 <div class="col-sm-4">
-                                    <input class="form-control" name="info[concat_name]" type="text" title="紧急联系人"/>
+                                    <input class="form-control" name="info[concat_name]" type="text" title="紧急联系人" />
                                 </div>
                                 <label class="control-label col-sm-2">联系人电话</label>
                                 <div class="col-sm-3">
-                                    <input class="form-control" name="info[concat_tel]" type="text" title="联系人电话"/>
+                                    <input class="form-control" name="info[concat_tel]" type="text" title="联系人电话" />
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-sm-2">联系人类型</label>
                                 <div class="col-sm-4">
-                                    <input class="form-control" name="info[concat_type]" type="text" title="联系人类型"/>
+                                    <input class="form-control" name="info[concat_type]" type="text" title="联系人类型" />
                                 </div>
                                 <label class="control-label col-sm-2">招聘人员</label>
                                 <div class="col-sm-4" oaSearch="all_staff">
                                     <div class="input-group">
                                         <input class="form-control" name="info[recruiter_name]"
                                                oaSearchColumn="realname" type="text" title="招聘人员"
-                                               style="background-color:#fff;" readonly/>
+                                               style="background-color:#fff;" readonly />
                                         <span class="input-group-btn">
                                         <button type="button" class="btn btn-default" oaSearchShow><i
                                                     class="fa fa-search"></i></button>
                                     </span>
                                     </div>
                                     <input class="form-control" name="info[recruiter_sn]" oaSearchColumn="staff_sn"
-                                           type="hidden"/>
+                                           type="hidden" />
                                 </div>
                             </div>
                         </div>
@@ -272,7 +272,7 @@
                                 <label class="control-label col-sm-2">生日</label>
                                 <div class="col-sm-3">
                                     <input class="form-control pick_date" name="birthday" isDate type="text"
-                                           title="生日"/>
+                                           title="生日" />
                                 </div>
                                 <div class="col-sm-1"></div>
                                 <label class="control-label col-sm-2">民族</label>
@@ -304,16 +304,27 @@
                                         {!! get_options('i_marital_status','name','name') !!}
                                     </select>
                                 </div>
+                                <div class="col-sm-1"></div>
+                                <label class="control-label col-sm-2">员工属性</label>
+                                <div class="col-sm-3">
+                                    <select class="form-control" name="property" title="员工属性">
+                                        <option value="0">无</option>
+                                        <option value="1">108将</option>
+                                        <option value="2">36天罡</option>
+                                        <option value="3">24金刚</option>
+                                        <option value="4">18罗汉</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-sm-2">身高(cm)</label>
                                 <div class="col-sm-3">
-                                    <input class="form-control" name="info[height]" type="number" title="身高"/>
+                                    <input class="form-control" name="info[height]" type="number" title="身高" />
                                 </div>
                                 <div class="col-sm-1"></div>
                                 <label class="control-label col-sm-2">体重(kg)</label>
                                 <div class="col-sm-3">
-                                    <input class="form-control" name="info[weight]" type="number" title="体重"/>
+                                    <input class="form-control" name="info[weight]" type="number" title="体重" />
                                 </div>
                             </div>
                             <div class="form-group">
@@ -333,7 +344,7 @@
                                 <label class="control-label col-sm-2">籍贯</label>
                                 <div class="col-sm-10">
                                     <input class="form-control" name="info[native_place]" type="text" title="籍贯"
-                                           placeholder="请输入0-30个字符"/>
+                                           placeholder="请输入0-30个字符" />
                                 </div>
                             </div>
                             @if($authority->checkAuthority(59))
@@ -341,12 +352,12 @@
                                     <label class="control-label col-sm-2">微商城编码</label>
                                     <div class="col-sm-3">
                                         <input class="form-control" name="info[mini_shop_sn]" type="text"
-                                               title="微商城编码"/>
+                                               title="微商城编码" />
                                     </div>
                                     <div class="col-sm-1"></div>
                                     <label class="control-label col-sm-2">钉钉编号</label>
                                     <div class="col-sm-4">
-                                        <input class="form-control" name="dingding" type="text" title="钉钉编号"/>
+                                        <input class="form-control" name="dingding" type="text" title="钉钉编号" />
                                     </div>
                                 </div>
                             @endif
@@ -360,14 +371,14 @@
                                     <div class=" input-group">
                                         <input class="form-control" name="relative[][pivot][relative_name]"
                                                oaSearchColumn="realname" type="text" title="关系人"
-                                               style="background-color:#fff;" readonly/>
+                                               style="background-color:#fff;" readonly />
                                         <span class="input-group-btn">
                                         <button type="button" class="btn btn-default" oaSearchShow><i
                                                     class="fa fa-search"></i></button>
                                     </span>
                                     </div>
                                     <input name="relative[][pivot][relative_sn]" oaSearchColumn="staff_sn"
-                                           type="hidden"/>
+                                           type="hidden" />
                                 </div>
                                 <label class="control-label col-sm-2">关系类型</label>
                                 <div class="col-sm-3">
