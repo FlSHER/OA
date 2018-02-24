@@ -46,6 +46,13 @@ class WorkingScheduleController extends Controller
     public function addOrEdit(Request $request)
     {
         $this->validate($request, $this->makeValidator($request), [], trans($this->transPath));
+        if (
+            !empty($request->clock_in) &&
+            !empty($request->clock_out) &&
+            strtotime($request->clock_in) > strtotime($request->clock_out)
+        ) {
+            return ['status' => -1, 'message' => '下班时间不能早于上班时间'];
+        }
         $date = $request->date;
         if (empty($request->clock_in)) $request->offsetSet('clock_in', null);
         if (empty($request->clock_out)) $request->offsetSet('clock_out', null);
@@ -91,8 +98,8 @@ class WorkingScheduleController extends Controller
         $validator = [
             'shop_duty_id' => ['required', 'exists:attendance.shop_duty,id'],
             'date' => ['required'],
-            'clock_in' => ['regex:/^\d{2}:\d{2}$/'],
-            'clock_out' => ['regex:/^\d{2}:\d{2}$/'],
+            'clock_in' => ['regex:/^\d{2}(:\d{2}){1,2}$/'],
+            'clock_out' => ['regex:/^\d{2}(:\d{2}){1,2}$/'],
         ];
         if (empty($input['id'])) {
             $validator['shop_sn'] = ['required', 'exists:shops,shop_sn,deleted_at,NULL'];
