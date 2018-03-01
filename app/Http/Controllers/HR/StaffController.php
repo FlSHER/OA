@@ -261,8 +261,6 @@ class StaffController extends Controller
                 $response = $this->addOrEditStaff($v);
             } catch (\Illuminate\Validation\ValidationException $e) {
                 $response['message'] = $e->validator->errors()->all();
-            } catch (\Illuminate\Http\Exception\HttpResponseException $e) {
-                $response['message'] = $e->getResponse()->getContent();
             } catch (\Exception $e) {
                 $response['message'] = '系统异常：' . $e->getMessage();
             }

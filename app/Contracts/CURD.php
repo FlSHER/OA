@@ -9,6 +9,7 @@ namespace App\Contracts;
 
 use App\Contracts\OperationLog as OperationLog;
 use DB;
+use Illuminate\Support\Facades\Log;
 
 class CURD
 {
@@ -143,7 +144,7 @@ class CURD
         if (array_has($data, $this->primaryKey) && !empty($data[$this->primaryKey])) {
             $model = $this->newBuilder()->find($data[$this->primaryKey]);
         } else {
-            $model = $this->model;
+            $model = new $this->model();
         }
         $this->fillDataAndSave($model, $data);
     }
@@ -157,8 +158,8 @@ class CURD
     protected function fillDataAndSave($model, $data)
     {
         $this->reset();
-        DB::beginTransaction();
-        try {
+//        DB::beginTransaction();
+//        try {
             $this->getRelation($model, $data);
             $model->fill($data);
             $this->changeBelongsTo($model);
@@ -173,11 +174,12 @@ class CURD
             if ($this->isDirty() && $this->hasLog()) {
                 $this->logService->model($model)->write($this->dirty, $data);
             }
-            DB::commit();
-        } catch (\Exception $err) {
-            DB::rollBack();
-            throw $err;
-        }
+//            DB::commit();
+//        } catch (\Exception $err) {
+//            Log::error($err->getMessage());
+//            DB::rollBack();
+//            throw $err;
+//        }
     }
 
     /**
@@ -206,7 +208,7 @@ class CURD
     {
         foreach ($this->relations['HasOne'] as $relation => $data) {
             $relationQuery = $model->$relation();
-            $foreignKey = $relationQuery->getPlainForeignKey();
+            $foreignKey = $relationQuery->getForeignKeyName();
             $parentKey = $relationQuery->getParentKey();
             $relationModel = $relationQuery->firstOrNew([$foreignKey => $parentKey])->fill($data);
             if ($relationModel->isDirty()) {
@@ -252,7 +254,7 @@ class CURD
      */
     protected function attachHasManyRelations($attached, $relationQuery, $data)
     {
-        $foreignKey = $relationQuery->getPlainForeignKey();
+        $foreignKey = $relationQuery->getForeignKeyName();
         $foreignKeyValue = $relationQuery->getParentKey();
         $dirty = [];
         foreach ($attached as $k => $v) {
@@ -298,7 +300,7 @@ class CURD
      */
     protected function detachHasManyRelations($detached, $relationQuery)
     {
-        $foreignKey = $relationQuery->getPlainForeignKey();
+        $foreignKey = $relationQuery->getForeignKeyName();
         if (is_null($detached)) {
             $relationModels = $relationQuery->get();
         } else {
@@ -343,7 +345,7 @@ class CURD
             $data = empty($data) ? [] : $data;
             $relationQuery = $model->$relation();
             $original = $relationQuery->get();
-            $otherKey = str_replace($relationQuery->getTable() . '.', '', $relationQuery->getOtherKey());
+            $otherKey = $relationQuery->getRelatedPivotKeyName();
             $input = [];
             foreach ($data as $v) {
                 if (!is_array($v)) {
