@@ -158,8 +158,8 @@ class CURD
     protected function fillDataAndSave($model, $data)
     {
         $this->reset();
-//        DB::beginTransaction();
-//        try {
+        DB::beginTransaction();
+        try {
             $this->getRelation($model, $data);
             $model->fill($data);
             $this->changeBelongsTo($model);
@@ -174,12 +174,12 @@ class CURD
             if ($this->isDirty() && $this->hasLog()) {
                 $this->logService->model($model)->write($this->dirty, $data);
             }
-//            DB::commit();
-//        } catch (\Exception $err) {
-//            Log::error($err->getMessage());
-//            DB::rollBack();
-//            throw $err;
-//        }
+            DB::commit();
+        } catch (\Exception $err) {
+            Log::error($err->getMessage());
+            DB::rollBack();
+            throw $err;
+        }
     }
 
     /**
