@@ -11,6 +11,8 @@ class Shop extends Model
 
     use SoftDeletes;
 
+    protected $connection = 'mysql';
+
     protected $fillable = [
         'shop_sn',
         'name',

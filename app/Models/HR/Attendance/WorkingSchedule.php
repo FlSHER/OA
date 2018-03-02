@@ -21,7 +21,7 @@ class WorkingSchedule extends Model
     {
         parent::__construct($attributes);
         $ymd = array_has($attributes, 'ymd') ? $attributes['ymd'] : date('Ymd');
-        $this->table .= $ymd;
+        $this->setDate($ymd);
     }
 
     /* ----- 定义关联 Start ----- */
@@ -58,5 +58,14 @@ class WorkingSchedule extends Model
     }
 
     /* ----- 本地作用域 End ----- */
+
+    public function setDate($ymd)
+    {
+        if (!preg_match('/^\d{8}$/', $ymd)) {
+            $ymd = date('Ymd', strtotime($ymd));
+        }
+        $this->setTable('working_schedule_' . $ymd);
+        return $this;
+    }
 
 }

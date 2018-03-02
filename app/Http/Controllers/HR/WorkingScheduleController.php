@@ -64,7 +64,7 @@ class WorkingScheduleController extends Controller
             $staffSn = $request->staff_sn;
             $shopSn = $request->shop_sn;
         }
-        $model = new WorkingSchedule(['ymd' => str_replace('-', '', $date)]);
+        $model = new WorkingSchedule(['ymd' => $date]);
         $request->offsetUnset('date');
         $workingSchedule = $model->where('staff_sn', $staffSn)->where('shop_sn', $shopSn)->first();
         if ($request->shop_duty_id == 1) {
@@ -77,7 +77,7 @@ class WorkingScheduleController extends Controller
         } else if (!empty($workingSchedule)) {
             return ['status' => -1, 'message' => '已有相同的排班存在'];
         } else {
-            $model->insert($request->except(['_url']));
+            $model->fill($request->except(['_url']))->setDate($date)->save();
             return ['status' => 1, 'message' => '添加成功'];
         }
     }
