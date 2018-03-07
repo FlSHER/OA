@@ -22,7 +22,7 @@
                 <div class="row">
                     <label class="control-label col-lg-4 col-sm-2">员工编号</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" name="staff_sn.like"/>
+                        <input type="text" class="form-control" name="staff_sn.like" />
                     </div>
                 </div>
             </div>
@@ -30,7 +30,7 @@
                 <div class="row">
                     <label class="control-label col-lg-4 col-sm-2">员工姓名</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" name="staff_name.like"/>
+                        <input type="text" class="form-control" name="staff_name.like" />
                     </div>
                 </div>
             </div>
@@ -38,7 +38,7 @@
                 <div class="row">
                     <label class="control-label col-lg-4 col-sm-2">部门名称</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" name="staff_department.like"/>
+                        <input type="text" class="form-control" name="staff_department_name.like" />
                     </div>
                 </div>
             </div>
@@ -47,7 +47,7 @@
                     <label class="control-label col-lg-4 col-sm-2">建单人</label>
                     <div class="col-sm-8 input-group input-group-sm" oaSearch="staff">
                         <input class="form-control" name="maker_name.like" oaSearchColumn="realname" type="text"
-                               title="建单人"/>
+                               title="建单人" />
                         <span class="input-group-btn">
                             <button type="button" class="btn btn-default" oaSearchShow><i
                                         class="fa fa-search"></i></button>
@@ -62,7 +62,7 @@
                     <label class="control-label col-lg-4 col-sm-2">调离店铺</label>
                     <div class="col-sm-8 input-group input-group-sm" oaSearch="shop">
                         <input class="form-control" name="leaving_shop_sn.like" oaSearchColumn="shop_sn" type="text"
-                               title="调离店铺"/>
+                               title="调离店铺" />
                         <span class="input-group-btn">
                             <button type="button" class="btn btn-default" oaSearchShow><i
                                         class="fa fa-search"></i></button>
@@ -75,7 +75,7 @@
                     <label class="control-label col-lg-4 col-sm-2">到达店铺</label>
                     <div class="col-sm-8 input-group input-group-sm" oaSearch="shop">
                         <input class="form-control" name="arriving_shop_sn.like" oaSearchColumn="shop_sn" type="text"
-                               title="到达店铺"/>
+                               title="到达店铺" />
                         <span class="input-group-btn">
                             <button type="button" class="btn btn-default" oaSearchShow><i
                                         class="fa fa-search"></i></button>
@@ -113,11 +113,11 @@
                     <div class="col-lg-9 col-sm-8">
                         <div class="row">
                             <div class="col-xs-6">
-                                <input class="form-control" name="leaving_date.min" type="text" isDate/>
+                                <input class="form-control" name="leaving_date.min" type="text" isDate />
                             </div>
                             <label class="control-label row pull-left" style="padding-left: 9px">至</label>
                             <div class="col-xs-6">
-                                <input class="form-control" name="leaving_date.max" type="text" isDate/>
+                                <input class="form-control" name="leaving_date.max" type="text" isDate />
                             </div>
                         </div>
                     </div>
@@ -129,11 +129,11 @@
                     <div class="col-lg-9 col-sm-8">
                         <div class="row">
                             <div class="col-xs-6">
-                                <input class="form-control" name="created_at.min" type="text" isDateTime/>
+                                <input class="form-control" name="created_at.min" type="text" isDateTime />
                             </div>
                             <label class="control-label row pull-left" style="padding-left: 9px">至</label>
                             <div class="col-xs-6">
-                                <input class="form-control" name="created_at.max" type="text" isDateTime/>
+                                <input class="form-control" name="created_at.max" type="text" isDateTime />
                             </div>
                         </div>
                     </div>
@@ -147,9 +147,9 @@
     </form>
 </div>
 <script>
-    window.onload = function () {
-        $("#filter form").on("reset", function () {
-            $(this).find('input,select').val('').change();
-        });
-    };
+  window.onload = function () {
+    $("#filter form").on("reset", function () {
+      $(this).find('input,select').val('').change();
+    });
+  };
 </script>
