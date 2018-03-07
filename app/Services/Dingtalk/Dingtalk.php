@@ -176,6 +176,9 @@ class Dingtalk
     public function startApprovalProcess($agentId, $processCode, $approvers_sn, $formData, $initiatorSn = null)
     {
         $dingId = empty($initiatorSn) ? app('CurrentUser')->dingding : Staff::find($initiatorSn)->dingding;
+        if (empty($dingId)) {
+            return '审批人未同步钉钉账号';
+        }
         $accessToken = $this->getAccessToken();
         $userInfo = app('Curl')->setUrl('https://oapi.dingtalk.com/user/get?access_token=' . $accessToken . '&userid=' . $dingId)->get();
         $departmentId = (string)$userInfo['department'][0];
