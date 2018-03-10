@@ -177,10 +177,15 @@ class Dingtalk
     {
         $dingId = empty($initiatorSn) ? app('CurrentUser')->dingding : Staff::find($initiatorSn)->dingding;
         if (empty($dingId)) {
-            return '审批人未同步钉钉账号';
+            return '未同步钉钉账号';
         }
         $accessToken = $this->getAccessToken();
         $userInfo = app('Curl')->setUrl('https://oapi.dingtalk.com/user/get?access_token=' . $accessToken . '&userid=' . $dingId)->get();
+        if ($userInfo['errcode'] == 60121) {
+            return '钉钉员工资料不存在';
+        } elseif (empty($userInfo['department'])) {
+            return '钉钉部门资料不存在';
+        }
         $departmentId = (string)$userInfo['department'][0];
         $approvers = $this->getApproversDingtalkId($approvers_sn);
         $realFormData = $this->makeRealFormData($formData);
