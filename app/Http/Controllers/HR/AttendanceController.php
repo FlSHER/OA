@@ -16,6 +16,7 @@ use App\Http\Requests;
 use DB;
 use Curl;
 use Artisan;
+use Illuminate\Support\Facades\Log;
 
 class AttendanceController extends Controller
 {
@@ -376,6 +377,7 @@ class AttendanceController extends Controller
             Artisan::call('attendance:getSalePerformance');
             return ['status' => 1, 'message' => '同步成功'];
         } catch (QueryException $e) {
+            Log::error($e);
             return ['status' => 0, 'message' => '同步失败,数据源异常'];
         }
     }
