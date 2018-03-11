@@ -9,6 +9,7 @@ use App\Models\HR\Attendance\LeaveRequest;
 use App\Models\HR\Attendance\StaffTransfer;
 use App\Models\HR\Attendance\WorkingSchedule;
 use App\Models\HR\Shop;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
@@ -371,7 +372,11 @@ class AttendanceController extends Controller
 
     public function syncSalesPerformance()
     {
-        Artisan::call('attendance:getSalePerformance');
-        return ['status' => 1, 'message' => '同步成功'];
+        try {
+            Artisan::call('attendance:getSalePerformance');
+            return ['status' => 1, 'message' => '同步成功'];
+        } catch (QueryException $e) {
+            return ['status' => 0, 'message' => '同步失败,数据源异常'];
+        }
     }
 }
