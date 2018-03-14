@@ -58,8 +58,8 @@ class WorkingScheduleController extends Controller
         if (empty($request->clock_out)) $request->offsetSet('clock_out', null);
         if ($request->has('id')) {
             $id = $request->id;
-            $staffSn = preg_replace('/^(.*)\-.*$/', '$1', $id);
-            $shopSn = preg_replace('/^.*\-(.*)$/', '$1', $id);
+            $staffSn = preg_replace('/^(.*?)\-.*$/', '$1', $id);
+            $shopSn = preg_replace('/^.*?\-(.*)$/', '$1', $id);
         } else {
             $staffSn = $request->staff_sn;
             $shopSn = $request->shop_sn;
@@ -87,8 +87,8 @@ class WorkingScheduleController extends Controller
         $id = $request->id;
         $date = $request->date;
         $model = new WorkingSchedule(['ymd' => date('Ymd', strtotime($date))]);
-        $staffSn = preg_replace('/^(.*)\-.*$/', '$1', $id);
-        $shopSn = preg_replace('/^.*\-(.*)$/', '$1', $id);
+        $staffSn = preg_replace('/^(.*?)\-.*$/', '$1', $id);
+        $shopSn = preg_replace('/^.*?\-(.*)$/', '$1', $id);
         $model->where('staff_sn', $staffSn)->where('shop_sn', $shopSn)->delete();
         return ['status' => 1, 'message' => '删除成功'];
     }
