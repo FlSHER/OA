@@ -35,8 +35,8 @@ class WorkingScheduleController extends Controller
         $id = $request->id;
         $date = $request->date;
         $model = new WorkingSchedule(['ymd' => date('Ymd', strtotime($date))]);
-        $staffSn = preg_replace('/^(.*)\-.*$/', '$1', $id);
-        $shopSn = preg_replace('/^.*\-(.*)$/', '$1', $id);
+        $staffSn = preg_replace('/^(.*?)\-.*$/', '$1', $id);
+        $shopSn = preg_replace('/^.*?\-(.*)$/', '$1', $id);
         $response = $model->where('staff_sn', $staffSn)->where('shop_sn', $shopSn)->first()->toArray();
         $response['id'] = $id;
         $response['date'] = $date;
