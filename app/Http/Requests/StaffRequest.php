@@ -183,7 +183,7 @@ class StaffRequest extends FormRequest
         $staffSn = empty($this->staff_sn) ? 'NULL' : $this->staff_sn;
         $validatorPersonal = [
             'realname' => ['required', 'between:2,10'],
-            'mobile' => ['required', 'regex:/^1[345789][0-9]{9}$/', 'unique:staff,mobile,' . $staffSn . ',staff_sn,deleted_at,NULL', 'unique:staff,username,' . $staffSn . ',staff_sn,deleted_at,NULL'],
+            'mobile' => ['required', 'regex:/^1[3456789][0-9]{9}$/', 'unique:staff,mobile,' . $staffSn . ',staff_sn,deleted_at,NULL', 'unique:staff,username,' . $staffSn . ',staff_sn,deleted_at,NULL'],
             'username' => ['max:16', 'unique:staff,username,' . $staffSn . ',staff_sn,deleted_at,NULL', 'unique:staff,mobile,' . $staffSn . ',staff_sn,deleted_at,NULL'],
             'info.id_card_number' => ['required', 'regex:/^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|10|11|12)(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/', 'unique:staff_info,id_card_number,' . $staffSn . ',staff_sn,deleted_at,NULL'],
             'birthday' => ['required', 'date'],
