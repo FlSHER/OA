@@ -130,7 +130,7 @@
             </ul>
             @if($authority->checkAuthority(122))
                 <div style="padding:0 10%;" class="row">
-                    @if($status == 1 || ($status == 2 && $auditor_sn == $currentUser->staff_sn))
+                    @if($status == 1 || ($status == 2 && in_array($currentUser->staff_sn,[$auditor_sn,999999])))
                         <div class="col-sm-4">
                             <button class="btn btn-default"
                                     onClick="refresh({{$id}})">
@@ -149,7 +149,7 @@
                                 通过 <i class="fa fa-check"></i>
                             </button>
                         </div>
-                    @elseif($status == 2 && $auditor_sn == $currentUser->staff_sn)
+                    @elseif($status == 2 && in_array($currentUser->staff_sn,[$auditor_sn,999999]))
                         <div class="col-sm-4">
                             <button class="btn btn-warning" onClick="revert({{$id}})">
                                 撤回 <i class="fa fa-rotate-left"></i>

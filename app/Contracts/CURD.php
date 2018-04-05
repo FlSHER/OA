@@ -9,6 +9,7 @@ namespace App\Contracts;
 
 use App\Contracts\OperationLog as OperationLog;
 use DB;
+use Illuminate\Support\Facades\Log;
 
 class CURD
 {
@@ -143,7 +144,7 @@ class CURD
         if (array_has($data, $this->primaryKey) && !empty($data[$this->primaryKey])) {
             $model = $this->newBuilder()->find($data[$this->primaryKey]);
         } else {
-            $model = $this->model;
+            $model = new $this->model();
         }
         $this->fillDataAndSave($model, $data);
     }
@@ -175,6 +176,7 @@ class CURD
             }
             DB::commit();
         } catch (\Exception $err) {
+            Log::error($err->getMessage());
             DB::rollBack();
             throw $err;
         }

@@ -96,12 +96,12 @@ class StaffRequest extends FormRequest
         if ($this->operationMatch($operationType, ['edit', 'entry', 'reinstate'])) {
             $importValidatorPersonal = [
                 'gender.name' => ['required', 'exists:i_gender,name'],
-                'info.household_province.name' => ['exists:i_district,name,level,1'],
-                'info.household_city.name' => ['exists:i_district,name,level,2'],
-                'info.household_county.name' => ['exists:i_district,name,level,3'],
-                'info.living_province.name' => ['exists:i_district,name,level,1'],
-                'info.living_city.name' => ['exists:i_district,name,level,2'],
-                'info.living_county.name' => ['exists:i_district,name,level,3'],
+                'info.household_province' => ['exists:i_district,name,level,1'],
+                'info.household_city' => ['exists:i_district,name,level,2'],
+                'info.household_county' => ['exists:i_district,name,level,3'],
+                'info.living_province' => ['exists:i_district,name,level,1'],
+                'info.living_city' => ['exists:i_district,name,level,2'],
+                'info.living_county' => ['exists:i_district,name,level,3'],
             ];
         }
         $this->validator = array_collapse([$this->validator, $importValidator, $importValidatorOrganic, $importValidatorPersonal]);
