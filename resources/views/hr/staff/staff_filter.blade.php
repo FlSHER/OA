@@ -222,7 +222,35 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-2 col-lg-offset-2">
+        </div>
+        <div class="form-group form-group-sm">
+            <div class="col-lg-6">
+                <div class="row">
+                    <label class="control-label col-sm-2">户口所在地</label>
+                    <div class="col-sm-10">
+                        @include('layouts/district_group',
+                        ['provinceName'=>'info.household_province_id',
+                        'cityName'=>'info.household_city_id',
+                        'countyName'=>'info.household_county_id',
+                        'isFilter'=>true])
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="row">
+                    <label class="control-label col-sm-2">现居住地</label>
+                    <div class="col-sm-10">
+                        @include('layouts/district_group',
+                        ['provinceName'=>'info.living_province_id',
+                        'cityName'=>'info.living_city_id',
+                        'countyName'=>'info.living_county_id',
+                        'isFilter'=>true])
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group form-group-sm">
+            <div class="col-lg-2 col-lg-offset-9">
                 <button type="reset" class="btn btn-warning btn-sm">重置</button>
                 <button type="submit" class="btn btn-default btn-sm pull-right">确认</button>
             </div>
