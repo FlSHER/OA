@@ -60,7 +60,7 @@ class AllotmentUserController extends Controller
         $rules = [
             'staff_sn' => 'required|exists:staff,staff_sn|unique:work_mission.users,staff_sn',
             'department' => 'array',
-            'department.*.department_id' => 'required|exists:departments,id|unique:work_mission.departments,department_id',
+            'department.*.department_id' => 'required|exists:departments,id',
         ];
 
         if ($request->has('id') && !empty($request->id)) {
