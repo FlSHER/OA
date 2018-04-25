@@ -23,6 +23,7 @@ return [
         'shop.name' => '店铺名称',
         'position_id' => '职位ID',
         'position.name' => '职位',
+        'position.level' => '职级',
         'brand_id' => '品牌ID',
         'brand.name' => '品牌',
         'dingding' => '钉钉用户编码',
