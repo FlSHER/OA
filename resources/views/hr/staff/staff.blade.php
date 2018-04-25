@@ -140,6 +140,7 @@
         { data: "shop.name", title: "店铺名称", type: 'search:shop', visible: false, defaultContent: "" },
         { data: "shop_sn", title: "店铺代码", visible: false, searchable: false },
         { data: "position.name", title: "职位", type: 'select', searchable: false },
+        { data: "position.level", title: "职级", type: 'select', visible: false, searchable: false },
         { data: "status.name", title: "状态", type: 'select', searchable: false },
         { data: "gender.name", title: "性别", type: 'select', visible: false, searchable: false },
         { data: "birthday", title: "生日", type: 'date', visible: false, searchable: false },
