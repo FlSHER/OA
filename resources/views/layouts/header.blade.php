@@ -24,7 +24,7 @@
             <li>
                 <a href="#" class="btn btn-default dropdown-toggle " data-toggle="dropdown">
                     <!--<img src="{{asset('images/photos/user-avatar.png')}}" alt="" />-->
-                    @if(empty(session('admin')['realname'])){{session('admin')['username']}}@else{{session('admin')['realname']}}@endif
+                    {{app('CurrentUser')->realname}}
                     <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-usermenu pull-right">
