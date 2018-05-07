@@ -20,5 +20,6 @@ Route::group(['prefix' => 'finance', 'namespace' => 'Finance', 'as' => 'finance'
         Route::post('/expenses', ['uses' => 'CheckReimburseController@getCheckReimburseExpenses']);//ajax获取消费明细报销单
         Route::get('/print/{reim_id}', ['uses' => 'CheckReimburseController@checkReimbursePrint']); //打印审核明细
         Route::post('/restore', ['uses' => 'CheckReimburseController@restore']);//撤回已审核单
+        Route::post('/pay', ['uses' => 'CheckReimburseController@pay']);//转账
     });
 });

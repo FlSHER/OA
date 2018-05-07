@@ -26,88 +26,7 @@ $(function () {
  */
 function createDataTable() {
   hTable = $('#history-table').oaTable({
-    "columns": [
-      {
-        "title": "详情", "data": "id", "name": "id", "class": "text-center", "sortable": false,
-        "render": function (data, type, row, meta) {
-          return '<i class="fa fa-plus-circle show_expense" style="font-size: 20px; cursor:pointer;" onclick="show_expenses(' + data + ',this)"></i>';
-        }
-      },
-      {
-        "title": "订单编号", "data": "reim_sn", "name": "reim_sn", "sortable": true,
-        "createdCell": function (nTd, sData, oData, iRow, iCol) {
-          $(nTd).css({
-            "max-width": "120px",
-            "overflow": "hidden",
-            "white-space": "nowrap",
-            "text-overflow": "ellipsis"
-          }).attr("title", sData);
-        }
-      },
-      { "title": "申请人", "data": "realname", "name": "realname", "sortable": true },
-      {
-        "title": "部门", "data": "department_name", "name": "department_name", "sortable": true,
-        "createdCell": function (nTd, sData, oData, iRow, iCol) {
-          var html = (sData.length > 6) ? sData.substring(0, 6) + '..' : sData;
-          $(nTd).html(html).attr('title', sData);
-        }
-      },
-      { "title": "审批人", "data": "approver_name", "name": "approver_name", "sortable": true },
-      { "title": "资金归属", "data": "reim_department.name", "name": "reim_department.name", "sortable": true },
-      {
-        "title": "申请时间", "data": "send_time", "name": "send_time", "sortable": true, searchable: false,
-        "createdCell": function (nTd, sData, oData, iRow, iCol) {
-          $(nTd).html(sData.substring(0, 10)).attr("title", sData);
-        }
-      },
-      {
-        "title": "审批时间", "data": "approve_time", "name": "approve_time", "sortable": true, searchable: false,
-        "createdCell": function (nTd, sData, oData, iRow, iCol) {
-          $(nTd).html(sData.substring(0, 10)).attr("title", sData);
-        }
-      },
-      {
-        "title": "审核时间", "data": "audit_time", "name": "audit_time", "sortable": true, searchable: false,
-        "createdCell": function (nTd, sData, oData, iRow, iCol) {
-          $(nTd).html(sData.substring(0, 10)).attr("title", sData);
-        }
-      },
-      {
-        "title": "审核人",
-        "data": "accountant_name",
-        "name": "accountant_name",
-        "class": "text-center",
-        "sortable": true
-      },
-      {
-        "title": "总金额",
-        "data": "audited_cost",
-        "name": "audited_cost",
-        "class": "text-center",
-        "width": "100px",
-        "sortable": true,
-        "render": function (data, type, row, meta) {
-          return '￥' + data;
-        }
-      },
-      {
-        title: "操作",
-        data: 'id',
-        name: 'id',
-        class: 'text-center',
-        sortable: false,
-        createdCell: function (nTd, sData, oData, iRow, iCol) {
-          var html = '';
-          if (oData.print_count === 0) {
-            html += '<a target="_blank" href="/finance/reimburse/print/' + sData + '" class="btn btn-sm btn-default print" title="打印"><i class="fa fa-print"></i></a>';
-          }
-          if (reply_button) {//撤回权限
-            html += ' <button class = "btn btn-sm btn-danger" title = "撤回" onclick="restore(' + sData + ')"><i class = "fa fa-reply"></i></button>';
-          }
-          $(nTd).html(html).css("padding", "6px");
-        }
-      }
-    ],
+    "columns": auditedColumns,
     "ajax": { "url": "/finance/check_reimburse/audited" },
     "scrollX": 1000,
     "dom": "<'row'<'col-sm-3'l><'col-sm-6'B<'#mytoolbox'>><'col-sm-3'f>r>" +
@@ -316,6 +235,19 @@ function restore(id) {
         hTable.draw();
       } else if (msg === 'error') {
         alert('撤回失败！请重新刷新后再试');
+      }
+    }, 'text');
+  }
+}
+
+function pay(id) {
+  if (confirm('确认转账')) {
+    var url = '/finance/check_reimburse/pay';
+    $.post(url, { reim_id: id }, function (msg) {
+      if (msg === 'success') {
+        hTable.draw();
+      } else if (msg === 'error') {
+        alert('转账失败！请重新刷新后再试');
       }
     }, 'text');
   }

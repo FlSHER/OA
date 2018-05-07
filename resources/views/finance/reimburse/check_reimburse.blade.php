@@ -4,15 +4,15 @@
 
 @section('css')
     <!--dynamic table-->
-    <link rel="stylesheet" href="{{source('plug_in/datatables/datatables.min.css')}}"/>
+    <link rel="stylesheet" href="{{source('plug_in/datatables/datatables.min.css')}}" />
     <!--daterangepicker-->
-    <link rel="stylesheet" href="{{source('plug_in/daterangepicker/daterangepicker.css')}}"/>
+    <link rel="stylesheet" href="{{source('plug_in/daterangepicker/daterangepicker.css')}}" />
     <!--viewerjs-->
-    <link rel="stylesheet" href="{{source('plug_in/viewerjs/css/viewer.css')}}"/>
+    <link rel="stylesheet" href="{{source('plug_in/viewerjs/css/viewer.css')}}" />
     <!-- checkbox -->
-    <link rel="stylesheet" href="{{source('css/checkbox.css')}}"/>
+    <link rel="stylesheet" href="{{source('css/checkbox.css')}}" />
     <!-- zTree css -->
-    <link rel="stylesheet" href="{{source('plug_in/ztree/css/metroStyle.css')}}"/>
+    <link rel="stylesheet" href="{{source('plug_in/ztree/css/metroStyle.css')}}" />
 @endsection
 
 @section('content')
@@ -113,20 +113,96 @@
     <!-- zTree js -->
     <script type="text/javascript" src="{{source('plug_in/ztree/js/jquery.ztree.all.js')}}"></script>
     <script>
-        //查看报销单的撤回权限
-        var reply_button = false;
-        <?php if ($authority->checkAuthority(119)) { ?>
-            reply_button = true;
+      /**
+       * 详情图片调用
+       *获取图片的绝对路径
+       * @returns {string}
+       */
+      function getExpensesTypeImgPath() {
+        return '{{config("api.url.reimburse.base")}}';
+      }
 
-        <?php } ?>
-        /**
-         * 详情图片调用
-         *获取图片的绝对路径
-         * @returns {string}
-         */
-        function getExpensesTypeImgPath() {
-            return '{{config("api.url.reimburse.base")}}';
+      var auditedColumns = [
+        {
+          title: "详情", data: "id", name: "id", class: "text-center", sortable: false,
+          render: function (data, type, row, meta) {
+            return '<i class="fa fa-plus-circle show_expense" style="font-size: 20px; cursor:pointer;" onclick="show_expenses(' + data + ',this)"></i>';
+          }
+        },
+        { title: "订单编号", data: "reim_sn", name: "reim_sn", sortable: true },
+        { title: "申请人", data: "realname", name: "realname", sortable: true },
+        {
+          title: "部门", data: "department_name", name: "department_name", sortable: true,
+          createdCell: function (nTd, sData, oData, iRow, iCol) {
+            var html = (sData.length > 6) ? sData.substring(0, 6) + '..' : sData;
+            $(nTd).html(html).attr('title', sData);
+          }
+        },
+        { title: "审批人", data: "approver_name", name: "approver_name", sortable: true },
+        { title: "资金归属", data: "reim_department.name", name: "reim_department.name", sortable: true },
+        {
+          title: "申请时间", data: "send_time", name: "send_time", sortable: true, searchable: false,
+          createdCell: function (nTd, sData, oData, iRow, iCol) {
+            $(nTd).html(sData.substring(0, 10)).attr("title", sData);
+          }
+        },
+        {
+          title: "审批时间", data: "approve_time", name: "approve_time", sortable: true, searchable: false,
+          createdCell: function (nTd, sData, oData, iRow, iCol) {
+            $(nTd).html(sData.substring(0, 10)).attr("title", sData);
+          }
+        },
+        {
+          title: "审核时间", data: "audit_time", name: "audit_time", sortable: true, searchable: false,
+          createdCell: function (nTd, sData, oData, iRow, iCol) {
+            $(nTd).html(sData.substring(0, 10)).attr("title", sData);
+          }
+        },
+        {
+          title: "审核人",
+          data: "accountant_name",
+          name: "accountant_name",
+          class: "text-center",
+          sortable: true
+        },
+        {
+          title: "总金额",
+          data: "audited_cost",
+          name: "audited_cost",
+          class: "text-center",
+          width: "100px",
+          sortable: true,
+          render: function (data, type, row, meta) {
+            return '￥' + data;
+          }
+        },
+        {
+          title: "操作",
+          data: 'id',
+          name: 'id',
+          class: 'text-center',
+          sortable: false,
+          createdCell: function (nTd, sData, oData, iRow, iCol) {
+            var html = '';
+            if (oData.print_count === 0) {
+              html += '<a target="_blank" href="/finance/reimburse/print/' +
+                sData + '" class="btn btn-sm btn-default print" title="打印">' +
+                '<i class="fa fa-fw fa-print"></i></a>';
+            }
+            if (oData.status_id == 4) {
+                @if ($authority->checkAuthority(119))
+                  html += ' <button class = "btn btn-sm btn-danger" title="撤回" onclick="restore(' + sData + ')">' +
+                  '<i class="fa fa-fw fa-reply"></i></button>';
+                @endif
+                        @if ($authority->checkAuthority(134))
+                  html += ' <button class = "btn btn-sm btn-success" title="转账" onclick="pay(' + sData + ')">' +
+                  '<i class="fa fa-fw fa-yen"></i></button>';
+                @endif
+            }
+            $(nTd).html(html).css("padding", "6px");
+          }
         }
+      ];
     </script>
 
     <!-- 报销相关功能 -->

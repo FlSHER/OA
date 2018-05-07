@@ -8,7 +8,7 @@
                 <div class="row">
                     <label class="control-label col-lg-4 col-sm-2">订单编号</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" name="reim_sn.like"/>
+                        <input type="text" class="form-control" name="reim_sn.like" />
                     </div>
                 </div>
             </div>
@@ -16,7 +16,7 @@
                 <div class="row">
                     <label class="control-label col-lg-4 col-sm-2">申请人</label>
                     <div class="col-sm-8 input-group input-group-sm" oaSearch="staff">
-                        <input type="text" class="form-control" name="realname.like" oaSearchColumn="realname"/>
+                        <input type="text" class="form-control" name="realname.like" oaSearchColumn="realname" />
                         <span class="input-group-btn">
                             <button type="button" class="btn btn-default" oaSearchShow><i
                                         class="fa fa-search"></i></button>
@@ -29,7 +29,7 @@
                     <label class="control-label col-lg-4 col-sm-2">审批人</label>
                     <div class="col-sm-8 input-group input-group-sm" oaSearch="staff">
                         <input type="text" class="form-control" name="approver_name.like"
-                               oaSearchColumn="realname"/>
+                               oaSearchColumn="realname" />
                         <span class="input-group-btn">
                             <button type="button" class="btn btn-default" oaSearchShow><i
                                         class="fa fa-search"></i></button>
@@ -42,7 +42,7 @@
                     <label class="control-label col-lg-4 col-sm-2">审核人</label>
                     <div class="col-sm-8 input-group input-group-sm" oaSearch="staff">
                         <input type="text" class="form-control" name="accountant_name.like"
-                               oaSearchColumn="realname"/>
+                               oaSearchColumn="realname" />
                         <span class="input-group-btn">
                             <button type="button" class="btn btn-default" oaSearchShow><i
                                         class="fa fa-search"></i></button>
@@ -65,7 +65,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4">
+            <div class="col-lg-6">
                 <div class="row">
                     <label class="control-label col-sm-2">部门</label>
                     <div class="col-md-7 col-sm-7" id="department_filter">
@@ -84,36 +84,47 @@
                     </div>
                 </div>
             </div>
+            <div class="col-lg-3">
+                <div class="row">
+                    <label class="control-label col-lg-4 col-sm-2">是否转账</label>
+                    <div class="col-sm-8">
+                        <select class="form-control" name="status_id">
+                            <option value="">全部</option>
+                            <option value="4">未转账</option>
+                            <option value="5">已转账</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group form-group-sm">
             <div class="col-lg-4">
                 <div class="row">
                     <label class="control-label col-lg-3 col-sm-2">申请时间</label>
                     <div class="col-lg-9 col-sm-8">
                         <div class="row">
                             <div class="col-xs-6">
-                                <input class="form-control" name="send_time.min" type="text" isDate/>
+                                <input class="form-control" name="send_time.min" type="text" isDate />
                             </div>
                             <label class="control-label row pull-left" style="padding-left: 9px">至</label>
                             <div class="col-xs-6">
-                                <input class="form-control" name="send_time.max" type="text" isDate/>
+                                <input class="form-control" name="send_time.max" type="text" isDate />
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-        </div>
-        <div class="form-group form-group-sm">
             <div class="col-lg-4">
                 <div class="row">
                     <label class="control-label col-lg-3 col-sm-2">审批时间</label>
                     <div class="col-lg-9 col-sm-8">
                         <div class="row">
                             <div class="col-xs-6">
-                                <input class="form-control" name="approve_time.min" type="text" isDate/>
+                                <input class="form-control" name="approve_time.min" type="text" isDate />
                             </div>
                             <label class="control-label row pull-left" style="padding-left: 9px">至</label>
                             <div class="col-xs-6">
-                                <input class="form-control" name="approve_time.max" type="text" isDate/>
+                                <input class="form-control" name="approve_time.max" type="text" isDate />
                             </div>
                         </div>
                     </div>
@@ -125,17 +136,20 @@
                     <div class="col-lg-9 col-sm-8">
                         <div class="row">
                             <div class="col-xs-6">
-                                <input class="form-control" name="audit_time.min" type="text" isDate/>
+                                <input class="form-control" name="audit_time.min" type="text" isDate />
                             </div>
                             <label class="control-label row pull-left" style="padding-left: 9px">至</label>
                             <div class="col-xs-6">
-                                <input class="form-control" name="audit_time.max" type="text" isDate/>
+                                <input class="form-control" name="audit_time.max" type="text" isDate />
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-2 col-lg-offset-2">
+
+        </div>
+        <div class="form-group form-group-sm">
+            <div class="col-lg-2 col-lg-offset-10">
                 <button type="reset" class="btn btn-warning btn-sm">重置</button>
                 <button type="submit" class="btn btn-default btn-sm pull-right">确认</button>
             </div>
@@ -143,93 +157,93 @@
     </form>
 </div>
 <script>
-    $(function () {
-        /* zTree start */
-        departmentOptionsZTreeSetting = {
-            async: {
-                url: "/hr/department/tree",
-                dataFilter: function (treeId, parentNode, responseData) {
-                    if (treeId == "department_filter_option") {
-                        return [{
-                            "name": "全部",
-                            "drag": true,
-                            "id": "0",
-                            "children": responseData,
-                            "iconSkin": " _",
-                            "open": true
-                        }];
-                    } else {
-                        return responseData;
-                    }
-                }
-            },
-            view: {
-                dblClickExpand: false
-            },
-            callback: {
-                onClick: function (event, treeId, treeNode) {
-                    if (treeNode.drag) {
-                        var options = $(event.target).parents(".ztreeOptions");
-                        if (treeNode.id == 0) {
-                            options.prev().children("option").first().prop("selected", true);
-                            if (options.next().prop('tagName') == 'INPUT') {
-                                options.next().val('');
-                            }
-                        } else {
-                            options.prev().children("option[value=" + treeNode.id + "]").prop("selected", true);
-                            if (options.next().prop('tagName') == 'INPUT') {
-                                var children = $.fn.zTree.getZTreeObj(treeId).getNodesByFilter(function (node) {
-                                    return node.drag;
-                                }, false, treeNode);
-                                var departmentId = treeNode.id;
-                                for (var i in children) {
-                                    departmentId += ',' + children[i].id;
-                                }
-                                options.next().val(departmentId);
-                            }
-                        }
-                        options.hide();
-                        options.prev().change();
-                    }
-                }
-            }
-        };
-        /* zTree End */
-    });
-
-    window.onload = function () {
-        $("#department_children").on('change', function () {
-            if ($(this).is(':checked')) {
-                $('#department_filter').find('select').removeAttr('name');
-                $('#department_filter').find('input').attr('name', 'department_id.in');
+  $(function () {
+    /* zTree start */
+    departmentOptionsZTreeSetting = {
+      async: {
+        url: "/hr/department/tree",
+        dataFilter: function (treeId, parentNode, responseData) {
+          if (treeId == "department_filter_option") {
+            return [{
+              "name": "全部",
+              "drag": true,
+              "id": "0",
+              "children": responseData,
+              "iconSkin": " _",
+              "open": true
+            }];
+          } else {
+            return responseData;
+          }
+        }
+      },
+      view: {
+        dblClickExpand: false
+      },
+      callback: {
+        onClick: function (event, treeId, treeNode) {
+          if (treeNode.drag) {
+            var options = $(event.target).parents(".ztreeOptions");
+            if (treeNode.id == 0) {
+              options.prev().children("option").first().prop("selected", true);
+              if (options.next().prop('tagName') == 'INPUT') {
+                options.next().val('');
+              }
             } else {
-                $('#department_filter').find('select').attr('name', 'department_id');
-                $('#department_filter').find('input').removeAttr('name');
+              options.prev().children("option[value=" + treeNode.id + "]").prop("selected", true);
+              if (options.next().prop('tagName') == 'INPUT') {
+                var children = $.fn.zTree.getZTreeObj(treeId).getNodesByFilter(function (node) {
+                  return node.drag;
+                }, false, treeNode);
+                var departmentId = treeNode.id;
+                for (var i in children) {
+                  departmentId += ',' + children[i].id;
+                }
+                options.next().val(departmentId);
+              }
             }
-        });
-        $("#check_reimburse_search form").on("reset", function () {
-            $(this).find('input,select').val('').change();
-        });
+            options.hide();
+            options.prev().change();
+          }
+        }
+      }
     };
+    /* zTree End */
+  });
 
-    function showTreeViewOptions(obj) {
-        var options = $(obj).next(".ztreeOptions");
-        var width = $(obj).outerWidth();
-        departmentTriger = obj;
-        options.outerWidth(width);
-        $(obj).children("option").hide();
-        if (options.html().length == 0) {
-            $.fn.zTree.init(options, departmentOptionsZTreeSetting);
-        }
-        options.toggle();
-        $("body").bind("click", hideTreeViewOptions);
-        return false;
-    }
+  window.onload = function () {
+    $("#department_children").on('change', function () {
+      if ($(this).is(':checked')) {
+        $('#department_filter').find('select').removeAttr('name');
+        $('#department_filter').find('input').attr('name', 'department_id.in');
+      } else {
+        $('#department_filter').find('select').attr('name', 'department_id');
+        $('#department_filter').find('input').removeAttr('name');
+      }
+    });
+    $("#check_reimburse_search form").on("reset", function () {
+      $(this).find('input,select').val('').change();
+    });
+  };
 
-    function hideTreeViewOptions(event) {
-        if (!($(event.target).hasClass("ztreeOptions") || $(event.target).parents(".ztreeOptions").length > 0 || event.target == departmentTriger)) {
-            $(".ztree.ztreeOptions").hide();
-            $("body").unbind("click", hideTreeViewOptions);
-        }
+  function showTreeViewOptions(obj) {
+    var options = $(obj).next(".ztreeOptions");
+    var width = $(obj).outerWidth();
+    departmentTriger = obj;
+    options.outerWidth(width);
+    $(obj).children("option").hide();
+    if (options.html().length == 0) {
+      $.fn.zTree.init(options, departmentOptionsZTreeSetting);
     }
+    options.toggle();
+    $("body").bind("click", hideTreeViewOptions);
+    return false;
+  }
+
+  function hideTreeViewOptions(event) {
+    if (!($(event.target).hasClass("ztreeOptions") || $(event.target).parents(".ztreeOptions").length > 0 || event.target == departmentTriger)) {
+      $(".ztree.ztreeOptions").hide();
+      $("body").unbind("click", hideTreeViewOptions);
+    }
+  }
 </script>

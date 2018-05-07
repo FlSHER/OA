@@ -23,8 +23,7 @@ class CheckReimburseController extends Controller
      */
     public function getAllAuditedList(Request $request)
     {
-        $where = ['status_id'=>4];
-        $result = app('Plugin')->dataTables($request, Reimbursement::where($where));
+        $result = app('Plugin')->dataTables($request, Reimbursement::whereIn('status_id', [4, 5]));
         return $result;
     }
 
@@ -63,5 +62,21 @@ class CheckReimburseController extends Controller
     {
         $reim_id = $request->reim_id;
         return app('AuditRepository')->checkReimburseRestore($reim_id);
+    }
+
+    public function pay(Request $request)
+    {
+        $reim_id = $request->reim_id;
+        $reimbursement = Reimbursement::find($reim_id);
+        if ($reimbursement && $reimbursement->status_id == 4) {
+            $reimbursement->status_id = 5;
+            $reimbursement->payer_sn = app('CurrentUser')->staff_sn;
+            $reimbursement->payer_name = app('CurrentUser')->realname;
+            $reimbursement->paid_at = date('Y-m-d');
+            $reimbursement->save();
+            return 'success';
+        } else {
+            return 'error';
+        }
     }
 }
