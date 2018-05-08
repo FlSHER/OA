@@ -274,15 +274,16 @@ class AuditRepository
     {
         $payeeSheetData = [];
         foreach ($data as $k => $v) {
-            $payeeKey = $v['payee_name'] . $v['payee_bank_other'] . $v['payee_bank_account'];
+            $payeeKey = $v['payee_name'] . $v['payee_bank_other'] . $v['payee_bank_account'] . $v['reim_department_id'];
             if (array_has($payeeSheetData, $payeeKey)) {
-                $payeeSheetData[$payeeKey]['金额'] += number_format($v['audited_cost'], 2, '.', '');
+                $payeeSheetData[$payeeKey]['金额'] = number_format(($payeeSheetData[$payeeKey]['金额'] + $v['audited_cost']), 2, '.', '');
                 $payeeSheetData[$payeeKey]['reim_sn'] .= '-' . $v['reim_sn'];
             } else {
                 $payeeSheetData[$payeeKey] = [
-                    'payee_name' => $v['payee_name'],
                     'payee_bank_other' => $v['payee_bank_other'],
                     'payee_bank_account' => $v['payee_bank_account'],
+                    'payee_name' => $v['payee_name'],
+                    'reim_department.name' => $v['reim_department']['name'],
                     'payee_phone' => $v['payee_phone'],
                     'payee_province' => $v['payee_province'],
                     'payee_city' => $v['payee_city'],
