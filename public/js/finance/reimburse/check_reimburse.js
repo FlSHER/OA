@@ -26,18 +26,29 @@ $(function () {
  */
 function createDataTable() {
   hTable = $('#history-table').oaTable({
-    "columns": auditedColumns,
-    "ajax": { "url": "/finance/check_reimburse/audited" },
-    "scrollX": 1000,
-    "dom": "<'row'<'col-sm-3'l><'col-sm-6'B<'#mytoolbox'>><'col-sm-3'f>r>" +
+    columns: auditedColumns,
+    ajax: { "url": "/finance/check_reimburse/audited" },
+    scrollX: 1000,
+    dom: "<'row'<'col-sm-3'l><'col-sm-6'B<'#mytoolbox'>><'col-sm-3'f>r>" +
     "t" +
     "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-    "buttons": [
-      'export:/finance/reimburse/excel?type=all',//导出
-    ],
+    buttons: buttons,
     filter: $("#check_reimburse_search"),//搜索
-    'order': [['8', 'desc']],
-    'scrollY': 586
+    order: [['8', 'desc']],
+    scrollY: 586,
+    initComplete() {
+      var selectAll = $('<label class="frame check frame-sm" unselectable="on" onselectstart="return false;" title="全选" />');
+      var selectAllInput = $('<input type="checkbox"/>');
+      selectAllInput.change(function () {
+        var checked = this.checked;
+        $('td.multi-select [name=id]:checkbox:not(:disabled)').each(function () {
+          $(this).prop('checked', checked);
+        });
+      });
+      selectAll.append(selectAllInput);
+      selectAll.append('<span class="checkbox-outer"><i class="fa fa-check"></i></span>&nbsp;');
+      $('.dataTables_scrollHead th.multi-select').append(selectAll);
+    }
   });
 }
 
@@ -232,7 +243,7 @@ function restore(id) {
     var url = '/finance/check_reimburse/restore';
     $.post(url, { reim_id: id }, function (msg) {
       if (msg === 'success') {
-        hTable.draw();
+        hTable.draw(false);
       } else if (msg === 'error') {
         alert('撤回失败！请重新刷新后再试');
       }
@@ -245,7 +256,7 @@ function pay(id) {
     var url = '/finance/check_reimburse/pay';
     $.post(url, { reim_id: id }, function (msg) {
       if (msg === 'success') {
-        hTable.draw();
+        hTable.draw(false);
       } else if (msg === 'error') {
         alert('转账失败！请重新刷新后再试');
       }
@@ -253,3 +264,9 @@ function pay(id) {
   }
 }
 
+function payByMultiple() {
+  var checked = $('td.multi-select [name=id]:checkbox:checked:not(:disabled)').map(function () {
+    return $(this).val();
+  }).get();
+  pay(checked);
+}

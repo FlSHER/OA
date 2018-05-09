@@ -112,6 +112,8 @@
     <script src="{{source('plug_in/viewerjs/js/viewer.js')}}"></script>
     <!-- zTree js -->
     <script type="text/javascript" src="{{source('plug_in/ztree/js/jquery.ztree.all.js')}}"></script>
+    <!-- 报销相关功能 -->
+    <script src="{{source('js/finance/reimburse/check_reimburse.js')}}"></script>
     <script>
       /**
        * 详情图片调用
@@ -123,6 +125,29 @@
       }
 
       var auditedColumns = [
+              @if ($authority->checkAuthority(134))
+        {
+          data: "id", name: "id", class: "text-center multi-select", sortable: false,
+          createdCell: function (nTd, sData, oData) {
+            var select = $('<label class="frame check frame-sm" unselectable="on" onselectstart="return false;" />');
+            var selectInput = $('<input type="checkbox" name="id" value="' + sData + '"/>');
+            if (oData.status_id !== 4) {
+              selectInput.prop('disabled', true);
+            }
+            selectInput.change(function () {
+              var checked = this.checked;
+              if (checked) {
+                var allSelect = $('td.multi-select [name=id]:checkbox:not(:disabled)');
+                checked = allSelect.length === allSelect.filter(':checked').length;
+              }
+              $('.dataTables_scrollHead th.multi-select :checkbox').prop('checked', checked);
+            });
+            select.append(selectInput);
+            select.append('<span class="checkbox-outer"><i class="fa fa-check"></i></span>&nbsp;');
+            $(nTd).html(select);
+          }
+        },
+              @endif
         {
           title: "详情", data: "id", name: "id", class: "text-center", sortable: false,
           render: function (data, type, row, meta) {
@@ -203,8 +228,10 @@
           }
         }
       ];
-    </script>
 
-    <!-- 报销相关功能 -->
-    <script src="{{source('js/finance/reimburse/check_reimburse.js')}}"></script>
+      var buttons = ['export:/finance/reimburse/excel?type=all'];
+      @if ($authority->checkAuthority(134))
+      buttons.push({ text: '<i class="fa fa-yen fa-fw"></i>', action: payByMultiple, titleAttr: '批量转账' });
+        @endif
+    </script>
 @endsection
