@@ -25,6 +25,13 @@
                                     <input type="text" class="form-control" name="name" placeholder="请输入资金归属名" maxlength="20">
                                 </div>
                             </div>
+                            <div class="form-group" oaSearch="staff">
+                                <label  class="col-sm-2 control-label">品牌副总<span style="color: red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" readonly name="manager_name" oaSearchShow oaSearchColumn="realname" placeholder="请点击选择品牌副总" value=""/>
+                                </div>
+                                <input type="hidden" name="manager_sn"  value="" oaSearchColumn="staff_sn" />
+                            </div>
                             <div class="form-group" isFormList>
                                 <label  class="col-sm-2 control-label">审核人<span style="color: red;">*</span></label>
                                 <div class="col-sm-8">
