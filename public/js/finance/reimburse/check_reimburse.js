@@ -28,10 +28,6 @@ function createDataTable() {
   hTable = $('#history-table').oaTable({
     columns: auditedColumns,
     ajax: { "url": "/finance/check_reimburse/audited" },
-    scrollX: 1000,
-    dom: "<'row'<'col-sm-3'l><'col-sm-6'B<'#mytoolbox'>><'col-sm-3'f>r>" +
-    "t" +
-    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
     buttons: buttons,
     filter: $("#check_reimburse_search"),//搜索
     order: [['8', 'desc']],
@@ -48,6 +44,11 @@ function createDataTable() {
       selectAll.append(selectAllInput);
       selectAll.append('<span class="checkbox-outer"><i class="fa fa-check"></i></span>&nbsp;');
       $('.dataTables_scrollHead th.multi-select').append(selectAll);
+    },
+    drawCallback() {
+      var allSelect = $('td.multi-select [name=id]:checkbox:not(:disabled)');
+      var checked = allSelect.length > 0 && allSelect.length === allSelect.filter(':checked').length;
+      $('.dataTables_scrollHead th.multi-select :checkbox').prop('checked', checked);
     }
   });
 }
@@ -251,6 +252,8 @@ function restore(id) {
   }
 }
 
+/*---------------------------转账start-------------------------*/
+
 function pay(id) {
   if (confirm('确认转账')) {
     var url = '/finance/check_reimburse/pay';
@@ -270,3 +273,61 @@ function payByMultiple() {
   }).get();
   pay(checked);
 }
+
+/*---------------------------转账end-------------------------*/
+
+/*---------------------------驳回start-------------------------*/
+
+//驳回 弹出层（待审核单）
+function auditReject(id) {
+  $('#remarks').val('收款人信息错误');
+  $('#confirm_reject').attr('reim_id', id);
+}
+
+//驳回提交处理 （待审核单）
+function confirm_reject(_self) {
+  var id = $(_self).attr('reim_id');
+  var url = "/finance/reimburse/reject";
+  var remarks = $.trim($('#remarks').val());
+  if (remarks.length < 1) {
+    alert('请输入驳回原因！内容不能为空');
+    return false;
+  }
+  $.ajax({
+    type: "POST",
+    url: url,
+    dataType: 'json',
+    data: { "id": id, "remarks": remarks },
+    success: function (msg) {
+      if (msg.msg == 'error') {
+        alert(msg.result);
+      } else if (msg.msg === "success") {
+        $('#myModals .close').click();
+        oTable.draw();
+      } else if (msg == 'warning') {
+        alert(msg.result);
+      }
+    },
+    error: function (msg) {
+      if (msg.status === 422) {
+        var response = JSON.parse(msg.responseText);
+        for (var i in response) {
+          alert(response[i]);
+        }
+      }
+    }
+  });
+}
+
+
+//检测内容是否为空（控制确认按钮是否可点击）
+function check_remarks(_self) {
+  var val = $.trim($(_self).val());
+  $("#confirm_reject").attr('disabled', true);
+  if (val.length != 0) {
+    $("#confirm_reject").attr('disabled', false);
+  }
+}
+
+
+/*---------------------------驳回end-------------------------*/

@@ -36,10 +36,6 @@
             padding-left: 50px;
         }
 
-        .dt-buttons {
-            padding-top: 12px;
-        }
-
         .show_expense.fa-plus-circle {
             color: #65CEA7;
         }
@@ -100,6 +96,30 @@
             </section>
         </div>
     </div>
+    {{--驳回界面start--}}
+    <div role="dialog" tabindex="-1" id="myModals" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header danger">
+                    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                    <h4 class="modal-title">驳回</h4>
+                </div>
+                <div class="modal-body" style="font-size:24px;">
+                    <form class="">
+                        <textarea onkeyup="check_remarks(this)" id="remarks" class="form-control" rows="4"
+                                  placeholder="请输入驳回原因" style="resize:none;"></textarea>
+                    </form>
+                </div>
+                <div class="modal-footer" style="margin-top:0;">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-success" disabled id="confirm_reject"
+                            onclick="confirm_reject(this)">确认
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{--驳回界面end--}}
 @endsection
 
 @section('js')
@@ -138,7 +158,7 @@
               var checked = this.checked;
               if (checked) {
                 var allSelect = $('td.multi-select [name=id]:checkbox:not(:disabled)');
-                checked = allSelect.length === allSelect.filter(':checked').length;
+                checked = allSelect.length > 0 && allSelect.length === allSelect.filter(':checked').length;
               }
               $('.dataTables_scrollHead th.multi-select :checkbox').prop('checked', checked);
             });
@@ -166,21 +186,27 @@
         { title: "审批人", data: "approver_name", name: "approver_name", sortable: true },
         { title: "资金归属", data: "reim_department.name", name: "reim_department.name", sortable: true },
         {
-          title: "申请时间", data: "send_time", name: "send_time", sortable: true, searchable: false,
+          title: "申请时间", data: "send_time", name: "send_time", sortable: true, searchable: false, visible: false,
           createdCell: function (nTd, sData, oData, iRow, iCol) {
-            $(nTd).html(sData.substring(0, 10)).attr("title", sData);
+            if (sData) $(nTd).html(sData.substring(0, 10)).attr("title", sData);
           }
         },
         {
-          title: "审批时间", data: "approve_time", name: "approve_time", sortable: true, searchable: false,
+          title: "审批时间", data: "approve_time", name: "approve_time", sortable: true, searchable: false, visible: false,
           createdCell: function (nTd, sData, oData, iRow, iCol) {
-            $(nTd).html(sData.substring(0, 10)).attr("title", sData);
+            if (sData) $(nTd).html(sData.substring(0, 10)).attr("title", sData);
           }
         },
         {
           title: "审核时间", data: "audit_time", name: "audit_time", sortable: true, searchable: false,
           createdCell: function (nTd, sData, oData, iRow, iCol) {
-            $(nTd).html(sData.substring(0, 10)).attr("title", sData);
+            if (sData) $(nTd).html(sData.substring(0, 10)).attr("title", sData);
+          }
+        },
+        {
+          title: "转账时间", data: "paid_at", name: "paid_at", sortable: true, searchable: false,
+          createdCell: function (nTd, sData, oData, iRow, iCol) {
+            if (sData) $(nTd).html(sData.substring(0, 10)).attr("title", sData);
           }
         },
         {
@@ -220,8 +246,11 @@
                   '<i class="fa fa-fw fa-reply"></i></button>';
                 @endif
                         @if ($authority->checkAuthority(134))
-                  html += ' <button class = "btn btn-sm btn-success" title="转账" onclick="pay(' + sData + ')">' +
-                  '<i class="fa fa-fw fa-yen"></i></button>';
+                  html += ' <button class = "btn btn-sm btn-danger reject" ' +
+                  'href="#myModals" data-toggle="modal" onclick="auditReject(' + sData + ')" title = "驳回">' +
+                  '<i class = "fa fa-fw fa-times"></i></button>';
+              html += ' <button class = "btn btn-sm btn-success" title="转账" onclick="pay(' + sData + ')">' +
+                '<i class="fa fa-fw fa-yen"></i></button>';
                 @endif
             }
             $(nTd).html(html).css("padding", "6px");

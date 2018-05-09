@@ -26,19 +26,55 @@ class ReimburseController extends Controller
      */
     public function getHandleList(Request $request)
     {
-        return $this->getHandleData($request);
-    }
-
-    private function getHandleData($request)
-    {
         $reim_deparment_arr = app('AuditService')->getReimDepartmentId();
         if (!$reim_deparment_arr) {
             $result['data'] = [];
-//            $result['draw'] = 2;
             $result['recordsFiltered'] = 0;
             $result['recordsTotal'] = 0;
         } else {
             $result = app('Plugin')->dataTables($request, Reimbursement::where('status_id', 3)->whereIn('reim_department_id', $reim_deparment_arr));
+        }
+        return $result;
+    }
+
+    /**
+     * 已审核列表数据
+     * @param Request $request
+     * @return mixed
+     */
+    public function getAuditedList(Request $request)
+    {
+        $reim_deparment_arr = app('AuditService')->getReimDepartmentId();
+        if (!$reim_deparment_arr) {
+            $result['data'] = [];
+            $result['recordsFiltered'] = 0;
+            $result['recordsTotal'] = 0;
+        } else {
+            $where = ['status_id' => 4];
+            $result = app('Plugin')->dataTables($request, Reimbursement::where($where)->whereIn('reim_department_id', $reim_deparment_arr));
+        }
+        return $result;
+    }
+
+    /**
+     * 已驳回列表数据
+     * @param Request $request
+     * @return mixed
+     */
+    public function getRejectedList(Request $request)
+    {
+        $reim_deparment_arr = app('AuditService')->getReimDepartmentId();
+        if (!$reim_deparment_arr) {
+            $result['data'] = [];
+            $result['recordsFiltered'] = 0;
+            $result['recordsTotal'] = 0;
+        } else {
+            $where = [
+                ['accountant_delete', '=', 0],
+                ['approve_time', '<>', ''],
+                ['reject_staff_sn', '<>', '']
+            ];
+            $result = app('Plugin')->dataTables($request, Reimbursement::where($where)->whereIn('reim_department_id', $reim_deparment_arr));
         }
         return $result;
     }
@@ -58,9 +94,7 @@ class ReimburseController extends Controller
         ];
         $data = Reimbursement::with('expenses.type', 'expenses.bills')->with($expensesWHere)->find($request->reim_id);
         return $data;
-
     }
-
 
     /**
      * 审核通过处理
@@ -103,7 +137,6 @@ class ReimburseController extends Controller
         return app('AuditRepository')->reject($request);
     }
 
-
     /**
      * 打印
      * @param Request $request
@@ -119,56 +152,6 @@ class ReimburseController extends Controller
         $reim = $data['result'];
         return view('finance.reimburse.reimburse_print', ['data' => $reim]);
     }
-
-
-    /**
-     * 已审核列表数据
-     * @param Request $request
-     * @return mixed
-     */
-    public function getAuditedList(Request $request)
-    {
-        $reim_deparment_arr = app('AuditService')->getReimDepartmentId();
-        if (!$reim_deparment_arr) {
-            $result['data'] = [];
-//            $result['draw'] = 2;
-            $result['recordsFiltered'] = 0;
-            $result['recordsTotal'] = 0;
-        } else {
-            $where = ['status_id' => 4];
-            $result = app('Plugin')->dataTables($request, Reimbursement::where($where)->whereIn('reim_department_id', $reim_deparment_arr));
-        }
-
-        return $result;
-    }
-
-
-    /**
-     * 已驳回列表数据
-     * @param Request $request
-     * @return mixed
-     */
-    public function getRejectedList(Request $request)
-    {
-        $staff_sn = app('CurrentUser')->staff_sn;
-        $reim_deparment_arr = app('AuditService')->getReimDepartmentId();
-        if (!$reim_deparment_arr) {
-            $result['data'] = [];
-//            $result['draw'] = 2;
-            $result['recordsFiltered'] = 0;
-            $result['recordsTotal'] = 0;
-        } else {
-            $where = [
-                ['accountant_delete', '=', 0],
-                ['approve_time', '<>', ''],
-                ['reject_staff_sn', '<>', '']
-            ];
-            $result = app('Plugin')->dataTables($request, Reimbursement::where($where)->whereIn('reim_department_id', $reim_deparment_arr));
-        }
-
-        return $result;
-    }
-
 
     /**
      * 删除驳回后的报销单

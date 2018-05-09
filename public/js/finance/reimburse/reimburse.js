@@ -12,16 +12,16 @@ function createDataTable() {
 
   //待审核报销单列表数据
   oTable = $('#pending-table').oaTable({
-    "columns": [
+    columns: [
       {
         title: "详情", data: "id", name: "id", "class": "text-center", "sortable": false,
-        "render": function (data, type, row, meta) {
+        render: function (data, type, row, meta) {
           return '<i class = "fa fa-plus-circle show_expense" style = "font-size:20px;cursor:pointer;" reim-id = "' + data + '"></i>';
         }
       },
       {
-        "title": "订单编号", "data": "reim_sn", "name": "reim_sn", "sortable": true,
-        "createdCell": function (nTd, sData, oData, iRow, iCol) {
+        title: "订单编号", data: "reim_sn", name: "reim_sn", sortable: true,
+        createdCell: function (nTd, sData, oData, iRow, iCol) {
           $(nTd).css({ "max-width": "120px", "overflow": "hidden" }).attr("title", sData);
         }
       },
@@ -81,27 +81,15 @@ function createDataTable() {
         }
       }
     ],
-    "ajax": {
-      "url": "/finance/reimburse/list"
+    ajax: {
+      url: "/finance/reimburse/list"
     },
-    "scrollX": 1000,
-    "dom": "<'row'<'col-sm-3'l><'col-sm-6'B><'col-sm-3'f>r>" +
-    "t" +
-    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-    // "buttons": [
-    //     {"extend": "colvis", "text": "<i class='fa fa-eye-slash fa-fw'></i>", "className": "btn-primary"},
-    //     {
-    //         "text": "<i class='fa fa-refresh fa-fw'></i>", "className": "btn-primary", "action": function () {
-    //         oTable.fnDraw();
-    //     }
-    //     }
-    // ]
-    'order': [[6, 'desc']],
-    'scrollY': 586
+    order: [[6, 'desc']],
+    scrollY: 586
   });
   //已审核报销单列表数据
   hTable = $('#history-table').oaTable({
-    "columns": [
+    columns: [
       {
         "title": "详情", "data": "id", "name": "id", "class": "text-center",
         "render": function (data, type, row, meta) {
@@ -121,23 +109,23 @@ function createDataTable() {
       },
       { "title": "申请人", "data": "realname", "name": "realname", "sortable": true },
       {
-        "title": "部门", "data": "department_name", "name": "department_name", "sortable": true,
-        "createdCell": function (nTd, sData, oData, iRow, iCol) {
+        title: "部门", data: "department_name", name: "department_name", sortable: true,
+        createdCell: function (nTd, sData, oData, iRow, iCol) {
           var html = (sData.length > 6) ? sData.substring(0, 6) + '..' : sData;
           $(nTd).html(html).attr('title', sData);
         }
       },
-      { "title": "审批人", "data": "approver_name", "name": "approver_name", "sortable": true },
-      { "title": "资金归属", "data": "reim_department.name", "name": "reim_department.name", "sortable": true },
+      { title: "审批人", data: "approver_name", name: "approver_name", sortable: true },
+      { title: "资金归属", data: "reim_department.name", name: "reim_department.name", sortable: true },
       {
-        "title": "申请时间", "data": "send_time", "name": "send_time", "sortable": true, searchable: false,
-        "createdCell": function (nTd, sData, oData, iRow, iCol) {
+        title: "申请时间", data: "send_time", name: "send_time", sortable: true, searchable: false, visible: false,
+        createdCell: function (nTd, sData, oData, iRow, iCol) {
           $(nTd).html(sData.substring(0, 10)).attr("title", sData);
         }
       },
       {
-        "title": "审批时间", "data": "approve_time", "name": "approve_time", "sortable": true, searchable: false,
-        "createdCell": function (nTd, sData, oData, iRow, iCol) {
+        title: "审批时间", data: "approve_time", name: "approve_time", sortable: true, searchable: false, visible: false,
+        createdCell: function (nTd, sData, oData, iRow, iCol) {
           $(nTd).html(sData.substring(0, 10)).attr("title", sData);
         }
       },
@@ -148,22 +136,18 @@ function createDataTable() {
         }
       },
       {
-        "title": "总金额",
-        "data": "audited_cost",
-        "name": "audited_cost",
-        "class": "text-center",
-        "width": "100px",
-        "render": function (data, type, row, meta) {
-          return '￥' + data;
+        title: "转账时间", data: "paid_at", name: "paid_at", sortable: true, searchable: false,
+        createdCell: function (nTd, sData, oData, iRow, iCol) {
+          if (sData) $(nTd).html(sData.substring(0, 10)).attr("title", sData);
         }
       },
       {
-        "title": "审核人",
-        "data": "accountant_name",
-        "name": "accountant_name",
-        "class": "text-center",
-        "sortable": true
+        title: "总金额", data: "audited_cost", name: "audited_cost", class: "text-center", width: "100px",
+        render: function (data, type, row, meta) {
+          return '￥' + data;
+        }
       },
+      { title: "审核人", data: "accountant_name", name: "accountant_name", class: "text-center", sortable: true },
       {
         "title": "操作", "data": "id", "name": "id", "class": "text-center", "sortable": false,
         "createdCell": function (nTd, sData, oData, iRow, iCol) {
@@ -171,32 +155,31 @@ function createDataTable() {
           if (oData.print_count === 0) {
             html += '<a target="_blank" href="/finance/reimburse/print/' + sData + '" class="btn btn-sm btn-default print" title="打印"><i class="fa fa-print"></i></a>';
           }
-          // html +=' <button class = "btn btn-sm btn-danger" title = "撤回" onclick="reply('+sData+')"><i class = "fa fa-reply"></i></button>';
           $(nTd).html(html).css("padding", "6px");
         }
       }
     ],
-    "ajax": { "url": "/finance/reimburse/audited" },
-    "scrollX": 1000,
-    "buttons": [
+    ajax: { "url": "/finance/reimburse/audited" },
+    scrollX: 1000,
+    buttons: [
       'export:/finance/reimburse/excel',//导出
     ],
     filter: $("#searchApproved"),//搜索
-    'order': [[8, 'desc']],
-    'scrollY': 586
+    order: [[8, 'desc']],
+    scrollY: 586
   });
   //已驳回报销单列表数据
   rTable = $('#reject-table').oaTable({
-    "columns": [
+    columns: [
       {
-        "title": "详情", "data": "id", "name": "id", "class": "text-center", 'sortable': false,
+        title: "详情", "data": "id", "name": "id", "class": "text-center", 'sortable': false,
         "render": function (data, type, row, meta) {
           return '<i class = "fa fa-plus-circle show_expense" style = "font-size:20px;cursor:pointer;" reim-id = "' + data + '"></i>';
         }
       },
       {
-        "title": "订单编号", "data": "reim_sn", "name": "reim_sn", "sortable": true,
-        "createdCell": function (nTd, sData, oData, iRow, iCol) {
+        title: "订单编号", data: "reim_sn", name: "reim_sn", sortable: true,
+        createdCell: function (nTd, sData, oData, iRow, iCol) {
           $(nTd).css({
             "max-width": "120px",
             "overflow": "hidden",
@@ -205,31 +188,31 @@ function createDataTable() {
           }).attr("title", sData);
         }
       },
-      { "title": "申请人", "data": "realname", "name": "realname", "sortable": true },
-      { "title": "审批人", "data": "approver_name", "name": "approver_name", "sortable": true },
+      { title: "申请人", "data": "realname", "name": "realname", "sortable": true },
+      { title: "审批人", "data": "approver_name", "name": "approver_name", "sortable": true },
       {
-        "title": "部门", "data": "department_name", "name": "department_id", "sortable": true,
-        "createdCell": function (nTd, sData, oData, iRow, iCol) {
+        title: "部门", data: "department_name", name: "department_id", sortable: true,
+        createdCell: function (nTd, sData, oData, iRow, iCol) {
           var html = (sData.length > 6) ? sData.substring(0, 6) + '..' : sData;
           $(nTd).html(html).attr('title', sData);
         }
       },
       { "title": "资金归属", "data": "reim_department.name", "name": "reim_department_id", "sortable": true },
       {
-        "title": "申请时间", "data": "send_time", "name": "send_time", "sortable": true, searchable: false,
-        "createdCell": function (nTd, sData, oData, iRow, iCol) {
+        title: "申请时间", data: "send_time", name: "send_time", sortable: true, searchable: false, visible: false,
+        createdCell: function (nTd, sData, oData, iRow, iCol) {
           $(nTd).html(sData.substring(0, 10)).attr("title", sData);
         }
       },
       {
-        "title": "审批时间", "data": "approve_time", "name": "approve_time", "sortable": true, searchable: false,
-        "createdCell": function (nTd, sData, oData, iRow, iCol) {
+        title: "审批时间", data: "approve_time", name: "approve_time", sortable: true, searchable: false, visible: false,
+        createdCell: function (nTd, sData, oData, iRow, iCol) {
           $(nTd).html(sData.substring(0, 10)).attr("title", sData);
         }
       },
       {
-        "title": "驳回时间", "data": "reject_time", "name": "reject_time", "sortable": true, searchable: false,
-        "createdCell": function (nTd, sData, oData, iRow, iCol) {
+        title: "驳回时间", data: "reject_time", name: "reject_time", sortable: true, searchable: false,
+        createdCell: function (nTd, sData, oData, iRow, iCol) {
           $(nTd).html(sData.substring(0, 10)).attr("title", sData);
         }
       },
@@ -253,21 +236,10 @@ function createDataTable() {
         }
       }
     ],
-    "ajax": { "url": "/finance/reimburse/rejected" },
+    ajax: { "url": "/finance/reimburse/rejected" },
     filter: $("#searchReject"),//搜索
-    "scrollX": 1000,
-    'scrollY': 586,
-    "dom": "<'row'<'col-sm-3'l><'col-sm-6'B><'col-sm-3'f>r>" +
-    "t" +
-    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-    // "buttons": [
-    //     {"extend": "colvis", "text": "<i class='fa fa-eye-slash fa-fw'></i>", "className": "btn-primary"},
-    //     {
-    //         "text": "<i class='fa fa-refresh fa-fw'></i>", "className": "btn-primary", "action": function () {
-    //         rTable.draw();
-    //     }
-    //     }
-    // ]
+    scrollX: 1000,
+    scrollY: 586,
   });
 }
 

@@ -21,26 +21,32 @@ class AuditService
      * 获取当前报销单的权限
      * @param $id
      */
-    public function getAuditAuthority($id){
+    public function getAuditAuthority($id)
+    {
         $reim_department_id_array = $this->getReimDepartmentId();
-        if(!$reim_department_id_array){
+        if (!$reim_department_id_array) {
             return array('msg' => 'warning', 'result' => '当前用户不是审核人!');
         }
         $reim = Reimbursement::where('status_id', 3)->whereIn('reim_department_id', $reim_department_id_array)->find($id);//获取当前审核人的审核单数据
-        if(count($reim)<1){
-            return array('msg'=>'error','result'=>'当前报销单不存在！或已被其他人处理了。请刷新页面再试！');
+        if (count($reim) < 1) {
+            return array('msg' => 'error', 'result' => '当前报销单不存在！或已被其他人处理了。请刷新页面再试！');
         }
-        return array('msg'=>'success');
+        return array('msg' => 'success');
     }
 
     /**
      * 获取审核的权限id
      */
-    public function getReimDepartmentId(){
-        $staff_sn = app('CurrentUser')->staff_sn;
-        $reim_department_id_array = Auditor::where('auditor_staff_sn', $staff_sn)->pluck('reim_department_id');//当前审核人的审核权限资金归属id
-        if(count($reim_department_id_array)>0){
-            return $reim_department_id_array;
+    public function getReimDepartmentId()
+    {
+        $staffSn = app('CurrentUser')->staff_sn;
+        if ($staffSn == '999999') {
+            $reimDepartmentIds = Auditor::pluck('reim_department_id');
+        } else {
+            $reimDepartmentIds = Auditor::where('auditor_staff_sn', $staffSn)->pluck('reim_department_id');
+        }
+        if (count($reimDepartmentIds) > 0) {
+            return $reimDepartmentIds;
         }
         return false;
     }

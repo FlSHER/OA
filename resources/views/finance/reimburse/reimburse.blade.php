@@ -30,11 +30,7 @@
         width: 800px; 
         font-weight: 700; 
         padding-left: 50px; 
-    } 
-
-    .dt-buttons { 
-        padding-top: 12px; 
-    } 
+    }
 
     .show_expense.fa-plus-circle { 
         color: #65CEA7; 
