@@ -29,22 +29,14 @@ class DingtalkController extends Controller
     public function startApproval(Request $request)
     {
         try {
-            $agentId = App::find($request->app_id)->agent_id;
+            $appId = $request->app_id;
             $processCode = $request->process_code;
             $approvers = $request->approvers;
             $formData = $request->form_data;
+            $callback = $request->callback_url;
             $initiatorSn = $request->has('initiator_sn') ? $request->initiator_sn : null;
-            $response = app('Dingtalk')->startApprovalProcess($agentId, $processCode, $approvers, $formData, $initiatorSn);
-            if (!empty($response->result) && $response->result->ding_open_errcode == 0) {
-                DB::table('dingtalk_approval_process')->insert([
-                    'app_id' => $request->app_id,
-                    'process_instance_id' => $response->result->process_instance_id,
-                    'callback_url' => $request->callback_url,
-                ]);
-                return app('ApiResponse')->makeSuccessResponse($response->result->process_instance_id, 200);
-            } else {
-                return app('ApiResponse')->makeErrorResponse($response, 500);
-            }
+            $processInstanceId = app('Dingtalk')->startApprovalAndRecord($appId, $processCode, $approvers, $formData, $callback, $initiatorSn);
+            return app('ApiResponse')->makeSuccessResponse($processInstanceId, 200);
         } catch (HttpException $e) {
             return app('ApiResponse')->makeErrorResponse($e->getMessage(), 501, $e->getStatusCode());
         }

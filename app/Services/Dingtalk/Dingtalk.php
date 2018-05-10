@@ -13,8 +13,10 @@ namespace App\Services\Dingtalk;
  *
  * @author admin
  */
+use App\Models\App;
 use Curl;
 use Cache;
+use DB;
 use App\Models\HR\Staff;
 
 class Dingtalk
@@ -166,11 +168,31 @@ class Dingtalk
             'aes_key' => config('dingding.AESKey'),
             'url' => $callBackUrl,
         ];
-        $response = app('Curl')->setUrl(config('dingding.server_api') . 'call_back/register_call_back?access_token=' . $accessToken)->sendMessageByPost($registerMessage);
+        $response = app('Curl')
+            ->setUrl(config('dingding.server_api') . 'call_back/register_call_back?access_token=' . $accessToken)
+            ->sendMessageByPost($registerMessage);
         if ($response['errcode'] == 71006) {
-            $response = app('Curl')->setUrl(config('dingding.server_api') . 'call_back/update_call_back?access_token=' . $accessToken)->sendMessageByPost($registerMessage);
+            $response = app('Curl')
+                ->setUrl(config('dingding.server_api') . 'call_back/update_call_back?access_token=' . $accessToken)
+                ->sendMessageByPost($registerMessage);
         }
         return $response;
+    }
+
+    public function startApprovalAndRecord($appId, $processCode, $approvers, $formData, $callback, $initiatorSn = null)
+    {
+        $agentId = App::find($appId)->agent_id;
+        $response = $this->startApprovalProcess($agentId, $processCode, $approvers, $formData, $initiatorSn);
+        if (!empty($response->result) && $response->result->ding_open_errcode == 0) {
+            DB::table('dingtalk_approval_process')->insert([
+                'app_id' => $appId,
+                'process_instance_id' => $response->result->process_instance_id,
+                'callback_url' => $callback,
+            ]);
+            return $response->result->process_instance_id;
+        } else {
+            abort(500, $response);
+        }
     }
 
     public function startApprovalProcess($agentId, $processCode, $approvers_sn, $formData, $initiatorSn = null)
@@ -191,7 +213,9 @@ class Dingtalk
         $realFormData = $this->makeRealFormData($formData);
 
         $req = new SmartworkBpmsProcessinstanceCreateRequest;
-        $req->setAgentId($agentId);
+        if ($agentId != 0) {
+            $req->setAgentId($agentId);
+        }
         $req->setProcessCode($processCode);
         $req->setOriginatorUserId($dingId);
         $req->setDeptId($departmentId);
@@ -214,6 +238,13 @@ class Dingtalk
     {
         $response = [];
         foreach ($formData as $k => $v) {
+            if (is_array($v) && count($v) > 0 && is_array($v[0])) {
+                $newV = [];
+                foreach ($v as $key => $value) {
+                    $newV[] = $this->makeRealFormData($value);
+                }
+                $v = $newV;
+            }
             $response[] = ['name' => $k, 'value' => $v];
         }
         return $response;
