@@ -25,52 +25,51 @@ class AuditRepository
      */
     public function saveAudit($request)
     {
-        DB::transaction(function () use ($request) {
-            $audited_cost = $this->saveAuditExpenses($request);//审核修改明细表数据
-            $this->saveReimburse($request, $audited_cost);//审核修改报销数据
-        });
-        return ['msg' => 'success'];
+        $reimbursement = Reimbursement::find($request->reim_id);
+        $audited_cost = $this->saveAuditExpenses($reimbursement, $request);//审核修改明细表数据
+        $this->saveReimburse($reimbursement, $audited_cost);//审核修改报销数据
+        return $reimbursement;
     }
 
     /*---------------明细处理start-----------*/
-    private function saveAuditExpenses($request)
+    private function saveAuditExpenses($reimbursement, $request)
     {
         if ($request->expenses == 'all') {//审核全部明细未修改金额
-            $reim_cost = $this->allExpensesSave($request);
+            $reimCost = $this->allExpensesSave($reimbursement);
         } else {//明细修改进行处理（选择部分明细单）
-            $reim_cost = $this->updateExpensesSave($request);
+            $reimCost = $this->updateExpensesSave($reimbursement, $request);
         }
-        return $reim_cost;//审核金额
+        return $reimCost;//审核金额
     }
 
-    private function allExpensesSave($request)
+    private function allExpensesSave($reimbursement)
     {
-        $expenses = Expense::where(['reim_id' => $request->reim_id, 'is_approved' => 1])->get();
-        $reim_cost = 0;
-        foreach ($expenses as $k => $v) {
-            $reim_cost += (float)$v['send_cost'];
-            $v->is_audited = 1;
-            $v->audited_cost = $v['send_cost'];
-            $v->save();
-        }
-        return $reim_cost;
+        $reimCost = 0;
+        $reimbursement->expenses
+            ->where('is_approved', 1)
+            ->each(function ($expense) use (&$reimCost) {
+                $reimCost += (float)$expense->send_cost;
+                $expense->is_audited = 1;
+                $expense->audited_cost = $expense->send_cost;
+                $expense->save();
+            });
+        return $reimCost;
     }
 
-    private function updateExpensesSave($request)
+    private function updateExpensesSave($reimbursement, $request)
     {
-        $expense = $request->expenses;
-        $reim_cost = 0;
-        if (!empty($expense)) {
-            foreach ($expense as $k => $v) {
-                $reim_cost += (float)$v['audited_cost'];
-                $data = [
-                    'is_audited' => 1,
-                    'audited_cost' => $v['audited_cost']
-                ];
-                Expense::where(['id' => $v['id'], 'reim_id' => $request->reim_id])->update($data);
-            }
-        }
-        return $reim_cost;
+        $auditedExpenses = $request->expenses;
+        $reimCost = 0;
+        $reimbursement->expenses
+            ->where('is_approved', 1)
+            ->whereIn('id', array_pluck($auditedExpenses, 'id'))
+            ->each(function ($expense) use (&$reimCost) {
+                $reimCost += (float)$expense->send_cost;
+                $expense->is_audited = 1;
+                $expense->audited_cost = $expense->send_cost;
+                $expense->save();
+            });
+        return $reimCost;
     }
     /*---------------------明细处理end-------------------------*/
     /**
@@ -78,14 +77,14 @@ class AuditRepository
      * @param $request
      * @param $audited_cost
      */
-    private function saveReimburse($request, $audited_cost)
+    private function saveReimburse($reimbursement, $auditedCost)
     {
-        $data['status_id'] = 4;
-        $data['accountant_staff_sn'] = app('CurrentUser')->staff_sn;
-        $data['accountant_name'] = app('CurrentUser')->realname;
-        $data['audited_cost'] = $audited_cost;
-        $data['audit_time'] = date('Y-m-d H:i:s', time());
-        Reimbursement::where('id', $request->reim_id)->update($data);
+        $reimbursement->status_id = 4;
+        $reimbursement->accountant_staff_sn = app('CurrentUser')->staff_sn;
+        $reimbursement->accountant_name = app('CurrentUser')->realname;
+        $reimbursement->audited_cost = $auditedCost;
+        $reimbursement->audit_time = date('Y-m-d H:i:s');
+        $reimbursement->save();
     }
 
     /*---------------------------------审核通过处理end-------------------------------------------------------*/
