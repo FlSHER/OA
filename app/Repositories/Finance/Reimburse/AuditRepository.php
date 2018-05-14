@@ -64,9 +64,10 @@ class AuditRepository
             ->where('is_approved', 1)
             ->whereIn('id', array_pluck($auditedExpenses, 'id'))
             ->each(function ($expense) use (&$reimCost, $auditedExpenses) {
-                $reimCost += (float)$expense->send_cost;
+                $auditedCost = $auditedExpenses[$expense->id]['audited_cost'];
+                $reimCost += (float)$auditedCost;
                 $expense->is_audited = 1;
-                $expense->audited_cost = $auditedExpenses[$expense->id]['audited_cost'];
+                $expense->audited_cost = $auditedCost;
                 $expense->save();
             });
         return $reimCost;

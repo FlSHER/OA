@@ -142,7 +142,13 @@ function createDataTable() {
         }
       },
       {
-        title: "总金额", data: "audited_cost", name: "audited_cost", class: "text-center", width: "100px",
+        title: "审核前金额", data: "approved_cost", name: "approved_cost", class: "text-center", width: "100px",
+        render: function (data, type, row, meta) {
+          return '￥' + data;
+        }
+      },
+      {
+        title: "审核后金额", data: "audited_cost", name: "audited_cost", class: "text-center", width: "100px",
         render: function (data, type, row, meta) {
           return '￥' + data;
         }
