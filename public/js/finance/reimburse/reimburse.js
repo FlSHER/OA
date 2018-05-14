@@ -136,13 +136,13 @@ function createDataTable() {
         }
       },
       {
-        title: "转账时间", data: "paid_at", name: "paid_at", sortable: true, searchable: false,
+        title: "转账时间", data: "paid_at", name: "paid_at", sortable: true, searchable: false, visible: false,
         createdCell: function (nTd, sData, oData, iRow, iCol) {
           if (sData) $(nTd).html(sData.substring(0, 10)).attr("title", sData);
         }
       },
       {
-        title: "审核前金额", data: "approved_cost", name: "approved_cost", class: "text-center", width: "100px",
+        title: "审核前金额", data: "{approved_cost}?:{send_cost}", name: "approved_cost", class: "text-center", width: "100px",
         render: function (data, type, row, meta) {
           return '￥' + data;
         }
