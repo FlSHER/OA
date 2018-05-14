@@ -58,15 +58,15 @@ class AuditRepository
 
     private function updateExpensesSave($reimbursement, $request)
     {
-        $auditedExpenses = $request->expenses;
+        $auditedExpenses = array_pluck($request->expenses, [], 'id');
         $reimCost = 0;
         $reimbursement->expenses
             ->where('is_approved', 1)
             ->whereIn('id', array_pluck($auditedExpenses, 'id'))
-            ->each(function ($expense) use (&$reimCost) {
+            ->each(function ($expense) use (&$reimCost, $auditedExpenses) {
                 $reimCost += (float)$expense->send_cost;
                 $expense->is_audited = 1;
-                $expense->audited_cost = $expense->send_cost;
+                $expense->audited_cost = $auditedExpenses[$expense->id]['audited_cost'];
                 $expense->save();
             });
         return $reimCost;
