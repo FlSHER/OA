@@ -64,25 +64,4 @@ class CheckReimburseController extends Controller
         $reim_id = $request->reim_id;
         return app('AuditRepository')->checkReimburseRestore($reim_id);
     }
-
-    public function pay(Request $request)
-    {
-        $reimIds = is_array($request->reim_id) ? $request->reim_id : [$request->reim_id];
-        DB::beginTransaction();
-        foreach ($reimIds as $reimId) {
-            $reimbursement = Reimbursement::find($reimId);
-            if ($reimbursement && $reimbursement->status_id == 4) {
-                $reimbursement->status_id = 5;
-                $reimbursement->payer_sn = app('CurrentUser')->staff_sn;
-                $reimbursement->payer_name = app('CurrentUser')->realname;
-                $reimbursement->paid_at = date('Y-m-d');
-                $reimbursement->save();
-            } else {
-                DB::rollBack();
-                return 'error';
-            }
-        }
-        DB::commit();
-        return 'success';
-    }
 }

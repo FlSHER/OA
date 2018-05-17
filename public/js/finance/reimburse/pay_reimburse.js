@@ -1,21 +1,62 @@
-var hTable;
+var nTable, pTable;
 var sOut;
 $(function () {
 
-  createDataTable();//已审核报销单
+  createNotPaidTable();//未转账报销单
+  createPaidTable();//已转账报销单
+
+  $('.nav-tabs li a').on("click", function () {
+    var link = $(this).attr("href");
+    switch (link) {
+      case "#not-paid"://已审核报销单
+        nTable.draw(false);
+        break;
+      case "#paid"://已审核报销单
+        pTable.draw(false);
+        break;
+    }
+  });
 });
 
 /**
  * 初始已审核报销单列表
  * Initialse DataTables, with no sorting on the 'details' column
  */
-function createDataTable() {
-  hTable = $('#history-table').oaTable({
-    columns: auditedColumns,
-    ajax: { "url": "/finance/check_reimburse/audited" },
+function createNotPaidTable() {
+  nTable = $('#not-paid-table').oaTable({
+    columns: notPaidColumns,
+    ajax: { "url": "/finance/pay_reimburse/not-paid" },
     buttons: buttons,
-    filter: $("#check_reimburse_search"),//搜索
-    order: [['8', 'desc']],
+    filter: $("#not-paid .reimburse_search"),//搜索
+    order: [['10', 'desc']],
+    scrollY: 586,
+    initComplete() {
+      var selectAll = $('<label class="frame check frame-sm" unselectable="on" onselectstart="return false;" title="全选" />');
+      var selectAllInput = $('<input type="checkbox"/>');
+      selectAllInput.change(function () {
+        var checked = this.checked;
+        $('td.multi-select [name=id]:checkbox:not(:disabled)').each(function () {
+          $(this).prop('checked', checked);
+        });
+      });
+      selectAll.append(selectAllInput);
+      selectAll.append('<span class="checkbox-outer"><i class="fa fa-check"></i></span>&nbsp;');
+      $('.dataTables_scrollHead th.multi-select').append(selectAll);
+    },
+    drawCallback() {
+      var allSelect = $('td.multi-select [name=id]:checkbox:not(:disabled)');
+      var checked = allSelect.length > 0 && allSelect.length === allSelect.filter(':checked').length;
+      $('.dataTables_scrollHead th.multi-select :checkbox').prop('checked', checked);
+    }
+  });
+}
+
+function createPaidTable() {
+  pTable = $('#paid-table').oaTable({
+    columns: paidColumns,
+    ajax: { "url": "/finance/pay_reimburse/paid" },
+    filter: $("#paid .reimburse_search"),//搜索
+    order: [['9', 'desc']],
     scrollY: 586,
   });
 }
@@ -26,7 +67,15 @@ function createDataTable() {
  * @param id
  */
 function show_expenses(reim_id, _self) {
-  var curTable = hTable;
+  var id = $(_self).parents(".reim_table").attr("id");
+  var curTable;
+  switch (id) {
+    case "not-paid-table":
+      curTable = nTable;
+      break;
+    case "paid-table":
+      curTable = pTable;
+  }
   var nTr = $(_self).closest('tr')[0];
   if ($(_self).hasClass("fa-plus-circle")) {
     $(".reim_table>tbody>tr.details").hide();
@@ -201,20 +250,82 @@ function expensesBillsClick(pic_path_str, description, cost) {
   var viewer = new Viewer($("#gallery")[0], { "title": false });
 }
 
+/*---------------------------转账start-------------------------*/
 
-/**
- * 撤回（操作）
- * @param id
- */
-function restore(id) {
-  if (confirm('确认撤回')) {
-    var url = '/finance/check_reimburse/restore';
+function pay(id) {
+  if (confirm('确认转账')) {
+    var url = '/finance/pay_reimburse/pay';
     $.post(url, { reim_id: id }, function (msg) {
       if (msg === 'success') {
-        hTable.draw(false);
+        nTable.draw(false);
       } else if (msg === 'error') {
-        alert('撤回失败！请重新刷新后再试');
+        alert('转账失败！请重新刷新后再试');
       }
     }, 'text');
   }
 }
+
+function payByMultiple() {
+  var checked = $('td.multi-select [name=id]:checkbox:checked:not(:disabled)').map(function () {
+    return $(this).val();
+  }).get();
+  pay(checked);
+}
+
+/*---------------------------转账end-------------------------*/
+
+/*---------------------------驳回start-------------------------*/
+
+//驳回 弹出层（待审核单）
+function auditReject(id) {
+  $('#remarks').val('收款人信息错误');
+  $('#confirm_reject').attr('reim_id', id);
+}
+
+//驳回提交处理 （待审核单）
+function confirm_reject(_self) {
+  var id = $(_self).attr('reim_id');
+  var url = "/finance/reimburse/reject";
+  var remarks = $.trim($('#remarks').val());
+  if (remarks.length < 1) {
+    alert('请输入驳回原因！内容不能为空');
+    return false;
+  }
+  $.ajax({
+    type: "POST",
+    url: url,
+    dataType: 'json',
+    data: { "id": id, "remarks": remarks },
+    success: function (msg) {
+      if (msg.msg == 'error') {
+        alert(msg.result);
+      } else if (msg.msg === "success") {
+        $('#myModals .close').click();
+        nTable.draw(false);
+      } else if (msg == 'warning') {
+        alert(msg.result);
+      }
+    },
+    error: function (msg) {
+      if (msg.status === 422) {
+        var response = JSON.parse(msg.responseText);
+        for (var i in response) {
+          alert(response[i]);
+        }
+      }
+    }
+  });
+}
+
+
+//检测内容是否为空（控制确认按钮是否可点击）
+function check_remarks(_self) {
+  var val = $.trim($(_self).val());
+  $("#confirm_reject").attr('disabled', true);
+  if (val.length != 0) {
+    $("#confirm_reject").attr('disabled', false);
+  }
+}
+
+
+/*---------------------------驳回end-------------------------*/

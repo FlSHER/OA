@@ -1,6 +1,6 @@
 @inject('reim_department_name',"\App\Services\Finance\Reimburse\AuditService")
 @inject('HRM',HRM)
-<div class="panel-body bg-warning" id="check_reimburse_search"
+<div class="panel-body bg-warning reimburse_search"
      style="display:none;box-shadow: inset 0 0px 10px 0 rgba(0,0,0,.075);padding-bottom:0;">
     <form class="form-horizontal" method="post">
         <div class="form-group form-group-sm">
@@ -84,20 +84,6 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3">
-                <div class="row">
-                    <label class="control-label col-lg-4 col-sm-2">订单状态</label>
-                    <div class="col-sm-8">
-                        <select class="form-control" name="status_id">
-                            <option value="">全部</option>
-                            <option value="4">待审批</option>
-                            <option value="5">待终审</option>
-                            <option value="6">待转账</option>
-                            <option value="7">已转账</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
         </div>
         <div class="form-group form-group-sm">
             <div class="col-lg-4">
@@ -151,7 +137,39 @@
 
         </div>
         <div class="form-group form-group-sm">
-            <div class="col-lg-2 col-lg-offset-10">
+            <div class="col-lg-4">
+                <div class="row">
+                    <label class="control-label col-lg-3 col-sm-2">副总审批时间</label>
+                    <div class="col-lg-9 col-sm-8">
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <input class="form-control" name="manager_approved_at.min" type="text" isDate />
+                            </div>
+                            <label class="control-label row pull-left" style="padding-left: 9px">至</label>
+                            <div class="col-xs-6">
+                                <input class="form-control" name="manager_approved_at.max" type="text" isDate />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="row">
+                    <label class="control-label col-lg-3 col-sm-2">转账时间</label>
+                    <div class="col-lg-9 col-sm-8">
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <input class="form-control" name="paid_at.min" type="text" isDate />
+                            </div>
+                            <label class="control-label row pull-left" style="padding-left: 9px">至</label>
+                            <div class="col-xs-6">
+                                <input class="form-control" name="paid_at.max" type="text" isDate />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-lg-offset-2">
                 <button type="reset" class="btn btn-warning btn-sm">重置</button>
                 <button type="submit" class="btn btn-default btn-sm pull-right">确认</button>
             </div>
