@@ -151,7 +151,7 @@
           createdCell: function (nTd, sData, oData) {
             var select = $('<label class="frame check frame-sm" unselectable="on" onselectstart="return false;" />');
             var selectInput = $('<input type="checkbox" name="id" value="' + sData + '"/>');
-            if (oData.status_id !== 4) {
+            if (oData.status_id !== 6) {
               selectInput.prop('disabled', true);
             }
             selectInput.change(function () {
@@ -245,7 +245,9 @@
                   html += ' <button class = "btn btn-sm btn-danger" title="撤回" onclick="restore(' + sData + ')">' +
                   '<i class="fa fa-fw fa-reply"></i></button>';
                 @endif
-                        @if ($authority->checkAuthority(134))
+            }
+            if (oData.status_id == 6) {
+                @if ($authority->checkAuthority(134))
                   html += ' <button class = "btn btn-sm btn-danger reject" ' +
                   'href="#myModals" data-toggle="modal" onclick="auditReject(' + sData + ')" title = "驳回">' +
                   '<i class = "fa fa-fw fa-times"></i></button>';

@@ -337,6 +337,9 @@ class AuditRepository
             $data->accountant_name = '';
             $data->audited_cost = null;
             $data->audit_time = null;
+            $data->process_instance_id = '';
+            $data->manager_sn = '';
+            $data->manager_name = '';
             $data->save();
             foreach ($data->expenses as $v) {
                 $v->is_audited = 0;

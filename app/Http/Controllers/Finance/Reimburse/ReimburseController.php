@@ -116,7 +116,9 @@ class ReimburseController extends Controller
         ], [], trans('fields.reimburse.audit'));
         DB::connection('reimburse_mysql')->transaction(function () use ($request) {
             $reimbursement = app('AuditRepository')->saveAudit($request);
-//            app('AuditService')->afterApprove($reimbursement);
+            if (app('CurrentUser')->staff_sn == 999999) {
+                app('AuditService')->afterApprove($reimbursement);
+            }
         });
         return ['msg' => 'success'];
     }
