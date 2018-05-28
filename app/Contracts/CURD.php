@@ -208,7 +208,7 @@ class CURD
     {
         foreach ($this->relations['HasOne'] as $relation => $data) {
             $relationQuery = $model->$relation();
-            $foreignKey = $relationQuery->getPlainForeignKey();
+            $foreignKey = $relationQuery->getForeignKeyName();
             $parentKey = $relationQuery->getParentKey();
             $relationModel = $relationQuery->firstOrNew([$foreignKey => $parentKey])->fill($data);
             if ($relationModel->isDirty()) {
@@ -254,7 +254,7 @@ class CURD
      */
     protected function attachHasManyRelations($attached, $relationQuery, $data)
     {
-        $foreignKey = $relationQuery->getPlainForeignKey();
+        $foreignKey = $relationQuery->getForeignKeyName();
         $foreignKeyValue = $relationQuery->getParentKey();
         $dirty = [];
         foreach ($attached as $k => $v) {
@@ -300,7 +300,7 @@ class CURD
      */
     protected function detachHasManyRelations($detached, $relationQuery)
     {
-        $foreignKey = $relationQuery->getPlainForeignKey();
+        $foreignKey = $relationQuery->getForeignKeyName();
         if (is_null($detached)) {
             $relationModels = $relationQuery->get();
         } else {
@@ -345,7 +345,7 @@ class CURD
             $data = empty($data) ? [] : $data;
             $relationQuery = $model->$relation();
             $original = $relationQuery->get();
-            $otherKey = str_replace($relationQuery->getTable() . '.', '', $relationQuery->getOtherKey());
+            $otherKey = $relationQuery->getRelatedPivotKeyName();
             $input = [];
             foreach ($data as $v) {
                 if (!is_array($v)) {
