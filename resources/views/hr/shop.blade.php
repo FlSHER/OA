@@ -5,11 +5,11 @@
 
 @section('css')
     <!-- data table -->
-    <link rel="stylesheet" href="{{source('plug_in/datatables/datatables.min.css')}}"/>
+    <link rel="stylesheet" href="{{source('plug_in/datatables/datatables.min.css')}}" />
     <!-- zTree css -->
-    <link rel="stylesheet" href="{{source('plug_in/ztree/css/metroStyle.css')}}"/>
+    <link rel="stylesheet" href="{{source('plug_in/ztree/css/metroStyle.css')}}" />
     <!-- checkbox -->
-    <link rel="stylesheet" href="{{source('css/checkbox.css')}}"/>
+    <link rel="stylesheet" href="{{source('css/checkbox.css')}}" />
 @endsection
 
 @section('content')
@@ -79,45 +79,46 @@
     <!--script for this view-->
     <script type="text/javascript" src="{{source('js/HR/shop.js')}}"></script>
     <script>
-        var columns = [
-            {data: "shop_sn", title: "店铺代码"},
-            {data: "name", title: "店铺名称"},
-            {data: "department.name", title: "所属部门"},
-            {data: "brand.name", title: "所属品牌"},
-            {data: "{province.name}.'-'.{city.name}.'-'.{county.name}.' '.{address}", title: "店铺地址"},
-            {data: "clock_in", title: "上班时间", searchable: false},
-            {data: "clock_out", title: "下班时间", searchable: false},
-            {data: "manager_name", title: "店长"},
-            {
-                data: "staff.realname", title: "店员", searchable: false, sortable: false, defaultContent: "",
-                createdCell: function (nTd, sData, oData, iRow, iCol) {
-                    var html = '';
-                    for (var i in oData.staff) {
-                        var staff = oData.staff[i];
-                        html += staff.realname + ',';
-                    }
-                    $(nTd).html(html);
-                }
-            },
-            {
-                data: "id", title: "操作", sortable: false, width: "50px",
-                createdCell: function (nTd, sData, oData, iRow, iCol) {
-                    delete oData.password;
-                    delete oData.salt;
-                    var html = '';
-                    <?php if (check_authority(72)): ?>
-                        html += '<button class="btn btn-sm btn-default" title="编辑" onclick=\'edit(' + sData + ')\'><i class="fa fa-edit fa-fw"></i></button> ';
-                    <?php endif; ?>
-                        <?php if (check_authority(73)): ?>
-                        html += '&nbsp;<button class="btn btn-sm btn-danger" title="删除" onclick="del(' + sData + ')"><i class="fa fa-trash-o fa-fw"></i></button>';
-                    <?php endif; ?>
-                    $(nTd).html(html).css({"padding": "5px", "text-align": "center"});
-                }
+      var columns = [
+        { data: "shop_sn", title: "店铺代码" },
+        { data: "name", title: "店铺名称" },
+        { data: "department.name", title: "所属部门" },
+        { data: "brand.name", title: "所属品牌" },
+        { data: "{province.name}.'-'.{city.name}.'-'.{county.name}.' '.{address}", title: "店铺地址" },
+        { data: "clock_in", title: "上班时间", searchable: false },
+        { data: "clock_out", title: "下班时间", searchable: false },
+        { data: "manager_name", title: "店长" },
+        { data: "manager.mobile", title: "店长电话", searchable: false, sortable: false, defaultContent: "" },
+        {
+          data: "staff.realname", title: "店员", searchable: false, sortable: false, defaultContent: "",
+          createdCell: function (nTd, sData, oData, iRow, iCol) {
+            var html = '';
+            for (var i in oData.staff) {
+              var staff = oData.staff[i];
+              html += staff.realname + ',';
             }
-        ];
-        var buttons = [
-            {"text": "<i class='fa fa-plus fa-fw'></i>", "action": addShop, "titleAttr": "添加"}
-        ];
+            $(nTd).html(html);
+          }
+        },
+        {
+          data: "id", title: "操作", sortable: false, width: "50px",
+          createdCell: function (nTd, sData, oData, iRow, iCol) {
+            delete oData.password;
+            delete oData.salt;
+            var html = '';
+              <?php if (check_authority(72)): ?>
+                html += '<button class="btn btn-sm btn-default" title="编辑" onclick=\'edit(' + sData + ')\'><i class="fa fa-edit fa-fw"></i></button> ';
+              <?php endif; ?>
+                  <?php if (check_authority(73)): ?>
+                html += '&nbsp;<button class="btn btn-sm btn-danger" title="删除" onclick="del(' + sData + ')"><i class="fa fa-trash-o fa-fw"></i></button>';
+              <?php endif; ?>
+              $(nTd).html(html).css({ "padding": "5px", "text-align": "center" });
+          }
+        }
+      ];
+      var buttons = [
+        { "text": "<i class='fa fa-plus fa-fw'></i>", "action": addShop, "titleAttr": "添加" }
+      ];
     </script>
 
 
