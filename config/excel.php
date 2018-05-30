@@ -234,7 +234,7 @@ return array(
               | The path we want to save excel file to
               |
              */
-            'path' => storage_path('app/public/exports'),
+            'path' => storage_path('exports'),
             /*
               |--------------------------------------------------------------------------
               | Return info
