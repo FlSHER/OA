@@ -18,6 +18,7 @@ class Staff extends Model
 
     use SoftDeletes;
 
+    protected $connection = 'mysql';
     protected $primaryKey = 'staff_sn';
     protected $fillable = [
         'username',
