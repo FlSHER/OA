@@ -401,7 +401,7 @@ function OAForm(dom, options) {
       },
       error: function (err) {
         if (err.status === 422) {
-          var msg = err.responseJSON;
+          var msg = err.responseJSON.errors;
           _call('validateError', [msg]);
         } else if (err.status === 403) {
           var msg = err.responseText;
