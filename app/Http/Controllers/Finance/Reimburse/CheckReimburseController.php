@@ -24,7 +24,8 @@ class CheckReimburseController extends Controller
      */
     public function getAllAuditedList(Request $request)
     {
-        $result = app('Plugin')->dataTables($request, Reimbursement::whereIn('status_id', [4, 5]));
+        $builder = Reimbursement::where('status_id', '>=', 4);
+        $result = app('Plugin')->dataTables($request, $builder);
         return $result;
     }
 

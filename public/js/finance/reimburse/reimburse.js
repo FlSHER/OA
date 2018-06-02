@@ -142,7 +142,11 @@ function createDataTable() {
         }
       },
       {
-        title: "审核前金额", data: "{approved_cost}?:{send_cost}", name: "approved_cost", class: "text-center", width: "100px",
+        title: "审核前金额",
+        data: "{approved_cost}?:{send_cost}",
+        name: "approved_cost",
+        class: "text-center",
+        width: "100px",
         render: function (data, type, row, meta) {
           return '￥' + data;
         }
@@ -154,6 +158,14 @@ function createDataTable() {
         }
       },
       { title: "审核人", data: "accountant_name", name: "accountant_name", class: "text-center", sortable: true },
+      {
+        title: "状态",
+        data: "status.name",
+        name: "status.name",
+        class: "text-center",
+        sortable: true,
+        searchable: false,
+      },
       {
         "title": "操作", "data": "id", "name": "id", "class": "text-center", "sortable": false,
         "createdCell": function (nTd, sData, oData, iRow, iCol) {

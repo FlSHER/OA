@@ -90,10 +90,10 @@
                     <div class="col-sm-8">
                         <select class="form-control" name="status_id">
                             <option value="">全部</option>
-                            <option value="4">待审批</option>
-                            <option value="5">待终审</option>
-                            <option value="6">待转账</option>
-                            <option value="7">已转账</option>
+                            <option value="4">已审核</option>
+                            <option value="5">副总审批</option>
+                            <option value="6">待付款</option>
+                            <option value="7">已完成</option>
                         </select>
                     </div>
                 </div>

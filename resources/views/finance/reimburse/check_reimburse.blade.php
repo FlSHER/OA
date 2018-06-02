@@ -194,6 +194,14 @@
           sortable: true
         },
         {
+          title: "状态",
+          data: "status.name",
+          name: "status.name",
+          sortable: true,
+          searchable: false,
+          class: "text-center",
+        },
+        {
           title: "总金额",
           data: "audited_cost",
           name: "audited_cost",

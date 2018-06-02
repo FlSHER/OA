@@ -51,8 +51,8 @@ class ReimburseController extends Controller
             $result['recordsFiltered'] = 0;
             $result['recordsTotal'] = 0;
         } else {
-            $where = ['status_id' => 4];
-            $result = app('Plugin')->dataTables($request, Reimbursement::where($where)->whereIn('reim_department_id', $reim_deparment_arr));
+            $builder = Reimbursement::where('status_id', '>=', 4)->whereIn('reim_department_id', $reim_deparment_arr);
+            $result = app('Plugin')->dataTables($request, $builder);
         }
         return $result;
     }
