@@ -13,6 +13,7 @@ class Department extends Model
 
     use SoftDeletes;
 
+    protected $connection = 'mysql';
     protected $guarded = ['id', 'manager_name'];
 
     /* ----- 定义关联Start ----- */
