@@ -11,13 +11,15 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Http\Request;
 use Excel;
 
-class ExcelImport {
+class ExcelImport
+{
 
     protected $filePath;
     protected $availableExtension = ['xlsx', 'xls', 'csv', 'bin'];
     protected $localization = [];
 
-    public function load(Request $request = null, $fileName = null) {
+    public function load(Request $request = null, $fileName = null)
+    {
         if (empty($request))
             $request = request();
         $fileList = $this->getFile($request, $fileName);
@@ -30,14 +32,15 @@ class ExcelImport {
         } elseif (count($fileList) == 1) {
             return $this->readFile(array_first($fileList));
         } else {
-            throw new \Illuminate\Http\Exception\HttpResponseException(response('无法读取有效文件', 500));
+            abort(500, '无法读取有效文件');
         }
     }
 
-    public function getFile(Request $request, $fileName = null) {
+    public function getFile(Request $request, $fileName = null)
+    {
         $fileList = $request->file($fileName);
         $availableFiles = [];
-        foreach ((array) $fileList as $name => $file) {
+        foreach ((array)$fileList as $name => $file) {
             if ($this->isAvailable($file)) {
                 $availableFiles[$name] = $file;
             }
@@ -45,7 +48,8 @@ class ExcelImport {
         return $availableFiles;
     }
 
-    public function extension($extension) {
+    public function extension($extension)
+    {
         if (is_string($extension)) {
             $extension = [$extension];
         }
@@ -54,7 +58,8 @@ class ExcelImport {
         return $this;
     }
 
-    public function trans($transPath) {
+    public function trans($transPath)
+    {
         if (is_array($transPath)) {
             foreach ($transPath as $v) {
                 $trans = array_flip(array_dot(trans($v)));
@@ -66,20 +71,22 @@ class ExcelImport {
         return $this;
     }
 
-    protected function readFile($file) {
+    protected function readFile($file)
+    {
         $heading = Excel::selectSheetsByIndex(0)->noHeading()->load($file)->first()->all();
         $columns = $this->makeColumns($heading);
-        $data = Excel::skip(1)->take(false)->get()->map(function($row)use($columns) {
-                    if (!empty(array_filter($row->all(0)))) {
-                        return $this->getRowData($row, $columns);
-                    } else {
-                        return false;
-                    }
-                })->filter()->all();
+        $data = Excel::skip(1)->take(false)->get()->map(function ($row) use ($columns) {
+            if (!empty(array_filter($row->all(0)))) {
+                return $this->getRowData($row, $columns);
+            } else {
+                return false;
+            }
+        })->filter()->all();
         return $data;
     }
 
-    protected function isAvailable(UploadedFile $file) {
+    protected function isAvailable(UploadedFile $file)
+    {
         $extension = $file->guessClientExtension();
         if ($file->isValid() && in_array($extension, $this->availableExtension)) {
             return true;
@@ -88,7 +95,8 @@ class ExcelImport {
         }
     }
 
-    protected function makeColumns($heading) {
+    protected function makeColumns($heading)
+    {
         $columns = [];
         $arrayColumns = [];
         foreach ($heading as $key => $column) {
@@ -108,7 +116,8 @@ class ExcelImport {
         return $columns;
     }
 
-    protected function getRowData($row, $columns) {
+    protected function getRowData($row, $columns)
+    {
         $rowData = [];
         foreach ($row as $index => $column) {
             if (array_has($columns, $index)) {
