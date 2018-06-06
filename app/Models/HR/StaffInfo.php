@@ -101,42 +101,42 @@ class StaffInfo extends Model
     public function setHouseholdProvinceAttribute($value)
     {
         if (is_string($value) && !empty($value)) {
-            $this->attributes['household_province_id'] = District::where('name', $value)->value('id');
+            $this->attributes['household_province_id'] = District::where('name', $value)->value('id') ?: 0;
         }
     }
 
     public function setHouseholdCityAttribute($value)
     {
         if (is_string($value) && !empty($value)) {
-            $this->attributes['household_city_id'] = District::where([['name', '=', $value], ['parent_id', '=', $this->household_province_id]])->value('id');
+            $this->attributes['household_city_id'] = District::where([['name', '=', $value], ['parent_id', '=', $this->household_province_id]])->value('id') ?: 0;
         }
     }
 
     public function setHouseholdCountyAttribute($value)
     {
         if (is_string($value) && !empty($value)) {
-            $this->attributes['household_county_id'] = District::where([['name', '=', $value], ['parent_id', '=', $this->household_city_id]])->value('id');
+            $this->attributes['household_county_id'] = District::where([['name', '=', $value], ['parent_id', '=', $this->household_city_id]])->value('id') ?: 0;
         }
     }
 
     public function setLivingProvinceAttribute($value)
     {
         if (is_string($value) && !empty($value)) {
-            $this->attributes['living_province_id'] = District::where('name', $value)->value('id');
+            $this->attributes['living_province_id'] = District::where('name', $value)->value('id') ?: 0;
         }
     }
 
     public function setLivingCityAttribute($value)
     {
         if (is_string($value) && !empty($value)) {
-            $this->attributes['living_city_id'] = District::where([['name', '=', $value], ['parent_id', '=', $this->living_province_id]])->value('id');
+            $this->attributes['living_city_id'] = District::where([['name', '=', $value], ['parent_id', '=', $this->living_province_id]])->value('id') ?: 0;
         }
     }
 
     public function setLivingCountyAttribute($value)
     {
         if (is_string($value) && !empty($value)) {
-            $this->attributes['living_county_id'] = District::where([['name', '=', $value], ['parent_id', '=', $this->living_city_id]])->value('id');
+            $this->attributes['living_county_id'] = District::where([['name', '=', $value], ['parent_id', '=', $this->living_city_id]])->value('id') ?: 0;
         }
     }
 
