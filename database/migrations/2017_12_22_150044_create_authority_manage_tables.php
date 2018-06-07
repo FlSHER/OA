@@ -40,21 +40,18 @@ class CreateAuthorityManageTables extends Migration
             $table->mediumInteger('role_id')->unsigned()->comment('角色ID');
             $table->mediumInteger('authority_id')->unsigned()->comment('权限ID');
             $table->primary(['role_id', 'authority_id']);
-            $table->index(['role_id', 'authority_id']);
         });
 
         Schema::create('role_has_staff', function (Blueprint $table) {
             $table->mediumInteger('role_id')->unsigned()->comment('角色ID');
             $table->mediumInteger('staff_sn')->unsigned()->comment('员工编号');
             $table->primary(['role_id', 'staff_sn']);
-            $table->index(['role_id', 'staff_sn']);
         });
 
         Schema::create('role_has_department', function (Blueprint $table) {
             $table->mediumInteger('role_id')->unsigned()->comment('角色ID');
             $table->smallInteger('department_id')->unsigned()->comment('部门ID');
             $table->primary(['role_id', 'department_id']);
-            $table->index(['role_id', 'department_id']);
         });
     }
 

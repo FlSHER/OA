@@ -2,7 +2,10 @@
 
 namespace App\Models\HR;
 
-use Illuminate\Database\Eloquent\Model;
+use Laravel\Passport\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User;
+
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Authority;
 use App\Models\Department;
@@ -13,10 +16,9 @@ use App\Models\I\National;
 use App\Models\I\MaritalStatus;
 use App\Models\I\Politics;
 
-class Staff extends Model
+class Staff extends User
 {
-
-    use SoftDeletes;
+    use HasApiTokens, Notifiable, SoftDeletes;
 
     protected $connection = 'mysql';
     protected $primaryKey = 'staff_sn';
@@ -37,9 +39,14 @@ class Staff extends Model
         'employed_at',
         'left_at',
         'is_active',
-        'property',
+        'property_id',
     ];
     protected $hidden = ['password', 'salt', 'created_at', 'updated_at', 'deleted_at'];
+
+    public function getAuthIdentifierName()
+    {
+        return 'staff_sn';
+    }
 
     /* ----- 定义关联 Start ----- */
 
@@ -225,9 +232,14 @@ class Staff extends Model
 
     public function scopeApi($query)
     {
-        $query->with('brand', 'department', 'position', 'shop', 'status', 'info');
+        $query->with('brand', 'department', 'position', 'shop', 'status', 'info', 'role');
     }
 
     /* ----- 本地作用域 End ----- */
 
+
+    protected function findForPassport($username)
+    {
+        return $this->where('mobile', $username)->first();
+    }
 }
