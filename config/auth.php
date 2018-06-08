@@ -15,7 +15,7 @@ return [
 
     'defaults' => [
         'guard' => 'web',
-        'passwords' => 'users',
+        'passwords' => '123465',
     ],
     /*
       |--------------------------------------------------------------------------
@@ -36,11 +36,11 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'users',
+            'provider' => 'staff',
         ],
         'api' => [
-            'driver' => 'token',
-            'provider' => 'users',
+            'driver' => 'passport',
+            'provider' => 'staff',
         ],
     ],
     /*
@@ -60,14 +60,18 @@ return [
       |
      */
     'providers' => [
-        'users' => [
-            'driver' => 'eloquent',
-            'model' => App\User::class,
+//        'users' => [
+//            'driver' => 'eloquent',
+//            'model' => App\User::class,
+//        ],
+        'staff' => [
+            'driver' => 'cache',
+            'model' => App\Models\HR\Staff::class,
         ],
-    // 'users' => [
-    //     'driver' => 'database',
-    //     'table' => 'users',
-    // ],
+        // 'users' => [
+        //     'driver' => 'database',
+        //     'table' => 'users',
+        // ],
     ],
     /*
       |--------------------------------------------------------------------------

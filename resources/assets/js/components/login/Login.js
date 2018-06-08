@@ -27,10 +27,10 @@ class LoginForm extends Component {
                                         让我们一起实现梦想
                                     </p>
                                 </FormItem>
-                                <FormItem name="username">
+                                <FormItem name="mobile">
                                     <Input size="large"
                                            prefix={<Icon type="user" style={{color: 'rgba(0,0,0,.25)'}}/>}
-                                           placeholder="用户名/手机号"/>
+                                           placeholder="手机号"/>
                                 </FormItem>
                                 <FormItem name="password">
                                     <Input size="large"
@@ -90,7 +90,7 @@ class LoginForm extends Component {
                                 this.setState({loading: false})
                             }, 500);
                         }).catch((err) => {
-                            message.error('自动登录异常:'+err.message);
+                            message.error('自动登录异常:' + err.message);
                             this.setState({loading: false});
                         });
                     } else {

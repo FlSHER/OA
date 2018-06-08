@@ -5,57 +5,88 @@
  * create by Fisher 2016/8/26 <fisher9389@sina.com>
  */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Exception\HttpResponseException;
-use App\Models\HR\Staff;
 use App\Http\Controllers\Controller;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use App\Models\HR\Staff;
 use Encypt;
 
 class LoginController extends Controller
 {
+    use AuthenticatesUsers {
+        login as protected loginByUsername;
+    }
 
     protected $username;
     protected $password;
     protected $admin;
     protected $response;
 
+    protected $redirectTo = '/';
+
     /**
      * 显示后台登录界面
      * @return html
      */
-    public function showLoginPage()
+    public function showLoginForm()
     {
-        if (session()->has('status')) {
-            $status = session()->get('status');
-            session()->forget('status');
-        } else {
-            $status = 200;
-        }
         session()->reflash();
         $app = app('Menu')->getAppData();
-        return response()->view('login', ['app' => $app], $status);
+        return response()->view('login', ['app' => $app]);
     }
 
-    /**
-     * 后台登录验证
-     * @param Request $request
-     */
-    public function loginCheck(Request $request)
+    public function username()
+    {
+        return 'mobile';
+    }
+
+    public function login(Request $request)
     {
         if ($request->has('dingtalk_auth_code')) {
             return $this->loginByDingtalkAuthCode($request);
         } else {
-            $this->validateLogin();
-            if ($this->loginAsDeveloper()) {
-                return $this->loginSuccess();
-            } else if ($this->checkUsername()) {
-                if ($this->checkPassword()) {
-                    return $this->loginSuccess();
+            $response = $this->loginByUsername($request);
+            if ($response instanceof RedirectResponse) {
+                $url = $response->getTargetUrl();
+                if (request()->isXmlHttpRequest()) {
+                    return ['status' => 1, 'url' => $url];
+                } else {
+                    return redirect($url)->withInput()->withErrors('为了保证您的账户安全！请立即修改初始密码');
                 }
+            } else {
+                return $response;
             }
-            return $this->sendFailedLoginResponse();
+        }
+    }
+
+    /**
+     * 登录表单验证
+     * @param Request $request
+     */
+    protected function validateLogin(Request $request)
+    {
+        $rules = [
+            $this->username() => 'required|string',
+            'password' => 'required|string',
+            'dingding' => 'string|max:50',
+        ];
+        $this->validate($request, $rules);
+    }
+
+
+    /**
+     * 登录失败，返回失败原因
+     */
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        session()->keep(['url']);
+        if (request()->isXmlHttpRequest()) {
+            return ['status' => -1, 'message' => trans('auth.failed')];
+        } else {
+            return redirect()->back()->withInput()->withErrors(['login_fail' => $this->response]);
         }
     }
 
@@ -103,32 +134,6 @@ class LoginController extends Controller
             'password_confirmation' => 'required',
         ], [], ['old_pwd' => '原密码', 'password' => '新密码', 'password_confirmation' => '确认新密码']
         );
-    }
-
-    /**
-     * 退出登录
-     */
-    public function logout()
-    {
-        session()->flush();
-        $data = request()->only(['url']);
-        return redirect()->route('login')->with($data);
-    }
-
-    /**
-     * 登录表单验证
-     * @param Request $request
-     */
-    private function validateLogin()
-    {
-        $array = [
-            'username' => 'required',
-            'password' => 'required',
-            'dingding' => 'string|max:50',
-        ];
-        $this->validate(request(), $array);
-        $this->username = request()->get('username');
-        $this->password = request()->get('password');
     }
 
     /**
@@ -228,18 +233,6 @@ class LoginController extends Controller
         $this->admin->save();
     }
 
-    /**
-     * 登录失败，返回失败原因
-     */
-    private function sendFailedLoginResponse()
-    {
-        session()->keep(['url']);
-        if (request()->isXmlHttpRequest()) {
-            return ['status' => -1, 'message' => $this->response];
-        } else {
-            return redirect()->back()->withInput()->withErrors(['login_fail' => $this->response]);
-        }
-    }
 
     /**
      * 使用开发者账户登录

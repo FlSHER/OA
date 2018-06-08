@@ -10,11 +10,15 @@
   | to using a Closure or controller method. Build something great!
   |
  */
+
+Auth::routes();
+Route::get('/logout/{url?}', ['uses' => 'Auth\LoginController@logout'])->name('logout');
+
 Route::group(['middleware' => 'admin'], function () {
     Route::get('/', ['uses' => 'HomeController@showDashBoard'])->name('home'); //首页仪表盘
     Route::get('/entrance', ['uses' => 'HomeController@showAppEntrance'])->name('entrance'); //应用端入口
-    Route::get('/reset_password', ['uses' => 'LoginController@showResetPage'])->name('reset'); //重置密码
-    Route::post('/reset_password', ['uses' => 'LoginController@resetPassword']);
+    Route::get('/reset_password', ['uses' => 'Auth\LoginController@showResetPage'])->name('reset'); //重置密码
+    Route::post('/reset_password', ['uses' => 'Auth\LoginController@resetPassword']);
     /* -- 财务系统 -- */
     include('finance.php');
     /* -- 人事系统 -- */
@@ -46,10 +50,8 @@ Route::group(['middleware' => 'admin'], function () {
     });
 });
 
-Route::post('/login-dingtalk', ['uses' => 'LoginController@loginByDingtalkAuthCode']); //检测钉钉登录
-Route::get('/login/{url?}', ['uses' => 'LoginController@showLoginPage'])->name('login'); //登录界面
-Route::post('/login/{url?}', ['uses' => 'LoginController@loginCheck']);
-Route::get('/logout/{url?}', ['uses' => 'LoginController@logout'])->name('logout');
+Route::post('/login-dingtalk', ['uses' => 'Auth\LoginController@loginByDingtalkAuthCode']); //检测钉钉登录
+
 Route::get('/error', ['uses' => 'ResponseController@showErrorPage'])->name('error'); //报错界面
 Route::get('/blank', ['uses' => 'HomeController@showBlankPage'])->name('blank'); //空白页面
 
@@ -62,4 +64,8 @@ Route::get('weather_image', function () {
     app('ApiResponse')->getWeatherImage(request()->input('city'));
     return response('')
         ->header('Content-Type', 'image/png');
+});
+
+Route::get('/opcache_clear', function () {
+    return opcache_reset() ? 'success' : 'error';
 });

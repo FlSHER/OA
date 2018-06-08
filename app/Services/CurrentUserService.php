@@ -7,6 +7,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Auth;
 use App\Models\HR\Staff;
 
 class CurrentUserService
@@ -17,13 +18,10 @@ class CurrentUserService
     public function __construct()
     {
         if ($this->isLogin()) {
-            $this->userInfo = session('admin');
-        } elseif (request()->has('current_staff_sn')) {
-            $staffSn = request()->get('current_staff_sn');
-            if ($staffSn == '999999') {
-                $this->userInfo = config('auth.developer');
+            if (!empty(Auth::user()->items)) {
+                $this->userInfo = Auth::user()->items;
             } else {
-                $this->userInfo = Staff::find($staffSn)->toArray();
+                $this->userInfo = Auth::user();
             }
         }
     }
@@ -66,7 +64,7 @@ class CurrentUserService
      */
     public function isLogin()
     {
-        return session()->has('admin');
+        return Auth::check();
     }
 
     /**

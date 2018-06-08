@@ -3,8 +3,10 @@
 namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use Laravel\Passport\Http\Middleware\CheckClientCredentials;
 
-class Kernel extends HttpKernel {
+class Kernel extends HttpKernel
+{
 
     /**
      * The application's global HTTP middleware stack.
@@ -38,7 +40,7 @@ class Kernel extends HttpKernel {
             'bindings',
         ],
         'admin' => [
-            'rbac',
+            'auth',
             'async',
         ],
     ];
@@ -60,6 +62,7 @@ class Kernel extends HttpKernel {
         'rbac' => \App\Http\Middleware\Rbac::class,
         'async' => \App\Http\Middleware\AsyncBackstage::class,
         'apiPassport' => \App\Http\Middleware\ApiPassport::class,
+        'client' => CheckClientCredentials::class,
     ];
 
 }
