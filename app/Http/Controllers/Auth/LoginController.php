@@ -52,7 +52,7 @@ class LoginController extends Controller
         ], ['mobile.required_without' => '用户名不能为空', 'password.required_without' => '密码不能为空']);
     }
 
-    public function authenticated(Request $request, $user)
+    protected function authenticated(Request $request, $user)
     {
         $url = redirect()->intended($this->redirectPath())->getTargetUrl();
         if ($request->has('password') && $request->password == 123456) {
@@ -62,7 +62,7 @@ class LoginController extends Controller
         }
     }
 
-    public function credentials(Request $request)
+    protected function credentials(Request $request)
     {
         return $request->only($this->username(), 'password', 'dingtalk_auth_code');
     }
