@@ -62,6 +62,11 @@ class LoginController extends Controller
         }
     }
 
+    public function credentials(Request $request)
+    {
+        return $request->only($this->username(), 'password', 'dingtalk_auth_code');
+    }
+
     /**
      * 显示密码重置界面
      */
