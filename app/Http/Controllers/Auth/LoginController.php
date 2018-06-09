@@ -9,18 +9,14 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Models\HR\Staff;
 use Encypt;
 
 class LoginController extends Controller
 {
-    use AuthenticatesUsers {
-        login as protected loginByUsername;
-    }
+    use AuthenticatesUsers;
 
-    protected $username;
     protected $password;
     protected $admin;
     protected $response;
@@ -43,50 +39,26 @@ class LoginController extends Controller
         return 'mobile';
     }
 
-    public function login(Request $request)
-    {
-        if ($request->has('dingtalk_auth_code')) {
-            return $this->loginByDingtalkAuthCode($request);
-        } else {
-            $response = $this->loginByUsername($request);
-            if ($response instanceof RedirectResponse) {
-                $url = $response->getTargetUrl();
-                if (request()->isXmlHttpRequest()) {
-                    return ['status' => 1, 'url' => $url];
-                } else {
-                    return redirect($url)->withInput()->withErrors('为了保证您的账户安全！请立即修改初始密码');
-                }
-            } else {
-                return $response;
-            }
-        }
-    }
-
     /**
      * 登录表单验证
      * @param Request $request
      */
     protected function validateLogin(Request $request)
     {
-        $rules = [
-            $this->username() => 'required|string',
-            'password' => 'required|string',
-            'dingding' => 'string|max:50',
-        ];
-        $this->validate($request, $rules);
+        $this->validate($request, [
+            $this->username() => ['required_without:dingtalk_auth_code', 'string'],
+            'password' => ['required_without:dingtalk_auth_code', 'string'],
+            'dingtalk_auth_code' => 'string|max:50',
+        ], ['mobile.required_without' => '用户名不能为空', 'password.required_without' => '密码不能为空']);
     }
 
-
-    /**
-     * 登录失败，返回失败原因
-     */
-    protected function sendFailedLoginResponse(Request $request)
+    public function authenticated(Request $request, $user)
     {
-        session()->keep(['url']);
-        if (request()->isXmlHttpRequest()) {
-            return ['status' => -1, 'message' => trans('auth.failed')];
+        $url = redirect()->intended($this->redirectPath())->getTargetUrl();
+        if ($request->has('password') && $request->password == 123456) {
+            return ['status' => 1, 'url' => '/reset_password?redirect_uri=' . $url];
         } else {
-            return redirect()->back()->withInput()->withErrors(['login_fail' => $this->response]);
+            return ['status' => 1, 'url' => $url];
         }
     }
 
@@ -118,7 +90,7 @@ class LoginController extends Controller
         } else {
             return ['status' => -1, 'message' => $this->response];
         }
-        $url = session()->has('url') ? session()->get('url') : $request->has('redirect_uri') ? $request->redirect_uri : '/';
+        $url = $request->has('redirect_uri') ? $request->redirect_uri : '/';
         return ['status' => 1, 'url' => $url];
     }
 
@@ -134,34 +106,6 @@ class LoginController extends Controller
             'password_confirmation' => 'required',
         ], [], ['old_pwd' => '原密码', 'password' => '新密码', 'password_confirmation' => '确认新密码']
         );
-    }
-
-    /**
-     * 检查用户名是否存在
-     * @return boolean
-     */
-    private function checkUsername()
-    {
-        $admin = $this->getAdminByUsername($this->username);
-        if (empty($admin)) {
-            $this->response = '用户名不存在，请联系人事核对手机号码';
-            return false;
-        } else {
-            $this->admin = $admin;
-            return true;
-        }
-    }
-
-    /**
-     * 通过用户名获取Admin
-     * @return object
-     */
-    private function getAdminByUsername($username)
-    {
-        return Staff::where(function ($query) use ($username) {
-            $query->orWhere(['username' => $username])
-                ->orWhere(['mobile' => $username]);
-        })->where([['is_active', '=', 1], ['status_id', '>=', 0]])->first();
     }
 
     /**
@@ -184,103 +128,6 @@ class LoginController extends Controller
     private function encyptPassword($password, $salt)
     {
         $this->password = Encypt::password($password, $salt);
-    }
-
-    /**
-     * 登录成功
-     * @return view
-     */
-    private function loginSuccess()
-    {
-        if (request()->has('dingding') && !empty(request()->input('dingding'))) {
-            $this->admin->dingding = request()->input('dingding');
-        }
-        $this->putAdminInfoInSession($this->admin);
-        $this->updateLoginInfo();
-        if (empty(request()->url)) {
-            $url = route('home');
-        } else {
-            $url = request()->url;
-            $url = str_replace('*', '/', $url);
-        }
-        $url = $this->updateDefaultPassword($url); //默认密码为123456的进行修改
-        if (request()->isXmlHttpRequest()) {
-            return ['status' => 1, 'url' => $url];
-        } else {
-            return redirect($url)->withInput()->withErrors('为了保证您的账户安全！请立即修改初始密码');
-        }
-    }
-
-    /**
-     * 将用户信息存入SESSION
-     */
-    private function putAdminInfoInSession($admin)
-    {
-        $data = array_except($admin, ['password', 'salt']);
-        session()->put('admin', $data);
-    }
-
-    /**
-     * 更新最近登录信息
-     */
-    private function updateLoginInfo()
-    {
-        if ($this->admin['staff_sn'] == config('auth.developer.staff_sn')) {
-            return false;
-        }
-        $this->admin->latest_login_time = time();
-        $this->admin->latest_login_ip = request()->getClientIp();
-        $this->admin->save();
-    }
-
-
-    /**
-     * 使用开发者账户登录
-     */
-    private function loginAsDeveloper()
-    {
-        $developer = config('auth.developer');
-        if ($this->username == $developer['username'] && $this->password == $developer['password']) {
-            $this->admin = $developer;
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * 检测钉钉登录
-     */
-    public function loginByDingtalkAuthCode(Request $request)
-    {
-        $code = $request->dingtalk_auth_code;
-        $userInfo = app('Dingtalk')->passCodeGetUserInfo($code); //通过CODE换取用户身份
-        if (empty($userInfo['userid'])) {
-            return ['status' => -1, 'message' => '钉钉免登失败，请手动登录'];
-        }
-        $dingtalkId = $userInfo['userid'];
-        $dingDingUser = Staff::where('dingding', $dingtalkId)->first();
-        if ($dingDingUser) {
-            $this->username = $dingDingUser->mobile;
-            if ($this->checkUsername()) {
-                return $this->loginSuccess();
-            }
-            return $this->sendFailedLoginResponse();
-        } else {
-            return ['status' => -2, 'message' => '钉钉账号未同步，请手动登录', 'dingding' => $dingtalkId];
-        }
-    }
-
-    /**
-     * 登录成功修改默认密码（123456）
-     */
-    private function updateDefaultPassword($url)
-    {
-        session()->keep(['url']);
-        if (request()->get('password') === '123456') {
-            $url = route('reset');
-        }
-        return $url;
     }
 
 }

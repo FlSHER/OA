@@ -35,7 +35,20 @@ class CacheUserProvider extends EloquentUserProvider
     public function retrieveByCredentials(array $credentials)
     {
         $developer = config('auth.developer');
-        if ($credentials['mobile'] == $developer['username']) {
+        if (array_has($credentials, 'dingtalk_auth_code')) {
+            $code = $credentials['dingtalk_auth_code'];
+            $userInfo = app('Dingtalk')->passCodeGetUserInfo($code);
+            if (empty($userInfo['userid'])) {
+                abort(400, '钉钉免登失败，请手动登录');
+            }
+            $dingtalkId = $userInfo['userid'];
+            $user = Staff::where(['dingding' => $dingtalkId, 'is_active' => 1])->first();
+            if ($user) {
+                return new AuthenticatableUser($user->toArray());
+            } else {
+                abort(400, '钉钉账号未同步，请手动登录');
+            }
+        } elseif ($credentials['mobile'] == $developer['username']) {
             $developer['password'] = Encypt::password($developer['password'], $developer['salt']);
             return new AuthenticatableUser($developer);
         } else {
@@ -46,8 +59,12 @@ class CacheUserProvider extends EloquentUserProvider
 
     public function validateCredentials(UserContract $user, array $credentials)
     {
-        $plain = $credentials['password'];
-        return Encypt::password($plain, $user->salt) == $user->getAuthPassword();
+        if (array_has($credentials, 'dingtalk_auth_code')) {
+            return true;
+        } else {
+            $plain = $credentials['password'];
+            return Encypt::password($plain, $user->salt) == $user->getAuthPassword();
+        }
     }
 
     public function updateRememberToken(UserContract $user, $token)

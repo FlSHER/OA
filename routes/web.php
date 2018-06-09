@@ -50,7 +50,7 @@ Route::group(['middleware' => 'admin'], function () {
     });
 });
 
-Route::post('/login-dingtalk', ['uses' => 'Auth\LoginController@loginByDingtalkAuthCode']); //检测钉钉登录
+Route::post('/login-dingtalk', ['uses' => 'Auth\LoginController@login']); //检测钉钉登录
 
 Route::get('/error', ['uses' => 'ResponseController@showErrorPage'])->name('error'); //报错界面
 Route::get('/blank', ['uses' => 'HomeController@showBlankPage'])->name('blank'); //空白页面

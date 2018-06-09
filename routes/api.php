@@ -40,7 +40,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'apiPassport'], function () 
         Route::post('update', 'AppraiseController@update');//修改
     });
 });
-Route::get('/get_auth_code', ['uses' => 'Api\OAuthController@getAuthCode']);
+Route::get('/get_auth_code', ['uses' => 'Api\OAuthController@getAuthCode'])->middleware('auth');
 Route::any('/get_token', ['uses' => 'Api\OAuthController@getAppToken']);
 Route::any('/refresh_token', ['uses' => 'Api\OAuthController@refreshAppToken']);
 
