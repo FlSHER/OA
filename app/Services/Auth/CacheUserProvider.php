@@ -42,9 +42,9 @@ class CacheUserProvider extends EloquentUserProvider
                 abort(400, '钉钉免登失败，请手动登录');
             }
             $dingtalkId = $userInfo['userid'];
-            $user = Staff::where(['dingding' => $dingtalkId, 'is_active' => 1])->first();
+            $user = parent::retrieveByCredentials(['dingding' => $dingtalkId, 'is_active' => 1]);
             if ($user) {
-                return new AuthenticatableUser($user->toArray());
+                return $user;
             } else {
                 abort(400, '钉钉账号未同步，请手动登录');
             }
