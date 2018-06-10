@@ -3,8 +3,10 @@
 namespace App\Http\Middleware;
 
 use App\Models\App;
+use App\Models\HR\Staff;
 use Closure;
 use DB;
+use Illuminate\Support\Facades\Auth;
 
 class ApiPassport
 {
@@ -44,6 +46,7 @@ class ApiPassport
         }
         $appId = $appUser->app_id;
         $staffSn = $appUser->staff_sn;
+        Auth::login(Staff::find($staffSn));
         $request->offsetSet('app_id', $appId);
         $request->offsetSet('current_staff_sn', $staffSn);
         return true;
