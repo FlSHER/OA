@@ -235,6 +235,11 @@ class Staff extends User
         $query->with('brand', 'department', 'position', 'shop', 'status', 'info', 'role');
     }
 
+    public function scopeWorking($query)
+    {
+        $query->where('status_id', '>=', 0)->where('is_active', 1);
+    }
+
     /* ----- 本地作用域 End ----- */
 
 
