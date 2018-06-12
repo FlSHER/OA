@@ -80,17 +80,17 @@ class LoginForm extends Component {
               let status = response.data.status;
               if (status == 1) {
                 location.href = response.data.url;
-              } else if (status == -1) {
-                message.error(response.data.message);
-              } else if (status == -2) {
-                message.info(response.data.message);
-                this.form.props.form.setFieldsValue({ dingding: response.data.dingding });
+              } else {
+                message.error(response.data.message || '未知错误');
               }
               setTimeout(() => {
                 this.setState({ loading: false })
               }, 500);
             }).catch((err) => {
               if (err.response && err.response.data && err.response.data.message) {
+                if (err.response.headers.dingding) {
+                  this.form.props.form.setFieldsValue({ dingding: err.response.headers.dingding });
+                }
                 message.error(err.response.data.message);
               } else {
                 message.error('自动登录异常:' + err.message);

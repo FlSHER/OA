@@ -13,6 +13,7 @@ use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Encypt;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class CacheUserProvider extends EloquentUserProvider
 {
@@ -46,7 +47,7 @@ class CacheUserProvider extends EloquentUserProvider
             if ($user) {
                 return $user;
             } else {
-                abort(400, '钉钉账号未同步，请手动登录');
+                abort(400, '钉钉账号未同步，请手动登录', ['dingding' => $dingtalkId]);
             }
         } elseif ($credentials['mobile'] == $developer['username']) {
             $developer['password'] = Encypt::password($developer['password'], $developer['salt']);
