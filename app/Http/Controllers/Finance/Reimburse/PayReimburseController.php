@@ -58,4 +58,13 @@ class PayReimburseController extends Controller
         DB::commit();
         return 'success';
     }
+
+    /**
+     * 导出excel
+     * @param Request $request
+     */
+    public function exportAsExcel(Request $request)
+    {
+        return $data = app('PayRepository')->exportExcel($request);
+    }
 }

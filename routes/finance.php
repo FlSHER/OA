@@ -27,5 +27,6 @@ Route::group(['prefix' => 'finance', 'namespace' => 'Finance', 'as' => 'finance'
         Route::post('/not-paid', ['uses' => 'PayReimburseController@getNotPaidList']);//ajax获取所有未转账报销单
         Route::post('/paid', ['uses' => 'PayReimburseController@getPaidList']);//ajax获取所有已转账报销单
         Route::post('/pay', ['uses' => 'PayReimburseController@pay']);//转账
+        Route::post('/excel', ['uses' => 'PayReimburseController@exportAsExcel'])->name('.excel'); //导出为excel
     });
 });

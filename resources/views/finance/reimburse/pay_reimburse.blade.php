@@ -324,7 +324,7 @@
         },
       ];
 
-      var buttons = ['export:/finance/reimburse/excel?type=all'];
+      var buttons = ['export:/finance/pay_reimburse/excel?type=all'];
       @if ($authority->checkAuthority(134))
       buttons.push({ text: '<i class="fa fa-yen fa-fw"></i>', action: payByMultiple, titleAttr: '批量转账' });
         @endif
