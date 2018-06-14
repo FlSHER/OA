@@ -46,3 +46,23 @@ Route::any('/refresh_token', ['uses' => 'Api\OAuthController@refreshAppToken']);
 
 Route::get('/dingtalk/register_approval_callback', ['uses' => 'Api\DingtalkController@registerApprovalCallback']); //注册钉钉审批回调
 Route::any('/dingtalk/approval_callback', ['uses' => 'Api\DingtalkController@approvalCallback']); //钉钉审批回调
+
+Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
+    Route::namespace('Resources')->group(function () {
+        Route::apiResource('staff', 'StaffController')->parameter('staff_sn', 'staffSn');
+        Route::apiResource('departments', 'DepartmentController');
+        Route::group(['prefix' => 'departments/{department}'], function () {
+            Route::get('children-and-staff', 'DepartmentController@getChildrenAndStaff');
+            Route::get('staff', 'DepartmentController@getStaff');
+        });
+        Route::apiResource('brands', 'BrandController');
+        Route::apiResource('positions', 'PositionController');
+        Route::apiResource('shops', 'ShopController');
+        Route::apiResource('roles', 'RoleController');
+    });
+    Route::get('current-user', 'Resources\StaffController@getCurrentUser');
+    Route::prefix('table')->group(function () {
+        Route::post('staff', 'TableController@getStaff');
+        Route::post('shop', 'TableController@getShop');
+    });
+});
