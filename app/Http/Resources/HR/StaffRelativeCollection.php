@@ -15,13 +15,15 @@ class StaffRelativeCollection extends ResourceCollection
      */
     public function toArray($request)
     {
-        return $this->collection->map(function ($relative) {
+        $relativeTypes = DB::table('staff_relative_type')
+            ->select(['id', 'name'])->get()->mapWithKeys(function ($item) {
+                return [$item->id => ['id' => $item->id, 'name' => $item->name]];
+            });
+        return $this->collection->map(function ($relative) use ($relativeTypes) {
             return [
                 'staff_sn' => $relative->staff_sn,
                 'realname' => $relative->realname,
-                'relative_type' => DB::table('staff_relative_type')
-                    ->select(['id', 'name'])
-                    ->where('id', $relative->pivot->relative_type)->first(),
+                'relative_type' => $relativeTypes[$relative->pivot->relative_type],
             ];
         })->toArray();
     }

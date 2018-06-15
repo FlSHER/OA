@@ -62,7 +62,6 @@ class StaffController extends Controller
      */
     public function show(Staff $staff)
     {
-        StaffResource::withoutWrapping();
         return new StaffResource($staff);
     }
 

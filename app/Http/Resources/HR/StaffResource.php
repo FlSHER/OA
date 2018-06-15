@@ -6,6 +6,9 @@ use Illuminate\Http\Resources\Json\Resource;
 
 class StaffResource extends Resource
 {
+
+    public static $wrap = null;
+
     /**
      * Transform the resource into an array.
      *
@@ -72,7 +75,7 @@ class StaffResource extends Resource
             'concat_name' => $this->info->concat_name,
             'concat_tel' => $this->info->concat_tel,
             'concat_type' => $this->info->concat_type,
-            'relatives' => new StaffRelativeCollection($this->relatives),
+            'relatives' => $this->relative ? new StaffRelativeCollection($this->relative) : [],
         ];
     }
 }
