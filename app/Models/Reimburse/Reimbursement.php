@@ -14,15 +14,18 @@ class Reimbursement extends Model
     /**
      * 资金归属
      */
-    public function reim_department() {
+    public function reim_department()
+    {
         return $this->belongsTo('App\Models\Reimburse\ReimDepartment')->withTrashed();
     }
 
-    public function expenses() {//消费明细
-        return $this->hasMany('App\Models\Reimburse\Expense', 'reim_id');
+    public function expenses()
+    {//消费明细
+        return $this->hasMany('App\Models\Reimburse\Expense', 'reim_id')->orderBy('date', 'asc');
     }
 
-    public function status() {//报销单状态
+    public function status()
+    {//报销单状态
         return $this->belongsTo('App\Models\Reimburse\Reimbursement_status', 'status_id');
     }
 }
