@@ -177,7 +177,7 @@ class AuditRepository
 
     private function getReimburse($request)
     {
-        $where = ['status_id', '>=', 4];
+        $where = [['status_id', '>=', 4]];
         $reim_deparment_arr = app('AuditService')->getReimDepartmentId();//当前的资金归属id（array）
         $expense_where = ['expenses' => function ($query) {
             $query->where('is_audited', '=', 1);
