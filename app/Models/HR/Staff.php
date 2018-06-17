@@ -2,6 +2,7 @@
 
 namespace App\Models\HR;
 
+use App\Models\Traits\ListScopes;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User;
@@ -18,7 +19,7 @@ use App\Models\I\Politics;
 
 class Staff extends User
 {
-    use HasApiTokens, Notifiable, SoftDeletes;
+    use HasApiTokens, Notifiable, SoftDeletes, ListScopes;
 
     protected $connection = 'mysql';
     protected $primaryKey = 'staff_sn';
