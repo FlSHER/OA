@@ -6,15 +6,11 @@ use App\Http\Resources\CurrentUserResource;
 use App\Http\Resources\HR\StaffCollection;
 use App\Http\Resources\HR\StaffResource;
 use App\Models\HR\Staff;
-use App\Repositories\Traits\Filterable;
-use App\Services\Tools\SourceFilter;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 
 class StaffController extends Controller
 {
-    use Filterable;
 
     /**
      * Display a listing of the resource.
@@ -30,7 +26,7 @@ class StaffController extends Controller
             $newFilters = preg_replace('/role\.id=.*?(;|$)/', '$3', $request->filters);
             $request->offsetSet('filters', $newFilters);
         }
-        $builder = Staff::when($roleId, function ($query) use ($roleId) {
+        $list = Staff::when($roleId, function ($query) use ($roleId) {
             $query->whereHas('role', function ($query) use ($roleId) {
                 if (is_array($roleId)) {
                     $query->whereIn('id', $roleId);
@@ -38,9 +34,13 @@ class StaffController extends Controller
                     $query->where('id', $roleId);
                 }
             });
-        });
-        $list = $this->getFilteredList($request, $builder);
-        return new StaffCollection($list);
+        })->filterByQueryString()->withPagination($request->get('pagesize', 10));
+        if ($list['data']) {
+            $list['data'] = new StaffCollection(collect($list['data']));
+            return $list;
+        } else {
+            return new StaffCollection($list);
+        }
     }
 
     /**

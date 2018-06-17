@@ -6,6 +6,9 @@ use Illuminate\Http\Resources\Json\Resource;
 
 class DepartmentResource extends Resource
 {
+
+    public static $wrap = null;
+
     /**
      * Transform the resource into an array.
      *

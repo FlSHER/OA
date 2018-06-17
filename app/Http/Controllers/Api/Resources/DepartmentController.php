@@ -3,15 +3,14 @@
 namespace App\Http\Controllers\Api\Resources;
 
 use App\Http\Resources\HR\DepartmentCollection;
+use App\Http\Resources\HR\DepartmentResource;
 use App\Http\Resources\HR\StaffCollection;
 use App\Models\HR\Department;
-use App\Repositories\Traits\Filterable;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class DepartmentController extends Controller
 {
-    use Filterable;
 
     /**
      * Display a listing of the resource.
@@ -20,7 +19,7 @@ class DepartmentController extends Controller
      */
     public function index(Request $request)
     {
-        $list = $this->getFilteredList($request, Department::query());
+        $list = Department::filterByQueryString()->get();
         return new DepartmentCollection($list);
     }
 
@@ -43,7 +42,7 @@ class DepartmentController extends Controller
      */
     public function show(Department $department)
     {
-        //
+        return new DepartmentResource($department);
     }
 
     /**
