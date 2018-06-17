@@ -1017,7 +1017,7 @@ function OATable(dom, options) {
       titleAttr: "刷新",
       className: "btn-primary",
       action: function (e, dt, node, config) {
-        dt.draw(false);
+        dt.ajax.reload(null, false);
       }
     },
     filter: {
@@ -1083,7 +1083,7 @@ function OATable(dom, options) {
       }
     }
     self.settings()[0].ajax.data.filter = filter;
-    self.draw();
+    self.ajax.reload();
     if (condition) {
       self.buttons().container().find('.fa-filter').css("color", "#65cea7");
     } else {

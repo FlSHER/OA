@@ -90,7 +90,7 @@ class DataTablesService
     protected function getColumns($request)
     {
         $columns = [];
-        foreach ($request->columns as $k => $v) {
+        foreach ($request->get('columns', []) as $k => $v) {
             $column = [];
             if (preg_match_all('/{([\w\.\*]+)}/', $v['data'], $column)) {
                 $columns[$k] = $column[1];
@@ -290,7 +290,7 @@ class DataTablesService
     private function makeResponseData($request, &$data)
     {
         foreach ($data as $index => $row) {
-            foreach ($request->columns as $v) {
+            foreach ($request->get('columns', []) as $v) {
                 $column = $v['data'];
                 if (preg_match('/{[\w\.\*]+}/', $column)) {
                     $code = preg_replace(['/{([\w\.]+)}/', '/{([\w\.]+)\.\*\.([\w\.]+)}/'], ['array_get($row, \'$1\')', 'array_pluck(array_get($row, \'$1\'),\'$2\')'], $column);
