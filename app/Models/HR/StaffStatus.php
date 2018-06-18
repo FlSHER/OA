@@ -2,9 +2,17 @@
 
 namespace App\Models\HR;
 
+use App\Scopes\SortScope;
 use Illuminate\Database\Eloquent\Model;
 
-class StaffStatus extends Model {
+class StaffStatus extends Model
+{
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::addGlobalScope(new SortScope);
+    }
 
     protected $table = 'staff_status';
 
