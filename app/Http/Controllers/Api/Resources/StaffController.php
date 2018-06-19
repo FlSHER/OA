@@ -35,7 +35,7 @@ class StaffController extends Controller
                 }
             });
         })->filterByQueryString()->withPagination($request->get('pagesize', 10));
-        if ($list['data']) {
+        if (isset($list['data'])) {
             $list['data'] = new StaffCollection(collect($list['data']));
             return $list;
         } else {
