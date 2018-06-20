@@ -21,6 +21,7 @@ class DepartmentCollection extends ResourceCollection
                 'id' => $department->id,
                 'name' => $department->name,
                 'full_name' => $department->full_name,
+                'parent_id' => $department->parent_id,
                 'is_locked' => $department->is_locked,
                 'is_public' => $department->is_public,
                 'manager_sn' => $department->manager_sn,

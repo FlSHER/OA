@@ -11,7 +11,7 @@ class ApiResponseService
      * 生成基础错误响应
      * @return array
      */
-    public function makeErrorResponse($message = '', $errorCode = 0, $stausCode = 500, $outerResponse = [])
+    public function makeErrorResponse($message = '', $errorCode = 0, $statusCode = 500, $outerResponse = [])
     {
         $response = [
             'status' => -1,
@@ -20,14 +20,14 @@ class ApiResponseService
             'timestamp' => time()
         ];
         $response = array_collapse([$response, $outerResponse]);
-        return response($response, $stausCode);
+        return response($response, $statusCode);
     }
 
     /**
      * 生成基础成功响应
      * @return array
      */
-    public function makeSuccessResponse($message = '', $stausCode = 200, $outerResponse = [])
+    public function makeSuccessResponse($message = '', $statusCode = 200, $outerResponse = [])
     {
         $response = [
             'status' => 1,
@@ -35,7 +35,7 @@ class ApiResponseService
             'timestamp' => time()
         ];
         $response = array_collapse([$response, $outerResponse]);
-        return response($response, $stausCode);
+        return response($response, $statusCode);
     }
 
     /* 生成天气预报图片 start */

@@ -17,7 +17,7 @@ class DepartmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
         $list = Department::filterByQueryString()->get();
         return new DepartmentCollection($list);
