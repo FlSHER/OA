@@ -10,6 +10,7 @@ namespace App\Services\Auth;
 
 
 use Illuminate\Auth\EloquentUserProvider;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Encypt;
@@ -27,7 +28,8 @@ class CacheUserProvider extends EloquentUserProvider
             $attribute = $developer;
         } else {
             $attribute = Cache::remember('staff_' . $identifier, $this->minutes, function () use ($identifier) {
-                return parent::retrieveById($identifier)->toArray();
+                $user = parent::retrieveById($identifier);
+                return $user instanceof Model ? $user->toArray() : $user;
             });
         }
         return new AuthenticatableUser($attribute);
