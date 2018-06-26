@@ -6,6 +6,7 @@
 
 namespace App\Providers;
 
+use App\Models\Department;
 use Illuminate\Support\ServiceProvider;
 
 class SystemServiceProvider extends ServiceProvider
@@ -18,7 +19,12 @@ class SystemServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Department::saving(function (Department $department) {
+            $department->changeFullName();
+        });
+        Department::saved(function (Department $department) {
+            $department->changeRoleAuthority();
+        });
     }
 
     /**

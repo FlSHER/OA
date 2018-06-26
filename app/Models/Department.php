@@ -155,17 +155,6 @@ class Department extends Model
 
     /* ----- 本地作用域 End ----- */
 
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-        self::saving(function ($post) {
-            $post->changeFullName();
-        });
-        self::saved(function ($post) {
-            $post->changeRoleAuthority();
-        });
-    }
-
     public static function deleteByTrees($departmentId)
     {
         $self = self::find($departmentId);
@@ -201,7 +190,7 @@ class Department extends Model
     /**
      * 更新部门全称
      */
-    private function changeFullName()
+    public function changeFullName()
     {
         if ($this->isDirty('parent_id') || $this->isDirty('name')) {
             $newFullName = $this->parent_id > 0 ? $this->_parent->full_name . '-' . $this->name : $this->name;
@@ -224,7 +213,7 @@ class Department extends Model
     /**
      * 根据父级继承部门权限
      */
-    private function changeRoleAuthority()
+    public function changeRoleAuthority()
     {
         if ($this->isDirty('parent_id')) {
             $originalParentId = $this->getOriginal('parent_id');
