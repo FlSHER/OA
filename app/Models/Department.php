@@ -155,17 +155,6 @@ class Department extends Model
 
     /* ----- 本地作用域 End ----- */
 
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-        self::saving(function ($post) {
-            $post->changeFullName();
-        });
-        self::saved(function ($post) {
-            $post->changeRoleAuthority();
-        });
-    }
-
     public static function deleteByTrees($departmentId)
     {
         $self = self::find($departmentId);
