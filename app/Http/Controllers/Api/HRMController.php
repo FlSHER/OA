@@ -28,8 +28,7 @@ class HRMController extends Controller
 
     public function getCurrentUserInfo(Request $request)
     {
-        $request->offsetSet('staff_sn', $request->current_staff_sn);
-        $currentUser = Staff::api()->find($request->staff_sn);
+        $currentUser = Staff::api()->find(app('CurrentUser')->staff_sn);
         if (!empty($currentUser->department)) {
             $currentUser->department->setAttribute('parentIds', $currentUser->department->parentIds);
             $currentUser->department->setAttribute('childrenIds', $currentUser->department->childrenIds);
