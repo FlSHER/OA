@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
   |
  */
 
-Route::group(['namespace' => 'Api', 'middleware' => 'apiPassport'], function () {
+Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
     Route::any('/get_current_user', ['uses' => 'HRMController@getCurrentUserInfo']); // 获取当前用户信息
     Route::any('/get_user', ['uses' => 'HRMController@getUserInfo']); // 获取用户信息
     Route::any('/get_department', ['uses' => 'HRMController@getDepartmentInfo']); // 获取部门信息
@@ -49,7 +49,7 @@ Route::any('/dingtalk/approval_callback', ['uses' => 'Api\DingtalkController@app
 
 Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
     Route::namespace('Resources')->group(function () {
-        Route::apiResource('staff', 'StaffController')->parameter('staff_sn', 'staffSn');
+        Route::apiResource('staff', 'StaffController');
         Route::apiResource('departments', 'DepartmentController');
         Route::group(['prefix' => 'departments/{department}'], function () {
             Route::get('children-and-staff', 'DepartmentController@getChildrenAndStaff');
@@ -59,6 +59,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
         Route::apiResource('positions', 'PositionController');
         Route::apiResource('shops', 'ShopController');
         Route::apiResource('roles', 'RoleController');
+        Route::get('educations', 'BasicInfoController@indexEducation');
     });
     Route::get('current-user', 'Resources\StaffController@getCurrentUser');
     Route::prefix('table')->group(function () {

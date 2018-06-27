@@ -29,7 +29,7 @@ class DingtalkController extends Controller
     public function startApproval(Request $request)
     {
         try {
-            $appId = $request->app_id;
+            $appId = $request->user()->token()->client_id;
             $processCode = $request->process_code;
             $approvers = $request->approvers;
             $formData = $request->form_data;
