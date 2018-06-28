@@ -52,10 +52,10 @@ class CurrentUserResource extends Resource
             'wechat_number' => $this->wechat_number,
             'qq_number' => $this->info->qq_number,
             'authorities' => [
-                'oa' => app('Authority')->getAvailableAuthorities(),
-                'available_brands' => app('Authority')->getAvailableBrands(),
-                'available_departments' => app('Authority')->getAvailableDepartments(),
-                'available_shops' => app('Authority')->getAvailableShops(),
+                'oa' => app('Authority')->getAuthoritiesByStaffSn($this->staff_sn),
+                'available_brands' => app('Authority')->getAvailableBrandsByStaffSn($this->staff_sn),
+                'available_departments' => app('Authority')->getAvailableDepartmentsByStaffSn($this->staff_sn),
+                'available_shops' => app('Authority')->getAvailableShopsByStaffSn($this->staff_sn),
             ]
         ];
     }

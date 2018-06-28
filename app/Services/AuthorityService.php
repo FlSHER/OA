@@ -138,7 +138,7 @@ class AuthorityService
         } else {
             if (empty($staffSn))
                 $staffSn = app('CurrentUser')->getStaffSn();
-            $shops = Shop::visible($staffSn)->pluck('shop_sn');
+            $shops = $this->getAvailableShopsByStaffSn($staffSn);
             session()->put('available_shops', $shops);
         }
         return $shops;
@@ -223,6 +223,16 @@ class AuthorityService
             $brands = array_unique($brands);
         }
         return $brands;
+    }
+
+    public function getAvailableShopsByStaffSn($staffSn)
+    {
+        if ($this->isDeveloper($staffSn)) {
+            $shops = Shop::get()->pluck('shop_sn')->toArray();
+        } else {
+            $shops = Shop::visible($staffSn)->pluck('shop_sn');
+        }
+        return $shops;
     }
 
     private function explodeToUriArr($authorityUri)
