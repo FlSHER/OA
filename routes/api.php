@@ -25,7 +25,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
     Route::any('/get_dingtalk_js_api_ticket', ['uses' => 'DingtalkController@getJsApiTicket']); //获取钉钉的jsApiTicket
     Route::any('/get_dingtalk_js_config', ['uses' => 'DingtalkController@getDingtalkConfig']); //获取钉钉的jsConfig
     Route::group(['prefix' => 'dingtalk'], function () {
-        Route::any('/start_approval', ['uses' => 'DingtalkController@startApproval']); //发起钉钉审批
+        Route::any('/start_approval', ['uses' => 'DingtalkController@startApproval'])->middleware('client'); //发起钉钉审批
     });
     Route::group(['prefix' => 'hr'], function () {
         Route::post('staff_update', ['uses' => 'HRMController@changeStaffInfo']); //修改员工信息
