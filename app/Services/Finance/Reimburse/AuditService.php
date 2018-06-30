@@ -83,7 +83,7 @@ class AuditService
             '报销单编号' => $reimbursement->reim_sn,
             '内容' => $reimbursement->description,
             '申请人' => $reimbursement->realname,
-            '总金额' => $reimbursement->audited_cost,
+            '总金额' => sprintf('%.2f', $reimbursement->audited_cost),
             '直属领导' => $reimbursement->approver_name,
             '财务审核' => $reimbursement->accountant_name,
             '资金归属' => $reimbursement->reim_department->name,
