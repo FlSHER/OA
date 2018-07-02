@@ -14,10 +14,10 @@ class RoleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        RoleCollection::withoutWrapping();
-        return new RoleCollection(Role::all());
+        $roles = Role::filterByQueryString()->withPagination($request->get('pagesize', 10));
+        return new RoleCollection($roles);
     }
 
     /**
