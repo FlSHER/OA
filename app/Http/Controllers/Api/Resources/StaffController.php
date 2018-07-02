@@ -100,6 +100,7 @@ class StaffController extends Controller
                 'available_departments' => app('Authority')->getAvailableDepartmentsByStaffSn($staffSn),
                 'available_shops' => app('Authority')->getAvailableShopsByStaffSn($staffSn),
             ];
+            return $currentUser;
         } else {
             $currentUser = Staff::find($staffSn);
             return new CurrentUserResource($currentUser);
