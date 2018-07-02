@@ -7,6 +7,8 @@ use Illuminate\Http\Resources\Json\Resource;
 
 class CurrentUserResource extends Resource
 {
+    public static $wrap = null;
+
     /**
      * Transform the resource into an array.
      *
