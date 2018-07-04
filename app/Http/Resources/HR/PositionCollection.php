@@ -6,6 +6,8 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class PositionCollection extends ResourceCollection
 {
+    public static $wrap = null;
+
     /**
      * Transform the resource collection into an array.
      *
@@ -20,6 +22,7 @@ class PositionCollection extends ResourceCollection
                 'name' => $position->name,
                 'level' => $position->level,
                 'is_public' => $position->is_public,
+                'brands' => $position->brand->toArray(),
             ];
         })->toArray();
     }

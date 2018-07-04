@@ -16,7 +16,6 @@ class PositionController extends Controller
      */
     public function index()
     {
-        PositionCollection::withoutWrapping();
         return new PositionCollection(Position::all());
     }
 
