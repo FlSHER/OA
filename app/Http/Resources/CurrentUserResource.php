@@ -53,6 +53,7 @@ class CurrentUserResource extends Resource
             'dingtalk_number' => $this->dingding,
             'wechat_number' => $this->wechat_number,
             'qq_number' => $this->info->qq_number,
+            'roles' => $this->roles,
             'authorities' => [
                 'oa' => app('Authority')->getAuthoritiesByStaffSn($this->staff_sn),
                 'available_brands' => app('Authority')->getAvailableBrandsByStaffSn($this->staff_sn),

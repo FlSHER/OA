@@ -56,6 +56,11 @@ class Staff extends User
         return $this->belongsToMany('App\Models\Role', 'staff_has_roles', 'staff_sn');
     }
 
+    public function roles()
+    { //角色
+        return $this->belongsToMany('App\Models\Role', 'staff_has_roles', 'staff_sn');
+    }
+
     public function status()
     { //员工状态
         return $this->belongsTo('App\Models\HR\StaffStatus');
