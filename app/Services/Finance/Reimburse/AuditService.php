@@ -12,7 +12,6 @@ use App\Models\Reimburse\Auditor;
 use App\Models\Reimburse\ReimDepartment;
 use App\Models\Reimburse\Reimbursement;
 use DB;
-use Illuminate\Http\Request;
 
 class AuditService
 {
@@ -65,16 +64,30 @@ class AuditService
     {
         $appId = 1;
         $processCode = 'PROC-GLYJ5N2V-E11VUX0YRK67A1WOOODU2-G8JBUYGJ-1';
+        $approverSn = $reimbursement->approver_staff_sn ?: $reimbursement->staff_sn;
         $managerSn = $reimbursement->reim_department->manager_sn;
         $managerName = $reimbursement->reim_department->manager_name;
-        $formData = $this->makeFormData($reimbursement);
-        $initiatorSn = $reimbursement->staff_sn;
         $callback = config("api.url.reimburse.base") . 'api/callback/manager';
-        $processInstanceId = app('Dingtalk')->startApprovalAndRecord($appId, $processCode, $managerSn, $formData, $callback, $initiatorSn);
-        $reimbursement->process_instance_id = $processInstanceId;
+        if ($approverSn != $managerSn) {
+            $formData = $this->makeFormData($reimbursement);
+            $initiatorSn = $reimbursement->staff_sn;
+            $processInstanceId = app('Dingtalk')->startApprovalAndRecord($appId, $processCode, $managerSn, $formData, $callback, $initiatorSn);
+            $reimbursement->process_instance_id = $processInstanceId;
+        } else {
+            $reimbursement->process_instance_id = 'skip_' . $reimbursement->reim_sn;
+        }
         $reimbursement->manager_sn = $managerSn;
         $reimbursement->manager_name = $managerName;
         $reimbursement->save();
+        if ($approverSn == $managerSn) {
+            $message = [
+                'processInstanceId' => $reimbursement->process_instance_id,
+                'EventType' => 'bpms_instance_change',
+                'type' => 'finish',
+                'result' => 'agree',
+            ];
+            app('Curl')->setUrl($callback)->sendMessageByPost($message);
+        }
     }
 
     public function makeFormData($reimbursement)
