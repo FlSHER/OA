@@ -191,7 +191,7 @@ class Dingtalk
             ]);
             return $response->result->process_instance_id;
         } else {
-            abort(500, !empty($response->msg) ? $response->msg : (is_strint($response) ? $response : json_encode($response)));
+            abort(500, !empty($response->msg) ? $response->msg : (is_string($response) ? $response : json_encode($response)));
         }
     }
 
