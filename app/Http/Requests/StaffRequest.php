@@ -204,7 +204,7 @@ class StaffRequest extends FormRequest
             'info.mini_shop_sn' => ['max:15', 'unique:staff_info,mini_shop_sn,' . $staffSn . ',staff_sn,deleted_at,NULL'],
             'dingding' => ['max:50', 'unique:staff,NULL,' . $staffSn . ',staff_sn,deleted_at,NULL'],
             'info.concat_name' => ['required', 'between:2,10'],
-            'info.concat_tel' => ['required', 'regex:/^1[345789]\d{9}$|^0\d{2,3}-\d{5,9}$/'],
+            'info.concat_tel' => ['required', 'regex:/^1[3456789]\d{9}$|^0\d{2,3}-\d{5,9}$/'],
             'info.concat_type' => ['required', 'max:5'],
             'info.household_address' => ['max:30'],
             'info.living_address' => ['max:30'],
