@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Finance\Reimburse;
 
 use DB;
-use App\Models\Reimburse\Auditor;
 use App\Models\Reimburse\Reimbursement;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -114,10 +113,15 @@ class ReimburseController extends Controller
             'expenses.*.id' => 'exists:reimburse_mysql.expenses,id,reim_id,' . $request->reim_id,
             'expenses.*.audited_cost' => 'required|regex:/^[0-9]+(.[0-9]{1,2})?$/',
         ], [], trans('fields.reimburse.audit'));
-        DB::connection('reimburse_mysql')->transaction(function () use ($request) {
-            $reimbursement = app('AuditRepository')->saveAudit($request);
-            app('AuditService')->afterApprove($reimbursement);
-        });
+        try {
+            DB::connection('reimburse_mysql')->transaction(function () use ($request) {
+                $reimbursement = app('AuditRepository')->saveAudit($request);
+                app('AuditService')->afterApprove($reimbursement);
+            });
+        } catch (\Exception $exception) {
+            return ['msg' => 'error', 'result' => $exception->getMessage()];
+        }
+
         return ['msg' => 'success'];
     }
 
