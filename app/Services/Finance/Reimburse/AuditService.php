@@ -68,7 +68,7 @@ class AuditService
         $managerSn = $reimbursement->reim_department->manager_sn;
         $managerName = $reimbursement->reim_department->manager_name;
         $callback = config("api.url.reimburse.base") . 'api/callback/manager';
-        if ($approverSn != $managerSn) {
+        if ((int)$approverSn != (int)$managerSn) {
             $formData = $this->makeFormData($reimbursement);
             $initiatorSn = $reimbursement->staff_sn;
             $processInstanceId = app('Dingtalk')->startApprovalAndRecord($appId, $processCode, $managerSn, $formData, $callback, $initiatorSn);
@@ -79,7 +79,7 @@ class AuditService
         $reimbursement->manager_sn = $managerSn;
         $reimbursement->manager_name = $managerName;
         $reimbursement->save();
-        if ($approverSn == $managerSn) {
+        if ((int)$approverSn == (int)$managerSn) {
             $message = [
                 'processInstanceId' => $reimbursement->process_instance_id,
                 'EventType' => 'bpms_instance_change',
