@@ -34,7 +34,9 @@ class StaffController extends Controller
                     $query->where('id', $roleId);
                 }
             });
-        })->filterByQueryString()->withPagination($request->get('pagesize', 10));
+        })->filterByQueryString()
+            ->sortByQueryString()
+            ->withPagination();
         if (isset($list['data'])) {
             $list['data'] = new StaffCollection(collect($list['data']));
             return $list;
