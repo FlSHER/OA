@@ -56,7 +56,7 @@ Trait ListScopes
     public function scopeWithPagination(Builder $query, int $pagesize = 10)
     {
         if (request()->has('page') && is_numeric(request('page'))) {
-            $items = $query->paginate($pagesize);
+            $items = $query->paginate(request()->get('pagesize', $pagesize));
 
             return [
                 'data' => $items->items(),
