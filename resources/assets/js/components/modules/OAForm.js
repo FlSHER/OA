@@ -112,10 +112,10 @@ class OAForm extends Component {
       }
       this.loaded();
     }).catch((err) => {
-      if (err.response && err.response.status == 422) {
+      if (err.response && (err.response.status == 422 || err.response.status == 423)) {
         this.showValidateError(err);
-      } else if (err.response) {
-        message.error(err.response.message);
+      } else if (err.response && err.response.data) {
+        message.error(err.response.data.message);
         console.error(err.response.data);
       } else {
         message.error('系统异常');
