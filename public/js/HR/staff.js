@@ -12,11 +12,11 @@ var oaFormOption = {
   }
 };
 
-$(function () {
+$(function() {
   /* oaForm */
   $(".modal form").oaForm(oaFormOption);
   /* oaTable start */
-  table = $('#example').oaTable({
+  table = $("#example").oaTable({
     columns: staffColumns,
     ajax: { url: "/hr/staff/list" },
     buttons: buttons,
@@ -28,36 +28,55 @@ $(function () {
   departmentOptionsZTreeSetting = {
     async: {
       url: "/hr/department/tree",
-      dataFilter: function (treeId, parentNode, responseData) {
+      dataFilter: function(treeId, parentNode, responseData) {
         if (treeId == "department_filter_option") {
-          return [{ "name": "全部", "drag": true, "id": "0", "children": responseData, "iconSkin": " _", "open": true }];
+          return [
+            {
+              name: "全部",
+              drag: true,
+              id: "0",
+              children: responseData,
+              iconSkin: " _",
+              open: true
+            }
+          ];
         } else {
           return responseData;
         }
-
       }
     },
     view: {
       dblClickExpand: false
     },
     callback: {
-      onClick: function (event, treeId, treeNode) {
+      onClick: function(event, treeId, treeNode) {
         if (treeNode.drag) {
           var options = $(event.target).parents(".ztreeOptions");
           if (treeNode.id == 0) {
-            options.prev().children("option").first().prop("selected", true);
-            if (options.next().prop('tagName') == 'INPUT') {
-              options.next().val('');
+            options
+              .prev()
+              .children("option")
+              .first()
+              .prop("selected", true);
+            if (options.next().prop("tagName") == "INPUT") {
+              options.next().val("");
             }
           } else {
-            options.prev().children("option[value=" + treeNode.id + "]").prop("selected", true);
-            if (options.next().prop('tagName') == 'INPUT') {
-              var children = $.fn.zTree.getZTreeObj(treeId).getNodesByFilter(function (node) {
-                return node.drag;
-              }, false, treeNode);
+            options
+              .prev()
+              .children("option[value=" + treeNode.id + "]")
+              .prop("selected", true);
+            if (options.next().prop("tagName") == "INPUT") {
+              var children = $.fn.zTree.getZTreeObj(treeId).getNodesByFilter(
+                function(node) {
+                  return node.drag;
+                },
+                false,
+                treeNode
+              );
               var departmentId = treeNode.id;
               for (var i in children) {
-                departmentId += ',' + children[i].id;
+                departmentId += "," + children[i].id;
               }
               options.next().val(departmentId);
             }
@@ -86,14 +105,14 @@ function getPositionOptions() {
   var positionTag = form.find("select[name='position_id']");
   var optionId = positionTag.attr("origin_value");
   var url = "/hr/position/options";
-  var data = { "brand_id": brandId };
+  var data = { brand_id: brandId };
   $.ajax({
     type: "POST",
     url: url,
     data: data,
     async: false,
-    dataType: 'text',
-    success: function (msg) {
+    dataType: "text",
+    success: function(msg) {
       var firstOptionTag = positionTag.children().eq(0);
       if (firstOptionTag.val() === "") {
         msg = '<option value="">全部</option>' + msg;
@@ -106,28 +125,26 @@ function getPositionOptions() {
   });
 }
 
-
 /**
  * 查看个人信息
  * @param {int} staffSn
  */
 function showPersonalInfo(staffSn) {
   oaWaiting.show();
-  var url = '/hr/staff/show_info';
-  var data = { 'staff_sn': staffSn };
+  var url = "/hr/staff/show_info";
+  var data = { staff_sn: staffSn };
   $.ajax({
     type: "POST",
     url: url,
     data: data,
-    dataType: 'text',
-    success: function (msg) {
+    dataType: "text",
+    success: function(msg) {
       $("#board-right").html(msg);
       oaWaiting.hide();
     },
     error: showErrorPage
   });
 }
-
 
 function addStaff() {
   oaWaiting.show();
@@ -146,12 +163,37 @@ function entryStaff() {
 function editStaff(staffSn, type) {
   oaWaiting.show();
   var form = $("#" + type + "Form");
-  if (typeof staffSn === 'number') {
-    form.oaForm()[0].fillData('/hr/staff/info', { 'staff_sn': staffSn });
-  } else if (typeof staffSn === 'object') {
+  if (typeof staffSn === "number") {
+    form.oaForm()[0].fillData("/hr/staff/info", { staff_sn: staffSn });
+  } else if (typeof staffSn === "object") {
     form[0].reset();
   }
   oaWaiting.hide();
+}
+
+/**
+ * 重置密码
+ * @author 28youth
+ * @param  staffSn 员工编号
+ */
+function resetPwd(staffSn) {
+  oaWaiting.show();
+  if (typeof staffSn === "number") {
+    var url = "/hr/staff/reset";
+    var data = { staff_sn: staffSn };
+    $.ajax({
+      type: "POST",
+      url: url,
+      data: data,
+      dataType: "json",
+      success: function(response) {
+        if (response["status"] === 1) {
+          alert(response['message']);
+          oaWaiting.hide();
+        }
+      }
+    });
+  }
 }
 
 /**
@@ -160,11 +202,15 @@ function editStaff(staffSn, type) {
  */
 function transferOut() {
   if (confirm("确认调离？")) {
-    var form = $('#transferForm');
-    form.find('select[name=department_id],select[name=brand_id],select[name=position_id],select[name=status_id]').val(1);
-    form.find('input[name=shop_sn]').val('');
-    form.find('input[name=operate_at]').oaDate({ 'defaultDate': 'today' });
-    form.find('textarea[name=operation_remark]').val('人员调离');
+    var form = $("#transferForm");
+    form
+      .find(
+        "select[name=department_id],select[name=brand_id],select[name=position_id],select[name=status_id]"
+      )
+      .val(1);
+    form.find("input[name=shop_sn]").val("");
+    form.find("input[name=operate_at]").oaDate({ defaultDate: "today" });
+    form.find("textarea[name=operation_remark]").val("人员调离");
     form.submit();
   }
 }
@@ -176,22 +222,33 @@ function transferOut() {
  */
 function activeStaff(staffSn) {
   oaWaiting.show();
-  var url = '/hr/staff/submit';
+  var url = "/hr/staff/submit";
   var curDate = new Date();
-  var dateStr = curDate.getFullYear() + '-' + (curDate.getMonth() + 1) + '-' + curDate.getDate();
-  var data = { staff_sn: staffSn, is_active: 1, operation_type: 'active', operate_at: dateStr, operation_remark: '' };
+  var dateStr =
+    curDate.getFullYear() +
+    "-" +
+    (curDate.getMonth() + 1) +
+    "-" +
+    curDate.getDate();
+  var data = {
+    staff_sn: staffSn,
+    is_active: 1,
+    operation_type: "active",
+    operate_at: dateStr,
+    operation_remark: ""
+  };
   $.ajax({
     type: "POST",
     url: url,
     data: data,
-    dataType: 'json',
-    success: function (msg) {
-      if (msg['status'] === 1) {
+    dataType: "json",
+    success: function(msg) {
+      if (msg["status"] === 1) {
         table.draw();
         oaWaiting.hide();
-      } else if (msg['status'] === -1) {
-        oaWaiting.hide(function () {
-          alert(msg['message']);
+      } else if (msg["status"] === -1) {
+        oaWaiting.hide(function() {
+          alert(msg["message"]);
         });
       }
     }
@@ -206,20 +263,20 @@ function deleteStaff(staffSn) {
   var _confirm = confirm("确认删除？");
   if (_confirm) {
     oaWaiting.show();
-    var url = '/hr/staff/delete';
-    var data = { 'staff_sn': staffSn };
+    var url = "/hr/staff/delete";
+    var data = { staff_sn: staffSn };
     $.ajax({
       type: "POST",
       url: url,
       data: data,
-      dataType: 'json',
-      success: function (msg) {
-        if (msg['status'] === 1) {
+      dataType: "json",
+      success: function(msg) {
+        if (msg["status"] === 1) {
           table.draw();
           oaWaiting.hide();
-        } else if (msg['status'] === -1) {
-          oaWaiting.hide(function () {
-            alert(msg['message']);
+        } else if (msg["status"] === -1) {
+          oaWaiting.hide(function() {
+            alert(msg["message"]);
           });
         }
       },
@@ -233,18 +290,18 @@ function deleteStaff(staffSn) {
  * @param {type} staffSn
  */
 function showStaffLeavingPage(staffSn) {
-  var url = '/hr/staff/leaving';
-  var data = { 'staff_sn': staffSn };
+  var url = "/hr/staff/leaving";
+  var data = { staff_sn: staffSn };
   $.ajax({
     type: "GET",
     url: url,
     data: data,
-    dataType: 'text',
-    success: function (msg) {
-      $('.wrapper').append(msg);
-      $('#leavingByOne').modal('show');
-      $('#leavingForm').oaForm(oaFormOption);
-      $('#leavingByOne').on('hidden.bs.modal', function () {
+    dataType: "text",
+    success: function(msg) {
+      $(".wrapper").append(msg);
+      $("#leavingByOne").modal("show");
+      $("#leavingForm").oaForm(oaFormOption);
+      $("#leavingByOne").on("hidden.bs.modal", function() {
         $(this).remove();
       });
     },
@@ -257,7 +314,9 @@ function showTreeViewOptions(obj) {
   var width = $(obj).outerWidth();
   departmentTriger = obj;
   options.outerWidth(width);
-  $(obj).children("option").hide();
+  $(obj)
+    .children("option")
+    .hide();
   if (options.html().length == 0) {
     $.fn.zTree.init(options, departmentOptionsZTreeSetting);
   }
@@ -267,7 +326,13 @@ function showTreeViewOptions(obj) {
 }
 
 function hideTreeViewOptions(event) {
-  if (!($(event.target).hasClass("ztreeOptions") || $(event.target).parents(".ztreeOptions").length > 0 || event.target == departmentTriger)) {
+  if (
+    !(
+      $(event.target).hasClass("ztreeOptions") ||
+      $(event.target).parents(".ztreeOptions").length > 0 ||
+      event.target == departmentTriger
+    )
+  ) {
     $(".ztree.ztreeOptions").hide();
     $("body").unbind("click", hideTreeViewOptions);
   }
@@ -286,10 +351,10 @@ function importStaff() {
       data: formdata,
       contentType: false,
       processData: false,
-      success: function (msg) {
-        if (msg['status'] === -1) {
-          alert(msg['message']);
-          $("#import_result").html('');
+      success: function(msg) {
+        if (msg["status"] === -1) {
+          alert(msg["message"]);
+          $("#import_result").html("");
           oaWaiting.hide();
         } else {
           table.draw();
@@ -300,7 +365,7 @@ function importStaff() {
       error: showErrorPage
     });
   }
-  $(this).val('');
+  $(this).val("");
 }
 
 function exportStaff(e, dt, node, config) {
@@ -316,11 +381,11 @@ function exportStaff(e, dt, node, config) {
       type: "POST",
       url: url,
       data: params,
-      dataType: 'json',
-      success: function (msg) {
-        if (msg['state'] == 1) {
-          var fileName = msg['file_name'];
-          window.location.href = '/storage/exports/' + fileName + '.xlsx';
+      dataType: "json",
+      success: function(msg) {
+        if (msg["state"] == 1) {
+          var fileName = msg["file_name"];
+          window.location.href = "/storage/exports/" + fileName + ".xlsx";
           oaWaiting.hide();
         }
       },
@@ -330,24 +395,36 @@ function exportStaff(e, dt, node, config) {
 }
 
 function getInfoFromIdCardNumber() {
-  $(this).on('keyup', function () {
+  $(this).on("keyup", function() {
     var value = $(this).val();
     if (value.length == 18) {
-      var birthday = value.substr(6, 4) + '-' + value.substr(10, 2) + '-' + value.substr(12, 2);
+      var birthday =
+        value.substr(6, 4) +
+        "-" +
+        value.substr(10, 2) +
+        "-" +
+        value.substr(12, 2);
       var gender = value.substr(16, 1) % 2;
-      var birthdayInput = $(this).parents('form').find('input[name=birthday]');
-      var genderSelect = $(this).parents('form').find('select[name=gender_id]');
-      if (new Date(birthday) != 'Invalid Date' && birthdayInput.attr('origin_value') == undefined) {
+      var birthdayInput = $(this)
+        .parents("form")
+        .find("input[name=birthday]");
+      var genderSelect = $(this)
+        .parents("form")
+        .find("select[name=gender_id]");
+      if (
+        new Date(birthday) != "Invalid Date" &&
+        birthdayInput.attr("origin_value") == undefined
+      ) {
         birthdayInput.val(birthday);
       }
-      if (genderSelect.attr('origin_value') == undefined) {
+      if (genderSelect.attr("origin_value") == undefined) {
         genderSelect.val(gender == 1 ? gender : 2);
       }
     }
   });
-  $(this).on('blur', function () {
-    $(this).off('keyup');
-    $(this).off('blur');
+  $(this).on("blur", function() {
+    $(this).off("keyup");
+    $(this).off("blur");
   });
 }
 
@@ -361,5 +438,5 @@ function oaFormSubmitSuccess(msg, obj) {
 }
 
 function oaFormListAfterAdd(li, obj) {
-  li.oaSearch('all_staff');
+  li.oaSearch("all_staff");
 }

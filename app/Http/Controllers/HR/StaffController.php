@@ -18,6 +18,7 @@ use App\Contracts\OperationLog;
 use App\Contracts\ExcelImport;
 use App\Contracts\CURD;
 use DB;
+use Encypt;
 
 class StaffController extends Controller
 {
@@ -182,6 +183,25 @@ class StaffController extends Controller
         $request->offsetSet('operation_remark', '');
         $curd = $this->curdService->delete($request->all(), ['info']);
         return $curd;
+    }
+
+    /**
+     * 重置员工密码.
+     * 
+     * @author 28youth
+     * @param  Request $request
+     */
+    public function resetPwd(Request $request)
+    {
+        $salt = mt_rand(100000, 999999);
+        $newPwd = Encypt::password('123456', $salt);
+
+        $staff = Staff::find($request->staff_sn);
+        $staff->salt = $salt;
+        $staff->password = $newPwd;
+        $staff->save();
+
+        return ['status' => 1, 'message' => '重置成功'];
     }
 
     /**

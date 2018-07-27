@@ -11,6 +11,7 @@ Route::group(['prefix' => 'hr', 'namespace' => 'HR', 'as' => 'hr'], function () 
         Route::post('/submit', ['uses' => 'StaffController@addOrEditStaff'])->name('.submit'); //添加或编辑单个员工
         Route::post('/import', ['uses' => 'StaffController@importStaff'])->name('.import'); //批量导入员工
         Route::post('/delete', ['uses' => 'StaffController@deleteStaff'])->name('.delete'); //删除员工
+        Route::post('/reset', ['uses' => 'StaffController@resetPwd'])->name('.reset'); //重置员工密码
         Route::group(['prefix' => 'leaving', 'as' => '.leaving'], function () {// 离职交接（未启用）
             Route::get('/', ['uses' => 'StaffController@showLeavingPage']);
             Route::post('/submit', ['uses' => 'StaffController@leaving'])->name('.submit'); //处理离职交接提交数据

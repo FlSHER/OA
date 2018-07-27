@@ -5,11 +5,11 @@
 
 @section('css')
     <!-- data table -->
-    <link rel="stylesheet" href="{{source('plug_in/datatables/datatables.min.css')}}" />
+    <link rel="stylesheet" href="{{ source('plug_in/datatables/datatables.min.css') }}" />
     <!-- zTree css -->
-    <link rel="stylesheet" href="{{source('plug_in/ztree/css/metroStyle.css')}}" />
+    <link rel="stylesheet" href="{{ source('plug_in/ztree/css/metroStyle.css') }}" />
     <!-- checkbox -->
-    <link rel="stylesheet" href="{{source('css/checkbox.css')}}" />
+    <link rel="stylesheet" href="{{ source('css/checkbox.css') }}" />
 @endsection
 
 @section('content')
@@ -44,8 +44,8 @@
             <div class="modal-content">
                 <div class="modal-body">
                     <div class="form-group text-center">
-                        <a href="{{source('template/批量入职.xlsx')}}">员工入职导入模板</a>
-                        <a href="{{source('template/批量变动.xlsx')}}" style="margin-left:20px;">人事变动导入模板</a>
+                        <a href="{{ source('template/批量入职.xlsx') }}">员工入职导入模板</a>
+                        <a href="{{ source('template/批量变动.xlsx') }}" style="margin-left:20px;">人事变动导入模板</a>
                     </div>
                     <div class="row">
                         <div class="col-lg-2"></div>
@@ -91,11 +91,11 @@
 
 @section('js')
     <!--data table-->
-    <script type="text/javascript" src="{{source('plug_in/datatables/datatables.min.js')}}"></script>
+    <script type="text/javascript" src="{{ source('plug_in/datatables/datatables.min.js') }}"></script>
     <!-- zTree js -->
-    <script type="text/javascript" src="{{source('plug_in/ztree/js/jquery.ztree.all.js')}}"></script>
+    <script type="text/javascript" src="{{ source('plug_in/ztree/js/jquery.ztree.all.js') }}"></script>
     <!--script for this view-->
-    <script type="text/javascript" src="{{source('js/HR/staff.js')}}"></script>
+    <script type="text/javascript" src="{{ source('js/HR/staff.js') }}"></script>
     <script>
       var staffColumns = [
         { data: "staff_sn", title: "编号", type: 'text' },
@@ -175,6 +175,10 @@
                   @endif
               }
               if (oData.status_id > 0) {
+                  @if  ($authority->checkAuthority(55))
+                    html += ' <button class="btn btn-sm btn-default" title="重置密码" onclick="resetPwd(' + sData + ')"><i class="fa fa-key fa-fw"></i></button>';
+                  @endif
+
                   @if ($authority->checkAuthority(56))
                     html += ' <button class="btn btn-sm btn-default" title="人事变动" onclick="editStaff(' + sData + ',\'transfer\')"><i class="fa fa-user-transfer fa-fw"></i></button>';
                   @endif;
