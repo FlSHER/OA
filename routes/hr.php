@@ -50,6 +50,7 @@ Route::group(['prefix' => 'hr', 'namespace' => 'HR', 'as' => 'hr'], function () 
         Route::post('/delete', ['uses' => 'ShopController@deleteByOne'])->name('.delete'); //删除店铺
         Route::post('/search', ['uses' => 'ShopController@showSearchResult'])->name('.search'); //搜索店铺
         Route::post('/validate', ['uses' => 'ShopController@validateColumn'])->name('.validate'); //检查字段
+        Route::post('/position', ['uses' => 'ShopController@position'])->name('.position'); // 店铺定位
     });
     Route::group(['prefix' => 'violation', 'as' => '.violation'], function () { //大爱管理
         Route::get('/', ['uses' => 'ViolationController@showManagePage']);
