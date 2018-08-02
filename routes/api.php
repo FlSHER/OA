@@ -63,7 +63,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
     });
     Route::get('current-user', 'Resources\StaffController@getCurrentUser');
     Route::prefix('table')->group(function () {
-        Route::post('staff', 'TableController@getStaff');
+        Route::post('staff', 'Resources\StaffController@index');
         Route::post('shop', 'TableController@getShop');
     });
 });
