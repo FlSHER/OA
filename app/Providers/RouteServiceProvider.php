@@ -39,6 +39,7 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapApiRoutes();
 
+        $this->mapReimburseApiRoutes();//报销接口路由
         //
     }
 
@@ -75,5 +76,16 @@ class RouteServiceProvider extends ServiceProvider
         ], function ($router) {
             require base_path('routes/api.php');
         });
+    }
+
+    /**
+     * 报销路由
+     */
+    protected function mapReimburseApiRoutes()
+    {
+        Route::prefix('reimburse')
+            ->middleware('api')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api/reimburse.php'));
     }
 }
