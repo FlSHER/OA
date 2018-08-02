@@ -7,8 +7,6 @@ namespace Fisher\Amap\API\Controllers;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Fisher\Amap\Models\AroundAmap;
-use Fisher\Amap\API\Requests\StoreAmapRequest;
-use Fisher\Amap\API\Requests\UpdateAmapRequest;
 
 class HomeController
 {
@@ -104,18 +102,22 @@ class HomeController
      * @param AroundAmap $around
      * @return void
      */
-    public function create(StoreAmapRequest $request, AroundAmap $around)
+    public function create(Request $request, AroundAmap $around)
     {
         $shopsn = $request->input('shop_sn');
         $shopname = $request->input('shop_name');
         $latitude = $request->input('latitude');
         $longitude = $request->input('longitude');
-        
+        if (! $latitude) {
+            return response()->json(['message' => '请传递GPS纬度坐标'], 400);
+        }
+        if (! $longitude) {
+            return response()->json(['message' => '请传递GPS经度坐标'], 400);
+        }
         $around->shop_sn = $shopsn;
         $around->longitude = $longitude;
         $around->latitude = $latitude;
         $_location = $longitude.','.$latitude;
-        $localtype = 1; // 采用经纬度方式
         $data = json_encode([
             '_name' => $shopname,
             '_location' => $_location,
@@ -124,7 +126,6 @@ class HomeController
             $prams = [
                 'data' => $data,
                 'key' => $this->amap_key,
-                'localtype' => $localtype,
                 'tableid' => $this->amap_tableId,
             ];
             $prams['sig'] = md5(urldecode(http_build_query($prams, '', '&')).$this->amap_sig);
@@ -141,7 +142,7 @@ class HomeController
             $around->_id = $result['_id'];
             $around->save();
 
-            return response()->json(['message' => '位置创建成功', '_id' => $result['_id']], 201);
+            return response()->json(['message' => '位置创建成功', 'status' => 1], 201);
         } else {
             return response()->json(['message' => $this->errors[$result['info']] ?? '未知错误'], 500);
         }
@@ -155,14 +156,22 @@ class HomeController
      * @param AroundAmap $around
      * @return void
      */
-    public function update(UpdateAmapRequest $request, AroundAmap $around)
+    public function update(Request $request, AroundAmap $around)
     {
         $shopsn = $request->input('shop_sn');
         $shopname = $request->input('shop_name');
         $latitude = $request->input('latitude');
         $longitude = $request->input('longitude');
         $aroundAmap = $around->find($shopsn);
-        
+        if (! $aroundAmap) {
+            return response()->json(['message' => '系统错误, 请联系管理员'], 500);
+        }
+        if (! $latitude) {
+            return response()->json(['message' => '纬度坐标获取失败'], 400);
+        }
+        if (! $longitude) {
+            return response()->json(['message' => '经度坐标获取失败'], 400);
+        }
         $_location = $longitude.','.$latitude;
         $data = json_encode([
             '_id' => $aroundAmap->_id,
@@ -188,8 +197,8 @@ class HomeController
             $aroundAmap->longitude = $longitude;
             $aroundAmap->latitude = $latitude;
             $aroundAmap->save();
-            
-            return response()->json(['message' => '位置更新成功'], 201);
+
+            return response()->json(['message' => '位置更新成功', 'status' => 1], 201);
         } else {
             return response()->json(['message' => $this->errors[$result['info']] ?? '未知错误'], 500);
         }

@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
 if (!function_exists('source')) {
 
     function source($path, $secure = null)
@@ -63,4 +66,20 @@ if (!function_exists('check_authority')) {
         return app('Authority')->checkAuthority($authorityId);
     }
 
+}
+
+if (!function_exists('createRequest')) {
+
+    function createRequest($url = '', $method = 'POST', $params = array(), $original = 1)
+    {
+        $request = Request::create($url, $method, $params);
+        $request->headers->add([
+            'Accept' => 'application/json', 
+        ]);
+        app()->instance(Request::class, $request);
+
+        $response = Route::dispatch($request);
+        
+        return $original ? $response->original : $response;
+    }
 }

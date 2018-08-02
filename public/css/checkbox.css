@@ -78,3 +78,6 @@ label.frame:hover input:checked:disabled + .checkbox-outer {
     border-color: #e3e3e3;
     background-color: #e6e6e6;
 }
+
+/* 高德map */
+#containerMap{min-height: 400px;}

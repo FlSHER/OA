@@ -30,6 +30,8 @@ class CreateShopManageTables extends Migration
             $table->char('address', 50)->comment('详细地址');
             $table->time('clock_in')->comment('上班时间');
             $table->time('clock_out')->comment('下班时间');
+            $table->char('location')->nullable()->comment('位置');
+            $table->char('geo_hash', 20)->nullable()->comment('地理位置范围');
             $table->timestamps();
             $table->softDeletes();
             $table->unique('shop_sn');

@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\HR;
 
-use App\Contracts\OperationLog;
-use Illuminate\Http\Request;
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
-use App\Models\HR\Shop;
 use App\Contracts\CURD;
+use App\Models\HR\Shop;
+use Illuminate\Http\Request;
+use App\Contracts\OperationLog;
+use App\Http\Controllers\Controller;
 
 class ShopController extends Controller
 {
@@ -91,4 +91,30 @@ class ShopController extends Controller
         return $validator;
     }
 
+    /**
+     * 保存店铺位置信息.
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function position(Request $request)
+    {
+        $shop = Shop::find($request->id);
+        if ($shop === null) {
+            return '店铺数据错误';
+        }
+        $amap = createRequest('/api/amap', 'post', [
+            'shop_sn' => $shop->shop_sn,
+            'shop_name' => $shop->name,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude
+        ]);
+        $shop->location = $request->location;
+        $shop->lng = $request->longitude;
+        $shop->lat = $request->latitude;
+        $shop->geo_hash = $request->geo_hash;
+        $shop->save();
+        
+        return response()->json(['message' => '操作成功', 'status' => 1], 201);
+    }
 }
