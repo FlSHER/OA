@@ -91,15 +91,17 @@ class AuditService
      * 删除驳回的单
      * @param $request
      */
-    public function destroy($request){
-        $auditRepository  = new AuditRepository();
+    public function destroy($request)
+    {
+        $auditRepository = new AuditRepository();
         $reimDepartmentIds = $auditRepository->getReimDepartmentId();//资金归属ID
         $reimburse = Reimbursement::where('reject_staff_sn', Auth::id())
-            ->whereIn('reim_department_id',$reimDepartmentIds)
+            ->where('status_id', -1)
+            ->whereIn('reim_department_id', $reimDepartmentIds)
             ->where('approve_time', '!=', null)
             ->find($request->id);
         if (!$reimburse) {
-            abort(400,'你不能进行删除！该报销单不是你审核的');
+            abort(400, '你不能进行删除！该报销单不是你审核的');
         }
         $reimburse->accountant_delete = 1;
         $reimburse->save();
