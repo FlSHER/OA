@@ -179,7 +179,7 @@ class AuthorityService
             $authorities = array_merge($authorities, $publicAuth);
             $authorities = array_unique($authorities);
         }
-        return $authorities;
+        return array_values($authorities);
     }
 
     /**
