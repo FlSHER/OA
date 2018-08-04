@@ -1,5 +1,5 @@
 import { Icon, Input, Button, Row, Col, Spin, message } from 'antd';
-import '../../public/dingtalk';
+import dd from 'dingtalk-jsapi';
 import Form from '../modules/OAForm';
 
 const FormItem = Form.Item;
@@ -53,11 +53,13 @@ class LoginForm extends Component {
   }
 
   componentDidMount() {
-    dd.ready(() => {
-      dd.ui.webViewBounce.disable();
-      this.getDingtalkAuthCode();
-    });
-    dd.error((msg) => {
+    if (dd.env.platform !== 'notInDingTalk') {
+      dd.ready(() => {
+        dd.ui.webViewBounce.disable();
+        this.getDingtalkAuthCode();
+      });
+    }
+    dd.error((error) => {
       message.error('钉钉初始化失败，请手动登录');
     });
   }
