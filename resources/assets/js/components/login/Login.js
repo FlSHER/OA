@@ -1,5 +1,5 @@
 import { Icon, Input, Button, Row, Col, Spin, message } from 'antd';
-import '../../public/dingtalk';
+import dd from 'dingtalk-jsapi';
 import Form from '../modules/OAForm';
 
 const FormItem = Form.Item;
