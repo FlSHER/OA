@@ -21,7 +21,8 @@ class CheckAuditedController extends Controller
      * 获取全部已审核列表数据
      * @param Request $request
      */
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $with = [
             'expenses' => function ($query) {
                 $query->where('is_audited', '=', 1);
@@ -63,14 +64,14 @@ class CheckAuditedController extends Controller
      */
     public function withdraw(Request $request)
     {
-        $reimburse = Reimbursement::with(['expenses'=>function($query){
-            return $query->where('is_audited',1);
+        $reimburse = Reimbursement::with(['expenses' => function ($query) {
+            return $query->where('is_audited', 1);
         }])
-            ->where('status_id',4)
+            ->where('status_id', 4)
             ->find($request->id);
-        if(!$reimburse)
-            abort(404,'该报销单不存在');
-        DB::transaction(function()use(&$reimburse){
+        if (!$reimburse)
+            abort(404, '该报销单不存在');
+        DB::connection('reimburse_mysql')->transaction(function () use (&$reimburse) {
             $reimburse->status_id = 3;
             $reimburse->accountant_staff_sn = '';
             $reimburse->accountant_name = '';
@@ -80,7 +81,7 @@ class CheckAuditedController extends Controller
             $reimburse->manager_sn = '';
             $reimburse->manager_name = '';
             $reimburse->save();
-            $reimburse->expenses->each(function($expense){
+            $reimburse->expenses->each(function ($expense) {
                 $expense->is_audited = 0;
                 $expense->audited_cost = null;
                 $expense->save();
