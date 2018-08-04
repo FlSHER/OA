@@ -53,11 +53,13 @@ class LoginForm extends Component {
   }
 
   componentDidMount() {
-    dd.ready(() => {
-      dd.ui.webViewBounce.disable();
-      this.getDingtalkAuthCode();
-    });
-    dd.error((msg) => {
+    if (dd.env.platform !== 'notInDingTalk') {
+      dd.ready(() => {
+        dd.ui.webViewBounce.disable();
+        this.getDingtalkAuthCode();
+      });
+    }
+    dd.error((error) => {
       message.error('钉钉初始化失败，请手动登录');
     });
   }
