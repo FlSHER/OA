@@ -209,6 +209,9 @@ class DataTablesService
         if (is_string($filter)) {
             $filter = ['is' => $filter];
         }
+        if (preg_match('/^\w+\(\w+\)$/', $column)) {
+            $column = DB::raw($column);
+        }
         foreach ($filter as $k => $v) {
             switch ($k) {
                 case 'min':
