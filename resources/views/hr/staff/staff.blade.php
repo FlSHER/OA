@@ -170,16 +170,16 @@
                 @endif
             } else {
               if (oData.status_id == 1) {
-                  @if  ($authority->checkAuthority(55))
+                  @if ($authority->checkAuthority(55))
                     html += ' <button class="btn btn-sm btn-default" title="转正" onclick="editStaff(' + sData + ',\'employ\')"><i class="fa fa-user-check fa-fw"></i></button>';
                   @endif
               }
               if (oData.status_id > 0) {
-                  @if  ($authority->checkAuthority(55))
+                  @if ($authority->checkAuthority(82))
                     html += ' <button class="btn btn-sm btn-default" title="重置密码" onclick="resetPwd(' + sData + ')"><i class="fa fa-key fa-fw"></i></button>';
                   @endif
 
-                  @if ($authority->checkAuthority(56))
+                          @if ($authority->checkAuthority(56))
                     html += ' <button class="btn btn-sm btn-default" title="人事变动" onclick="editStaff(' + sData + ',\'transfer\')"><i class="fa fa-user-transfer fa-fw"></i></button>';
                   @endif;
                   @if ($authority->checkAuthority(57))

@@ -23,18 +23,19 @@
             </li>
             <li>
                 <a href="#" class="btn btn-default dropdown-toggle " data-toggle="dropdown">
-                    <!--<img src="{{asset('images/photos/user-avatar.png')}}" alt="" />-->
+                <!--<img src="{{asset('images/photos/user-avatar.png')}}" alt="" />-->
                     {{app('CurrentUser')->realname}}
                     <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-usermenu pull-right">
                     <?php if ($authority->checkAuthority(85)) { ?>
-                        <li><a href="{{asset(route('system.flush_cache'))}}"><i class="fa fa-warning"></i> 清除缓存</a></li>
+                    <li><a href="{{asset(route('system.flush_cache'))}}"><i class="fa fa-warning"></i> 清除缓存</a></li>
                     <?php } ?>
                     <?php if ($authority->checkAuthority(86)) { ?>
-                        <li><a href="{{asset(route('personal.refresh_authority'))}}"><i class="fa fa-refresh"></i> 更新权限</a></li>
+                    <li><a href="{{asset(route('personal.refresh_authority'))}}"><i class="fa fa-refresh"></i> 更新权限</a>
+                    </li>
                     <?php } ?>
-                    <li><a href="{{asset(route('reset'))}}"><i class="fa fa-rotate-left"></i> 重置密码</a></li>
+                    <li><a href="{{asset(route('reset'))}}"><i class="fa fa-rotate-left"></i> 修改密码</a></li>
                     <li><a href="{{asset(route('logout'))}}"><i class="fa fa-sign-out"></i> 退出登录</a></li>
                 </ul>
             </li>
