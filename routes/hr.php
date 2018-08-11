@@ -22,6 +22,7 @@ Route::group(['prefix' => 'hr', 'namespace' => 'HR', 'as' => 'hr'], function () 
         Route::post('/multi_set', ['uses' => 'StaffController@multiSetStaff'])->name('.multi_set'); //设置员工（中间表）
         /* 插件部分 end */
     });
+    Route::post('/cost_brands', 'CostBrandController@index');//获取费用品牌
     Route::group(['prefix' => 'department', 'as' => '.department'], function () { //部门管理
         Route::get('/', ['uses' => 'DepartmentController@showManagePage']);
         Route::post('/list', ['uses' => 'DepartmentController@getDepartmentList'])->name('.list'); //获取部门列表

@@ -113,7 +113,7 @@
         },
         { data: "mobile", title: "电话号码", type: 'text' },
         {
-          "data": "username", "title": "用户名", visible: false, searchable: false,
+          data: "username", title: "用户名", visible: false, searchable: false,
           createdCell: function (nTd, sData, oData, iRow, iCol) {
             var html;
             if (sData && sData.length > 10) {
@@ -125,6 +125,13 @@
           }
         },
         { data: "brand.name", title: "品牌", type: 'select', searchable: false },
+        {
+          data: "implode('/',array_pluck({cost_brands},'name'))",
+          name: "cost_brands",
+          title: "费用品牌",
+          type: 'select',
+          searchable: false,
+        },
         {
           data: "department.full_name", title: "部门全称",
           createdCell: function (nTd, sData, oData, iRow, iCol) {

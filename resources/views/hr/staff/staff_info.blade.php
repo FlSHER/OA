@@ -69,6 +69,21 @@
                             </div>
                         </div>
                         <div class="clearfix">
+                            <label class="control-label col-lg-3"><strong>费用品牌：</strong></label>
+                            <div class="col-lg-9" style="white-space: nowrap;">
+                                <p class="form-control-static">
+                                    @if($staff->cost_brands)
+                                        @foreach($staff->cost_brands as $index=>$costBrand)
+                                            @if($index != 0)
+                                                /
+                                            @endif
+                                            {{$costBrand->name}}
+                                        @endforeach
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+                        <div class="clearfix">
                             <label class="control-label col-lg-3"><strong>员工状态：</strong></label>
                             <div class="col-lg-3">
                                 <p class="form-control-static">{{$staff->status->name}}</p>

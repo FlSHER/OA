@@ -322,6 +322,11 @@ function OAForm(dom, options) {
           var getValueCode = ('msg' + name).replace(/^(.*?)\[\](.*)$/, 'self.arrayPluck($1,\'$2\')');
           try {
             var value = eval(getValueCode);
+            if ($.isArray(value) && typeof value[0] === 'object' && value[0].id !== undefined) {
+              value = value.map(function (item) {
+                return item.id;
+              });
+            }
           } catch (err) {
             var value = undefined;
           }

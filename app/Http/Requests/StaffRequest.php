@@ -124,6 +124,8 @@ class StaffRequest extends FormRequest
             $formValidator['status_id'][] = 'min:1';
             $formValidatorOrganic = [
                 'brand_id' => ['required', 'integer', 'exists:brands,id'],
+                'cost_brands' => ['required', 'array'],
+                'cost_brands.*' => ['exists:cost_brands,id'],
                 'department_id' => ['required', 'integer', 'exists:departments,id,deleted_at,NULL'],
                 'position_id' => ['required', 'integer', 'exists:positions,id,deleted_at,NULL'],
             ];
