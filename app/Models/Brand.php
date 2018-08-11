@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Brand extends Model {
+    use SoftDeletes;
     /* ----- 定义关联Start ----- */
 
     public function position() { // 职位

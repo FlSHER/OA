@@ -18,7 +18,7 @@ class Position extends Model {
     }
 
     public function brand() { // 所属品牌
-        return $this->belongsToMany('App\Models\Brand', 'brand_has_positions')->orderBy('sort', 'asc');
+        return $this->belongsToMany('App\Models\Brand', 'brand_has_positions')->orderBy('sort', 'asc')->withTrashed();
     }
 
     public function authority() { //权限

@@ -269,6 +269,9 @@ class StaffController extends Controller
     {
         foreach ($excelData as $v) {
             $fail = $v;
+            $v['cost_brands'] = array_map(function ($costBrandName) {
+                return ['name' => $costBrandName];
+            }, explode('/', $v['cost_brands']));
             $v = new Requests\StaffRequest($v);
             $response = [];
             try {

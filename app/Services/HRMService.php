@@ -19,9 +19,9 @@ class HRMService
     public function getCostBrandSelectors()
     {
         return CostBrand::get()->map(function ($costBrand) {
-            return '<span style="display:inline-block">'.
+            return '<span style="display:inline-block">' .
                 '<label class="frame check frame-sm" unselectable="on" onselectstart="return false;">' .
-                '     <input name="cost_brands[]" type="checkbox" value="' . $costBrand->id . '">' .
+                '     <input name="cost_brands[][id]" type="checkbox" value="' . $costBrand->id . '">' .
                 '     <span class="checkbox-outer"><i class="fa fa-check"></i></span>&nbsp;' .
                 '   </label> <span style="cursor:default;">' . $costBrand->name . '&nbsp;&nbsp;</span></span>';
         })->implode('');

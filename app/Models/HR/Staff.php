@@ -78,7 +78,7 @@ class Staff extends User
 
     public function brand()
     { //所属品牌
-        return $this->belongsTo('App\Models\Brand');
+        return $this->belongsTo('App\Models\Brand')->withTrashed();
     }
 
     public function cost_brands()
