@@ -209,6 +209,21 @@
             </div>
             <div class="col-lg-4">
                 <div class="row">
+                    <div class="hidden-lg col-sm-2"></div>
+                    <div class="col-lg-8 col-sm-6">
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <input class="form-control" name="MONTH(birthday)" type="text" placeholder="月" />
+                            </div>
+                            <div class="col-xs-6">
+                                <input class="form-control" name="DAY(birthday)" type="text" placeholder="日" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="row">
                     <label class="control-label col-lg-4 col-sm-2">员工属性</label>
                     <div class="col-sm-8">
                         <select class="form-control" name="property">

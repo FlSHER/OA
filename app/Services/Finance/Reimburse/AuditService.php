@@ -26,7 +26,7 @@ class AuditService
         if (!$reim_department_id_array) {
             return array('msg' => 'warning', 'result' => '当前用户不是审核人!');
         }
-        $reim = Reimbursement::where('status_id', 3)->whereIn('reim_department_id', $reim_department_id_array)->find($id);//获取当前审核人的审核单数据
+        $reim = Reimbursement::whereIn('status_id', [3, 6])->whereIn('reim_department_id', $reim_department_id_array)->find($id);//获取当前审核人的审核单数据
         if (empty($reim)) {
             return array('msg' => 'error', 'result' => '当前报销单不存在！或已被其他人处理了。请刷新页面再试！');
         }
