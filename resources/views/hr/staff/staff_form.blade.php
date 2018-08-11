@@ -110,7 +110,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-sm-2">*费用品牌</label>
-                                <div class="col-sm-8 form-control-static cost_brands_box">
+                                <div class="col-sm-9 form-control-static cost_brands_box">
                                     {!! $HRM->getCostBrandSelectors() !!}
                                 </div>
                             </div>

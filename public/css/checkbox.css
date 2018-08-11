@@ -75,9 +75,12 @@ label.frame input:disabled + .checkbox-outer,
 label.frame input:checked:disabled + .checkbox-outer,
 label.frame:hover input:disabled + .checkbox-outer,
 label.frame:hover input:checked:disabled + .checkbox-outer {
+    cursor: not-allowed;
     border-color: #e3e3e3;
     background-color: #e6e6e6;
 }
 
 /* 高德map */
-#containerMap{min-height: 400px;}
+#containerMap {
+    min-height: 400px;
+}
