@@ -102,7 +102,7 @@ $(function () {
 });
 
 /**
- * 获取职位选项
+ * 获取费用品牌
  */
 function getCostBrands(brandId, form) {
   var box = form.find(".cost_brands_box");
@@ -116,7 +116,7 @@ function getCostBrands(brandId, form) {
     async: false,
     success: function (costBrands) {
       costBrands.forEach(function (costBrand) {
-        box.find("input[value=" + costBrand.id + "]").attr("disabled", false);
+        box.find("input[value=" + costBrand.id + "]").prop("disabled", false);
       });
     }
   });
@@ -231,7 +231,9 @@ function transferOut() {
       .find(
         "select[name=department_id],select[name=brand_id],select[name=position_id],select[name=status_id]"
       )
-      .val(1);
+      .val(1).change();
+    form.find("input[name='cost_brands[][id]']").prop('checked', false);
+    form.find("input[name='cost_brands[][id]'][value=1]").prop('checked', true);
     form.find("input[name=shop_sn]").val("");
     form.find("input[name=operate_at]").oaDate({ defaultDate: "today" });
     form.find("textarea[name=operation_remark]").val("人员调离");
