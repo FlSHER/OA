@@ -12,7 +12,7 @@ var oaFormOption = {
   }
 };
 
-$(function() {
+$(function () {
   /* oaForm */
   $(".modal form").oaForm(oaFormOption);
   /* oaTable start */
@@ -28,7 +28,7 @@ $(function() {
   departmentOptionsZTreeSetting = {
     async: {
       url: "/hr/department/tree",
-      dataFilter: function(treeId, parentNode, responseData) {
+      dataFilter: function (treeId, parentNode, responseData) {
         if (treeId == "department_filter_option") {
           return [
             {
@@ -49,7 +49,7 @@ $(function() {
       dblClickExpand: false
     },
     callback: {
-      onClick: function(event, treeId, treeNode) {
+      onClick: function (event, treeId, treeNode) {
         if (treeNode.drag) {
           var options = $(event.target).parents(".ztreeOptions");
           if (treeNode.id == 0) {
@@ -68,7 +68,7 @@ $(function() {
               .prop("selected", true);
             if (options.next().prop("tagName") == "INPUT") {
               var children = $.fn.zTree.getZTreeObj(treeId).getNodesByFilter(
-                function(node) {
+                function (node) {
                   return node.drag;
                 },
                 false,
@@ -89,7 +89,12 @@ $(function() {
   };
   /* zTree End */
   // 生成可选职位
-  $("select[name='brand_id']").on("change", getPositionOptions);
+  $("select[name='brand_id']").on("change", function () {
+    var brandId = $(this).val();
+    var form = $(this).closest("form");
+    getCostBrands(brandId, form);
+    getPositionOptions(brandId, form);
+  });
   // 批量上传
   $("#import_staff").on("change", importStaff);
   // 通过身份证号获取生日性别
@@ -97,11 +102,30 @@ $(function() {
 });
 
 /**
+ * 获取费用品牌
+ */
+function getCostBrands(brandId, form) {
+  var box = form.find(".cost_brands_box");
+  var url = "/hr/cost_brands";
+  var data = { brand_id: brandId };
+  box.find("input").prop({ disabled: true, checked: false });
+  $.ajax({
+    type: "POST",
+    url: url,
+    data: data,
+    async: false,
+    success: function (costBrands) {
+      costBrands.forEach(function (costBrand) {
+        box.find("input[value=" + costBrand.id + "]").prop("disabled", false);
+      });
+    }
+  });
+}
+
+/**
  * 获取职位选项
  */
-function getPositionOptions() {
-  var brandId = $(this).val();
-  var form = $(this).closest("form");
+function getPositionOptions(brandId, form) {
   var positionTag = form.find("select[name='position_id']");
   var optionId = positionTag.attr("origin_value");
   var url = "/hr/position/options";
@@ -112,7 +136,7 @@ function getPositionOptions() {
     data: data,
     async: false,
     dataType: "text",
-    success: function(msg) {
+    success: function (msg) {
       var firstOptionTag = positionTag.children().eq(0);
       if (firstOptionTag.val() === "") {
         msg = '<option value="">全部</option>' + msg;
@@ -138,7 +162,7 @@ function showPersonalInfo(staffSn) {
     url: url,
     data: data,
     dataType: "text",
-    success: function(msg) {
+    success: function (msg) {
       $("#board-right").html(msg);
       oaWaiting.hide();
     },
@@ -186,7 +210,7 @@ function resetPwd(staffSn) {
       url: url,
       data: data,
       dataType: "json",
-      success: function(response) {
+      success: function (response) {
         if (response["status"] === 1) {
           alert(response['message']);
           oaWaiting.hide();
@@ -207,7 +231,9 @@ function transferOut() {
       .find(
         "select[name=department_id],select[name=brand_id],select[name=position_id],select[name=status_id]"
       )
-      .val(1);
+      .val(1).change();
+    form.find("input[name='cost_brands[][id]']").prop('checked', false);
+    form.find("input[name='cost_brands[][id]'][value=1]").prop('checked', true);
     form.find("input[name=shop_sn]").val("");
     form.find("input[name=operate_at]").oaDate({ defaultDate: "today" });
     form.find("textarea[name=operation_remark]").val("人员调离");
@@ -242,12 +268,12 @@ function activeStaff(staffSn) {
     url: url,
     data: data,
     dataType: "json",
-    success: function(msg) {
+    success: function (msg) {
       if (msg["status"] === 1) {
         table.draw();
         oaWaiting.hide();
       } else if (msg["status"] === -1) {
-        oaWaiting.hide(function() {
+        oaWaiting.hide(function () {
           alert(msg["message"]);
         });
       }
@@ -270,12 +296,12 @@ function deleteStaff(staffSn) {
       url: url,
       data: data,
       dataType: "json",
-      success: function(msg) {
+      success: function (msg) {
         if (msg["status"] === 1) {
           table.draw();
           oaWaiting.hide();
         } else if (msg["status"] === -1) {
-          oaWaiting.hide(function() {
+          oaWaiting.hide(function () {
             alert(msg["message"]);
           });
         }
@@ -297,11 +323,11 @@ function showStaffLeavingPage(staffSn) {
     url: url,
     data: data,
     dataType: "text",
-    success: function(msg) {
+    success: function (msg) {
       $(".wrapper").append(msg);
       $("#leavingByOne").modal("show");
       $("#leavingForm").oaForm(oaFormOption);
-      $("#leavingByOne").on("hidden.bs.modal", function() {
+      $("#leavingByOne").on("hidden.bs.modal", function () {
         $(this).remove();
       });
     },
@@ -351,7 +377,7 @@ function importStaff() {
       data: formdata,
       contentType: false,
       processData: false,
-      success: function(msg) {
+      success: function (msg) {
         if (msg["status"] === -1) {
           alert(msg["message"]);
           $("#import_result").html("");
@@ -382,7 +408,7 @@ function exportStaff(e, dt, node, config) {
       url: url,
       data: params,
       dataType: "json",
-      success: function(msg) {
+      success: function (msg) {
         if (msg["state"] == 1) {
           var fileName = msg["file_name"];
           window.location.href = "/storage/exports/" + fileName + ".xlsx";
@@ -395,7 +421,7 @@ function exportStaff(e, dt, node, config) {
 }
 
 function getInfoFromIdCardNumber() {
-  $(this).on("keyup", function() {
+  $(this).on("keyup", function () {
     var value = $(this).val();
     if (value.length == 18) {
       var birthday =
@@ -422,7 +448,7 @@ function getInfoFromIdCardNumber() {
       }
     }
   });
-  $(this).on("blur", function() {
+  $(this).on("blur", function () {
     $(this).off("keyup");
     $(this).off("blur");
   });

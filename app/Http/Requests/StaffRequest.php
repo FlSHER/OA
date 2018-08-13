@@ -35,11 +35,6 @@ class StaffRequest extends FormRequest
         return true;
     }
 
-    protected function failedAuthorization()
-    {
-        throw new HttpResponseException(response('无操作权限', 403));
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -85,6 +80,8 @@ class StaffRequest extends FormRequest
         if ($this->operationMatch($operationType, ['entry', 'reinstate', 'transfer'])) {
             $importValidatorOrganic = [
                 'brand.name' => ['required', 'exists:brands,name'],
+                'cost_brands' => ['required', 'array'],
+                'cost_brands.*.name' => ['exists:cost_brands,name'],
                 'department.full_name' => ['required', 'exists:departments,full_name,deleted_at,NULL'],
                 'position.name' => ['required', 'exists:positions,name,deleted_at,NULL'],
             ];
@@ -124,6 +121,8 @@ class StaffRequest extends FormRequest
             $formValidator['status_id'][] = 'min:1';
             $formValidatorOrganic = [
                 'brand_id' => ['required', 'integer', 'exists:brands,id'],
+                'cost_brands' => ['required', 'array'],
+                'cost_brands.*.id' => ['exists:cost_brands,id'],
                 'department_id' => ['required', 'integer', 'exists:departments,id,deleted_at,NULL'],
                 'position_id' => ['required', 'integer', 'exists:positions,id,deleted_at,NULL'],
             ];

@@ -54,7 +54,7 @@ class Department extends Model
 
     public function brand()
     { //品牌
-        return $this->belongsTo('App\Models\Brand');
+        return $this->belongsTo('App\Models\Brand')->withTrashed();
     }
 
     /* ----- 定义关联End ----- */

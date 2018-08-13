@@ -78,7 +78,12 @@ class Staff extends User
 
     public function brand()
     { //所属品牌
-        return $this->belongsTo('App\Models\Brand');
+        return $this->belongsTo('App\Models\Brand')->withTrashed();
+    }
+
+    public function cost_brands()
+    { //所属品牌
+        return $this->belongsToMany(CostBrand::class, 'staff_has_cost_brands', 'staff_sn');
     }
 
     public function shop()

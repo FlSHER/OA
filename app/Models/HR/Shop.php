@@ -49,7 +49,7 @@ class Shop extends Model
 
     public function brand()
     { //所属品牌
-        return $this->belongsTo('App\Models\Brand', 'brand_id');
+        return $this->belongsTo('App\Models\Brand', 'brand_id')->withTrashed();
     }
 
     public function province()

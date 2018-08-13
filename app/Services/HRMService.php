@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Department;
+use App\Models\HR\CostBrand;
 use App\Models\Position;
 use App\Models\I\District;
 use DB;
@@ -14,6 +15,17 @@ use DB;
  */
 class HRMService
 {
+
+    public function getCostBrandSelectors()
+    {
+        return CostBrand::get()->map(function ($costBrand) {
+            return '<span style="display:inline-block">' .
+                '<label class="frame check frame-sm" unselectable="on" onselectstart="return false;">' .
+                '     <input name="cost_brands[][id]" type="checkbox" value="' . $costBrand->id . '">' .
+                '     <span class="checkbox-outer"><i class="fa fa-check"></i></span>&nbsp;' .
+                '   </label> <span style="cursor:default;">' . $costBrand->name . '&nbsp;&nbsp;</span></span>';
+        })->implode('');
+    }
 
     /**
      * 获取部门选择option标签

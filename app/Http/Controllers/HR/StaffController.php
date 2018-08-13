@@ -54,9 +54,9 @@ class StaffController extends Controller
      */
     public function getStaffList(Request $request, $withAuth = false)
     {
-        $staffModel = $this->model;
+        $staffModel = $this->model::with('cost_brands');
         if ($withAuth) {
-            $staffModel = $staffModel::visible();
+            $staffModel = $staffModel->visible();
         }
         return app('Plugin')->dataTables($request, $staffModel);
     }
@@ -131,7 +131,7 @@ class StaffController extends Controller
     public function getInfo(Request $request)
     {
         $staffSn = $request->staff_sn;
-        $staff = Staff::with(['info', 'relative', 'appraise'])->find($staffSn);
+        $staff = Staff::with(['info', 'relative', 'appraise', 'cost_brands'])->find($staffSn);
         return $staff;
     }
 
@@ -187,7 +187,7 @@ class StaffController extends Controller
 
     /**
      * 重置员工密码.
-     * 
+     *
      * @author 28youth
      * @param  Request $request
      */
@@ -269,6 +269,9 @@ class StaffController extends Controller
     {
         foreach ($excelData as $v) {
             $fail = $v;
+            $v['cost_brands'] = array_map(function ($costBrandName) {
+                return ['name' => $costBrandName];
+            }, explode('/', $v['cost_brands']));
             $v = new Requests\StaffRequest($v);
             $response = [];
             try {
