@@ -1,5 +1,6 @@
 <?php
 
+$url = 'https://oapi.dingtalk.com/';
 return [
     /**
      * 服务端接口地址
@@ -29,4 +30,12 @@ return [
      * 加解密密钥，必须为43位
      */
     'AESKey' => env('DINGTALK_AESKEY'),
+
+    /**
+     * 消息通知
+     */
+    'message' => [
+        //发送工作通知消息
+        'jobNotification' => $url . 'topapi/message/corpconversation/asyncsend_v2',
+    ]
 ];
