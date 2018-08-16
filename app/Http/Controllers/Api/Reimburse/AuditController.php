@@ -96,6 +96,7 @@ class AuditController extends Controller
      */
     public function getStatus()
     {
-        return $this->response->get(ReimbursementStatus::get());
+        $data = ReimbursementStatus::orderBy('id', 'desc')->get();
+        return $this->response->get($data);
     }
 }
