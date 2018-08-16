@@ -35,6 +35,6 @@ class SendMessage implements ShouldQueue
     public function handle()
     {
         $result = $this->notificationMessage->sendMessage($this->data);
-        dump($result);
+//        dump($result);
     }
 }
