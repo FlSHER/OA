@@ -38,37 +38,40 @@ class AuditRepository
      */
     public function getListData($request)
     {
-        if ($request->has('type') && in_array($request->query('type'), ['processing', 'audited', 'rejected'])) {
+        if ($request->has('type') && in_array($request->query('type'), ['processing', 'overtime', 'audited', 'rejected'])) {
             $reimDepartmentIds = $this->getReimDepartmentId();//资金归属ID
-            $type = $request->query('type');
-            $where = '';
-            switch ($type) {
-                case 'processing':
-                    $where = ['status_id' => 3];
-                    break;
-                case 'audited':
-                    $where = [['status_id', '>=', 4]];
-                    break;
-                case 'rejected':
-                    $where = [
-                        ['status_id', '=', -1],
-                        ['accountant_delete', '=', 0],
-                        ['approve_time', '<>', ''],
-                        ['reject_staff_sn', '<>', '']
-                    ];
-            }
-            $with = [
+            $query = Reimbursement::with([
                 'expenses' => function ($query) {
                     $query->where('is_approved', '=', 1);
                 },
+                'reim_department',
                 'expenses.type',
                 'expenses.bills'
-            ];
-            $data = Reimbursement::with('reim_department')
-                ->with($with)
-                ->where($where)
-                ->whereIn('reim_department_id', $reimDepartmentIds)
-                ->filterByQueryString()
+            ])->whereIn('reim_department_id', $reimDepartmentIds);
+            $curDay = date('d');
+            $approveDeadLine = $curDay >= 13 ?
+                ($curDay >= 27 ? date('Y-m-28 12:00:00') : date('Y-m-14 12:00:00')) :
+                date('Y-m-d H:i:s', strtotime(date('Y-m-28 12:00:00') . ' -1 month'));
+            $type = $request->query('type');
+            switch ($type) {
+                case 'processing':
+                    $query->where('status_id', 3)
+                        ->where('approve_time', '<=', $approveDeadLine);
+                    break;
+                case 'overtime':
+                    $query->where('status_id', 3)
+                        ->where('approve_time', '>', $approveDeadLine);
+                    break;
+                case 'audited':
+                    $query->whereNotNull('audit_time');
+                    break;
+                case 'rejected':
+                    $query->whereNotNull('approve_time')
+                        ->whereNull('audit_time')
+                        ->where(['status_id' => -1, 'accountant_delete' => 0]);
+                    break;
+            }
+            $data = $query->filterByQueryString()
                 ->sortByQueryString()
                 ->withPagination();
             return $data;
@@ -97,6 +100,7 @@ class AuditRepository
             abort(404, '该数据不存在');
         return $data;
     }
+
     /**
      * 获取打印数据
      * @param $request
