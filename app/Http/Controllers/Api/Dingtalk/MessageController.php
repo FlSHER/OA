@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Dingtalk;
 
 use App\Models\App;
+use App\Models\HR\Staff;
 use App\Services\Dingtalk\Notification\Messages;
 use App\Services\ResponseService;
 use Illuminate\Http\Request;
@@ -28,7 +29,9 @@ class MessageController extends Controller
     {
         $agentId = App::find($request->input('oa_client_id'))->agent_id;
         $data = $request->except('oa_client_id');
+        $dingUserId = Staff::find($data['userid_list'])->pluck('dingding')->all();
         $data['agent_id'] = $agentId;
+        $data['userid_list'] = implode(',',$dingUserId);
         $result = $this->message->sendJobNotificationMessage($data);
         return $this->response->post($result);
     }
