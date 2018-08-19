@@ -37,5 +37,12 @@ return [
     'message' => [
         //发送工作通知消息
         'jobNotification' => $url . 'topapi/message/corpconversation/asyncsend_v2',
+    ],
+    //待办事项
+    'todo'=>[
+        //发起待办
+        'add'=>$url.'topapi/workrecord/add',
+        //更新待办
+        'update'=>$url.'topapi/workrecord/update',
     ]
 ];
