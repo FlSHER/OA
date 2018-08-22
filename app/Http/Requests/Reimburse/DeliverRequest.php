@@ -42,6 +42,10 @@ class DeliverRequest extends FormRequest
                     ->where('process_instance_id','')
                     ->whereIn('reim_department_id', $reimDepartmentIds)
                     ->whereNull('deleted_at')
+            ],
+            'remark'=>[
+                'string',
+                'max:300'
             ]
         ];
     }
