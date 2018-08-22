@@ -133,7 +133,7 @@ class DeliverService
         foreach ($data as $managerSn => $value) {
             $formData['报销单数量'] = count(array_merge($value['data']));
             $formData['总金额'] = sprintf('%.2f',array_sum(array_pluck($value['data'],'金额')));
-            $formData['备注'] = $request->input('remark');
+            $formData['备注'] = $request->input('remark','无');
             $formData ['报销清单'] =  array_merge($value['data']);
 
             try {
