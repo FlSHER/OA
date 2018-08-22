@@ -131,8 +131,11 @@ class DeliverService
         $reimbursement = Reimbursement::orderBy('audit_time', 'desc')->find($ids);
         $data = $this->makeManagerFormData($reimbursement);//表单数据
         foreach ($data as $managerSn => $value) {
-            $formData = ['报销清单' => array_merge($value['data'])];
-            $formData['备注'] = Auth::user()->realname . '提交已审核的报销单';
+            $formData['报销单数量'] = count(array_merge($value['data']));
+            $formData['总金额'] = sprintf('%.2f',array_sum(array_pluck($value['data'],'金额')));
+            $formData['备注'] = $request->input('remark');
+            $formData ['报销清单'] =  array_merge($value['data']);
+
             try {
                 $processInstanceId = app('Dingtalk')->startApprovalAndRecord($this->appId, $this->processCode, $managerSn, $formData, $callback);
                 DB::connection('reimburse_mysql')->transaction(function () use ($value, $processInstanceId) {
