@@ -130,25 +130,28 @@ class DeliverService
         $ids = (array)$request->input('id');
         $reimbursement = Reimbursement::orderBy('audit_time', 'desc')->find($ids);
         $data = $this->makeManagerFormData($reimbursement);//表单数据
-        foreach ($data as $managerSn => $value) {
-            $formData['报销单数量'] = count(array_merge($value['data']));
-            $formData['总金额'] = sprintf('%.2f', array_sum(array_pluck($value['data'], '金额')));
-            $formData['备注'] = $request->input('remark') ?: '无';
-            $formData ['报销清单'] = array_merge($value['data']);
 
-            try {
-                $processInstanceId = app('Dingtalk')->startApprovalAndRecord($this->appId, $this->processCode, $managerSn, $formData, $callback);
-                DB::connection('reimburse_mysql')->transaction(function () use ($value, $processInstanceId) {
-                    $ids = array_keys($value['data']);//审核要审批的ID
-                    $saveData = [
-                        'process_instance_id' => $processInstanceId,
-                        'manager_sn' => $value['manager']['manager_sn'],
-                        'manager_name' => $value['manager']['manager_name']
-                    ];
-                    Reimbursement::whereIn('id', $ids)->update($saveData);
-                });
-            } catch (\Exception $e) {
-                abort(400, $e->getMessage());
+        foreach ($data as $managerSn => $value) {
+            foreach ($value['data'] as $reimDepartmentName => $reim) {
+                $formData['资金归属'] = $reimDepartmentName;
+                $formData['报销单'] = count(array_merge($reim));
+                $formData['总金额'] = sprintf('%.2f', array_sum(array_pluck($reim, '金额')));
+                $formData['备注'] = $request->input('remark') ?: '无';
+                $formData ['报销清单'] = array_merge($reim);
+                try {
+                    $processInstanceId = app('Dingtalk')->startApprovalAndRecord($this->appId, $this->processCode, $managerSn, $formData, $callback);
+                    DB::connection('reimburse_mysql')->transaction(function () use ($value, $reim, $processInstanceId) {
+                        $ids = array_keys($reim);//审核要审批的ID
+                        $saveData = [
+                            'process_instance_id' => $processInstanceId,
+                            'manager_sn' => $value['manager']['manager_sn'],
+                            'manager_name' => $value['manager']['manager_name']
+                        ];
+                        Reimbursement::whereIn('id', $ids)->update($saveData);
+                    });
+                } catch (\Exception $e) {
+                    abort(400, $e->getMessage());
+                }
             }
         }
         return 1;
@@ -165,6 +168,7 @@ class DeliverService
         $reimbursement->map(function ($reim) use (&$data) {
             $managerSn = $reim->reim_department->manager_sn;
             $managerName = $reim->reim_department->manager_name;
+            $reimDepartmentName = $reim->reim_department->name;//资金归属名
             $period = $this->computeExpensesMaxAndMinDate($reim->expenses);//报销期间
             $item = [];
             $item['姓名'] = $reim->realname;
@@ -172,11 +176,14 @@ class DeliverService
             $item['金额'] = $reim->audited_cost;
             $item['报销期间'] = implode(' 至 ', $period);
             $item['备注'] = $reim->remark;
-            $data[$managerSn]['data'][$reim->id] = $item;
+//            $data[$managerSn]['data'][$reim->id] = $item;
+            $data[$managerSn]['data'][$reimDepartmentName][$reim->id] = $item;
             $manager = [];
             $manager['manager_sn'] = $managerSn;
             $manager['manager_name'] = $managerName;
             $data[$managerSn]['manager'] = $manager;
+            //资金归属
+//            $data[$managerSn]['reim_department_name'] = $reim->reim_department->name;
         });
         return $data;
     }
