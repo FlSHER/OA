@@ -132,9 +132,9 @@ class DeliverService
         $data = $this->makeManagerFormData($reimbursement);//表单数据
         foreach ($data as $managerSn => $value) {
             $formData['报销单数量'] = count(array_merge($value['data']));
-            $formData['总金额'] = sprintf('%.2f',array_sum(array_pluck($value['data'],'金额')));
-            $formData['备注'] = $request->input('remark','无');
-            $formData ['报销清单'] =  array_merge($value['data']);
+            $formData['总金额'] = sprintf('%.2f', array_sum(array_pluck($value['data'], '金额')));
+            $formData['备注'] = !empty($request->input('remark')) ?? '无';
+            $formData ['报销清单'] = array_merge($value['data']);
 
             try {
                 $processInstanceId = app('Dingtalk')->startApprovalAndRecord($this->appId, $this->processCode, $managerSn, $formData, $callback);
@@ -142,8 +142,8 @@ class DeliverService
                     $ids = array_keys($value['data']);//审核要审批的ID
                     $saveData = [
                         'process_instance_id' => $processInstanceId,
-                        'manager_sn'=>$value['manager']['manager_sn'],
-                        'manager_name'=>$value['manager']['manager_name']
+                        'manager_sn' => $value['manager']['manager_sn'],
+                        'manager_name' => $value['manager']['manager_name']
                     ];
                     Reimbursement::whereIn('id', $ids)->update($saveData);
                 });
