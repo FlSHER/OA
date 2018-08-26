@@ -6,7 +6,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class ShopCollection extends ResourceCollection
 {
-    protected $wrap = null;
+    protected static $wrap = null;
 
     /**
      * Transform the resource collection into an array.
