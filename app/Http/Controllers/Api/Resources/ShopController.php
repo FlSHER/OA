@@ -16,8 +16,13 @@ class ShopController extends Controller
      */
     public function index()
     {
-        $data = Shop::filterByQueryString()->sortByQueryString()->withPagination();
-        return new ShopCollection($data);
+        $list = Shop::filterByQueryString()->sortByQueryString()->withPagination();
+        if (isset($list['data'])) {
+            $list['data'] = new ShopCollection(collect($list['data']));
+            return $list;
+        } else {
+            return new ShopCollection($list);
+        }
     }
 
     /**
