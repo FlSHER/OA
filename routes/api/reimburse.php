@@ -13,6 +13,7 @@ Route::middleware('auth:api')->namespace('Api\Reimburse')->group(function(){
     Route::delete('/delete','AuditController@destroy');//删除驳回的单
     Route::get('/reim-department','AuditController@getReimDepartment');//获取所有归属数据
     Route::get('/status','AuditController@getStatus');//获取所有状态
+    Route::get('/types','AuditController@getTypes');//获取所有明细类型
 
     Route::get('/deliver','DeliverController@index');//转交列表（已审核的单）
     Route::post('/deliver','DeliverController@store');//转交处理

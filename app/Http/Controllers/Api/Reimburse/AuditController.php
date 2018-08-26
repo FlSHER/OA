@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Reimburse;
 
 use App\Http\Requests\Reimburse\AgreeRequest;
 use App\Http\Requests\Reimburse\RejectRequest;
+use App\Models\Reimburse\Expense_type;
 use App\Models\Reimburse\ReimbursementStatus;
 use App\Models\Reimburse\ReimDepartment;
 use App\Repositories\Reimburse\AuditRepository;
@@ -97,6 +98,15 @@ class AuditController extends Controller
     public function getStatus()
     {
         $data = ReimbursementStatus::orderBy('id', 'desc')->get();
+        return $this->response->get($data);
+    }
+
+    /**
+     * 获取所有明细类型
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    public function getTypes(){
+        $data = Expense_type::get();
         return $this->response->get($data);
     }
 }
