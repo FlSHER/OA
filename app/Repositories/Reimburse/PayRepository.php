@@ -40,7 +40,6 @@ class PayRepository
                 $query->where('is_audited', '=', 1);
                 $query->orderBy('date', 'asc');
             },
-            'expenses.type',
             'expenses.bills'
         ];
         $data = Reimbursement::with($with)
