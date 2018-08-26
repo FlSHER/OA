@@ -2,6 +2,7 @@
 
 namespace App\Models\HR;
 
+use App\Models\Traits\ListScopes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Authority;
@@ -9,7 +10,7 @@ use Authority;
 class Shop extends Model
 {
 
-    use SoftDeletes;
+    use SoftDeletes, ListScopes;
 
     protected $connection = 'mysql';
 

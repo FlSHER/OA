@@ -16,8 +16,8 @@ class ShopController extends Controller
      */
     public function index()
     {
-        ShopCollection::withoutWrapping();
-        return new ShopCollection(Shop::all());
+        $data = Shop::filterByQueryString()->sortByQueryString()->withPagination();
+        return new ShopCollection($data);
     }
 
     /**
