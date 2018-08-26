@@ -82,12 +82,12 @@ class PayController extends Controller
         DB::connection('reimburse_mysql')->beginTransaction();
         try {
             Reimbursement::whereIn('id', $ids)->update($column);
-            $data = Reimbursement::find($ids);
+            $data = Reimbursement::with(['expenses.bills'])->find($ids);
             DB::connection('reimburse_mysql')->commit();
             return $this->response->patch($data);
         } catch (\Exception $e) {
             DB::connection('reimburse_mysql')->rollBack();
-            abort(400,'转账通过失败');
+            abort(400, '转账通过失败');
         }
 
     }
