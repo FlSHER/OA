@@ -44,7 +44,6 @@ class AuditRepository
                 'expenses' => function ($query) {
                     $query->where('is_approved', '=', 1);
                 },
-                'expenses.type',
                 'expenses.bills'
             ])->whereIn('reim_department_id', $reimDepartmentIds);
             $curDay = date('d');
