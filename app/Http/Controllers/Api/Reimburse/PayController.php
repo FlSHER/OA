@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Reimburse;
 use App\Http\Requests\Reimburse\PayRequest;
 use App\Models\Reimburse\Reimbursement;
 use App\Repositories\Reimburse\PayRepository;
-use App\Services\Reimburse\AuditService;
+use App\Services\Reimburse\PayService;
 use App\Services\ResponseService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -17,15 +17,15 @@ class PayController extends Controller
 {
     protected $response;
     protected $payRepository;
-    protected $auditService;
+    protected $payService;
 
     public function __construct(ResponseService $responseService,
                                 PayRepository $payRepository,
-                                AuditService $auditService)
+                                PayService $payService)
     {
         $this->response = $responseService;
         $this->payRepository = $payRepository;
-        $this->auditService = $auditService;
+        $this->payService = $payService;
     }
 
     /**
@@ -61,7 +61,7 @@ class PayController extends Controller
                 'string'
             ]
         ], [], $messages);
-        $data = $this->auditService->reject($request);
+        $data = $this->payService->reject($request);
         return $this->response->patch($data);
     }
 
@@ -71,24 +71,7 @@ class PayController extends Controller
      */
     public function pay(PayRequest $request)
     {
-        $ids = is_array($request->input('id')) ? $request->input('id') : [$request->input('id')];
-        $column = [
-            'status_id' => 7,
-            'payer_sn' => Auth::id(),
-            'payer_name' => Auth::user()->realname,
-            'paid_at' => date('Y-m-d')
-        ];
-
-        DB::connection('reimburse_mysql')->beginTransaction();
-        try {
-            Reimbursement::whereIn('id', $ids)->update($column);
-            $data = Reimbursement::with(['expenses.bills'])->find($ids);
-            DB::connection('reimburse_mysql')->commit();
-            return $this->response->patch($data);
-        } catch (\Exception $e) {
-            DB::connection('reimburse_mysql')->rollBack();
-            abort(400, '转账通过失败');
-        }
-
+        $data = $this->payService->pay($request);
+        return $this->response->patch($data);
     }
 }
