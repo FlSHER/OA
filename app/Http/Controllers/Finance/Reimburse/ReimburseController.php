@@ -116,7 +116,9 @@ class ReimburseController extends Controller
         try {
             DB::connection('reimburse_mysql')->transaction(function () use ($request) {
                 $reimbursement = app('AuditRepository')->saveAudit($request);
-                app('AuditService')->afterApprove($reimbursement);
+                if (in_array($reimbursement->reim_department_id, [11, 7, 8])) {
+                    app('AuditService')->afterApprove($reimbursement);
+                }
             });
         } catch (\Exception $exception) {
             return ['msg' => 'error', 'result' => $exception->getMessage()];
