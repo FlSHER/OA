@@ -15,6 +15,8 @@ class ReimDepartment extends Model
         'name',
         'manager_sn',
         'manager_name',
+        'cashier_sn',
+        'cashier_name'
     ];
 
     public function auditor()
