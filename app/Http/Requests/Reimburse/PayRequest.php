@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Reimburse;
 
+use App\Repositories\Reimburse\PayRepository;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -24,13 +25,15 @@ class PayRequest extends FormRequest
      */
     public function rules()
     {
-        if(is_array($this->id)){
+        $payRepository = new PayRepository();
+        if (is_array($this->id)) {
             //批量验证
             return [
-                'id.*'=>[
+                'id.*' => [
                     'required',
-                    Rule::exists('reimburse_mysql.reimbursements','id')
+                    Rule::exists('reimburse_mysql.reimbursements', 'id')
                         ->where('status_id', 6)
+                        ->whereIn('reim_department_id', $payRepository->getCashierReimDepartmentAuthority())
                         ->whereNull('deleted_at')
                 ]
             ];
@@ -41,6 +44,7 @@ class PayRequest extends FormRequest
                 'required',
                 Rule::exists('reimburse_mysql.reimbursements')
                     ->where('status_id', 6)
+                    ->whereIn('reim_department_id', $payRepository->getCashierReimDepartmentAuthority())
                     ->whereNull('deleted_at')
             ]
         ];
@@ -49,8 +53,8 @@ class PayRequest extends FormRequest
     public function attributes()
     {
         return [
-            'id'=>'报销单ID',
-            'id.*'=>'报销单ID'
+            'id' => '报销单ID',
+            'id.*' => '报销单ID'
         ];
     }
 }

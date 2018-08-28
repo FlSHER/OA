@@ -54,6 +54,7 @@ class PayController extends Controller
                 'required',
                 Rule::exists('reimburse_mysql.reimbursements')
                     ->where('status_id', 6)
+                    ->whereIn('reim_department_id', $this->payRepository->getCashierReimDepartmentAuthority())
                     ->whereNull('deleted_at')
             ],
             'remarks' => [

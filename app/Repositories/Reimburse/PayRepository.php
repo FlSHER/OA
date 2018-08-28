@@ -12,6 +12,8 @@ namespace App\Repositories\Reimburse;
 
 
 use App\Models\Reimburse\Reimbursement;
+use App\Models\Reimburse\ReimDepartment;
+use Illuminate\Support\Facades\Auth;
 
 class PayRepository
 {
@@ -22,6 +24,7 @@ class PayRepository
      */
     public function getPayList($request)
     {
+        $reimDepartmentIds = $this->getCashierReimDepartmentAuthority();
         $type = $request->query('type');
         if (!($request->has('type') && in_array($type, ['paid', 'not_paid']))) {
             abort(404, '请正确输入type类型');
@@ -44,9 +47,20 @@ class PayRepository
         ];
         $data = Reimbursement::with($with)
             ->where($where)
+            ->whereIn('reim_department_id', $reimDepartmentIds)
             ->filterByQueryString()
             ->sortByQueryString()
             ->withPagination();
         return $data;
+    }
+
+    /**
+     * 获取出纳资金归属权限
+     */
+    public function getCashierReimDepartmentAuthority()
+    {
+        //资金归属ID
+        $reimDepartmentIds = ReimDepartment::where('cashier_sn', Auth::id())->pluck('id')->all();
+        return $reimDepartmentIds;
     }
 }
