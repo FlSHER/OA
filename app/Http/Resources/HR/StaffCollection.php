@@ -39,6 +39,7 @@ class StaffCollection extends ResourceCollection
                 'birthday' => $staff->birthday,
                 'property' => $staff->property,
                 'education' => $staff->info->education,
+                'relatives' => $staff->relative,
             ];
         })->toArray();
     }

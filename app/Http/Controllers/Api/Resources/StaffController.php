@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api\Resources;
 
-use App\Http\Resources\CurrentUserResource;
-use App\Http\Resources\HR\StaffCollection;
-use App\Http\Resources\HR\StaffResource;
 use App\Models\HR\Staff;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\HR\StaffResource;
+use App\Http\Resources\HR\StaffCollection;
+use App\Http\Resources\CurrentUserResource;
 
 class StaffController extends Controller
 {
@@ -34,9 +34,11 @@ class StaffController extends Controller
                     $query->where('id', $roleId);
                 }
             });
-        })->filterByQueryString()
-            ->sortByQueryString()
-            ->withPagination();
+        })
+        ->with('relative')
+        ->filterByQueryString()
+        ->sortByQueryString()
+        ->withPagination();
         if (isset($list['data'])) {
             $list['data'] = new StaffCollection(collect($list['data']));
             return $list;
