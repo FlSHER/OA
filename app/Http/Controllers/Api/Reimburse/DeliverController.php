@@ -26,7 +26,8 @@ class DeliverController extends Controller
     /**
      * 已审核待转交列表
      */
-    public function index(){
+    public function index()
+    {
         $data = $this->deliverRepository->getDeliverList();
         return $this->response->get($data);
     }
@@ -38,6 +39,6 @@ class DeliverController extends Controller
     public function store(DeliverRequest $request)
     {
         $data = $this->deliverService->managerApprove($request);
-        return response($data,201);
+        return $this->response->post($data);
     }
 }
