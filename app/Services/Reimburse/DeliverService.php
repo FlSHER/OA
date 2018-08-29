@@ -37,8 +37,8 @@ class DeliverService
         $managerSn = $reimbursement->reim_department->manager_sn;//资金归属管理人员工编号
         $managerName = $reimbursement->reim_department->manager_name;//资金归属管理人员工名字
         $callback = config("reimburse.manager_callback");
+        DB::connection('reimburse_mysql')->beginTransaction();
         try {
-            DB::connection('reimburse_mysql')->beginTransaction();
             if ((int)$approverSn != (int)$managerSn) {
                 $formData = $this->makeFormData($reimbursement);
                 $initiatorSn = $reimbursement->staff_sn;//报销单创建人编号
@@ -50,6 +50,10 @@ class DeliverService
 
             $reimbursement->manager_sn = $managerSn;
             $reimbursement->manager_name = $managerName;
+            $reimbursement->second_rejecter_staff_sn = '';
+            $reimbursement->second_rejecter_name = '';
+            $reimbursement->second_rejected_at = null;
+            $reimbursement->second_rejected_remark = null;
             $reimbursement->save();
             DB::connection('reimburse_mysql')->commit();
         } catch (\Exception $e) {
@@ -145,7 +149,11 @@ class DeliverService
                         $saveData = [
                             'process_instance_id' => $processInstanceId,
                             'manager_sn' => $value['manager']['manager_sn'],
-                            'manager_name' => $value['manager']['manager_name']
+                            'manager_name' => $value['manager']['manager_name'],
+                            'second_rejecter_staff_sn' => '',
+                            'second_rejecter_name' => '',
+                            'second_rejected_at' => null,
+                            'second_rejected_remark' => null,
                         ];
                         Reimbursement::whereIn('id', $ids)->update($saveData);
                     });

@@ -68,6 +68,10 @@ class AuditService
         $reimburse->accountant_name = Auth::user()->realname;
         $reimburse->audited_cost = $auditedCost;
         $reimburse->audit_time = date('Y-m-d H:i:s');
+        $reimburse->second_rejecter_staff_sn = '';
+        $reimburse->second_rejecter_name = '';
+        $reimburse->second_rejected_at = null;
+        $reimburse->second_rejected_remark = null;
         $reimburse->save();
     }
 
