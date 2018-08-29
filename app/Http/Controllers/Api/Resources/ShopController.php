@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Api\Resources;
 
-use App\Http\Resources\HR\ShopCollection;
 use App\Models\HR\Shop;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\HR\ShopCollection;
 
 class ShopController extends Controller
 {
@@ -16,8 +16,12 @@ class ShopController extends Controller
      */
     public function index()
     {
-        ShopCollection::withoutWrapping();
-        return new ShopCollection(Shop::all());
+        $shops = Shop::api()
+            ->filterByQueryString()
+            ->sortByQueryString()
+            ->withPagination();
+            
+        return response()->json($shops, 200);
     }
 
     /**
