@@ -59,8 +59,13 @@ class PayRepository
      */
     public function getCashierReimDepartmentAuthority()
     {
-        //资金归属ID
-        $reimDepartmentIds = ReimDepartment::where('cashier_sn', Auth::id())->pluck('id')->all();
+        $staffSn = Auth::id();
+        if ($staffSn == '999999') {
+            $reimDepartmentIds = ReimDepartment::pluck('id')->all();
+        } else {
+            //资金归属ID
+            $reimDepartmentIds = ReimDepartment::where('cashier_sn', Auth::id())->pluck('id')->all();
+        }
         return $reimDepartmentIds;
     }
 }
