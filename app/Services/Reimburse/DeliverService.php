@@ -53,7 +53,7 @@ class DeliverService
             $reimbursement->second_rejecter_staff_sn = '';
             $reimbursement->second_rejecter_name = '';
             $reimbursement->second_rejected_at = null;
-            $reimbursement->second_rejected_remark = null;
+            $reimbursement->second_reject_remarks = null;
             $reimbursement->save();
             DB::connection('reimburse_mysql')->commit();
         } catch (\Exception $e) {
@@ -153,7 +153,7 @@ class DeliverService
                             'second_rejecter_staff_sn' => '',
                             'second_rejecter_name' => '',
                             'second_rejected_at' => null,
-                            'second_rejected_remark' => null,
+                            'second_reject_remarks' => null,
                         ];
                         Reimbursement::whereIn('id', $ids)->update($saveData);
                     });

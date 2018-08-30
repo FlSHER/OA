@@ -71,7 +71,7 @@ class AuditService
         $reimburse->second_rejecter_staff_sn = '';
         $reimburse->second_rejecter_name = '';
         $reimburse->second_rejected_at = null;
-        $reimburse->second_rejected_remark = null;
+        $reimburse->second_reject_remarks = null;
         $reimburse->save();
     }
 
