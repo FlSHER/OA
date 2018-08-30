@@ -29,6 +29,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
     });
     Route::group(['prefix' => 'hr'], function () {
         Route::post('staff_update', ['uses' => 'HRMController@changeStaffInfo']); //修改员工信息
+        Route::delete('staff_delete/{staff}', ['uses' => 'HRMController@deleteStaff']); // 删除员工信息
         Route::post('shop_update', ['uses' => 'HRMController@changeShopInfo']); //修改店铺信息
     });
     //评价路由

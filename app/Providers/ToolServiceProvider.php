@@ -51,6 +51,11 @@ class ToolServiceProvider extends ServiceProvider
         $this->app->when('App\Http\Controllers\HR\StaffController')
             ->needs('App\Contracts\CURD')
             ->give(\App\Services\Tools\CURDs\StaffCurdService::class);
+
+        $this->app->when('App\Http\Controllers\Api\HRMController')
+            ->needs('App\Contracts\CURD')
+            ->give(\App\Services\Tools\CURDs\StaffCurdService::class);
+
         $this->app->when('App\Http\Controllers\HR\TransferController')
             ->needs('App\Contracts\CURD')
             ->give(\App\Services\Tools\CURDs\TransferCurdService::class);
