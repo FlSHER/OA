@@ -62,7 +62,9 @@ Trait ListScopes
 
     protected function unserializeFilters()
     {
-        $inputArr = str_split(request('filters', ''));
+        $inputString = request('filters');
+        if (!$inputString) return false;
+        $inputArr = str_split(request('filters'));
         $filters = [];
         $key = [0];
         $implodedKey = '0';
