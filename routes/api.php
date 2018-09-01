@@ -68,3 +68,38 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
         Route::post('shop', 'TableController@getShop');
     });
 });
+
+Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
+    
+    // department router
+    Route::group(['prefix' => 'department', 'as' => '.department'], function () {
+
+        // 获取部门列表
+        // get /api/department
+        Route::get('/', ['uses' => 'DepartmentController@index']);
+
+        // 添加部门
+        // post /api/department
+        Route::post('/', ['uses' => 'DepartmentController@store']);
+
+        // 编辑部门
+        // patch /api/department
+        Route::patch('/', ['uses' => 'DepartmentController@update']);
+
+        // 获取部门树形结构
+        // get /api/department/tree
+        Route::get('tree', ['uses' => 'DepartmentController@tree']);
+
+        // 获取单个部门详情
+        // get /api/department/:department
+        Route::get('{department}', ['uses' => 'DepartmentController@show']);
+
+        // 删除部门
+        // delete /api/department/:department
+        Route::delete('{department}', ['uses' => 'DepartmentController@delete']);
+
+        // 获取部门选项
+        // post /api/department/options
+        Route::post('/options', ['uses' => 'DepartmentController@getOptionsById']);
+    });
+});
