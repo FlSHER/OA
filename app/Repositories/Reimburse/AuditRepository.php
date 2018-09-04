@@ -38,7 +38,7 @@ class AuditRepository
      */
     public function getListData($request)
     {
-        if ($request->has('type') && in_array($request->query('type'), ['processing', 'overtime', 'audited', 'rejected'])) {
+        if ($request->has('type') && in_array($request->query('type'), ['processing', 'overtime', 'being-rejected', 'audited', 'rejected'])) {
             $reimDepartmentIds = $this->getReimDepartmentId();//资金归属ID
             $query = Reimbursement::with([
                 'expenses' => function ($query) {
@@ -60,7 +60,7 @@ class AuditRepository
                     $query->where('status_id', 3)
                         ->where('approve_time', '>', $approveDeadLine);
                     break;
-                case 'be-rejected':
+                case 'being-rejected':
                     $query->where('status_id', 3)
                         ->whereNotNull('second_rejected_at');
                     break;
