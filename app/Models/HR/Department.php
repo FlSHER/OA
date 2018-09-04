@@ -2,12 +2,12 @@
 
 namespace App\Models\HR;
 
+use DB;
+use App\Models\HR\Staff;
 use App\Models\Traits\ListScopes;
+use App\Services\AuthorityService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Services\AuthorityService;
-use App\Models\HR\Staff;
-use DB;
 
 class Department extends Model
 {
@@ -213,11 +213,14 @@ class Department extends Model
     }
 
     private function changeChildrenFullName($fullName)
-    {
-        $this->_children->each(function ($item) use ($fullName) {
-            $item->full_name = $fullName . '-' . $item->name;
-            $item->save();
-        });
+    {   
+        if(isset($this->_children) && $this->_children)
+        {
+            $this->_children->each(function ($item) use ($fullName) {
+                $item->full_name = $fullName . '-' . $item->name;
+                $item->save();
+            });
+        }
     }
 
     /**
@@ -239,11 +242,14 @@ class Department extends Model
 
     private function changeChildrenRoleAuthority($rolesOrigin, $rolesNew)
     {
-        $this->_children->each(function ($item) use ($rolesOrigin, $rolesNew) {
-            $item->role()->detach(array_diff($rolesOrigin, $rolesNew));
-            $item->role()->attach(array_diff($rolesNew, $rolesOrigin));
-            $item->changeChildrenRoleAuthority($rolesOrigin, $rolesNew);
-        });
+        if(isset($this->_children) && $this->_children)
+        {
+            $this->_children->each(function ($item) use ($rolesOrigin, $rolesNew) {
+                $item->role()->detach(array_diff($rolesOrigin, $rolesNew));
+                $item->role()->attach(array_diff($rolesNew, $rolesOrigin));
+                $item->changeChildrenRoleAuthority($rolesOrigin, $rolesNew);
+            });
+        }
     }
 
 }

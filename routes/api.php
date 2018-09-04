@@ -29,6 +29,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
     });
     Route::group(['prefix' => 'hr'], function () {
         Route::post('staff_update', ['uses' => 'HRMController@changeStaffInfo']); //修改员工信息
+        Route::delete('staff_delete/{staff}', ['uses' => 'HRMController@deleteStaff']); // 删除员工信息
         Route::post('shop_update', ['uses' => 'HRMController@changeShopInfo']); //修改店铺信息
     });
     //评价路由
@@ -65,5 +66,33 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
     Route::prefix('table')->group(function () {
         Route::post('staff', 'Resources\StaffController@index');
         Route::post('shop', 'TableController@getShop');
+    });
+});
+
+Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
+    Route::namespace('Resources')->group(function () {
+        // department router
+        Route::group(['prefix' => 'department', 'as' => '.department'], function () {
+
+            // 获取部门列表
+            // get /api/department
+            Route::get('/', 'DepartmentController@index');
+
+            // 添加部门
+            // post /api/department
+            Route::post('/', 'DepartmentController@store');
+
+            // 编辑部门
+            // patch /api/department
+            Route::patch('{department}', 'DepartmentController@update');
+
+            // 获取单个部门详情
+            // get /api/department/:department
+            Route::get('{department}', 'DepartmentController@show');
+
+            // 删除部门
+            // delete /api/department/:department
+            Route::delete('{department}', 'DepartmentController@destroy');
+        });
     });
 });

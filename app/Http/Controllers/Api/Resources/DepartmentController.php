@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api\Resources;
 
-use App\Http\Resources\HR\DepartmentCollection;
-use App\Http\Resources\HR\DepartmentResource;
-use App\Http\Resources\HR\StaffCollection;
-use App\Models\HR\Department;
 use Illuminate\Http\Request;
+use App\Models\HR\Department;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\HR\StaffCollection;
+use App\Http\Resources\HR\DepartmentResource;
+use App\Http\Resources\HR\DepartmentCollection;
 
 class DepartmentController extends Controller
 {
@@ -17,9 +17,19 @@ class DepartmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $list = Department::filterByQueryString()->get();
+        $list = Department::query()
+            ->filterByQueryString()
+            ->sortByQueryString()
+            ->withPagination();
+
+        if (isset($list['data'])) {
+            $list['data'] = new DepartmentCollection($list['data']);
+            
+            return $list;
+        }
+        
         return new DepartmentCollection($list);
     }
 
@@ -31,7 +41,26 @@ class DepartmentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $rules = [
+            'name' => ['required', 'unique:departments'],
+            'staff_name' => ['required', 'exists:staff,realname'],
+        ];
+        $messages = [
+            'name.required' => '部门名称不能为空',
+            'name.unique' => '部门名称已存在',
+            'staff_name.required' => '部门负责人必填',
+            'staff_name.exists' => '部门负责人不存在',
+        ];
+        $this->validate($request, $rules, $messages);
+        $department = new Department;
+        $department->name = $request->name;
+        $department->brand_id = $request->brand_id;
+        $department->manager_sn = $request->staff_sn;
+        $department->manager_name = $request->staff_name;
+        $department->parent_id = $request->parent_id ? : 0;
+        $department->save();
+
+        return response()->json($department, 201);
     }
 
     /**
@@ -54,7 +83,23 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, Department $department)
     {
-        //
+        $rules = [
+            'name' => ['required'],
+            'manager_name' => ['exists:staff,realname'],
+        ];
+        $messages = [
+            'name.required' => '部门名称不能为空',
+            'manager_name.exists' => '部门负责人不存在',
+        ];
+        $this->validate($request, $rules, $messages);
+        $department->name = $request->name;
+        $department->brand_id = $request->brand_id;
+        $department->manager_sn = $request->staff_sn;
+        $department->manager_name = $request->staff_name;
+        $department->parent_id = $request->parent_id ? : 0;
+        $department->save();
+
+        return response()->json($department, 201);
     }
 
     /**
@@ -65,7 +110,9 @@ class DepartmentController extends Controller
      */
     public function destroy(Department $department)
     {
-        //
+        $department->delete();
+
+        return response()->json(null, 204);
     }
 
     public function getChildrenAndStaff(Department $department)
