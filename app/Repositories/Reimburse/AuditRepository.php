@@ -60,6 +60,10 @@ class AuditRepository
                     $query->where('status_id', 3)
                         ->where('approve_time', '>', $approveDeadLine);
                     break;
+                case 'be-rejected':
+                    $query->where('status_id', 3)
+                        ->whereNotNull('second_rejected_at');
+                    break;
                 case 'audited':
                     $query->whereNotNull('audit_time');
                     break;
