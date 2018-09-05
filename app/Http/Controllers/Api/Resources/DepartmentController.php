@@ -115,6 +115,20 @@ class DepartmentController extends Controller
         return response()->json(null, 204);
     }
 
+    /**
+     * 获取全部部门.
+     *
+     * @return mixed
+     */
+    public function tree()
+    {
+        return Department::get()->map(function ($item) {
+            $item->parent_id = $item->parent_id ? : null;
+
+            return $item;
+        });
+    }
+
     public function getChildrenAndStaff(Department $department)
     {
         return [

@@ -78,17 +78,21 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             // get /api/department
             Route::get('/', 'DepartmentController@index');
 
+            // 获取全部部门
+            // get /api/department/tree
+            Route::get('tree', 'DepartmentController@tree');
+
             // 添加部门
             // post /api/department
             Route::post('/', 'DepartmentController@store');
 
             // 编辑部门
             // patch /api/department
-            Route::patch('{department}', 'DepartmentController@update');
+            Route::patch('{department}', 'DepartmentController@update')->where(['department' => '[0-9]+']);
 
             // 获取单个部门详情
             // get /api/department/:department
-            Route::get('{department}', 'DepartmentController@show');
+            Route::get('{department}', 'DepartmentController@show')->where(['department' => '[0-9]+']);
 
             // 删除部门
             // delete /api/department/:department
