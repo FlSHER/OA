@@ -98,5 +98,25 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             // delete /api/department/:department
             Route::delete('{department}', 'DepartmentController@destroy');
         });
+
+        // position router
+        Route::group(['prefix' => 'position', 'as' => '.position'], function (){
+
+            // 获取职位列表
+            // /api/position
+            Route::get('/', 'PositionController@index');
+
+            // 新增职位
+            // /api/position
+            Route::post('/', 'PositionController@store');
+
+            // 编辑职位
+            // /api/position/:position
+            Route::patch('{position}', 'PositionController@update')->where(['position' => '[0-9]+']);
+
+            // 删除职位
+            // /api/position/:position
+            Route::delete('{position}', 'PositionController@destory')->where(['position' => '[0-9]+']);
+        });
     });
 });

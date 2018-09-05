@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Api\Resources;
 
-use App\Http\Resources\HR\PositionCollection;
 use App\Models\HR\Position;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\HR\PositionCollection;
 
 class PositionController extends Controller
 {
@@ -16,7 +16,18 @@ class PositionController extends Controller
      */
     public function index()
     {
-        return new PositionCollection(Position::all());
+        $list = Position::query()
+            ->filterByQueryString()
+            ->sortByQueryString()
+            ->withPagination();
+            
+        if (isset($list['data'])) {
+            $list['data'] = new PositionCollection($list['data']);
+            
+            return $list;
+        }
+
+        return new PositionCollection($list);
     }
 
     /**
@@ -25,9 +36,29 @@ class PositionController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Position $position)
     {
-        //
+        $rules = [
+            'name' => 'required|unique:positions',
+            'level' => 'required',
+        ];
+        $message = [
+            'name.required' => '职位名称不能为空',
+            'name.unique' => '职位名称已存在',
+            'level.required' => '职级不能为空', 
+        ]; 
+        $this->validate($request, $rules, $message);
+        $data = $request->all();
+        $position->name = $data['name'];
+        $position->level = $data['level'];
+        $position->is_public = $data['is_public'];
+        
+        $position->getConnection()->transaction(function () use ($position, $data) {
+            $position->save();
+            $position->brand()->attach($data['brands']);
+        });
+        
+        return response()->json(['message' => '添加成功'], 201);
     }
 
     /**
@@ -38,7 +69,9 @@ class PositionController extends Controller
      */
     public function show(Position $position)
     {
-        //
+        $position->load('brand');
+
+        return response()->json($position, 200);
     }
 
     /**
@@ -50,7 +83,27 @@ class PositionController extends Controller
      */
     public function update(Request $request, Position $position)
     {
-        //
+        $rules = [
+            'name' => 'required',
+            'level' => 'required',
+        ];
+        $message = [
+            'name.required' => '职位名称不能为空',
+            'level.required' => '职级不能为空', 
+        ];
+        $this->validate($request, $rules, $message);
+        $data = $request->all();
+        $position->name = $data['name'];
+        $position->level = $data['level'];
+        $position->is_public = $data['is_public'];
+        
+        $position->getConnection()->transaction(function () use ($position, $data) {
+            $position->save();
+            $position->brand()->detach();
+            $position->brand()->attach($data['brands']);
+        });
+        
+        return response()->json(['message' => '编辑成功'], 201);
     }
 
     /**
@@ -61,6 +114,8 @@ class PositionController extends Controller
      */
     public function destroy(Position $position)
     {
-        //
+        $position->delete();
+
+        return response()->json(null, 204);
     }
 }
