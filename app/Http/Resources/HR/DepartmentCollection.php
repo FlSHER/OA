@@ -22,7 +22,7 @@ class DepartmentCollection extends ResourceCollection
                 'name' => $department->name,
                 'brand_id' => $department->brand_id,
                 'full_name' => $department->full_name,
-                'parent_id' => $department->parent_id ? : null,
+                'parent_id' => $department->parent_id,
                 'is_locked' => $department->is_locked,
                 'is_public' => $department->is_public,
                 'manager_sn' => $department->manager_sn,
