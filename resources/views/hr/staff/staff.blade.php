@@ -182,7 +182,7 @@
                   @endif
               }
               if (oData.status_id > 0) {
-                  @if ($authority->checkAuthority(82))
+                  @if ($authority->checkAuthority(175))
                     html += ' <button class="btn btn-sm btn-default" title="重置密码" onclick="resetPwd(' + sData + ')"><i class="fa fa-key fa-fw"></i></button>';
                   @endif
 
