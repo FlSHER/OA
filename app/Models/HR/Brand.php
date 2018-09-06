@@ -3,10 +3,16 @@
 namespace App\Models\HR;
 
 use App\Scopes\SortScope;
+use App\Models\Traits\ListScopes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Brand extends Model
 {
+    use SoftDeletes, ListScopes;
+
+    public $timestamps = false;
+    
     protected static function boot()
     {
         parent::boot();

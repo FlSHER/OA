@@ -118,5 +118,25 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             // /api/position/:position
             Route::delete('{position}', 'PositionController@destroy')->where(['position' => '[0-9]+']);
         });
+
+        // brand router
+        Route::group(['prefix' => 'brand', 'as' => '.brand'], function () {
+
+            // 获取品牌列表
+            // /api/brand
+            Route::get('/', 'BrandController@index');
+
+            // 添加品牌
+            // /api/brand
+            Route::post('/', 'BrandController@store');
+
+            // 编辑品牌
+            // /api/brand/:brand
+            Route::patch('{brand}', 'BrandController@update')->where(['brand' => '[0-9]+']);
+
+            //  删除品牌
+            // /api/brand/:brand
+            Route::delete('{brand}', 'BrandController@destroy')->where(['brand' => '[0-9]+']);
+        });
     });
 });
