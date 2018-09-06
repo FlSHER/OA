@@ -57,8 +57,11 @@ class PositionController extends Controller
             $position->save();
             $position->brand()->attach($data['brands']);
         });
+
+        $position->load('brand');
+        $position->brands = $position->brand;
         
-        return response()->json(['message' => '添加成功'], 201);
+        return response()->json($position, 201);
     }
 
     /**
@@ -103,7 +106,10 @@ class PositionController extends Controller
             $position->brand()->attach($data['brands']);
         });
         
-        return response()->json(['message' => '编辑成功'], 201);
+        $position->load('brand');
+        $position->brands = $position->brand;
+        
+        return response()->json($position, 201);
     }
 
     /**
@@ -114,7 +120,10 @@ class PositionController extends Controller
      */
     public function destroy(Position $position)
     {
-        $position->delete();
+        $position->getConnection()->transaction(function () use ($position) {
+            $position->brand()->detach();
+            $position->delete();
+        });
 
         return response()->json(null, 204);
     }

@@ -116,7 +116,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
 
             // 删除职位
             // /api/position/:position
-            Route::delete('{position}', 'PositionController@destory')->where(['position' => '[0-9]+']);
+            Route::delete('{position}', 'PositionController@destroy')->where(['position' => '[0-9]+']);
         });
     });
 });
