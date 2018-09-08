@@ -102,7 +102,8 @@ class AuditRepository
                 break;
         }
         $data = $query->filterByQueryString()
-            ->sortByQueryString();
+            ->sortByQueryString()
+            ->get();
         return $data;
     }
 
