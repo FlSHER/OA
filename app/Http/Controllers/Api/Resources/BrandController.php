@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Api\Resources;
 
-use App\Http\Resources\HR\BrandCollection;
 use App\Models\HR\Brand;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\HR\BrandCollection;
 
 class BrandController extends Controller
 {
@@ -16,8 +16,18 @@ class BrandController extends Controller
      */
     public function index()
     {
-        BrandCollection::withoutWrapping();
-        return new BrandCollection(Brand::all());
+        $list = Brand::query()
+            ->filterByQueryString()
+            ->sortByQueryString()
+            ->withPagination();
+            
+        if (isset($list['data'])) {
+            $list['data'] = new BrandCollection($list['data']);
+
+            return $list;
+        }
+        
+        return new BrandCollection($list);
     }
 
     /**
@@ -26,9 +36,21 @@ class BrandController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Brand $brand)
     {
-        //
+        $rules = [
+            'name' => 'required|unique:brands',
+        ];
+        $message = [
+            'name.required' => '品牌名称不能为空',
+            'name.unique' => '品牌名称已存在',
+        ];
+        $this->validate($request, $rules, $message);
+        $brand->name = $request->name;
+        $brand->is_public = $request->is_public;
+        $brand->save();
+
+        return response()->json($brand, 201);
     }
 
     /**
@@ -39,7 +61,7 @@ class BrandController extends Controller
      */
     public function show(Brand $brand)
     {
-        //
+        return response()->json($brand, 200);
     }
 
     /**
@@ -51,7 +73,18 @@ class BrandController extends Controller
      */
     public function update(Request $request, Brand $brand)
     {
-        //
+        $rules = [
+            'name' => 'required',
+        ];
+        $message = [
+            'name.required' => '品牌名称不能为空',
+        ];
+        $this->validate($request, $rules, $message);
+        $brand->name = $request->name;
+        $brand->is_public = $request->is_public;
+        $brand->save();
+
+        return response()->json($brand, 201);
     }
 
     /**
@@ -62,6 +95,8 @@ class BrandController extends Controller
      */
     public function destroy(Brand $brand)
     {
-        //
+        $brand->delete();
+
+        return response()->json(null, 204);
     }
 }

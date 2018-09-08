@@ -78,21 +78,65 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             // get /api/department
             Route::get('/', 'DepartmentController@index');
 
+            // 获取全部部门
+            // get /api/department/tree
+            Route::get('tree', 'DepartmentController@tree');
+
             // 添加部门
             // post /api/department
             Route::post('/', 'DepartmentController@store');
 
             // 编辑部门
             // patch /api/department
-            Route::patch('{department}', 'DepartmentController@update');
+            Route::patch('{department}', 'DepartmentController@update')->where(['department' => '[0-9]+']);
 
             // 获取单个部门详情
             // get /api/department/:department
-            Route::get('{department}', 'DepartmentController@show');
+            Route::get('{department}', 'DepartmentController@show')->where(['department' => '[0-9]+']);
 
             // 删除部门
             // delete /api/department/:department
             Route::delete('{department}', 'DepartmentController@destroy');
+        });
+
+        // position router
+        Route::group(['prefix' => 'position', 'as' => '.position'], function (){
+
+            // 获取职位列表
+            // /api/position
+            Route::get('/', 'PositionController@index');
+
+            // 新增职位
+            // /api/position
+            Route::post('/', 'PositionController@store');
+
+            // 编辑职位
+            // /api/position/:position
+            Route::patch('{position}', 'PositionController@update')->where(['position' => '[0-9]+']);
+
+            // 删除职位
+            // /api/position/:position
+            Route::delete('{position}', 'PositionController@destroy')->where(['position' => '[0-9]+']);
+        });
+
+        // brand router
+        Route::group(['prefix' => 'brand', 'as' => '.brand'], function () {
+
+            // 获取品牌列表
+            // /api/brand
+            Route::get('/', 'BrandController@index');
+
+            // 添加品牌
+            // /api/brand
+            Route::post('/', 'BrandController@store');
+
+            // 编辑品牌
+            // /api/brand/:brand
+            Route::patch('{brand}', 'BrandController@update')->where(['brand' => '[0-9]+']);
+
+            //  删除品牌
+            // /api/brand/:brand
+            Route::delete('{brand}', 'BrandController@destroy')->where(['brand' => '[0-9]+']);
         });
     });
 });
