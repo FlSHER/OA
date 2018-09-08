@@ -40,6 +40,17 @@ class PayController extends Controller
     }
 
     /**
+     * 获取导出列表
+     * @param Request $request
+     * @return mixed
+     */
+    public function exportIndex(Request $request)
+    {
+        $data = $this->payRepository->getExportList($request);
+        return $this->response->get($data);
+    }
+
+    /**
      * 驳回
      * @param Request $request
      */

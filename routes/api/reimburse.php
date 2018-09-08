@@ -24,6 +24,7 @@ Route::middleware('auth:api')->namespace('Api\Reimburse')->group(function(){
     Route::patch('/withdraw','CheckAuditedController@withdraw');//撤回已审核单
 
     Route::get('/pay','PayController@index');//转账列表
+    Route::get('/export-pay','PayController@exportIndex');//导出
     Route::patch('/pay','PayController@pay');//转账
     Route::patch('/pay/reject','PayController@reject');//驳回 转账
 
