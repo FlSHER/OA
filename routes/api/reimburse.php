@@ -8,6 +8,7 @@
 Route::middleware('auth:api')->namespace('Api\Reimburse')->group(function(){
     Route::get('/audit','AuditController@index');//审核列表
     Route::get('/audit/{id}','AuditController@show');//审核详情
+    Route::get('/export-audit','AuditController@exportIndex');//导出
     Route::patch('/agree','AuditController@agree');//通过
     Route::patch('/reject','AuditController@reject');//驳回
     Route::delete('/delete','AuditController@destroy');//删除驳回的单

@@ -60,10 +60,6 @@ class AuditRepository
                     $query->where('status_id', 3)
                         ->where('approve_time', '>', $approveDeadLine);
                     break;
-                case 'being-rejected':
-                    $query->where('status_id', 3)
-                        ->whereNotNull('second_rejected_at');
-                    break;
                 case 'audited':
                     $query->whereNotNull('audit_time');
                     break;
@@ -79,6 +75,35 @@ class AuditRepository
             return $data;
         }
         abort(400, '请正确输入type类型，不要乱修改哦');
+    }
+
+    /**
+     * 获取导出列表
+     * @param $request
+     * @return mixed
+     */
+    public function getExportList($request)
+    {
+        $reimDepartmentIds = $this->getReimDepartmentId();//资金归属ID
+        $query = Reimbursement::with([
+            'expenses' => function ($query) {
+                $query->where('is_approved', '=', 1);
+            },
+        ])->whereIn('reim_department_id', $reimDepartmentIds);
+        $type = $request->query('type');
+        switch ($type) {
+            case 'audited':
+                $query->whereNotNull('audit_time');
+                break;
+            case 'rejected':
+                $query->whereNotNull('approve_time')
+                    ->whereNull('audit_time')
+                    ->where(['status_id' => -1, 'accountant_delete' => 0]);
+                break;
+        }
+        $data = $query->filterByQueryString()
+            ->sortByQueryString();
+        return $data;
     }
 
     /**

@@ -49,6 +49,17 @@ class AuditController extends Controller
     }
 
     /**
+     * 获取导出列表
+     * @param Request $request
+     * @return mixed
+     */
+    public function exportIndex(Request $request)
+    {
+        $data = $this->auditRepository->getExportList($request);
+        return $this->response->get($data);
+    }
+
+    /**
      * 通过处理
      * @param AgreeRequest $request
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
@@ -105,7 +116,8 @@ class AuditController extends Controller
      * 获取所有明细类型
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    public function getTypes(){
+    public function getTypes()
+    {
         $data = Expense_type::get();
         return $this->response->get($data);
     }
