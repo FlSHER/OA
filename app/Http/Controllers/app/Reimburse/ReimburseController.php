@@ -119,7 +119,9 @@ class ReimburseController extends Controller
         $this->validate($request, [
             'name' => 'required|max:20|string|unique:reimburse_mysql.reim_departments,name,' . $request->id,
             'manager_sn' => 'required_with:manager_sn',
-            'manager_name' => 'required',
+            'manager_name' => 'required|max:10',
+            'cashier_sn'=>'required',
+            'cashier_name'=>'required|string|max:10',
             'auditor.*.auditor_realname' => 'required|string|max:10',
             'auditor.*.auditor_staff_sn' => 'required_with:auditor.*.auditor_realname|string|max:9'
         ], [], trans('fields.reimburse.auditor')

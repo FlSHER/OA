@@ -39,6 +39,9 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapApiRoutes();
 
+        $this->mapReimburseApiRoutes();//报销接口路由
+
+        $this->mapDingtalkApiRoutes();//钉钉接口路由
         //
     }
 
@@ -75,5 +78,27 @@ class RouteServiceProvider extends ServiceProvider
         ], function ($router) {
             require base_path('routes/api.php');
         });
+    }
+
+    /**
+     * 报销路由
+     */
+    protected function mapReimburseApiRoutes()
+    {
+        Route::prefix('reimburse')
+            ->middleware('api')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api/reimburse.php'));
+    }
+
+    /**
+     * 钉钉路由
+     */
+    protected function mapDingtalkApiRoutes()
+    {
+        Route::prefix('dingtalk')
+            ->middleware('api')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api/dingtalk.php'));
     }
 }

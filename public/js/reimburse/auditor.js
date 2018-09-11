@@ -4,6 +4,7 @@ var auditorTable = $("#auditorTable").oaTable({
   "columns": [
     { data: "name", title: "资金归属" },
     { data: "manager_name", title: "品牌副总" },
+    { data: "cashier_name", title: "出纳" },
     {
       "data": "auditor.auditor_realname", "title": "审核人", "defaultContent": "",
       "createdCell": function (nTd, sData, oData, iRow, iCol) {

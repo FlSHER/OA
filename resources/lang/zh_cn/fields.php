@@ -271,6 +271,10 @@ return [
 //配置审核人
         'auditor' => [
             'name' => '资金归属',
+            'manager_sn' => '品牌副总工号',
+            'manager_name' => '品牌副总',
+            'cashier_sn'=>'出纳工号',
+            'cashier_name'=>'出纳',
             'auditor.*.auditor_staff_sn' => '审核人编号',
             'auditor.*.auditor_realname' => '审核人',
         ],

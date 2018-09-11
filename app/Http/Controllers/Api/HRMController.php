@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\HR\Shop;
-use Illuminate\Http\Request;
+use ApiResponse;
 use App\Http\Requests;
+use App\Contracts\CURD;
+use App\Models\HR\Shop;
 use App\Models\HR\Staff;
 use App\Models\Department;
-use ApiResponse;
+use Illuminate\Http\Request;
+use App\Contracts\OperationLog;
 use App\Http\Controllers\Controller;
 
 class HRMController extends Controller
@@ -18,12 +20,16 @@ class HRMController extends Controller
     protected $search;
     protected $model; //模型
     protected $availableColumns; //全部字段
+    protected $curdService;
+    protected $logService;
 
-    public function __construct()
+    public function __construct(OperationLog $logService, CURD $curd)
     {
         $request = request();
         $this->start = $request->has('start') ? $request->start : 0;
         $this->length = $request->has('length') ? $request->length : 0;
+        $this->logService = $logService;
+        $this->curdService = $curd->log($this->logService);
     }
 
     public function getCurrentUserInfo(Request $request)
@@ -106,6 +112,22 @@ class HRMController extends Controller
     public function changeStaffInfo(Request $request)
     {
         return $this->changeInfo($request->input(), 'App\Models\HR\Staff', $request->staff_sn);
+    }
+
+    /**
+     * 删除员工操作.
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function deleteStaff(Request $request, Staff $staff)
+    {
+        $request->offsetSet('staff_sn', $staff->staff_sn);
+        $request->offsetSet('operation_type', 'delete');
+        $request->offsetSet('operate_at', date('Y-m-d'));
+        $request->offsetSet('operation_remark', '');
+        $curd = $this->curdService->delete($staff, ['info']);
+        return $curd;
     }
 
     /**

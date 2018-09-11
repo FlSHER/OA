@@ -109,7 +109,6 @@ class ShopController extends Controller
             'latitude' => $request->latitude,
             'longitude' => $request->longitude
         ]);
-        $shop->location = $request->location;
         $shop->lng = $request->longitude;
         $shop->lat = $request->latitude;
         $shop->geo_hash = $request->geo_hash;

@@ -32,6 +32,13 @@
                                 </div>
                                 <input type="hidden" name="manager_sn"  value="" oaSearchColumn="staff_sn" />
                             </div>
+                            <div class="form-group" oaSearch="staff">
+                                <label  class="col-sm-2 control-label">出纳<span style="color: red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" readonly name="cashier_name" oaSearchShow oaSearchColumn="realname" placeholder="请点击选择出纳" value=""/>
+                                </div>
+                                <input type="hidden" name="cashier_sn"  value="" oaSearchColumn="staff_sn" />
+                            </div>
                             <div class="form-group" isFormList>
                                 <label  class="col-sm-2 control-label">审核人<span style="color: red;">*</span></label>
                                 <div class="col-sm-8">

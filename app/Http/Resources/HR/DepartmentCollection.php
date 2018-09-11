@@ -20,6 +20,7 @@ class DepartmentCollection extends ResourceCollection
             return [
                 'id' => $department->id,
                 'name' => $department->name,
+                'brand_id' => $department->brand_id,
                 'full_name' => $department->full_name,
                 'parent_id' => $department->parent_id,
                 'is_locked' => $department->is_locked,

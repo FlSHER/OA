@@ -40,6 +40,7 @@ class StaffCollection extends ResourceCollection
                 'property' => $staff->property,
                 'education' => $staff->info->education,
                 'relatives' => $staff->relative,
+                'dingtalk_number' => $staff->dingding,
             ];
         })->toArray();
     }

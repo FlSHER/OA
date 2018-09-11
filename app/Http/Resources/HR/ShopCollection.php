@@ -6,6 +6,8 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class ShopCollection extends ResourceCollection
 {
+    public static $wrap = null;
+
     /**
      * Transform the resource collection into an array.
      *
@@ -16,10 +18,12 @@ class ShopCollection extends ResourceCollection
     {
         return $this->collection->map(function ($shop) {
             return [
+                'id' => $shop->id,
                 'shop_sn' => $shop->shop_sn,
                 'name' => $shop->name,
                 'manager_sn' => $shop->manager_sn,
                 'manager_name' => $shop->manager_name,
+                'manager_mobile' => $shop->manager->mobile ?? '',
                 'department_id' => $shop->department_id,
                 'brand_id' => $shop->brand_id,
                 'lng' => $shop->lng,
@@ -36,6 +40,8 @@ class ShopCollection extends ResourceCollection
                         'realname' => $staff->realname,
                     ];
                 }),
+                'department' => $shop->department,
+                'brand' => $shop->brand,
             ];
         })->toArray();
     }
