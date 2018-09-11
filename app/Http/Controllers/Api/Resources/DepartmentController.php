@@ -122,7 +122,11 @@ class DepartmentController extends Controller
      */
     public function tree()
     {
-        return Department::get();
+        return Department::get()->map(function ($item) {
+            $item->parent_id = $item->parent_id ? : null;
+
+            return $item;
+        });
     }
 
     public function getChildrenAndStaff(Department $department)
