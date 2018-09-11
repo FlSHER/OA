@@ -2,10 +2,10 @@
 
 namespace App\Models\HR;
 
+use Authority;
 use App\Models\Traits\ListScopes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Authority;
 
 class Shop extends Model
 {
@@ -106,8 +106,29 @@ class Shop extends Model
 
     public function scopeApi($query)
     {
-        $query->with(['staff', 'department', 'brand', 'province', 'city', 'county']);
+        $query->with(['staff', 'department', 'brand', 'province', 'city', 'county', 'manager']);
     }
 
     /* ----- 本地作用域 End ----- */
+
+    /**
+     * 记录店铺变更日志。
+     *
+     * @return void
+     */
+    public function createShopLog()
+    {
+        $isDirty = $this->isDirty();
+        if ($isDirty === true) {
+            $dirty = $this->getDirty();
+            $staff = request()->user();
+            $logModel = new ShopLog();
+            $logModel->fill([
+                'target_id' => $this->id,
+                'admin_sn' => $staff['staff_sn'],
+                'changes' => $dirty,
+            ]);
+            $logModel->save();
+        }
+    }
 }

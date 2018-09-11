@@ -138,5 +138,29 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             // /api/brand/:brand
             Route::delete('{brand}', 'BrandController@destroy')->where(['brand' => '[0-9]+']);
         });
+
+        // shop router
+        Route::group(['prefix' => 'shop', 'as' => '.shop'], function () {
+
+            // 获取店铺列表
+            // /api/shop
+            Route::get('/', 'ShopController@index');
+
+            // 新增店铺
+            // /api/shop
+            Route::post('/', 'ShopController@store');
+
+            // 店铺定位
+            // /api/shop/position
+            Route::post('position', 'ShopController@position');
+            
+           // 编辑店铺
+           // /api/shop/:shop
+           Route::patch('{shop}', 'ShopController@update')->where(['shop' => '[0-9]+']);
+
+           // 删除店铺
+           // /api/shop/:shop
+           Route::delete('{shop}', 'ShopController@destroy')->where(['shop' => '[0-9]+']);
+        });
     });
 });
