@@ -162,5 +162,13 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
            // /api/shop/:shop
            Route::delete('{shop}', 'ShopController@destroy')->where(['shop' => '[0-9]+']);
         });
+
+        // rbac router
+        Route::group(['prefix' => 'authorities', 'as' => '.authorities'], function () {
+
+            // 权限列表
+            // /api/authorities
+            Route::get('/', 'RbacController@index');
+        });
     });
 });

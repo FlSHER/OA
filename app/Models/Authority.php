@@ -6,11 +6,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use App\Services\AuthorityService;
 use DB;
+use App\Models\Traits\ListScopes;
+use App\Services\AuthorityService;
+use Illuminate\Database\Eloquent\Model;
 
-class Authority extends Model {
+class Authority extends Model
+{
+    use ListScopes;
 
     protected $guarded = ['id'];
     protected $appends = ['full_url_tmp'];
