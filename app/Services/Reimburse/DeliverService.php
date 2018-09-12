@@ -20,6 +20,11 @@ class DeliverService
     protected $appId;
     protected $processCode;
 
+//    protected $financeOfficerSn = 110085;
+//    protected $financeOfficerName = '郭娟';
+    protected $financeOfficerSn = 110103;
+    protected $financeOfficerName = '刘勇01';
+
     public function __construct()
     {
         $this->appId = config('reimburse.app_id');
@@ -39,17 +44,28 @@ class DeliverService
         $callback = config("reimburse.manager_callback");
         DB::connection('reimburse_mysql')->beginTransaction();
         try {
-            if ((int)$approverSn != (int)$managerSn) {
+            $dingApproveSn = '';
+            if($reimbursement->audited_cost > 5000){
+                if((int)$approverSn == (int)$managerSn){
+                    $dingApproveSn = $this->financeOfficerSn;
+                }else{
+                    $dingApproveSn =[$managerSn,$this->financeOfficerSn];
+                }
+            }else{
+                if((int)$approverSn != (int)$managerSn){
+                    $dingApproveSn = $managerSn;
+                }
+            }
+            if(!empty($dingApproveSn)){
                 $formData = $this->makeFormData($reimbursement);
                 $initiatorSn = $reimbursement->staff_sn;//报销单创建人编号
-                $processInstanceId = app('Dingtalk')->startApprovalAndRecord($this->appId, $this->processCode, $managerSn, $formData, $callback, $initiatorSn);
-                $reimbursement->process_instance_id = $processInstanceId;
-            } else {
+                $code = 'PROC-GLYJ5N2V-E11VUX0YRK67A1WOOODU2-G8JBUYGJ-1';
+                $processInstanceId = app('Dingtalk')->startApprovalAndRecord($this->appId, $code, $dingApproveSn, $formData, $callback, $initiatorSn);
+                $reimbursement->process_instance_id  = $processInstanceId;
+            }else{
                 $reimbursement->process_instance_id = 'skip_' . $reimbursement->reim_sn;
             }
 
-            $reimbursement->manager_sn = $managerSn;
-            $reimbursement->manager_name = $managerName;
             $reimbursement->second_rejecter_staff_sn = '';
             $reimbursement->second_rejecter_name = '';
             $reimbursement->second_rejected_at = null;
@@ -60,20 +76,6 @@ class DeliverService
             DB::connection('reimburse_mysql')->rollBack();
             $this->reimbursementRollback($reimbursement);//审核失败数据回滚到待审状态
             abort(400, $e->getMessage());
-        }
-        if ((int)$approverSn == (int)$managerSn) {
-            //审批人等于资金归属管理人
-            $message = [
-                'processInstanceId' => $reimbursement->process_instance_id,
-                'EventType' => 'bpms_instance_change',
-                'type' => 'finish',
-                'result' => 'agree',
-            ];
-            $data = app('Curl')->setUrl($callback)->sendMessageByPost($message);
-            if ($data == 0) {
-                $this->reimbursementRollback($reimbursement);//审核失败数据回滚到待审状态
-                abort(400, '审核后转交管理人审批失败，可能是报销服务器无响应');
-            }
         }
     }
 

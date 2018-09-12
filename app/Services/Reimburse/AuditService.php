@@ -29,8 +29,14 @@ class AuditService
             $auditedCost = $this->saveAuditExpenses($request, $reimburse);//明细通过处理
             $this->saveReimburse($reimburse, $auditedCost);//报销单通过处理
         });
-//        $deliver = new DeliverService();
-//        $deliver->afterApprove($reimburse);//转交到钉钉审批
+
+        //资金归属 （7 成都分公司，8 电商版块，10女装，11 濮院总公司）
+        if (in_array($reimburse->reim_department_id, [7, 8, 10, 11])) {
+            //转交到钉钉审批
+            $deliver = new DeliverService();
+            $deliver->afterApprove($reimburse);//转交到钉钉审批
+        }
+
         return $reimburse;
     }
 
