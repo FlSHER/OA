@@ -19,8 +19,10 @@ class RbacController extends Controller
         
         if (isset($list['data'])) {
             $list['data'] = new RbacCollection($list['data']);
+
+            return $list;
         }
-        return new  RbacCollection($list);
+        return new RbacCollection($list);
     }
 
 }
