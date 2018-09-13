@@ -37,7 +37,7 @@ class RbacController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request, Authority $authority)
-    {dd(1);
+    {
         $rules = [
             'auth_name' => 'required|string|max:20',
         ];
