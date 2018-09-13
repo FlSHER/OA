@@ -61,7 +61,18 @@ class RbacController extends Controller
      */
     public function update(Request $request, Authority $authority)
     {
+        $rules = [
+            'auth_name' => 'required|string|max:20',
+        ];
+        $message = [
+            'auth_name.required' => '权限名称不能为空',
+            'auth_name.max' => '权限名称不能超过 :max 个字',
+        ];
+        $this->validate($request, $rules, $message);
+        $authority->fill($request->all());
+        $authority->save();
 
+        return response()->json($authority, 201);
     }
 
     /**
