@@ -37,6 +37,7 @@ class AuditService
             $deliver->afterApprove($reimburse);//转交到钉钉审批
         }
 
+        $reimburse->load('expenses.bills');
         return $reimburse;
     }
 
@@ -94,6 +95,7 @@ class AuditService
         $reimburse->reject_remarks = $request->input('remarks');
         $reimburse->status_id = -1;
         $reimburse->save();
+        $reimburse->load('expenses.bills');
         return $reimburse;
     }
 
