@@ -17,6 +17,16 @@ class Authority extends Model
 
     protected $guarded = ['id'];
     protected $appends = ['full_url_tmp'];
+    protected $fillable = [
+        'auth_name',
+        'access_url',
+        'parent_id',
+        'menu_logo',
+        'menu_name',
+        'is_menu',
+        'is_lock',
+        'is_public',
+    ];
 
     /* ----- 定义关联Start ----- */
 
