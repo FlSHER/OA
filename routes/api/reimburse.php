@@ -21,7 +21,7 @@ Route::middleware('auth:api')->namespace('Api\Reimburse')->group(function(){
 
     Route::get('/audited','CheckAuditedController@index');//全部已审核单列表
     Route::get('/audited/{id}','CheckAuditedController@show');//全部已审核单详情
-    Route::patch('/withdraw','CheckAuditedController@withdraw');//撤回已审核单
+    Route::patch('/withdraw/{reimbursement}','CheckAuditedController@withdraw');//撤回已审核单
 
     Route::get('/pay','PayController@index');//转账列表
     Route::get('/export-pay','PayController@exportIndex');//导出

@@ -61,31 +61,27 @@ class CheckAuditedController extends Controller
      * 撤回已审核单
      * @param Request $request
      */
-    public function withdraw(Request $request)
+    public function withdraw(Reimbursement $reimbursement)
     {
-        $reimburse = Reimbursement::with(['expenses' => function ($query) {
-            return $query->where('is_audited', 1);
-        }])
-            ->where('status_id', 4)
-            ->find($request->id);
-        if (!$reimburse)
-            abort(404, '该报销单不存在');
-        DB::connection('reimburse_mysql')->transaction(function () use (&$reimburse) {
-            $reimburse->status_id = 3;
-            $reimburse->accountant_staff_sn = '';
-            $reimburse->accountant_name = '';
-            $reimburse->audited_cost = null;
-            $reimburse->audit_time = null;
-            $reimburse->process_instance_id = '';
-            $reimburse->manager_sn = '';
-            $reimburse->manager_name = '';
-            $reimburse->save();
-            $reimburse->expenses->each(function ($expense) {
+        if ($reimbursement->status_id !== 4) {
+            abort(400, '该报销单无法撤回');
+        }
+        DB::connection('reimburse_mysql')->transaction(function () use (&$reimbursement) {
+            $reimbursement->status_id = 3;
+            $reimbursement->accountant_staff_sn = '';
+            $reimbursement->accountant_name = '';
+            $reimbursement->audited_cost = null;
+            $reimbursement->audit_time = null;
+            $reimbursement->process_instance_id = '';
+            $reimbursement->manager_sn = '';
+            $reimbursement->manager_name = '';
+            $reimbursement->save();
+            $reimbursement->expenses->each(function ($expense) {
                 $expense->is_audited = 0;
                 $expense->audited_cost = null;
                 $expense->save();
             });
         });
-        return $this->response->get($reimburse);
+        return $this->response->patch($reimbursement);
     }
 }
