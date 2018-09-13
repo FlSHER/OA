@@ -14,9 +14,20 @@ use Illuminate\Database\Eloquent\Model;
 class Authority extends Model
 {
     use ListScopes;
-
+    
+    public $timestamps = false;
     protected $guarded = ['id'];
     protected $appends = ['full_url_tmp'];
+    protected $fillable = [
+        'auth_name',
+        'access_url',
+        'parent_id',
+        'menu_logo',
+        'menu_name',
+        'is_menu',
+        'is_lock',
+        'is_public',
+    ];
 
     /* ----- 定义关联Start ----- */
 
@@ -59,6 +70,11 @@ class Authority extends Model
                 self::reOrder($v['children'], $v['id']);
             }
         }
+    }
+
+    public function setParentIdAttribute($value)
+    {
+        $this->attributes['parent_id'] = (int)$value;
     }
 
 }

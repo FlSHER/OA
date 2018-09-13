@@ -169,6 +169,18 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             // 权限列表
             // /api/authorities
             Route::get('/', 'RbacController@index');
+
+            // 添加权限
+            // /api/authorities
+            Route::post('/', 'RbacController@store');
+
+            // 修改权限
+            // /api/authorities/:authority
+            Route::patch('{authority}', 'RbacController@update')->where(['authority' => '[0-9]+']);
+
+            // 删除权限
+            // /api/authorities/:authority
+            Route::delete('{authority}', 'RbacController@destroy')->where(['authority' => '[0-9]+']);
         });
     });
 });
