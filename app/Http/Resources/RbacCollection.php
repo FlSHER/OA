@@ -28,6 +28,7 @@ class RbacCollection extends ResourceCollection
                 'is_menu' => $item->is_menu,
                 'is_lock' => $item->is_lock,
                 'is_public' => $item->is_public,
+                'full_url' => $item->full_url_tmp,
             ];
         })->toArray();
     }

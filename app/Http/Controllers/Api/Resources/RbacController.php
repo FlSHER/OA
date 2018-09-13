@@ -83,7 +83,9 @@ class RbacController extends Controller
      */
     public function destroy(Authority $authority)
     {
+        $authority->delete();
 
+        return response()->json(null, 204);
     }
 
 }
