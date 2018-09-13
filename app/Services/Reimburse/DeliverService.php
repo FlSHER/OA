@@ -20,10 +20,10 @@ class DeliverService
     protected $appId;
     protected $processCode;
 
-//    protected $financeOfficerSn = 110085;
-//    protected $financeOfficerName = '郭娟';
-    protected $financeOfficerSn = 110103;
-    protected $financeOfficerName = '刘勇01';
+    protected $financeOfficerSn = 110085;
+    protected $financeOfficerName = '郭娟';
+//    protected $financeOfficerSn = 110103;
+//    protected $financeOfficerName = '刘勇01';
 
     public function __construct()
     {
