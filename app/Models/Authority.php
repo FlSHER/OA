@@ -72,4 +72,9 @@ class Authority extends Model
         }
     }
 
+    public function setParentIdAttribute($value)
+    {
+        $this->attributes['parent_id'] = (int)$value;
+    }
+
 }
