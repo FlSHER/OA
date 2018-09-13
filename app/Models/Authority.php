@@ -14,7 +14,8 @@ use Illuminate\Database\Eloquent\Model;
 class Authority extends Model
 {
     use ListScopes;
-
+    
+    public $timestamps = false;
     protected $guarded = ['id'];
     protected $appends = ['full_url_tmp'];
     protected $fillable = [
