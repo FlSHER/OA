@@ -23,7 +23,9 @@ class Reimbursement extends Model
 
     public function expenses()
     {//消费明细
-        return $this->hasMany('App\Models\Reimburse\Expense', 'reim_id')->orderBy('date', 'asc');
+        return $this->hasMany('App\Models\Reimburse\Expense', 'reim_id')
+            ->orderBy('date', 'asc')
+            ->orderBy('id', 'asc');
     }
 
     public function status()
