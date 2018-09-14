@@ -44,18 +44,14 @@ class DeliverService
         $callback = config("reimburse.manager_callback");
         DB::connection('reimburse_mysql')->beginTransaction();
         try {
-            $dingApproveSn = '';
-            if($reimbursement->audited_cost > 5000){
-                if((int)$approverSn == (int)$managerSn){
-                    $dingApproveSn = $this->financeOfficerSn;
-                }else{
-                    $dingApproveSn =[$managerSn,$this->financeOfficerSn];
-                }
-            }else{
-                if((int)$approverSn != (int)$managerSn){
-                    $dingApproveSn = $managerSn;
-                }
+            $dingApproveSn = [];
+            if((int)$managerSn != (int)$approverSn){
+                array_push($dingApproveSn, $managerSn);
             }
+            if($reimbursement->audited_cost > 5000 && (int)$managerSn != $this->financeOfficerSn){
+                array_push($dingApproveSn, $this->financeOfficerSn);
+            }
+
             if(!empty($dingApproveSn)){
                 $formData = $this->makeFormData($reimbursement);
                 $initiatorSn = $reimbursement->staff_sn;//报销单创建人编号
@@ -64,8 +60,11 @@ class DeliverService
                 $reimbursement->process_instance_id  = $processInstanceId;
             }else{
                 $reimbursement->process_instance_id = 'skip_' . $reimbursement->reim_sn;
+                $reimbursement->status_id = 6;
             }
 
+            $reimbursement->manager_sn = $managerSn;
+            $reimbursement->manager_name = $managerName;
             $reimbursement->second_rejecter_staff_sn = '';
             $reimbursement->second_rejecter_name = '';
             $reimbursement->second_rejected_at = null;
