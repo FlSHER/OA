@@ -71,6 +71,19 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
 
 Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
     Route::namespace('Resources')->group(function () {
+        // staff router
+        Route::group(['prefix' => 'staff', 'as' => '.staff'], function () {
+
+            // 员工批量导入
+            // /api/staff/import
+            Route::post('import', 'StaffController@import');
+            
+            // 批量导出
+            // /api/staff/export
+            Route::post('export', 'StaffController@export');
+
+        });
+
         // department router
         Route::group(['prefix' => 'department', 'as' => '.department'], function () {
 
