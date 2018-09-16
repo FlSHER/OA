@@ -10,6 +10,7 @@ namespace App\Services\Reimburse;
 
 
 use App\Models\Reimburse\Reimbursement;
+use App\Models\Reimburse\VicePresident;
 use App\Repositories\Reimburse\AuditRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -29,14 +30,18 @@ class AuditService
             $auditedCost = $this->saveAuditExpenses($request, $reimburse);//明细通过处理
             $this->saveReimburse($reimburse, $auditedCost);//报销单通过处理
         });
-
-        //资金归属 （7 成都分公司，8 电商版块，10女装，11 濮院总公司）
-        if (in_array($reimburse->reim_department_id, [7, 8, 10, 11])) {
-            //转交到钉钉审批
-            $deliver = new DeliverService();
-            $deliver->afterApprove($reimburse);//转交到钉钉审批
+        $deliver = new DeliverService();
+        $vicePresidentSn = VicePresident::pluck('staff_sn')->all();
+        //发起人是副总 提交喜哥审批
+        if (in_array($reimburse->staff_sn, $vicePresidentSn)) {
+            $deliver->bossApprove($reimburse);
+        }else{
+            //资金归属 （7 成都分公司，8 电商版块，10女装，11 濮院总公司）
+            if (in_array($reimburse->reim_department_id, [7, 8, 10, 11])) {
+                //转交到钉钉审批
+                $deliver->afterApprove($reimburse);//转交到钉钉审批
+            }
         }
-
         $reimburse->load('expenses.bills');
         return $reimburse;
     }
