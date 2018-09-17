@@ -192,12 +192,14 @@ class DeliverService
                 $formData['备注'] = $request->input('remark') ?: '无';
                 $formData ['报销清单'] = array_merge($reim);
                 try {
-                    if ($managerSn != '110085') {
-                        //品牌副总不是郭娟 添加郭娟审批
-                        $approveSn = [$managerSn, 110085];
+                    $approveSn = [$managerSn];
+                    if ($managerSn != $this->financeOfficerSn) {
+                        //品牌副总不是郭娟 添加郭娟审批 110085
+                        array_push($approveSn,$this->financeOfficerSn);
                     }
+
                     $processInstanceId = app('Dingtalk')->startApprovalAndRecord($this->appId, $this->batchProcessCode, $approveSn, $formData, $callback);
-                    DB::connection('reimburse_mysql')->transaction(function () use ($value, $reim, $processInstanceId) {
+                    DB::connection('reimburse_mysql')->transaction(function () use ($value, $reim, $processInstanceId,$approveSn) {
                         $ids = array_keys($reim);//审核要审批的ID
                         $saveData = [
                             'process_instance_id' => $processInstanceId,
@@ -208,6 +210,10 @@ class DeliverService
                             'second_rejected_at' => null,
                             'second_reject_remarks' => null,
                         ];
+                        if(count($approveSn)>1){
+                            $saveData['finance_approved_sn'] = $this->financeOfficerSn;
+                            $saveData['finance_approved_name'] = $this->financeOfficerName;
+                        }
                         Reimbursement::whereIn('id', $ids)->update($saveData);
                     });
                 } catch (\Exception $e) {
