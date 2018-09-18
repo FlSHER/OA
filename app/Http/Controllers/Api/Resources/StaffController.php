@@ -170,10 +170,10 @@ class StaffController extends Controller
         } catch (Exception $e) {
             \DB::rollBack();
 
-            return response()->json(['message' => '数据错误，导入失败'], 500);
+            return response()->json(['message' => '数据错误，更新失败'], 500);
         }
 
-        return response()->json(['message' => '导入成功'], 201);
+        return response()->json(['message' => '更新成功'], 201);
     }
 
     /**
@@ -209,7 +209,11 @@ class StaffController extends Controller
             \DB::commit();
         } catch(Exception $e) {
             \DB::rollback();
+
+            return response()->json(['message' => '数据错误，导入失败'], 500);
         }
+
+        return response()->json(['message' => '导入成功'], 201);
     }
 
     /**
