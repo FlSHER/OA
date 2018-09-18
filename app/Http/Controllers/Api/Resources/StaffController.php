@@ -221,6 +221,7 @@ class StaffController extends Controller
     protected function makeFillCreateStaff($value)
     {
         $staff = new Staff();
+        $staff->hired_at = $value['hired_at'] ?? now();
         $staff->username = $value['realname'];
         foreach ($value as $k => $v) {
             if (in_array($k, ['realname', 'mobile', 'shop_sn', 'birthday', 'dingding', 'wechat_number'])) {
