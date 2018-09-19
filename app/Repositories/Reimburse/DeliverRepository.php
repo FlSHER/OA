@@ -26,8 +26,9 @@ class DeliverRepository
      */
     public function getDeliverList()
     {
-        $data = Reimbursement::where('status_id', 4)
-            ->where('process_instance_id','')
+        $data = Reimbursement::with('expenses')
+            ->where('status_id', 4)
+            ->where('process_instance_id', '')
             ->whereIn('reim_department_id', $this->auditRepository->getReimDepartmentId())
             ->orderBy('audit_time', 'desc')
             ->get();

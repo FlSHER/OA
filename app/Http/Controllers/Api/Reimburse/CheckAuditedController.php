@@ -82,6 +82,7 @@ class CheckAuditedController extends Controller
                 $expense->save();
             });
         });
+        $reimbursement->load('expenses.bills');
         return $this->response->patch($reimbursement);
     }
 }
