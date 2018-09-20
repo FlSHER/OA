@@ -28,14 +28,14 @@ class AuditService
         DB::connection('reimburse_mysql')->transaction(function () use ($request, &$reimburse) {
             $reimburse = Reimbursement::find($request->id);
             $auditedCost = $this->saveAuditExpenses($request, $reimburse);//明细通过处理
-            $this->saveReimburse($reimburse, $auditedCost);//报销单通过处理
+            $this->saveReimburse($reimburse, $auditedCost, $request->accountant_remark);//报销单通过处理
         });
         $deliver = new DeliverService();
         $vicePresidentSn = VicePresident::pluck('staff_sn')->all();
         //发起人是副总 提交喜哥审批
         if (in_array($reimburse->staff_sn, $vicePresidentSn)) {
             $deliver->bossApprove($reimburse);
-        }else{
+        } else {
             //资金归属 （7 成都分公司，8 电商版块，10女装，11 濮院总公司）
             if (in_array($reimburse->reim_department_id, [7, 8, 10, 11])) {
                 //转交到钉钉审批
@@ -73,13 +73,14 @@ class AuditService
      * @param $reimburse
      * @param $auditedCost
      */
-    protected function saveReimburse($reimburse, $auditedCost)
+    protected function saveReimburse($reimburse, $auditedCost, $remark)
     {
         $reimburse->status_id = 4;
         $reimburse->accountant_staff_sn = Auth::id();
         $reimburse->accountant_name = Auth::user()->realname;
         $reimburse->audited_cost = $auditedCost;
         $reimburse->audit_time = date('Y-m-d H:i:s');
+        $reimburse->accountant_remark = $remark;
         $reimburse->second_rejecter_staff_sn = '';
         $reimburse->second_rejecter_name = '';
         $reimburse->second_rejected_at = null;
