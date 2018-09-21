@@ -135,8 +135,7 @@ class StaffController extends Controller
         if (!$hasAuth) {
             return $this->exportStaffInfo($request);
         }   
-        $data = [];
-        array_push($data, $request->input('maxCols'));
+        $data = [$request->input('maxCols')];
         $staff = Staff::query()
             ->with('gender', 'brand', 'info', 'department', 'position')
             ->filterByQueryString()
@@ -164,7 +163,7 @@ class StaffController extends Controller
                 $district->contains($item->info->living_city_id) ? $temp[$item->info->living_city_id]['name'] : '',
                 $district->contains($item->info->living_county_id) ? $temp[$item->info->living_county_id]['name'] : '',
             ];
-            array_push($data, [
+            $data[$key+1] = [
                 $item->staff_sn,
                 $item->realname,
                 $item->mobile,
@@ -205,7 +204,7 @@ class StaffController extends Controller
                 $item->info->remark,
                 $item->dingding,
                 '操作备注',
-            ]); 
+            ]; 
         });
         
         return response()->json($data, 201);
@@ -219,15 +218,14 @@ class StaffController extends Controller
      */
     protected function exportStaffInfo(Request $request)
     { 
-        $data = [];
-        array_push($data, $request->input('minCols'));
+        $data = [$request->input('minCols')];
         $staff = Staff::query()
             ->with('gender', 'brand', 'department', 'position')
             ->filterByQueryString()
             ->sortByQueryString()
             ->get();
         $staff->map(function ($item, $key) use (&$data) {
-            array_push($data, [
+            $data[$key+1] = [
                 $item->staff_sn,
                 $item->realname,
                 $item->mobile,
@@ -240,7 +238,7 @@ class StaffController extends Controller
                 $item->birthday,
                 $item->wechat_number,
                 $item->dingding,
-            ]); 
+            ];
         });
         
         return response()->json($data, 201);
