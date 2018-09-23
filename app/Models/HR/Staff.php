@@ -2,20 +2,20 @@
 
 namespace App\Models\HR;
 
-use App\Models\Traits\ListScopes;
-use Laravel\Passport\HasApiTokens;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Foundation\Auth\User;
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Authority;
-use App\Models\Department;
-use App\Models\Position;
 use App\Models\Brand;
 use App\Models\I\Gender;
+use App\Models\Position;
+
+use App\Models\Department;
 use App\Models\I\National;
-use App\Models\I\MaritalStatus;
 use App\Models\I\Politics;
+use App\Models\I\MaritalStatus;
+use App\Models\Traits\ListScopes;
+use Laravel\Passport\HasApiTokens;
+use Illuminate\Foundation\Auth\User;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Staff extends User
 {
@@ -40,7 +40,7 @@ class Staff extends User
         'employed_at',
         'left_at',
         'is_active',
-        'property_id',
+        'property',
     ];
     protected $hidden = ['password', 'salt', 'created_at', 'updated_at', 'deleted_at'];
 
