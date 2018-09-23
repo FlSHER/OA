@@ -35,12 +35,13 @@ class StaffCollection extends ResourceCollection
                 'employed_at' => $staff->employed_at,
                 'left_at' => $staff->left_at,
                 'gender_id' => $staff->gender_id,
-//                'gender' => $staff->gender,
+                'gender' => $staff->gender,
                 'birthday' => $staff->birthday,
                 'property' => $staff->property,
-                'education' => $staff->info->education,
                 'relatives' => $staff->relative,
                 'dingtalk_number' => $staff->dingding,
+                'education' => $staff->info->education,
+                'remark' => $staff->info->remark,
             ];
         })->toArray();
     }

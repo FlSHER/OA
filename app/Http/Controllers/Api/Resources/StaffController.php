@@ -16,6 +16,7 @@ use App\Models\HR\StaffInfo;
 use Illuminate\Http\Request;
 use App\Models\HR\Department;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreStaffRequest;
 use App\Http\Resources\HR\StaffResource;
 use App\Http\Requests\ImportStaffRequest;
 use App\Http\Resources\HR\StaffCollection;
@@ -47,7 +48,7 @@ class StaffController extends Controller
                 }
             });
         })
-        ->with('relative')
+        ->with('relative', 'info', 'gender', 'position', 'department', 'brand', 'shop')
         ->filterByQueryString()
         ->sortByQueryString()
         ->withPagination();
@@ -65,7 +66,19 @@ class StaffController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreStaffRequest $request)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  \App\Models\HR\Staff $staff
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, Staff $staff)
     {
         //
     }
@@ -82,18 +95,6 @@ class StaffController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \App\Models\HR\Staff $staff
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Staff $staff)
-    {
-        //
-    }
-
-    /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\HR\Staff $staff
@@ -101,7 +102,9 @@ class StaffController extends Controller
      */
     public function destroy(Staff $staff)
     {
-        //
+        $staff->delete();
+
+        return response()->json(null, 204);
     }
 
 
@@ -531,9 +534,9 @@ class StaffController extends Controller
     protected function makeValidator($value)
     {
         $rules = [
-            'realname' => 'bail|string|max:10',
-            'mobile' => 'bail|unique:staff,mobile|regex:/^1[3456789][0-9]{9}$/',
-            'id_card_number' => 'bail|max:18',
+            'realname' => 'bail|required|string|max:10',
+            'mobile' => 'bail|required|unique:staff,mobile|regex:/^1[3456789][0-9]{9}$/',
+            'id_card_number' => 'bail|required|max:18',
             'gender' => 'bail|in:男,女,未知',
             'brand' => 'bail|exists:brands,name',
             'position' => 'bail|exists:positions,name',
@@ -549,7 +552,7 @@ class StaffController extends Controller
             'living_province' => 'bail|exists:i_district,name',
             'living_city' => 'bail|exists:i_district,name',
             'living_county' => 'bail|exists:i_district,name',
-            'dingding' => 'bail|max:50',
+            'dingding' => 'bail|required|max:50',
             'department' => [
                 'bail',
                 function ($attribute, $value, $fail) {
@@ -566,8 +569,11 @@ class StaffController extends Controller
         ];
         $messages = [
             'realname.max' => '姓名长度不能超过 :max 个字',
+            'realname.required' => '姓名不能为空',
+            'mobile.required' => '手机号码不能为空',
             'mobile.unique' => '手机号码已经存在',
             'mobile.regex' => '手机号码不是一个有效的手机号',
+            'id_card_number.required' => '身份证不能为空',
             'id_card_number.max' => '身份证号码无效',
             'gender.in' => '性别填写错误只能有男、女、未知、三种',
             'brand.exists' => '品牌信息错误',
@@ -584,22 +590,20 @@ class StaffController extends Controller
             'living_province.exists' => '现居地址（省）不存在',
             'living_city.exists' => '现居地址（市）不存在',
             'living_county.exists' => '现居地址（区）不存在',
+            'dingding.required' => '钉钉编号不能为空',
         ];
         if (isset($value->staff_sn)) {
             $rules = array_merge($rules, [
                 'staff_sn' => 'bail|required|exists:staff,staff_sn',
-                'realname' => 'bail|required|string|max:10',
-                'dingding' => 'bail|required|max:50',
-                'mobile' => 'bail|required|unique:staff,mobile|regex:/^1[3456789][0-9]{9}$/',
-                'id_card_number' => 'bail|required|max:18',
+                'realname' => 'bail|string|max:10',
+                'dingding' => 'bail|max:50',
+                'mobile' => 'bail|unique:staff,mobile|regex:/^1[3456789][0-9]{9}$/',
+                'id_card_number' => 'bail|max:18',
             ]);
             $messages = array_merge($messages, [
                 'staff_sn.required' => '员工编号不能为空',
                 'staff_sn.exists' => '员工编号不正确',
-                'realname.required' => '姓名不能为空',
-                'dingding.required' => '钉钉编号不能为空',
-                'mobile.required' => '手机号码不能为空',
-                'id_card_number.required' => '身份证不能为空',
+                
             ]);
         }
 
