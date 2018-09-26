@@ -3,14 +3,11 @@
 namespace App\Http\Controllers\Api\Reimburse;
 
 use App\Http\Requests\Reimburse\PayRequest;
-use App\Models\Reimburse\Reimbursement;
 use App\Repositories\Reimburse\PayRepository;
 use App\Services\Reimburse\PayService;
 use App\Services\ResponseService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class PayController extends Controller

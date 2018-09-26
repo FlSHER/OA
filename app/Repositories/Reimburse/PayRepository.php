@@ -47,6 +47,7 @@ class PayRepository
         ];
         $data = Reimbursement::with($with)
             ->where($where)
+            ->where('payee_is_public', 0)
             ->whereIn('reim_department_id', $reimDepartmentIds)
             ->filterByQueryString()
             ->sortByQueryString()
