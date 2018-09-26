@@ -35,6 +35,17 @@ class PublicController extends Controller
         return $this->response->get($data);
     }
 
+    /**
+     * 获取导出列表
+     * @param Request $request
+     * @return mixed
+     */
+    public function exportIndex(Request $request)
+    {
+        $data = $this->publicRepository->getExportList($request);
+        return $this->response->get($data);
+    }
+
     public function toPrivate(Reimbursement $reimbursement)
     {
         if ($reimbursement->payee_is_public == 0) {
