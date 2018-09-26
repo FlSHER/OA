@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreStaffRequest extends FormRequest
+class UpdateStaffRequest extends FormRequest
 {
 
     /**
@@ -30,7 +30,7 @@ class StoreStaffRequest extends FormRequest
             'brand_id' => 'bail|required|exists:brands,id',
             'department_id' => 'bail|required|exists:departments,id',
             'position_id' => 'bail|required|exists:positions,id',
-            'mobile' => 'bail|required|unique:staff,mobile|regex:/^1[3456789][0-9]{9}$/',
+            'mobile' => 'bail|required|regex:/^1[3456789][0-9]{9}$/',
             'id_card_number' => 'bail|required|max:18',
             'gender_id' => 'bail|required|in:0,1,2',
             'remark' => 'bail|max:200',
@@ -82,7 +82,6 @@ class StoreStaffRequest extends FormRequest
             'position_id.required' => '职位不能为空',
             'position_id.exists' => '职位不存在',
             'mobile.required' => '手机号码不能为空',
-            'mobile.unique' => '手机号码已经存在',
             'mobile.regex' => '手机号码不是一个有效的手机号',
             'id_card_number.required' => '身份证不能为空',
             'id_card_number.max' => '身份证号码无效',

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\Resources;
 
 use Cache;
-use Encypt;
 use Validator;
 use App\Models\Brand;
 use App\Models\HR\Staff;
@@ -17,6 +16,7 @@ use Illuminate\Http\Request;
 use App\Models\HR\Department;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreStaffRequest;
+use App\Http\Requests\UpdateStaffRequest;
 use App\Http\Resources\HR\StaffResource;
 use App\Http\Requests\ImportStaffRequest;
 use App\Http\Resources\HR\StaffCollection;
@@ -66,9 +66,23 @@ class StaffController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreStaffRequest $request)
+    public function store(StoreStaffRequest $request, Staff $staff)
     {
-        //
+        $data = $request->all();
+        $staff->fill($data);
+
+        $info = new StaffInfo();
+        $info->fill($data);
+
+        return $staff->getConnection()->transaction(function () use ($staff, $info, $data) {
+            $staff->save();
+            $staff->info()->save($info);
+            $staff->relative()->attach($data['relatives']);
+
+            $staff->load(['relative', 'info', 'gender', 'position', 'department', 'brand', 'shop']);
+
+            return response()->json(new StaffResource($staff), 201);
+        });
     }
 
     /**
@@ -78,9 +92,24 @@ class StaffController extends Controller
      * @param  \App\Models\HR\Staff $staff
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Staff $staff)
+    public function update(UpdateStaffRequest $request, Staff $staff)
     {
-        //
+        $data = $request->all();
+        $staff->fill($data);
+
+        $info = $staff->info;
+        $info->fill($data);
+
+        return $staff->getConnection()->transaction(function () use ($staff, $info, $data) {
+            $staff->save();
+            $info->save();
+            $staff->relative()->detach();
+            $staff->relative()->attach($data['relatives']);
+
+            $staff->load(['relative', 'info', 'gender', 'position', 'department', 'brand', 'shop']);
+
+            return response()->json(new StaffResource($staff), 201);
+        });
     }
 
     /**
@@ -346,11 +375,7 @@ class StaffController extends Controller
             $staff= Staff::where('staff_sn', $value['staff_sn'])->first();
         } else {
             $staff = new Staff();
-            $salt = mt_rand(100000, 999999);
-            $staff->salt = $salt;
             $staff->hired_at = $value['hired_at'] ?? now();
-            $staff->username = $value['realname'];
-            $staff->password = Encypt::password(123456, $salt);
         }
         foreach ($value as $k => $v) {
             if (in_array($k, ['realname', 'mobile', 'shop_sn', 'birthday', 'dingding', 'wechat_number'])) {
