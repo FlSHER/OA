@@ -52,4 +52,35 @@ class PublicRepository
             ->withPagination();
         return $data;
     }
+
+    /**
+     * 获取导出列表
+     * @param $request
+     * @return mixed
+     */
+    public function getExportList($request)
+    {
+        $type = $request->query('type');
+        if (!($request->has('type') && in_array($type, ['paid', 'not_paid']))) {
+            abort(404, '请正确输入type类型');
+        }
+        if ($type == 'paid') {//已转账
+            $where = [
+                ['status_id', '=', 7]
+            ];
+        }
+        $with = [
+            'expenses' => function ($query) {
+                $query->where('is_audited', '=', 1);
+                $query->orderBy('date', 'asc');
+            },
+        ];
+        $data = Reimbursement::with($with)
+            ->where($where)
+            ->where('payee_is_public', 1)
+            ->filterByQueryString()
+            ->sortByQueryString()
+            ->get();
+        return $data;
+    }
 }

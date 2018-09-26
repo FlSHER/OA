@@ -29,6 +29,7 @@ Route::middleware('auth:api')->namespace('Api\Reimburse')->group(function () {
     Route::patch('/pay/reject', 'PayController@reject');//驳回 转账
 
     Route::get('/public', 'PublicController@index');//对公转账列表
+    Route::get('/public/export', 'PublicController@exportIndex');//对公转账导出
     Route::patch('/public/{reimbursement}/to-private', 'PublicController@toPrivate');//转为对私
 
     Route::get('/print/{id}', 'PrintController@index');//获取报销打印数据
