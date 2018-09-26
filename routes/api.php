@@ -50,7 +50,7 @@ Route::any('/dingtalk/approval_callback', ['uses' => 'Api\DingtalkController@app
 
 Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
     Route::namespace('Resources')->group(function () {
-        Route::apiResource('staff', 'StaffController');
+        // Route::apiResource('staff', 'StaffController');
         Route::apiResource('departments', 'DepartmentController');
         Route::group(['prefix' => 'departments/{department}'], function () {
             Route::get('children-and-staff', 'DepartmentController@getChildrenAndStaff');
@@ -73,6 +73,26 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
     Route::namespace('Resources')->group(function () {
         // staff router
         Route::group(['prefix' => 'staff', 'as' => '.staff'], function () {
+
+            // 获取员工列表
+            // /api/staff
+            Route::get('/', 'StaffController@index');
+
+            // 添加单个员工
+            // /api/staff
+            Route::post('/', 'StaffController@store');
+
+            // 编辑单个员工
+            // /api/staff/:staff
+            Route::patch('{staff}', 'StaffController@update')->where(['staff' => '[0-9]+']);
+
+            // 获取单个员工
+            // /api/staff/:staff
+            Route::get('{staff}', 'StaffController@show')->where(['staff' => '[0-9]+']);
+
+            // 软删除单个员工.
+            // /api/staff/:staff
+            Route::delete('{staff}', 'StaffController@destroy')->where(['staff' => '[0-9]+']);
 
             // 员工批量导入
             // /api/staff/import
@@ -100,7 +120,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             Route::post('/', 'DepartmentController@store');
 
             // 编辑部门
-            // patch /api/department
+            // patch /api/department/:department
             Route::patch('{department}', 'DepartmentController@update')->where(['department' => '[0-9]+']);
 
             // 获取单个部门详情

@@ -17,9 +17,10 @@ class StaffCollection extends ResourceCollection
     public function toArray($request)
     {
         return $this->collection->map(function ($staff) {
-            return [
+            $baseStaff = [
                 'staff_sn' => $staff->staff_sn,
                 'realname' => $staff->realname,
+                'username' => $staff->username,
                 'mobile' => $staff->mobile,
                 'brand_id' => $staff->brand_id,
                 'brand' => $staff->brand->only(['id', 'name']),
@@ -35,13 +36,16 @@ class StaffCollection extends ResourceCollection
                 'employed_at' => $staff->employed_at,
                 'left_at' => $staff->left_at,
                 'gender_id' => $staff->gender_id,
-//                'gender' => $staff->gender,
+                'gender' => $staff->gender,
                 'birthday' => $staff->birthday,
                 'property' => $staff->property,
-                'education' => $staff->info->education,
-                'relatives' => $staff->relative,
                 'dingtalk_number' => $staff->dingding,
+                'wechat_number' => $staff->wechat_number,
+                'is_active' => $staff->is_active,
+                'relatives' => $staff->relative ? new StaffRelativeCollection($this->relative) : [],
             ];
+
+            return array_merge($baseStaff, $staff->info->toArray());
         })->toArray();
     }
 }
