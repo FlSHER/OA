@@ -21,7 +21,7 @@ class CheckAuditedController extends Controller
      * 获取全部已审核列表数据
      * @param Request $request
      */
-    public function index(Request $request)
+    public function index()
     {
         $with = [
             'expenses' => function ($query) {
@@ -30,13 +30,12 @@ class CheckAuditedController extends Controller
             },
             'expenses.bills'
         ];
-        $data = Reimbursement::with('reim_department')
-            ->with($with)
+        $data = Reimbursement::with($with)
             ->where('status_id', '>=', 4)
             ->filterByQueryString()
             ->sortByQueryString()
             ->withPagination();
-        $this->response->get($data);
+        return $this->response->get($data);
     }
 
     /**
