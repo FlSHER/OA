@@ -42,7 +42,7 @@ class StaffCollection extends ResourceCollection
                 'dingtalk_number' => $staff->dingding,
                 'wechat_number' => $staff->wechat_number,
                 'is_active' => $staff->is_active,
-                'relatives' => $staff->relative ? new StaffRelativeCollection($this->relative) : [],
+                'relatives' => $staff->relative ? new StaffRelativeCollection($staff->relative) : [],
             ];
 
             return array_merge($baseStaff, $staff->info->toArray());
