@@ -120,6 +120,8 @@ class StaffController extends Controller
      */
     public function show(Staff $staff)
     {
+        $staff->load(['relative', 'info', 'gender', 'position', 'department', 'brand', 'shop']);
+
         return new StaffResource($staff);
     }
 
@@ -131,8 +133,21 @@ class StaffController extends Controller
      */
     public function destroy(Staff $staff)
     {
-        $staff->delete();
+        \DB::beginTransaction();
 
+        try {
+
+            $staff->delete();
+            $staff->info()->delete();
+
+            \DB::commit();
+
+        } catch (\Exception $e) {
+
+            \DB::rollBack();
+
+            return response()->json(['message' => '服务器错误，删除失败'], 500);
+        }
         return response()->json(null, 204);
     }
 
