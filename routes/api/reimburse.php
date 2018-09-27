@@ -20,7 +20,7 @@ Route::middleware('auth:api')->namespace('Api\Reimburse')->group(function () {
     Route::post('/deliver', 'DeliverController@store');//转交处理
 
     Route::get('/audited', 'CheckAuditedController@index');//全部已审核单列表
-    Route::get('/audited/{id}', 'CheckAuditedController@show');//全部已审核单详情
+    Route::get('/audited/export', 'CheckAuditedController@exportIndex');//导出
     Route::patch('/withdraw/{reimbursement}', 'CheckAuditedController@withdraw');//撤回已审核单
 
     Route::get('/pay', 'PayController@index');//转账列表

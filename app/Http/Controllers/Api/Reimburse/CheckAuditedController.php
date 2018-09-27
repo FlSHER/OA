@@ -38,21 +38,19 @@ class CheckAuditedController extends Controller
         return $this->response->get($data);
     }
 
-    /**
-     * 全部已审核详情
-     * @param $id
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
-     */
-    public function show($id)
+    public function exportIndex()
     {
-        //模型条件（查询审批通过的单 is_approved =1的）
-        $expensesWhere = [
+        $with = [
             'expenses' => function ($query) {
                 $query->where('is_audited', '=', 1);
                 $query->orderBy('date', 'asc');
-            }
+            },
         ];
-        $data = Reimbursement::with('expenses.type', 'expenses.bills')->with($expensesWhere)->find($id);
+        $data = Reimbursement::with($with)
+            ->where('status_id', '>=', 4)
+            ->filterByQueryString()
+            ->sortByQueryString()
+            ->get();
         return $this->response->get($data);
     }
 
