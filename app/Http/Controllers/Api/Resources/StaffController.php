@@ -70,6 +70,7 @@ class StaffController extends Controller
     {
         $data = $request->all();
         $staff->fill($data);
+        $staff->hired_at = $data['hired_at'] ?? now();
 
         $info = new StaffInfo();
         $info->fill($data);
@@ -103,8 +104,10 @@ class StaffController extends Controller
         return $staff->getConnection()->transaction(function () use ($staff, $info, $data) {
             $staff->save();
             $info->save();
-            $staff->relative()->detach();
-            $staff->relative()->attach($data['relatives']);
+            if (isset($data['relatives'])) {
+                $staff->relative()->detach();
+                $staff->relative()->attach($data['relatives']);
+            }
 
             $staff->load(['relative', 'info', 'gender', 'position', 'department', 'brand', 'shop']);
 

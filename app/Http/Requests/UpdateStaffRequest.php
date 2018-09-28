@@ -30,9 +30,9 @@ class UpdateStaffRequest extends FormRequest
             'brand_id' => 'bail|required|exists:brands,id',
             'department_id' => 'bail|required|exists:departments,id',
             'position_id' => 'bail|required|exists:positions,id',
-            'mobile' => 'bail|required|regex:/^1[3456789][0-9]{9}$/',
-            'id_card_number' => 'bail|required|max:18',
-            'gender_id' => 'bail|required|in:0,1,2',
+            'mobile' => 'bail|regex:/^1[3456789][0-9]{9}$/',
+            'id_card_number' => 'bail|max:18',
+            'gender_id' => 'bail|in:0,1,2',
             'remark' => 'bail|max:200',
             'operation_remark' => 'bail|max:100',
             'education' => 'bail|exists:i_education,name',
@@ -60,8 +60,8 @@ class UpdateStaffRequest extends FormRequest
             'email' => 'bail|email',
             'height' => 'bail|integer|between:140,220',
             'weight' => 'bail|integer|between:30,150',
-            'status_id' => 'bail|required|in:1,2,3,-1,-2,-3,-4',
-            'hired_at' => 'bail|required|date',
+            'status_id' => 'bail|in:1,2,3,-1,-2,-3,-4',
+            'operate_at' => 'bail|required|date',
         ];
     }
 
@@ -81,11 +81,11 @@ class UpdateStaffRequest extends FormRequest
             'department_id.exists' => '所属部门不存在',
             'position_id.required' => '职位不能为空',
             'position_id.exists' => '职位不存在',
-            'mobile.required' => '手机号码不能为空',
+            // 'mobile.required' => '手机号码不能为空',
             'mobile.regex' => '手机号码不是一个有效的手机号',
-            'id_card_number.required' => '身份证不能为空',
+            // 'id_card_number.required' => '身份证不能为空',
             'id_card_number.max' => '身份证号码无效',
-            'gender_id.required' => '性别不能为空',
+            // 'gender_id.required' => '性别不能为空',
             'gender_id.in' => '性别填写错误',
             'remark.max' => '员工备注不能超过 :max 个字',
             'operation_remark.max' => '操作备注不能超过 :max 个字',
@@ -106,9 +106,9 @@ class UpdateStaffRequest extends FormRequest
             'email.email' => '电子邮箱格式错误',
             'height.between' => '身高输入范围为 :min - :max cm',
             'weight.between' => '体重输入范围为 :min - :max kg',
-            'status_id.required' => '人员状态不能为空',
+            // 'status_id.required' => '人员状态不能为空',
             'status_id.in' => '人员状态填写错误',
-            'hired_at.required' => '执行时间不能为空',
+            'operate_at.required' => '执行时间不能为空',
         ];
     }
 

@@ -61,7 +61,7 @@ class StoreStaffRequest extends FormRequest
             'height' => 'bail|integer|between:140,220',
             'weight' => 'bail|integer|between:30,150',
             'status_id' => 'bail|required|in:1,2,3,-1,-2,-3,-4',
-            'hired_at' => 'bail|required|date',
+            'operate_at' => 'bail|required|date',
         ];
     }
 
@@ -109,7 +109,7 @@ class StoreStaffRequest extends FormRequest
             'weight.between' => '体重输入范围为 :min - :max kg',
             'status_id.required' => '人员状态不能为空',
             'status_id.in' => '人员状态填写错误',
-            'hired_at.required' => '执行时间不能为空',
+            'operate_at.required' => '执行时间不能为空',
         ];
     }
 
