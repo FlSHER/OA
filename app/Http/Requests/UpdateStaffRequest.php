@@ -27,9 +27,9 @@ class UpdateStaffRequest extends FormRequest
     {
         return [
         	'realname' => 'bail|required|string|max:10',
-            'brand_id' => 'bail|required|exists:brands,id',
-            'department_id' => 'bail|required|exists:departments,id',
-            'position_id' => 'bail|required|exists:positions,id',
+            'brand_id' => 'bail|exists:brands,id',
+            'department_id' => 'bail|exists:departments,id',
+            'position_id' => 'bail|exists:positions,id',
             'mobile' => 'bail|regex:/^1[3456789][0-9]{9}$/',
             'id_card_number' => 'bail|max:18',
             'gender_id' => 'bail|in:0,1,2',
@@ -75,11 +75,11 @@ class UpdateStaffRequest extends FormRequest
         return [
 			'realname.max' => '姓名长度不能超过 :max 个字',
             'realname.required' => '姓名不能为空',
-            'brand_id.required' => '所属品牌不能为空',
+            // 'brand_id.required' => '所属品牌不能为空',
             'brand_id.exists' => '所属品牌不存在',
-            'department_id.required' => '所属部门不能为空',
+            // 'department_id.required' => '所属部门不能为空',
             'department_id.exists' => '所属部门不存在',
-            'position_id.required' => '职位不能为空',
+            // 'position_id.required' => '职位不能为空',
             'position_id.exists' => '职位不存在',
             // 'mobile.required' => '手机号码不能为空',
             'mobile.regex' => '手机号码不是一个有效的手机号',
