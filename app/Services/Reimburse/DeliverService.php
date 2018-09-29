@@ -46,7 +46,7 @@ class DeliverService
      */
     public function afterApprove($reimbursement)
     {
-         $this->vicePresidentApprove($reimbursement);
+        $this->vicePresidentApprove($reimbursement);
     }
 
     /**
@@ -75,6 +75,7 @@ class DeliverService
         } catch (\Exception $e) {
             DB::connection('reimburse_mysql')->rollBack();
             $this->reimbursementRollback($reimbursement);//审核失败数据回滚到待审状态
+            throw $e;
         }
     }
 
@@ -91,10 +92,10 @@ class DeliverService
             $managerName = $reimbursement->reim_department->manager_name;//资金归属管理人员工名字
             $callback = config("reimburse.manager_callback");
             $dingApproveSn = [];
-            if(($managerSn == $this->financeOfficerSn || $reimbursement->audited_cost <= 5000) && $managerSn == $approverSn){
+            if (($managerSn == $this->financeOfficerSn || $reimbursement->audited_cost <= 5000) && $managerSn == $approverSn) {
                 $reimbursement->status_id = 6;
                 $reimbursement->process_instance_id = 'skip_' . $reimbursement->reim_sn;
-            }elseif ($managerSn == $this->financeOfficerSn || $managerSn == $approverSn) {
+            } elseif ($managerSn == $this->financeOfficerSn || $managerSn == $approverSn) {
                 $dingApproveSn = [$this->financeOfficerSn];
                 $reimbursement->finance_approved_sn = $managerSn;
                 $reimbursement->finance_approved_name = $managerName;
@@ -104,7 +105,7 @@ class DeliverService
                 $reimbursement->manager_sn = $managerSn;
                 $reimbursement->manager_name = $managerName;
                 if ($reimbursement->audited_cost >= 5000) {
-                    array_push($dingApproveSn,$this->financeOfficerSn);
+                    array_push($dingApproveSn, $this->financeOfficerSn);
                     $reimbursement->finance_approved_sn = $this->financeOfficerSn;
                     $reimbursement->finance_approved_name = $this->financeOfficerName;
                 }
@@ -124,6 +125,7 @@ class DeliverService
         } catch (\Exception $e) {
             DB::connection('reimburse_mysql')->rollBack();
             $this->reimbursementRollback($reimbursement);//审核失败数据回滚到待审状态
+            throw $e;
         }
     }
 
@@ -195,11 +197,11 @@ class DeliverService
                     $approveSn = [$managerSn];
                     if ($managerSn != $this->financeOfficerSn) {
                         //品牌副总不是郭娟 添加郭娟审批 110085
-                        array_push($approveSn,$this->financeOfficerSn);
+                        array_push($approveSn, $this->financeOfficerSn);
                     }
 
                     $processInstanceId = app('Dingtalk')->startApprovalAndRecord($this->appId, $this->batchProcessCode, $approveSn, $formData, $callback);
-                    DB::connection('reimburse_mysql')->transaction(function () use ($value, $reim, $processInstanceId,$approveSn) {
+                    DB::connection('reimburse_mysql')->transaction(function () use ($value, $reim, $processInstanceId, $approveSn) {
                         $ids = array_keys($reim);//审核要审批的ID
                         $saveData = [
                             'process_instance_id' => $processInstanceId,
@@ -210,7 +212,7 @@ class DeliverService
                             'second_rejected_at' => null,
                             'second_reject_remarks' => null,
                         ];
-                        if(count($approveSn)>1){
+                        if (count($approveSn) > 1) {
                             $saveData['finance_approved_sn'] = $this->financeOfficerSn;
                             $saveData['finance_approved_name'] = $this->financeOfficerName;
                         }
