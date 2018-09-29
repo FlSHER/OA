@@ -15,7 +15,7 @@ class PayRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return app('Authority')->checkAuthority(134) || app('Authority')->checkAuthority(194);
     }
 
     /**
@@ -33,7 +33,10 @@ class PayRequest extends FormRequest
                     'required',
                     Rule::exists('reimburse_mysql.reimbursements', 'id')
                         ->where('status_id', 6)
-                        ->whereIn('reim_department_id', $payRepository->getCashierReimDepartmentAuthority())
+                        ->where(function ($query) use ($payRepository) {
+                            $query->whereIn('reim_department_id', $payRepository->getCashierReimDepartmentAuthority())
+                                ->orWhere('payee_is_public', 1);
+                        })
                         ->whereNull('deleted_at')
                 ]
             ];
@@ -44,7 +47,10 @@ class PayRequest extends FormRequest
                 'required',
                 Rule::exists('reimburse_mysql.reimbursements')
                     ->where('status_id', 6)
-                    ->whereIn('reim_department_id', $payRepository->getCashierReimDepartmentAuthority())
+                    ->where(function ($query) use ($payRepository) {
+                        $query->whereIn('reim_department_id', $payRepository->getCashierReimDepartmentAuthority())
+                            ->orWhere('payee_is_public', 1);
+                    })
                     ->whereNull('deleted_at')
             ]
         ];
