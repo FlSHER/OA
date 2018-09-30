@@ -108,7 +108,7 @@ class StaffController extends Controller
                 $staff->relative()->detach();
                 $staff->relative()->attach($data['relatives']);
             }
-
+            
             $staff->load(['relative', 'info', 'gender', 'position', 'department', 'brand', 'shop']);
 
             return response()->json(new StaffResource($staff), 201);
@@ -404,7 +404,7 @@ class StaffController extends Controller
             }
             if ($v && $k === 'department') {
                 $name = $v;
-                if (strpos('-', $v) !== false) {
+                if (strpos($v, '-') !== false) {
                     $department = explode('-', $v);
                     $name = end($department);
                 }
