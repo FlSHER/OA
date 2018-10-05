@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Resources;
 
+use App\Models\HR\Staff;
 use App\Models\HR\Position;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -40,12 +41,13 @@ class PositionController extends Controller
     {
         $rules = [
             'name' => 'required|unique:positions',
-            'level' => 'required',
+            'level' => 'required|integer|max:100',
         ];
         $message = [
             'name.required' => '职位名称不能为空',
             'name.unique' => '职位名称已存在',
-            'level.required' => '职级不能为空', 
+            'level.required' => '职级不能为空',
+            'level.max' => '职级不能大于 :max',
         ]; 
         $this->validate($request, $rules, $message);
         $data = $request->all();
@@ -120,6 +122,10 @@ class PositionController extends Controller
      */
     public function destroy(Position $position)
     {
+        $hasStaff = $position->staffs->isNotEmpty();
+        if ($hasStaff) {
+            return response()->json(['message' => '有在职员工使用的职位不能删除'], 422);
+        }
         $position->getConnection()->transaction(function () use ($position) {
             $position->brand()->detach();
             $position->delete();

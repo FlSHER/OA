@@ -49,4 +49,9 @@ class Position extends Model
     }
 
     /* ----- 本地作用域 End ----- */
+
+    public function staffs()
+    {
+        return $this->hasMany(Staff::class, 'position_id');
+    }
 }
