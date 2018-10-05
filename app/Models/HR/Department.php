@@ -15,9 +15,17 @@ class Department extends Model
 
     protected $guarded = ['id', 'manager_name'];
 
+    protected $fillable = [
+        'name',
+        'brand_id',
+        'manager_sn',
+        'manager_name',
+        'parent_id'
+    ];
+
     /* ----- 定义关联Start ----- */
 
-    public function parent()
+    public function _parent()
     { //上级部门
         return $this->belongsTo('App\Models\Department', 'parent_id');
     }

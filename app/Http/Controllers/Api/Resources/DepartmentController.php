@@ -22,6 +22,7 @@ class DepartmentController extends Controller
         $list = Department::query()
             ->filterByQueryString()
             ->sortByQueryString()
+            ->orderBy('sort')
             ->withPagination();
 
         if (isset($list['data'])) {
@@ -43,21 +44,17 @@ class DepartmentController extends Controller
     {
         $rules = [
             'name' => ['required', 'unique:departments'],
-            'staff_name' => ['required', 'exists:staff,realname'],
+            'manager_name' => ['required', 'exists:staff,realname'],
         ];
         $messages = [
             'name.required' => '部门名称不能为空',
             'name.unique' => '部门名称已存在',
-            'staff_name.required' => '部门负责人必填',
-            'staff_name.exists' => '部门负责人不存在',
+            'manager_name.required' => '部门负责人必填',
+            'manager_name.exists' => '部门负责人不存在',
         ];
         $this->validate($request, $rules, $messages);
-        $department = new Department;
-        $department->name = $request->name;
-        $department->brand_id = $request->brand_id;
-        $department->manager_sn = $request->staff_sn;
-        $department->manager_name = $request->staff_name;
-        $department->parent_id = $request->parent_id ? : 0;
+        $department = new Department();
+        $department->fill($request->all());
         $department->save();
 
         return response()->json($department, 201);
@@ -140,5 +137,22 @@ class DepartmentController extends Controller
     public function getStaff(Department $department)
     {
         return new StaffCollection($department->staff()->working()->get());
+    }
+
+    /**
+     * 部门拖动排序
+     *
+     * @return mixed 
+     */
+    public function sortBy(Request $request, Department $department)
+    {
+        dd($request->all());
+        $this->validate($request, [
+            'new_data.*.name' => 'bail|required|string',
+            'new_data.*.sort' => 'bail|required|numeric',
+        ], [
+            'new_data.*.name.required' => '部门名称不能为空',
+            'new_data.*.sort.required' => '部门排序值不能为空',
+        ]);
     }
 }
