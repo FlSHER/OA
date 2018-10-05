@@ -220,7 +220,7 @@ class StaffController extends Controller
                 $item->info->id_card_number,
                 $item->gender->name,
                 $item->brand->name,
-                $item->cost_brands->implode('name', ','),
+                $item->cost_brands->implode('name', '/'),
                 $item->department->name,
                 $item->shop_sn,
                 $item->position->name,
@@ -278,16 +278,15 @@ class StaffController extends Controller
             $data[$key+1] = [
                 $item->staff_sn,
                 $item->realname,
-                $item->mobile,
                 $item->gender->name,
                 $item->brand->name,
+                $item->cost_brands->implode('name', '/'),
                 $item->shop_sn,
                 $item->department->name,
                 $item->position->name,
                 $item->status->name,
                 $item->birthday,
                 $item->wechat_number,
-                $item->dingding,
             ];
         });
         
@@ -306,29 +305,21 @@ class StaffController extends Controller
             return $this->createStaffs($request);
         }
         $data = $this->combineImportData($request);
-        try {
-            \DB::beginTransaction();
 
-            foreach ($data as $key => $value) {
-                $validator = $this->makeValidator($value);
-                if ($validator->fails()) {
-                    return response()->json([
-                        'message' =>  "导入失败第 {$key} 条数据错误", 
-                        'errors' => $validator->errors(),
-                    ], 422);
-                }
-                $staff = $this->makeFillStaff($value);
-                $staff->save();
-
-                // 员工信息更新
-                $staffInfo = $this->makeFillStaffInfo($value);
-                $staffInfo->save();
+        foreach ($data as $key => $value) {
+            $validator = $this->makeValidator($value);
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' =>  "导入失败第 {$key} 条数据错误", 
+                    'errors' => $validator->errors(),
+                ], 422);
             }
-            \DB::commit();
-        } catch (Exception $e) {
-            \DB::rollBack();
+            $staff = $this->makeFillStaff($value);
+            $staff->save();
 
-            return response()->json(['message' => '数据错误，更新失败'], 500);
+            // 员工信息更新
+            $staffInfo = $this->makeFillStaffInfo($value);
+            $staffInfo->save();
         }
 
         return response()->json(['message' => '更新成功'], 201);
@@ -343,39 +334,30 @@ class StaffController extends Controller
     public function createStaffs(Request $request)
     {
         $data = $this->combineImportData($request);
-        try {
-            \DB::beginTransaction();
 
-            foreach ($data as $key => $value) {
-                $validator = $this->makeValidator($value);
-                if ($validator->fails()) {
-                    return response()->json([
-                        'message' =>  "导入失败第 {$key} 条数据错误", 
-                        'errors' => $validator->errors(),
-                    ], 422);
-                }
-                // 转化数据字段
-                $staff = $this->makeFillStaff($value);
-                $staff->save();
-
-                // 关联数据表操作
-                $staffInfo = $this->makeFillStaffInfo($value);
-                $staffInfo->staff_sn = $staff->staff_sn;
-                $staffInfo->save();
-
-                // 费用品牌
-                if (isset($value['cost_brand'])) {
-                    $cost = explode('/', $value['cost_brand']);
-                    $costIds = CostBrand::whereIn('name', $cost)->pluck('id')->toArray();
-                    $staff->cost_brands()->attach($costIds);
-                }
+        foreach ($data as $key => $value) {
+            $validator = $this->makeValidator($value);
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' =>  "导入失败第 {$key} 条数据错误", 
+                    'errors' => $validator->errors(),
+                ], 422);
             }
+            // 转化数据字段
+            $staff = $this->makeFillStaff($value);
+            $staff->save();
 
-            \DB::commit();
-        } catch(Exception $e) {
-            \DB::rollback();
+            // 关联数据表操作
+            $staffInfo = $this->makeFillStaffInfo($value);
+            $staffInfo->staff_sn = $staff->staff_sn;
+            $staffInfo->save();
 
-            return response()->json(['message' => '数据错误，导入失败'], 500);
+            // 费用品牌
+            if (isset($value['cost_brand'])) {
+                $cost = explode('/', $value['cost_brand']);
+                $costIds = CostBrand::whereIn('name', $cost)->pluck('id')->toArray();
+                $staff->cost_brands()->attach($costIds);
+            }
         }
 
         return response()->json(['message' => '导入成功'], 201);
