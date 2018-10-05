@@ -107,6 +107,11 @@ class DepartmentController extends Controller
      */
     public function destroy(Department $department)
     {
+        $hasStaff = $department->staff->isNotEmpty();
+        if ($hasStaff) {
+            return response()->json(['message' => '有在职员工使用的部门不能删除'], 422);
+        }
+
         $department->delete();
 
         return response()->json(null, 204);

@@ -47,9 +47,9 @@ class Brand extends Model
         $query->whereIn('id', $brands);
     }
 
-    public function scopeApi($query)
+    public function staffs()
     {
-
+        return $this->hasMany(Staff::class, 'brand_id');
     }
 
     /* ----- 本地作用域 End ----- */
