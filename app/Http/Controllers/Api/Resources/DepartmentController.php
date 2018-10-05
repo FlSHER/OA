@@ -144,9 +144,8 @@ class DepartmentController extends Controller
      *
      * @return mixed 
      */
-    public function sortBy(Request $request, Department $department)
+    public function sortBy(Request $request)
     {
-        dd($request->all());
         $this->validate($request, [
             'new_data.*.name' => 'bail|required|string',
             'new_data.*.sort' => 'bail|required|numeric',
@@ -154,5 +153,18 @@ class DepartmentController extends Controller
             'new_data.*.name.required' => '部门名称不能为空',
             'new_data.*.sort.required' => '部门排序值不能为空',
         ]);
+
+        $departments = Department::get();
+        $data = $request->input('new_data', []);
+        foreach ($data as $key => $val) {
+            $isUpdate = $departments->filter(function ($item) use ($val) {
+                return $item->id === $val['id'] && $item->sort !== $val['sort'];
+            });
+            if ($isUpdate->isNotEmpty()) {
+                Department::where('id', $val['id'])->update(['sort' => $val['sort']]);
+            }
+        }
+
+        return response()->json(['message' => '操作成功'], 201);
     }
 }

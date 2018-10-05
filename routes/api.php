@@ -115,6 +115,10 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             // get /api/department/tree
             Route::get('tree', 'DepartmentController@tree');
 
+            // 部门排序
+            // get /api/department/sort
+            Route::patch('sort', 'DepartmentController@sortBy');
+
             // 添加部门
             // post /api/department
             Route::post('/', 'DepartmentController@store');
