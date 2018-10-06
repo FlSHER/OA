@@ -44,7 +44,7 @@ class NormalLoginForm extends Component {
                             <FormItem>
                                 {/*<a style={{float: 'right'}} href="">忘记密码</a>*/}
                                 <Button type="primary" size="large" htmlType="submit" style={{width: '100%'}}>
-                                    登 录
+                                    确 认
                                 </Button>
 
                             </FormItem>
