@@ -27,6 +27,7 @@ class RoleCollection extends ResourceCollection
                 'staff' => $staff,
                 'brand' => $item->brand,
                 'department' => $item->department,
+                'authority' => $item->authority,
             ];
         })->toArray();
     }

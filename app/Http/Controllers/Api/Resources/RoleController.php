@@ -18,7 +18,7 @@ class RoleController extends Controller
     public function index(Request $request)
     {
         $roles = Role::query()
-            ->with('staff', 'brand', 'department')
+            ->with('staff', 'brand', 'department', 'authority')
             ->filterByQueryString()
             ->withPagination();
 
@@ -45,8 +45,12 @@ class RoleController extends Controller
 
         return $role->getConnection()->transaction(function () use ($role, $data) {
             $role->save();
-            $role->brand()->attach($data['brand']);
-            $role->department()->attach($data['department']);
+            if (!empty($data['brand'])) {
+                $role->brand()->attach($data['brand']);
+            }
+            if (!empty($data['department'])) {
+                $role->department()->attach($data['department']);
+            }
             
             $role->load([
                 'staff' => function ($query) {
@@ -108,10 +112,26 @@ class RoleController extends Controller
 
         return $role->getConnection()->transaction(function () use ($role, $data) {
             $role->save();
-            $role->brand()->detach();
-            $role->brand()->attach($data['brand']);
-            $role->department()->detach();
-            $role->department()->attach($data['department']);
+
+            if (!empty($data['brand'])) {
+                $role->brand()->detach();
+                $role->brand()->attach($data['brand']);
+            }
+
+            if (!empty($data['department'])) {
+                $role->department()->detach();
+                $role->department()->attach($data['department']);
+            }
+
+            if (!empty($data['authority'])) {
+                $role->authority()->detach();
+                $role->authority()->attach($data['authority']);
+            }
+            
+            if (!empty($data['staff'])) {
+                $role->staff()->detach();
+                $role->staff()->attach($data['staff']);
+            }
 
             $role->load([
                 'staff' => function ($query) {
@@ -122,6 +142,9 @@ class RoleController extends Controller
                 },
                 'brand' => function ($query) {
                     $query->select('id', 'name');
+                },
+                'authority' => function ($query) {
+                    $query->select('id', 'auth_name');
                 },
             ]);
 
