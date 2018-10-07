@@ -205,10 +205,12 @@ class StaffController extends Controller
             $district->map(function ($city, $ck) use (&$temp) {
                 $temp[$city->id] = $city;
             });
-            $makeCity = [
+            $makeHouseholdCity = [
                 $district->contains($item->info->household_province_id) ? $temp[$item->info->household_province_id]['name'] : '',
                 $district->contains($item->info->household_city_id) ? $temp[$item->info->household_city_id]['name'] : '',
                 $district->contains($item->info->household_county_id) ? $temp[$item->info->household_county_id]['name'] : '',
+            ];
+            $makeLivingCity = [
                 $district->contains($item->info->living_province_id) ? $temp[$item->info->living_province_id]['name'] : '',
                 $district->contains($item->info->living_city_id) ? $temp[$item->info->living_city_id]['name'] : '',
                 $district->contains($item->info->living_county_id) ? $temp[$item->info->living_county_id]['name'] : '',
@@ -228,7 +230,7 @@ class StaffController extends Controller
                 $item->info->account_number,
                 $item->info->account_name,
                 $item->info->account_bank,
-                $item->created_at->toDateTimeString(),
+                $item->hired_at,
                 $item->birthday,
                 $item->info->national,
                 $item->info->qq_number,
@@ -239,21 +241,13 @@ class StaffController extends Controller
                 $item->info->marital_status,
                 $item->info->height,
                 $item->info->weight,
-                $makeCity[0],
-                $makeCity[1],
-                $makeCity[2],
-                $item->info->household_address,
-                $makeCity[3],
-                $makeCity[4],
-                $makeCity[5],
-                $item->info->living_address,
+                implode(' ', $makeHouseholdCity).' '.$item->info->household_address,
+                implode(' ', $makeLivingCity).' '.$item->info->living_address,
                 $item->info->native_place,
                 $item->info->concat_name,
                 $item->info->concat_tel,
                 $item->info->concat_type,
                 $item->info->remark,
-                $item->dingding,
-                '操作备注',
             ]; 
         });
         
@@ -286,7 +280,6 @@ class StaffController extends Controller
                 $item->position->name,
                 $item->status->name,
                 $item->birthday,
-                $item->wechat_number,
             ];
         });
         
