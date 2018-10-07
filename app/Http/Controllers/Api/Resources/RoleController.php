@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Api\Resources;
 
-use App\Http\Resources\RoleCollection;
 use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\RoleCollection;
 
 class RoleController extends Controller
 {
@@ -16,7 +17,11 @@ class RoleController extends Controller
      */
     public function index(Request $request)
     {
-        $roles = Role::filterByQueryString()->withPagination($request->get('pagesize', 10));
+        $roles = Role::query()
+            ->with('staff', 'brand', 'department')
+            ->filterByQueryString()
+            ->withPagination();
+
         return new RoleCollection($roles);
     }
 
@@ -26,9 +31,37 @@ class RoleController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Role $role)
     {
-        //
+        $this->validate($request, [
+            'role_name' => 'required|unique:roles|max:10',
+        ],[
+            'role_name.required' => '角色名称不能为空',
+            'role_name.unique' => '角色名称已存在',
+            'role_name.max' => '角色名称不能超过 :max 个字',
+        ]);
+        $data = $request->all();
+        $role->role_name = $data['role_name'];
+
+        return $role->getConnection()->transaction(function () use ($role, $data) {
+            $role->save();
+            $role->brand()->attach($data['brand']);
+            $role->department()->attach($data['department']);
+            
+            $role->load([
+                'staff' => function ($query) {
+                    $query->select('staff.staff_sn', 'staff.realname');
+                }, 
+                'department' => function ($query) {
+                    $query->select('id', 'name');
+                },
+                'brand' => function ($query) {
+                    $query->select('id', 'name');
+                },
+            ]);
+
+            return response()->json($role, 201);
+        });
     }
 
     /**
@@ -39,7 +72,19 @@ class RoleController extends Controller
      */
     public function show(Role $role)
     {
-        //
+        $role->load([
+            'staff' => function ($query) {
+                $query->select('staff.staff_sn', 'staff.realname');
+            },  
+            'department' => function ($query) {
+                return $query->select('id', 'name');
+            },
+            'brand' => function ($query) {
+                return $query->select('id', 'name');
+            },
+        ]);
+
+        return response()->json($role, 200);
     }
 
     /**
@@ -51,7 +96,37 @@ class RoleController extends Controller
      */
     public function update(Request $request, Role $role)
     {
-        //
+        $this->validate($request, [
+            'role_name' => ['required', Rule::unique('roles')->ignore($role->id), 'max:10'],
+        ],[
+            'role_name.required' => '角色名称不能为空',
+            'role_name.unique' => '角色名称已存在',
+            'role_name.max' => '角色名称不能超过 :max 个字',
+        ]);
+        $data = $request->all();
+        $role->role_name = $data['role_name'];
+
+        return $role->getConnection()->transaction(function () use ($role, $data) {
+            $role->save();
+            $role->brand()->detach();
+            $role->brand()->attach($data['brand']);
+            $role->department()->detach();
+            $role->department()->attach($data['department']);
+
+            $role->load([
+                'staff' => function ($query) {
+                    $query->select('staff.staff_sn', 'staff.realname');
+                }, 
+                'department' => function ($query) {
+                    $query->select('id', 'name');
+                },
+                'brand' => function ($query) {
+                    $query->select('id', 'name');
+                },
+            ]);
+
+            return response()->json($role, 201);
+        });
     }
 
     /**
@@ -62,6 +137,14 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
-        //
+        return $role->getConnection()->transaction(function () use ($role) {
+            $role->delete();
+            $role->staff()->detach();
+            $role->brand()->detach();
+            $role->authority()->detach();
+            $role->department()->detach();
+
+            return response()->json(null, 204);
+        });
     }
 }

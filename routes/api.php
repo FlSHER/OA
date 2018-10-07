@@ -219,5 +219,25 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             // /api/authorities/:authority
             Route::delete('{authority}', 'RbacController@destroy')->where(['authority' => '[0-9]+']);
         });
+
+        //role router
+        Route::group(['prefix' => 'roles', 'as' => '.roles'], function () {
+
+            // 角色列表
+            // /api/roles
+            Route::get('/', 'RoleController@index');
+
+            // 创建角色
+            // /api/roles/:role
+            Route::post('/', 'RoleController@store');
+
+            // 编辑角色
+            // /api/roles
+            Route::patch('{role}', 'RoleController@update')->where(['role' => '[0-9]+']);
+
+            // 删除角色
+            // /api/roles/:role
+            Route::delete('{role}', 'RoleController@destroy')->where(['role' => '[0-9]+']);
+        });
     });
 });
