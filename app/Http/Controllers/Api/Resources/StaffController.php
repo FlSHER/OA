@@ -210,13 +210,6 @@ class StaffController extends Controller
             ->sortByQueryString()
             ->get();
         $staff->map(function ($item, $key) use (&$data) {
-            // 筛选掉无权限查看的员工
-            $checkBrand = app('Authority')->checkBrand($item->brand_id);
-            $checkDepart = app('Authority')->checkDepartment($item->department_id);
-            if ((!$checkBrand || !$checkDepart) && $item->status_id > 0) {
-                return;
-            }
-
             // 查询地区名称
             $temp = [];
             $district = District::whereIn('id', [
@@ -240,40 +233,59 @@ class StaffController extends Controller
                 $district->contains($item->info->living_city_id) ? $temp[$item->info->living_city_id]['name'] : '',
                 $district->contains($item->info->living_county_id) ? $temp[$item->info->living_county_id]['name'] : '',
             ];
-            $data[$key+1] = [
-                $item->staff_sn,
-                $item->realname,
-                $item->mobile,
-                $item->info->id_card_number,
-                $item->gender->name,
-                $item->brand->name,
-                $item->cost_brands->implode('name', '/'),
-                $item->department->name,
-                $item->shop_sn,
-                $item->position->name,
-                $item->status->name,
-                $item->info->account_number,
-                $item->info->account_name,
-                $item->info->account_bank,
-                $item->hired_at,
-                $item->birthday,
-                $item->info->national,
-                $item->info->qq_number,
-                $item->wechat_number,
-                $item->info->email,
-                $item->info->education,
-                $item->info->politics,
-                $item->info->marital_status,
-                $item->info->height,
-                $item->info->weight,
-                implode(' ', $makeHouseholdCity).' '.$item->info->household_address,
-                implode(' ', $makeLivingCity).' '.$item->info->living_address,
-                $item->info->native_place,
-                $item->info->concat_name,
-                $item->info->concat_tel,
-                $item->info->concat_type,
-                $item->info->remark,
-            ]; 
+            // 筛选掉无权限查看的员工
+            $checkBrand = app('Authority')->checkBrand($item->brand_id);
+            $checkDepart = app('Authority')->checkDepartment($item->department_id);
+            if ((!$checkBrand || !$checkDepart) && $item->status_id > 0) {
+                $data[$key+1] = [
+                    $item->staff_sn,
+                    $item->realname,
+                    $item->gender->name,
+                    $item->brand->name,
+                    $item->cost_brands->implode('name', '/'),
+                    $item->department->name,
+                    $item->shop_sn,
+                    $item->position->name,
+                    $item->status->name,
+                    $item->birthday,
+                    $item->hired_at,
+                ]; 
+            } else {
+                $data[$key+1] = [
+                    $item->staff_sn,
+                    $item->realname,
+                    $item->gender->name,
+                    $item->brand->name,
+                    $item->cost_brands->implode('name', '/'),
+                    $item->department->full_name,
+                    $item->shop_sn,
+                    $item->position->name,
+                    $item->status->name,
+                    $item->birthday,
+                    $item->hired_at,
+                    $item->mobile,
+                    $item->info->id_card_number,
+                    $item->info->account_number,
+                    $item->info->account_name,
+                    $item->info->account_bank,
+                    $item->info->national,
+                    $item->info->qq_number,
+                    $item->wechat_number,
+                    $item->info->email,
+                    $item->info->education,
+                    $item->info->politics,
+                    $item->info->marital_status,
+                    $item->info->height,
+                    $item->info->weight,
+                    implode(' ', $makeHouseholdCity).' '.$item->info->household_address,
+                    implode(' ', $makeLivingCity).' '.$item->info->living_address,
+                    $item->info->native_place,
+                    $item->info->concat_name,
+                    $item->info->concat_tel,
+                    $item->info->concat_type,
+                    $item->info->remark,
+                ]; 
+            }
         });
         
         return response()->json($data, 201);
