@@ -210,6 +210,13 @@ class StaffController extends Controller
             ->sortByQueryString()
             ->get();
         $staff->map(function ($item, $key) use (&$data) {
+            // 筛选掉无权限查看的员工
+            $checkBrand = app('Authority')->checkBrand($item->brand_id);
+            $checkDepart = app('Authority')->checkDepartment($item->department_id);
+            if ((!$checkBrand || !$checkDepart) && $item->status_id > 0) {
+                return;
+            }
+
             // 查询地区名称
             $temp = [];
             $district = District::whereIn('id', [
