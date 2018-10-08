@@ -22,7 +22,6 @@ class DepartmentController extends Controller
         $list = Department::query()
             ->filterByQueryString()
             ->sortByQueryString()
-            ->orderBy('sort')
             ->withPagination();
 
         if (isset($list['data'])) {

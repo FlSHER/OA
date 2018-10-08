@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Resources;
 
 use Cache;
+use Encypt;
 use Validator;
 use App\Models\Brand;
 use App\Models\HR\Staff;
@@ -16,9 +17,9 @@ use Illuminate\Http\Request;
 use App\Models\HR\Department;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreStaffRequest;
-use App\Http\Requests\UpdateStaffRequest;
 use App\Http\Resources\HR\StaffResource;
 use App\Http\Requests\ImportStaffRequest;
+use App\Http\Requests\UpdateStaffRequest;
 use App\Http\Resources\HR\StaffCollection;
 use App\Http\Resources\CurrentUserResource;
 
@@ -154,6 +155,23 @@ class StaffController extends Controller
         return response()->json(null, 204);
     }
 
+    /**
+     * 重置密码 (默认：123456)
+     *
+     * @param \App\Models\HR\Staff $staff
+     * @return mixed
+     */
+    public function resetPass(Staff $staff)
+    {
+        $salt = mt_rand(100000, 999999);
+        $newPass = Encypt::password('123456', $salt);
+
+        $staff->password = $newPass;
+        $staff->salt = $salt;
+        $staff->save();
+        
+        return response()->json(['message' => '重置成功'], 201);
+    }
 
     public function getCurrentUser()
     {
