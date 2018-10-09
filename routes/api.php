@@ -94,6 +94,10 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             // /api/staff/:staff
             Route::delete('{staff}', 'StaffController@destroy')->where(['staff' => '[0-9]+']);
 
+            // 重置密码
+            // /api/staff/reset/:staff
+            Route::post('reset/{staff}', 'StaffController@resetPass')->where(['staff' => '[0-9]+']);
+
             // 员工批量导入
             // /api/staff/import
             Route::post('import', 'StaffController@import');
@@ -218,6 +222,26 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             // 删除权限
             // /api/authorities/:authority
             Route::delete('{authority}', 'RbacController@destroy')->where(['authority' => '[0-9]+']);
+        });
+
+        //role router
+        Route::group(['prefix' => 'roles', 'as' => '.roles'], function () {
+
+            // 角色列表
+            // /api/roles
+            Route::get('/', 'RoleController@index');
+
+            // 创建角色
+            // /api/roles/:role
+            Route::post('/', 'RoleController@store');
+
+            // 编辑角色
+            // /api/roles
+            Route::patch('{role}', 'RoleController@update')->where(['role' => '[0-9]+']);
+
+            // 删除角色
+            // /api/roles/:role
+            Route::delete('{role}', 'RoleController@destroy')->where(['role' => '[0-9]+']);
         });
     });
 });

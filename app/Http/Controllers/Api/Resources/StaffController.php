@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Resources;
 
 use Cache;
+use Encypt;
 use Validator;
 use App\Models\Brand;
 use App\Models\HR\Staff;
@@ -16,9 +17,9 @@ use Illuminate\Http\Request;
 use App\Models\HR\Department;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreStaffRequest;
-use App\Http\Requests\UpdateStaffRequest;
 use App\Http\Resources\HR\StaffResource;
 use App\Http\Requests\ImportStaffRequest;
+use App\Http\Requests\UpdateStaffRequest;
 use App\Http\Resources\HR\StaffCollection;
 use App\Http\Resources\CurrentUserResource;
 
@@ -154,6 +155,23 @@ class StaffController extends Controller
         return response()->json(null, 204);
     }
 
+    /**
+     * 重置密码 (默认：123456)
+     *
+     * @param \App\Models\HR\Staff $staff
+     * @return mixed
+     */
+    public function resetPass(Staff $staff)
+    {
+        $salt = mt_rand(100000, 999999);
+        $newPass = Encypt::password('123456', $salt);
+
+        $staff->password = $newPass;
+        $staff->salt = $salt;
+        $staff->save();
+        
+        return response()->json(['message' => '重置成功'], 201);
+    }
 
     public function getCurrentUser()
     {
@@ -205,56 +223,69 @@ class StaffController extends Controller
             $district->map(function ($city, $ck) use (&$temp) {
                 $temp[$city->id] = $city;
             });
-            $makeCity = [
+            $makeHouseholdCity = [
                 $district->contains($item->info->household_province_id) ? $temp[$item->info->household_province_id]['name'] : '',
                 $district->contains($item->info->household_city_id) ? $temp[$item->info->household_city_id]['name'] : '',
                 $district->contains($item->info->household_county_id) ? $temp[$item->info->household_county_id]['name'] : '',
+            ];
+            $makeLivingCity = [
                 $district->contains($item->info->living_province_id) ? $temp[$item->info->living_province_id]['name'] : '',
                 $district->contains($item->info->living_city_id) ? $temp[$item->info->living_city_id]['name'] : '',
                 $district->contains($item->info->living_county_id) ? $temp[$item->info->living_county_id]['name'] : '',
             ];
-            $data[$key+1] = [
-                $item->staff_sn,
-                $item->realname,
-                $item->mobile,
-                $item->info->id_card_number,
-                $item->gender->name,
-                $item->brand->name,
-                $item->cost_brands->implode('name', '/'),
-                $item->department->name,
-                $item->shop_sn,
-                $item->position->name,
-                $item->status->name,
-                $item->info->account_number,
-                $item->info->account_name,
-                $item->info->account_bank,
-                $item->created_at->toDateTimeString(),
-                $item->birthday,
-                $item->info->national,
-                $item->info->qq_number,
-                $item->wechat_number,
-                $item->info->email,
-                $item->info->education,
-                $item->info->politics,
-                $item->info->marital_status,
-                $item->info->height,
-                $item->info->weight,
-                $makeCity[0],
-                $makeCity[1],
-                $makeCity[2],
-                $item->info->household_address,
-                $makeCity[3],
-                $makeCity[4],
-                $makeCity[5],
-                $item->info->living_address,
-                $item->info->native_place,
-                $item->info->concat_name,
-                $item->info->concat_tel,
-                $item->info->concat_type,
-                $item->info->remark,
-                $item->dingding,
-                '操作备注',
-            ]; 
+            // 筛选掉无权限查看的员工
+            $checkBrand = app('Authority')->checkBrand($item->brand_id);
+            $checkDepart = app('Authority')->checkDepartment($item->department_id);
+            if ((!$checkBrand || !$checkDepart) && $item->status_id > 0) {
+                $data[$key+1] = [
+                    $item->staff_sn,
+                    $item->realname,
+                    $item->gender->name,
+                    $item->brand->name,
+                    $item->cost_brands->implode('name', '/'),
+                    $item->department->name,
+                    $item->shop_sn,
+                    $item->position->name,
+                    $item->status->name,
+                    $item->birthday,
+                    $item->hired_at,
+                ]; 
+            } else {
+                $data[$key+1] = [
+                    $item->staff_sn,
+                    $item->realname,
+                    $item->gender->name,
+                    $item->brand->name,
+                    $item->cost_brands->implode('name', '/'),
+                    $item->department->full_name,
+                    $item->shop_sn,
+                    $item->position->name,
+                    $item->status->name,
+                    $item->birthday,
+                    $item->hired_at,
+                    $item->mobile,
+                    $item->info->id_card_number,
+                    $item->info->account_number,
+                    $item->info->account_name,
+                    $item->info->account_bank,
+                    $item->info->national,
+                    $item->info->qq_number,
+                    $item->wechat_number,
+                    $item->info->email,
+                    $item->info->education,
+                    $item->info->politics,
+                    $item->info->marital_status,
+                    $item->info->height,
+                    $item->info->weight,
+                    implode(' ', $makeHouseholdCity).' '.$item->info->household_address,
+                    implode(' ', $makeLivingCity).' '.$item->info->living_address,
+                    $item->info->native_place,
+                    $item->info->concat_name,
+                    $item->info->concat_tel,
+                    $item->info->concat_type,
+                    $item->info->remark,
+                ]; 
+            }
         });
         
         return response()->json($data, 201);
@@ -286,7 +317,6 @@ class StaffController extends Controller
                 $item->position->name,
                 $item->status->name,
                 $item->birthday,
-                $item->wechat_number,
             ];
         });
         

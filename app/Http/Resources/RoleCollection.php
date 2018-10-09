@@ -24,7 +24,10 @@ class RoleCollection extends ResourceCollection
             return [
                 'id' => $item->id,
                 'role_name' => $item->role_name,
-                'staff' => $staff
+                'staff' => $staff,
+                'brand' => $item->brand,
+                'department' => $item->department,
+                'authority' => $item->authority,
             ];
         })->toArray();
     }
