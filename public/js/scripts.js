@@ -404,7 +404,7 @@ function OAForm(dom, options) {
           var msg = err.responseJSON.errors;
           _call('validateError', [msg]);
         } else if (err.status === 403) {
-          var msg = err.responseText;
+          var msg = err.responseJSON.message || err.responseText;
           alert(msg);
         } else {
           document.write(err.responseText);
