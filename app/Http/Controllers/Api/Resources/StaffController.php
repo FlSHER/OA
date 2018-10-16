@@ -22,9 +22,19 @@ use App\Http\Requests\ImportStaffRequest;
 use App\Http\Requests\UpdateStaffRequest;
 use App\Http\Resources\HR\StaffCollection;
 use App\Http\Resources\CurrentUserResource;
+use App\Contracts\OperationLog;
+use App\Contracts\CURD;
 
 class StaffController extends Controller
 {
+    protected $logService;
+    protected $curdService;
+
+    public function __construct(OperationLog $logService, CURD $curd)
+    {
+        $this->logService = $logService;
+        $this->curdService = $curd->log($this->logService);
+    }
 
     /**
      * Display a listing of the resource.
@@ -49,12 +59,14 @@ class StaffController extends Controller
                 }
             });
         })
-        ->with('relative', 'info', 'gender', 'position', 'department', 'brand', 'shop')
+        ->with('relative', 'position', 'department', 'brand', 'shop')
         ->filterByQueryString()
         ->sortByQueryString()
         ->withPagination();
+
         if (isset($list['data'])) {
             $list['data'] = new StaffCollection(collect($list['data']));
+
             return $list;
         } else {
             return new StaffCollection($list);
@@ -67,24 +79,22 @@ class StaffController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreStaffRequest $request, Staff $staff)
+    public function store(StoreStaffRequest $request)
     {
         $data = $request->all();
-        $staff->fill($data);
-        $staff->hired_at = $data['hired_at'] ?? now();
 
-        $info = new StaffInfo();
-        $info->fill($data);
+        $curd = $this->curdService->create($data);
 
-        return $staff->getConnection()->transaction(function () use ($staff, $info, $data) {
-            $staff->save();
-            $staff->info()->save($info);
-            $staff->relative()->attach($data['relatives']);
-
-            $staff->load(['relative', 'info', 'gender', 'position', 'department', 'brand', 'shop']);
+        if ($curd['status'] == 1) {
+            $staff = Staff::query()
+                ->with(['relative', 'position', 'department', 'brand', 'shop'])
+                ->orderBy('staff_sn', 'desc')
+                ->first();
 
             return response()->json(new StaffResource($staff), 201);
-        });
+        }
+
+        return response()->json($curd, 422);
     }
 
     /**
@@ -97,23 +107,16 @@ class StaffController extends Controller
     public function update(UpdateStaffRequest $request, Staff $staff)
     {
         $data = $request->all();
-        $staff->fill($data);
 
-        $info = $staff->info;
-        $info->fill($data);
+        $curd = $this->curdService->update($data);
 
-        return $staff->getConnection()->transaction(function () use ($staff, $info, $data) {
-            $staff->save();
-            $info->save();
-            if (isset($data['relatives'])) {
-                $staff->relative()->detach();
-                $staff->relative()->attach($data['relatives']);
-            }
-            
-            $staff->load(['relative', 'info', 'gender', 'position', 'department', 'brand', 'shop']);
+        if ($curd['status'] == 1) {
+            $staff->load(['relative', 'position', 'department', 'brand', 'shop']);
 
             return response()->json(new StaffResource($staff), 201);
-        });
+        }
+
+        return response()->json($curd, 422);
     }
 
     /**
@@ -124,7 +127,7 @@ class StaffController extends Controller
      */
     public function show(Staff $staff)
     {
-        $staff->load(['relative', 'info', 'gender', 'position', 'department', 'brand', 'shop']);
+        $staff->load(['relative', 'position', 'department', 'brand', 'shop']);
 
         return new StaffResource($staff);
     }
@@ -137,21 +140,8 @@ class StaffController extends Controller
      */
     public function destroy(Staff $staff)
     {
-        \DB::beginTransaction();
+        $staff->delete();
 
-        try {
-
-            $staff->delete();
-            $staff->info()->delete();
-
-            \DB::commit();
-
-        } catch (\Exception $e) {
-
-            \DB::rollBack();
-
-            return response()->json(['message' => '服务器错误，删除失败'], 500);
-        }
         return response()->json(null, 204);
     }
 
@@ -205,7 +195,7 @@ class StaffController extends Controller
         }   
         $data = [$request->input('maxCols')];
         $staff = Staff::query()
-            ->with('gender', 'brand', 'info', 'department', 'position')
+            ->with('status', 'brand', 'department', 'position')
             ->filterByQueryString()
             ->sortByQueryString()
             ->get();
@@ -213,25 +203,25 @@ class StaffController extends Controller
             // 查询地区名称
             $temp = [];
             $district = District::whereIn('id', [
-                $item->info->household_province_id,
-                $item->info->household_city_id,
-                $item->info->household_county_id,
-                $item->info->living_province_id,
-                $item->info->living_city_id,
-                $item->info->living_county_id,
+                $item->household_province_id,
+                $item->household_city_id,
+                $item->household_county_id,
+                $item->living_province_id,
+                $item->living_city_id,
+                $item->living_county_id,
             ])->get();
             $district->map(function ($city, $ck) use (&$temp) {
                 $temp[$city->id] = $city;
             });
             $makeHouseholdCity = [
-                $district->contains($item->info->household_province_id) ? $temp[$item->info->household_province_id]['name'] : '',
-                $district->contains($item->info->household_city_id) ? $temp[$item->info->household_city_id]['name'] : '',
-                $district->contains($item->info->household_county_id) ? $temp[$item->info->household_county_id]['name'] : '',
+                $district->contains($item->household_province_id) ? $temp[$item->household_province_id]['name'] : '',
+                $district->contains($item->household_city_id) ? $temp[$item->household_city_id]['name'] : '',
+                $district->contains($item->household_county_id) ? $temp[$item->household_county_id]['name'] : '',
             ];
             $makeLivingCity = [
-                $district->contains($item->info->living_province_id) ? $temp[$item->info->living_province_id]['name'] : '',
-                $district->contains($item->info->living_city_id) ? $temp[$item->info->living_city_id]['name'] : '',
-                $district->contains($item->info->living_county_id) ? $temp[$item->info->living_county_id]['name'] : '',
+                $district->contains($item->living_province_id) ? $temp[$item->living_province_id]['name'] : '',
+                $district->contains($item->living_city_id) ? $temp[$item->living_city_id]['name'] : '',
+                $district->contains($item->living_county_id) ? $temp[$item->living_county_id]['name'] : '',
             ];
             // 筛选掉无权限查看的员工
             $checkBrand = app('Authority')->checkBrand($item->brand_id);
@@ -240,50 +230,46 @@ class StaffController extends Controller
                 $data[$key+1] = [
                     $item->staff_sn,
                     $item->realname,
-                    $item->gender->name,
+                    $item->gender,
                     $item->brand->name,
                     $item->cost_brands->implode('name', '/'),
                     $item->department->name,
                     $item->shop_sn,
                     $item->position->name,
                     $item->status->name,
-                    $item->birthday,
                     $item->hired_at,
                 ]; 
             } else {
                 $data[$key+1] = [
                     $item->staff_sn,
                     $item->realname,
-                    $item->gender->name,
+                    $item->gender,
                     $item->brand->name,
                     $item->cost_brands->implode('name', '/'),
                     $item->department->full_name,
                     $item->shop_sn,
                     $item->position->name,
                     $item->status->name,
-                    $item->birthday,
                     $item->hired_at,
                     $item->mobile,
-                    $item->info->id_card_number,
-                    $item->info->account_number,
-                    $item->info->account_name,
-                    $item->info->account_bank,
-                    $item->info->national,
-                    $item->info->qq_number,
+                    $item->id_card_number,
+                    $item->account_number,
+                    $item->account_name,
+                    $item->account_bank,
+                    $item->national,
                     $item->wechat_number,
-                    $item->info->email,
-                    $item->info->education,
-                    $item->info->politics,
-                    $item->info->marital_status,
-                    $item->info->height,
-                    $item->info->weight,
-                    implode(' ', $makeHouseholdCity).' '.$item->info->household_address,
-                    implode(' ', $makeLivingCity).' '.$item->info->living_address,
-                    $item->info->native_place,
-                    $item->info->concat_name,
-                    $item->info->concat_tel,
-                    $item->info->concat_type,
-                    $item->info->remark,
+                    $item->education,
+                    $item->politics,
+                    $item->marital_status,
+                    $item->height,
+                    $item->weight,
+                    implode(' ', $makeHouseholdCity).' '.$item->household_address,
+                    implode(' ', $makeLivingCity).' '.$item->living_address,
+                    $item->native_place,
+                    $item->concat_name,
+                    $item->concat_tel,
+                    $item->concat_type,
+                    $item->remark,
                 ]; 
             }
         });
@@ -301,7 +287,7 @@ class StaffController extends Controller
     { 
         $data = [$request->input('minCols')];
         $staff = Staff::query()
-            ->with('gender', 'brand', 'department', 'position')
+            ->with('status', 'brand', 'department', 'position')
             ->filterByQueryString()
             ->sortByQueryString()
             ->get();
@@ -309,14 +295,14 @@ class StaffController extends Controller
             $data[$key+1] = [
                 $item->staff_sn,
                 $item->realname,
-                $item->gender->name,
+                $item->gender,
                 $item->brand->name,
                 $item->cost_brands->implode('name', '/'),
                 $item->shop_sn,
                 $item->department->name,
                 $item->position->name,
                 $item->status->name,
-                $item->birthday,
+                $item->hired_at,
             ];
         });
         
@@ -331,7 +317,7 @@ class StaffController extends Controller
      */
     public function import(Request $request)
     {
-        if (count($request->input('cols')) > 22) {
+        if (count($request->input('cols')) > 25) {
             return $this->createStaffs($request);
         }
         $data = $this->combineImportData($request);
@@ -340,16 +326,12 @@ class StaffController extends Controller
             $validator = $this->makeValidator($value);
             if ($validator->fails()) {
                 return response()->json([
-                    'message' =>  "导入失败第 {$key} 条数据错误", 
+                    'message' =>  "更新失败第 {$key} 条数据错误", 
                     'errors' => $validator->errors(),
                 ], 422);
             }
-            $staff = $this->makeFillStaff($value);
-            $staff->save();
-
-            // 员工信息更新
-            $staffInfo = $this->makeFillStaffInfo($value);
-            $staffInfo->save();
+            $makeVal = $this->makeFillStaff($value);
+            $this->curdService->update($makeVal);
         }
 
         return response()->json(['message' => '更新成功'], 201);
@@ -373,17 +355,12 @@ class StaffController extends Controller
                     'errors' => $validator->errors(),
                 ], 422);
             }
-            // 转化数据字段
-            $staff = $this->makeFillStaff($value);
-            $staff->save();
 
-            // 关联数据表操作
-            $staffInfo = $this->makeFillStaffInfo($value);
-            $staffInfo->staff_sn = $staff->staff_sn;
-            $staffInfo->save();
-
+            $makeVal = $this->makeFillStaff($value);
+            $curd = $this->curdService->create($makeVal);
             // 费用品牌
-            if (isset($value['cost_brand'])) {
+            if ($curd['status'] == 1 && isset($value['cost_brand'])) {
+                $staff = Staff::query()->orderBy('staff_sn', 'desc')->first();
                 $cost = explode('/', $value['cost_brand']);
                 $costIds = CostBrand::whereIn('name', $cost)->pluck('id')->toArray();
                 $staff->cost_brands()->attach($costIds);
@@ -401,18 +378,18 @@ class StaffController extends Controller
      */
     protected function makeFillStaff($value)
     {
-        if (isset($value['staff_sn'])) {
-            $staff= Staff::where('staff_sn', $value['staff_sn'])->first();
-        } else {
-            $staff = new Staff();
-            $staff->hired_at = $value['hired_at'] ?? now();
-        }
+        $data = [];
         foreach ($value as $k => $v) {
-            if (in_array($k, ['realname', 'mobile', 'shop_sn', 'birthday', 'dingding', 'wechat_number'])) {
-                $staff->{$k} = $v;
+            if (in_array($k, [
+                'realname', 'mobile', 'shop_sn', 'dingtalk_number', 'wechat_number', 'national', 'politics', 'gender',
+                'marital_status', 'id_card_number', 'account_number', 'account_bank', 'account_name', 'height',
+                'weight', 'household_address', 'living_address', 'native_place', 'education', 'remark',
+                'concat_name', 'concat_tel', 'concat_type'
+            ])) {
+                $data[$k] = $v;
             }
             if ($v && $k === 'brand') {
-                $staff->brand_id = $this->getBrand()->where('name', $v)->pluck('id')->last();
+                $data['brand_id'] = $this->getBrand()->where('name', $v)->pluck('id')->last();
             }
             if ($v && $k === 'department') {
                 $name = $v;
@@ -420,72 +397,36 @@ class StaffController extends Controller
                     $department = explode('-', $v);
                     $name = end($department);
                 }
-                $staff->department_id = $this->getDepartment()->where('name', $name)->pluck('id')->last();
+                $data['department_id'] = $this->getDepartment()->where('name', $name)->pluck('id')->last();
             }
             if ($v && $k === 'position') {
-                $staff->position_id = $this->getPosition()->where('name', $v)->pluck('id')->last();
+                $data['position_id'] = $this->getPosition()->where('name', $v)->pluck('id')->last();
             }
             if ($v && $k === 'status') {
                 $status = ['试用期' => 1, '在职' => 2, '停薪留职' => 3, '离职' => -1, '自动离职' => -2, '开除' => -3, '劝退' => -4];
-                $staff->status_id = $status[$v];
-            }
-            if ($v && $k === 'national') {
-                $staff->national_id = $this->getNational()->where('name', $v)->pluck('id')->last();
-            }
-            if ($v && $k === 'politics') {
-                $staff->politics_id = $this->getPolitics()->where('name', $v)->pluck('id')->last();
-            }
-            if ($v && $k === 'gender') {
-                $gender = ['未知' => 0, '男' => 1, '女' => 2];
-                $staff->gender_id = $gender[$v];
-            }
-            if ($v && $k === 'marital_status') {
-                $marital = ['未知' => 0, '未婚' => 1, '已婚' => 2, '离异' => 3, '再婚' => 4, '丧偶' => 5];
-                $staff->status_id = $marital[$v];
-            }
-        }
-
-        return $staff;
-    }
-
-    /**
-     * 批量创建填充员工信息模型.
-     *
-     * @param array $value
-     * @return void
-     */
-    protected function makeFillStaffInfo($value)
-    {
-        if (isset($value['staff_sn'])) {
-            $staffInfo = StaffInfo::where('staff_sn', $value['staff_sn'])->first();
-        } else {
-            $staffInfo = new StaffInfo();
-        }
-        foreach ($value as $k => $v) {
-            if (in_array($k, ['id_card_number', 'account_number', 'account_bank', 'account_name', 'email', 'qq_number', 'national', 'marital_status', 'politics', 'height', 'weight', 'household_address', 'living_address', 'native_place', 'education', 'remark', 'concat_name', 'concat_tel', 'concat_type'])) {
-                $staffInfo->{$k} = $v;
+                $data['status_id'] = $status[$v];
             }
             if ($v && $k === 'household_province') {
-                $staffInfo->household_province_id = $this->getDistrict()->where('name', $v)->pluck('id')->last();
+                $data['household_province_id'] = $this->getDistrict()->where('name', $v)->pluck('id')->last();
             }
             if ($v && $k === 'household_city') {
-                $staffInfo->household_city_id = $this->getDistrict()->where('name', $v)->pluck('id')->last();
+                $data['household_city_id'] = $this->getDistrict()->where('name', $v)->pluck('id')->last();
             }
             if ($v && $k === 'household_county') {
-                $staffInfo->household_county_id = $this->getDistrict()->where('name', $v)->pluck('id')->last();
+                $data['household_county_id'] = $this->getDistrict()->where('name', $v)->pluck('id')->last();
             }
             if ($v && $k === 'living_province') {
-                $staffInfo->living_province_id = $this->getDistrict()->where('name', $v)->pluck('id')->last();
+                $data['living_province_id'] = $this->getDistrict()->where('name', $v)->pluck('id')->last();
             }
             if ($v && $k === 'living_city') {
-                $staffInfo->living_city_id = $this->getDistrict()->where('name', $v)->pluck('id')->last();
+                $data['living_city_id'] = $this->getDistrict()->where('name', $v)->pluck('id')->last();
             }
             if ($v && $k === 'living_county') {
-                $staffInfo->living_county_id = $this->getDistrict()->where('name', $v)->pluck('id')->last();
+                $data['living_county_id'] = $this->getDistrict()->where('name', $v)->pluck('id')->last();
             }
         }
 
-        return $staffInfo;
+        return $data;
     }
 
      // 缓存职位
@@ -590,16 +531,17 @@ class StaffController extends Controller
     {
         $rules = [
             'realname' => 'bail|required|string|max:10',
-            'mobile' => 'bail|required|unique:staff,mobile|regex:/^1[3456789][0-9]{9}$/',
-            'id_card_number' => 'bail|required|max:18',
-            'gender' => 'bail|in:男,女,未知',
             'brand' => 'bail|exists:brands,name',
             'position' => 'bail|exists:positions,name',
+            'mobile' => 'bail|required|unique:staff,mobile|cn_phone',
+            'id_card_number' => 'bail|required|ck_identity',
+            'gender' => 'bail|required|in:未知,男,女',
+            'property' => 'bail|in:0,1,2,3,4',
             'status' => 'bail|exists:staff_status,name',
-            'birthday' => 'bail|date',
             'national' => 'bail|exists:i_national,name',
             'education' => 'bail|exists:i_education,name',
             'politics' => 'bail|exists:i_politics,name',
+            'shop_sn' => 'bail|exists:shops,shop_sn|max:10',
             'marital_status' => 'bail|exists:i_marital_status,name',
             'household_province' => 'bail|exists:i_district,name',
             'household_city' => 'bail|exists:i_district,name',
@@ -607,7 +549,18 @@ class StaffController extends Controller
             'living_province' => 'bail|exists:i_district,name',
             'living_city' => 'bail|exists:i_district,name',
             'living_county' => 'bail|exists:i_district,name',
-            'dingding' => 'bail|required|max:50',
+            'household_address' => 'bail|string|max:30',
+            'living_address' => 'bail|string|max:30',
+            'concat_name' => 'bail|max:10',
+            'concat_tel' => 'bail|cn_phone',
+            'concat_type' => 'bail|max:5',
+            'account_bank' => 'bail|max:20',
+            'account_name' => 'bail|max:10',
+            'account_number' => 'bail|between:16,19',
+            'height' => 'bail|integer|between:140,220',
+            'weight' => 'bail|integer|between:30,150',
+            'dingtalk_number' => 'bail|max:50',
+            'remark' => 'bail|max:100',
             'department' => [
                 'bail',
                 function ($attribute, $value, $fail) {
@@ -621,44 +574,39 @@ class StaffController extends Controller
                     }
                 }
             ],
+            'cost_brand' => [
+                'bail',
+                function ($attribute, $value, $fail) {
+                    $cost = CostBrand::pluck('name');
+                    if (strpos($value, '/') !== false) {
+                        $values = explode('/', $value);
+                        foreach ($values as $key => $val) {
+                            if (!$cost->contains($val)) {
+                                $fail('没有名称为 “'.$val.'” 的费用品牌！');
+                            }
+                        }
+                    } else {
+                        if (!$cost->contains($value)) {
+                            $fail('没有名称为 “'.$value.'” 的费用品牌！');
+                        }
+                    }
+                }
+            ],
         ];
         $messages = [
-            'realname.max' => '姓名长度不能超过 :max 个字',
-            'realname.required' => '姓名不能为空',
-            'mobile.required' => '手机号码不能为空',
-            'mobile.unique' => '手机号码已经存在',
-            'mobile.regex' => '手机号码不是一个有效的手机号',
-            'id_card_number.required' => '身份证不能为空',
-            'id_card_number.max' => '身份证号码无效',
-            'gender.in' => '性别填写错误只能有男、女、未知、三种',
-            'brand.exists' => '品牌信息错误',
-            'position.exists' => '职位信息错误',
-            'status.exists' => '员工状态不正确',
-            'birthday.date' => '生日不是一个有效的日期',
-            'national.exists' => '民族填写错误',
-            'education.exists' => '学历填写错误',
-            'politics.exists' => '政治面貌填写错误',
-            'marital_status.exists' => '婚姻状态填写错误',
-            'household_province.exists' => '户口所在地（省）不存在',
-            'household_city.exists' => '户口所在地（市）不存在',
-            'household_county.exists' => '户口所在地（区）不存在',
-            'living_province.exists' => '现居地址（省）不存在',
-            'living_city.exists' => '现居地址（市）不存在',
-            'living_county.exists' => '现居地址（区）不存在',
-            'dingding.required' => '钉钉编号不能为空',
+            'in' => ':attribute 必须在【:values】中选择。',
+            'max' => ':attribute 不能大于 :max 个字。',
+            'exists' => ':attribute 填写错误。',
+            'unique' => ':attribute 已经存在，请重新填写。',
+            'required' => ' :attribute 为必填项，不能为空。',
         ];
         if (isset($value->staff_sn)) {
             $rules = array_merge($rules, [
                 'staff_sn' => 'bail|required|exists:staff,staff_sn',
+                'mobile' => 'bail|unique:staff,mobile|cn_phone',
+                'id_card_number' => 'bail|ck_identity',
+                'dingtalk_number' => 'bail|max:50',
                 'realname' => 'bail|string|max:10',
-                'dingding' => 'bail|max:50',
-                'mobile' => 'bail|unique:staff,mobile|regex:/^1[3456789][0-9]{9}$/',
-                'id_card_number' => 'bail|max:18',
-            ]);
-            $messages = array_merge($messages, [
-                'staff_sn.required' => '员工编号不能为空',
-                'staff_sn.exists' => '员工编号不正确',
-                
             ]);
         }
 

@@ -64,7 +64,7 @@ class StaffCurdService extends CURD
                 break;
         }
         if (empty($model->employed_at) && $model->status_id > 1) {
-            $model->setAttribute('employed_at ', $operateAt);
+            $model->setAttribute('employed_at', $operateAt);
         }
     }
 
@@ -93,9 +93,9 @@ class StaffCurdService extends CURD
         foreach ($model->relative as $value) {
             $type = app('db')->table('staff_relative_type')->find($value['pivot']['relative_type']);
             $oppositeType = app('db')->table('staff_relative_type')
-                ->where([['group_id', '=', $type->opposite_group_id]])
+                ->where('group_id', $type->opposite_group_id)
                 ->where(function ($query) use ($model) {
-                    $query->where('gender_id', $model->gender_id)
+                    $query->where('gender_id', $model->igender->id)
                         ->orWhere('gender_id', 0);
                 })->value('id');
             $antiRelative[$value['relative_sn']] = [
