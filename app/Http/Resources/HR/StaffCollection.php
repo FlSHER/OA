@@ -45,7 +45,7 @@ class StaffCollection extends ResourceCollection
                 'relatives' => $staff->relative ? new StaffRelativeCollection($staff->relative) : [],
             ];
 
-            return array_merge($baseStaff, $staff->info->toArray());
+            return array_merge($baseStaff, $staff->info ? $staff->info->toArray() : []);
         })->toArray();
     }
 }
