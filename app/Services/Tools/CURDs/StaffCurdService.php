@@ -77,7 +77,7 @@ class StaffCurdService extends CURD
     private function transferLater($model, $data)
     {
         if (!empty($model->tmp)) {
-            throw new HttpResponseException(response('该员工有未执行操作', 403));
+            abort(403, '该员工有未执行操作');
         } else {
             $tmpData = $model->getDirty();
             $tmpData['operate_at'] = $data['operate_at'];
