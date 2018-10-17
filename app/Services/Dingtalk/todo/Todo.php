@@ -32,6 +32,7 @@ class Todo
     {
         $url = config('dingding.todo.add') . '?access_token=' . app('Dingtalk')->getAccessToken();
         $result = Curl::setUrl($url)->sendMessageByPost($data);
+        //发送信息存入数据库
         $todoData = $this->addTodoToDatabase($data, $result);
         return $todoData;
     }
