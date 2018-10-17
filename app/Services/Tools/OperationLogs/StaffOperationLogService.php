@@ -22,12 +22,12 @@ class StaffOperationLogService extends OperationLog
         'position_id' => 'position.name',
         'brand_id' => 'brand.name',
         'status_id' => 'status.name',
-        'info.household_province_id' => 'info.household_province.name',
-        'info.household_city_id' => 'info.household_city.name',
-        'info.household_county_id' => 'info.household_county.name',
-        'info.living_province_id' => 'info.living_province.name',
-        'info.living_city_id' => 'info.living_city.name',
-        'info.living_county_id' => 'info.living_county.name',
+        'household_province_id' => 'household_province.name',
+        'household_city_id' => 'household_city.name',
+        'household_county_id' => 'household_county.name',
+        'living_province_id' => 'living_province.name',
+        'living_city_id' => 'living_city.name',
+        'living_county_id' => 'living_county.name',
     ];
 
     public function __construct($tableName = null, \Illuminate\Database\Eloquent\Model $model = null)

@@ -331,6 +331,7 @@ class StaffController extends Controller
                 ], 422);
             }
             $makeVal = $this->makeFillStaff($value);
+            $makeVal['operation_type'] = 'edit';
             $this->curdService->update($makeVal);
         }
 
@@ -357,6 +358,7 @@ class StaffController extends Controller
             }
 
             $makeVal = $this->makeFillStaff($value);
+            $makeVal['operation_type'] = 'entry';
             $curd = $this->curdService->create($makeVal);
             // 费用品牌
             if ($curd['status'] == 1 && isset($value['cost_brand'])) {
@@ -378,7 +380,10 @@ class StaffController extends Controller
      */
     protected function makeFillStaff($value)
     {
-        $data = [];
+        $data = ['operate_at' => now(), 'operation_remark' => ''];
+        if (isset($value['staff_sn'])) {
+            $data['realname'] = Staff::where('staff_sn', $value['staff_sn'])->value('realname');
+        }
         foreach ($value as $k => $v) {
             if (in_array($k, [
                 'realname', 'mobile', 'shop_sn', 'dingtalk_number', 'wechat_number', 'national', 'politics', 'gender',
@@ -535,7 +540,7 @@ class StaffController extends Controller
             'position' => 'bail|exists:positions,name',
             'mobile' => 'bail|required|unique:staff,mobile|cn_phone',
             'id_card_number' => 'bail|required|ck_identity',
-            'gender' => 'bail|required|in:未知,男,女',
+            'gender' => 'bail|in:未知,男,女',
             'property' => 'bail|in:0,1,2,3,4',
             'status' => 'bail|exists:staff_status,name',
             'national' => 'bail|exists:i_national,name',
@@ -600,10 +605,11 @@ class StaffController extends Controller
             'unique' => ':attribute 已经存在，请重新填写。',
             'required' => ' :attribute 为必填项，不能为空。',
         ];
-        if (isset($value->staff_sn)) {
+
+        if (isset($value['staff_sn'])) {
             $rules = array_merge($rules, [
                 'staff_sn' => 'bail|required|exists:staff,staff_sn',
-                'mobile' => 'bail|unique:staff,mobile|cn_phone',
+                'mobile' => 'bail|cn_phone',
                 'id_card_number' => 'bail|ck_identity',
                 'dingtalk_number' => 'bail|max:50',
                 'realname' => 'bail|string|max:10',
