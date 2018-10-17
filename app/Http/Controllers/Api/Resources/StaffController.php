@@ -380,7 +380,7 @@ class StaffController extends Controller
      */
     protected function makeFillStaff($value)
     {
-        $data = ['operate_at' => now(), 'operation_remark' => ''];
+        $data = ['operate_at' => now()->toDateString(), 'operation_remark' => ''];
         if (isset($value['staff_sn'])) {
             $data['realname'] = Staff::where('staff_sn', $value['staff_sn'])->value('realname');
         }
