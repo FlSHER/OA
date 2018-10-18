@@ -16,7 +16,6 @@ class StaffOperationLogService extends OperationLog
     protected $relationMap = [
         'gender_id' => 'gender.name',
         'national_id' => 'national.name',
-        'marital_status_id' => 'marital_status.name',
         'politics_id' => 'politics.name',
         'department_id' => 'department.full_name',
         'position_id' => 'position.name',

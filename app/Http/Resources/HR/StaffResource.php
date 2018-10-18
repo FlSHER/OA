@@ -20,6 +20,7 @@ class StaffResource extends Resource
         return [
             'staff_sn' => $this->staff_sn,
             'realname' => $this->realname,
+            'username' => $this->username,
             'gender' => $this->gender,
             'mobile' => $this->mobile,
             'brand_id' => (int) $this->brand_id,
