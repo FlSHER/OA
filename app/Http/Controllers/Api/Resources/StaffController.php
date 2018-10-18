@@ -111,9 +111,10 @@ class StaffController extends Controller
         $curd = $this->curdService->update($data);
 
         if ($curd['status'] == 1) {
-            $staff->load(['relative', 'position', 'department', 'brand', 'shop']);
+            $result = $staff->where('staff_sn', $staff->staff_sn)->first();
+            $result->load(['relative', 'position', 'department', 'brand', 'shop']);
 
-            return response()->json(new StaffResource($staff), 201);
+            return response()->json(new StaffResource($result), 201);
         }
 
         return response()->json($curd, 422);
@@ -331,7 +332,7 @@ class StaffController extends Controller
                 ], 422);
             }
             $makeVal = $this->makeFillStaff($value);
-            $makeVal['operation_type'] = 'edit';
+            $makeVal['operation_type'] = 'import_transfer';
             $this->curdService->update($makeVal);
         }
 
@@ -358,7 +359,7 @@ class StaffController extends Controller
             }
 
             $makeVal = $this->makeFillStaff($value);
-            $makeVal['operation_type'] = 'entry';
+            $makeVal['operation_type'] = 'import_entry';
             $curd = $this->curdService->create($makeVal);
             // 费用品牌
             if ($curd['status'] == 1 && isset($value['cost_brand'])) {
