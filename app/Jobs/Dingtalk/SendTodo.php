@@ -31,20 +31,7 @@ class SendTodo implements ShouldQueue
      */
     public function handle()
     {
-        $result = $this->sendAddTodo;
-        if(!empty($result->record_id)){
-            //发送成功 触发回调到工作流
-            $this->addTodoCallback($result);
-        }
+        $this->sendAddTodo;
     }
 
-    /**
-     *
-     * @param $todoData
-     */
-    protected function addTodoCallback($todoData)
-    {
-        $data = $todoData->only(['step_run_id','record_id']);
-        $result = Curl::setUrl($todoData->callback)->sendMessageByPost($data);
-    }
 }

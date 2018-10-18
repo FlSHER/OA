@@ -29,9 +29,18 @@ class TodoController extends Controller
      */
     public function add(Request $request)
     {
-        $data = $request->except(['step_run_id','callback']);
+        $data = $request->except(['step_run_id']);
         $data['userid'] = Staff::find($request->input('userid'))->dingding;
         $response = $this->todo->addTodo($data);
         return $this->response->post($response);
+    }
+
+    /**
+     * 更新待办
+     * @param Request $request
+     */
+    public function update(Request $request)
+    {
+
     }
 }

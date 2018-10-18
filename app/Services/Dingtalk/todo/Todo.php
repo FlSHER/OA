@@ -49,7 +49,6 @@ class Todo
         $createRealname = Auth::user() ? Auth::user()->realname : '系统';
         $todoStaff = request()->has('userid') ? request()->get('userid') : 0;
         $stepRunId = request()->has('step_run_id') ? request()->get('step_run_id') : 0;
-        $callback = request()->has('callback') ? request()->get('callback') : null;
         $newData['create_staff'] = $createStaff;
         $newData['create_realname'] = $createRealname;
         $newData['todo_staff'] = $todoStaff;
@@ -57,7 +56,6 @@ class Todo
         $newData['form_item_list'] = $newData['formItemList'];
         $newData['data'] = $data;
         $newData['step_run_id'] = $stepRunId;
-        $newData['callback'] = $callback;
         try {
             $todoData = \App\Models\Dingtalk\Todo::create(array_collapse([$newData, $result]));
         } catch (\Exception $exception) {

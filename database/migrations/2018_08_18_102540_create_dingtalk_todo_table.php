@@ -29,13 +29,14 @@ class CreateDingtalkTodoTable extends Migration
             $table->string('record_id')->nullable()->comment('待办事项唯一id，更新待办事项的时候需要用到');
             $table->string('request_id')->nullable()->comment('request_id');
             $table->unsignedInteger('step_run_id')->default(0)->comment('步骤运行ID');
-            $table->string('callback')->comment('待办发送队列成功时回调到工作流');
+            $table->unsignedTinyInteger('is_finish')->default(0)->comment('是否审批通过 1是，0否');
             $table->index('create_staff');
             $table->index('todo_staff');
             $table->index('todo_userid');
             $table->index('create_time');
             $table->index('record_id');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
