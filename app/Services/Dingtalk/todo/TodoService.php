@@ -15,10 +15,20 @@ use Illuminate\Support\Facades\Auth;
 
 class TodoService
 {
-    public function addTodo($data)
+    public function sendAddTodo($data)
     {
         try {
-            SendTodo::dispatch($this->sendAddTodo($data));
+            SendTodo::dispatch($this->addTodo($data));
+            return 1;
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    public function sendUpdateTodo($data)
+    {
+        try {
+            SendTodo::dispatch($this->updateTodo($data));
             return 1;
         } catch (\Exception $e) {
             return 0;
@@ -29,7 +39,7 @@ class TodoService
      * 发送钉钉待办事项
      * @param $data
      */
-    public function sendAddTodo(array $data)
+    public function addTodo(array $data)
     {
         //待办数据存入数据库
         $todo = $this->makeTodoDataToDatabase($data);
@@ -37,6 +47,21 @@ class TodoService
         $result = Curl::setUrl($url)->sendMessageByPost($data);
         //发送信息结果存入数据库
         return $this->todoResultToDatabase($todo,$result);
+    }
+
+    /**
+     * 更新待办
+     * @param array $data
+     */
+    public function updateTodo(array $data)
+    {
+        $url = config('dingding.todo.update') . '?access_token=' . app('Dingtalk')->getAccessToken();
+        $result = Curl::setUrl($url)->sendMessageByPost($data);
+        if($result['errcode'] == 0 && $result['result'] == true){
+            //更新待办
+            Todo::where('record_id',$data['record_id'])->update(['is_finish'=>1]);
+        }
+        return $result;
     }
 
     /**

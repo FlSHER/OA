@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Dingtalk;
 
+use App\Models\Dingtalk\Todo;
 use App\Models\HR\Staff;
 use App\Services\Dingtalk\todo\TodoService;
 use App\Services\ResponseService;
@@ -31,7 +32,7 @@ class TodoController extends Controller
     {
         $data = $request->except(['step_run_id']);
         $data['userid'] = Staff::find($request->input('userid'))->dingding;
-        $response = $this->todo->addTodo($data);
+        $response = $this->todo->sendAddTodo($data);
         return $this->response->post($response);
     }
 
@@ -41,6 +42,12 @@ class TodoController extends Controller
      */
     public function update(Request $request)
     {
-
+        $todoData = Todo::where('step_run_id',$request->input('step_run_id'))->select('record_id','todo_userid')->first();
+        $data = [
+            'userid' => $todoData->todo_userid,
+            'record_id'=>$todoData->record_id,
+        ];
+        $response = $this->todo->sendUpdateTodo($data);
+        return $this->response->post($response);
     }
 }
