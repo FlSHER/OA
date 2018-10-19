@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Dingtalk;
 
 use App\Models\HR\Staff;
-use App\Services\Dingtalk\todo\Todo;
+use App\Services\Dingtalk\todo\TodoService;
 use App\Services\ResponseService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -16,7 +16,7 @@ class TodoController extends Controller
     /**
      * @return mixed
      */
-    public function __construct(Todo $todo,ResponseService $responseService)
+    public function __construct(TodoService $todo, ResponseService $responseService)
     {
         $this->todo = $todo;
         $this->response = $responseService;

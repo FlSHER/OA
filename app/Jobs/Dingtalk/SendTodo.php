@@ -13,15 +13,15 @@ class SendTodo implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $sendAddTodo;
+    protected $sendTodo;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($sendAddTodo)
+    public function __construct($sendTodo)
     {
-        $this->sendAddTodo = $sendAddTodo;
+        $this->sendTodo = $sendTodo;
     }
 
     /**
@@ -31,7 +31,7 @@ class SendTodo implements ShouldQueue
      */
     public function handle()
     {
-        $this->sendAddTodo;
+        $this->sendTodo;
     }
 
 }
