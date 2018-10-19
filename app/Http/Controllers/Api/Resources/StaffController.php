@@ -24,16 +24,19 @@ use App\Http\Resources\HR\StaffCollection;
 use App\Http\Resources\CurrentUserResource;
 use App\Contracts\OperationLog;
 use App\Contracts\CURD;
+use App\Services\StaffService;
 
 class StaffController extends Controller
 {
     protected $logService;
     protected $curdService;
+    protected $staffService;
 
-    public function __construct(OperationLog $logService, CURD $curd)
+    public function __construct(OperationLog $logService, CURD $curd, StaffService $staffService)
     {
         $this->logService = $logService;
         $this->curdService = $curd->log($this->logService);
+        $this->staffService = $staffService;
     }
 
     /**
@@ -162,6 +165,21 @@ class StaffController extends Controller
         $staff->save();
         
         return response()->json(['message' => '重置成功'], 201);
+    }
+
+    /**
+     * 转正操作.
+     * 
+     * @param  Request $request
+     * @return mixed
+     */
+    public function process(Request $request)
+    {
+        $data = $request->all();
+        $this->processValidator($data);
+        return $this->staffService->beforAction($data);
+
+        // return 
     }
 
     public function getCurrentUser()
@@ -374,7 +392,7 @@ class StaffController extends Controller
     }
 
     /**
-     * 批量创建填充员工模型信息.
+     * 将表单数据转为数据库需要的数据.
      *
      * @param array $value
      * @return void
@@ -471,30 +489,6 @@ class StaffController extends Controller
          return $position;   
      }
 
-     // 缓存民族
-     protected function getNational()
-     {
-        $key = "national_list";
-        if (Cache::has($key)) return Cache::get($key);
-        
-        $national = National::select('id', 'name')->get();
-        Cache::put($key, $national, now()->addMinutes(10));
-
-        return $national; 
-     }
-
-     // 缓存政治面貌
-     protected function getPolitics()
-     {
-        $key = "politics_list";
-        if (Cache::has($key)) return Cache::get($key);
-        
-        $politics = Politics::select('id', 'name')->get();
-        Cache::put($key, $politics, now()->addMinutes(10));
-
-        return $politics;
-     }
-
      // 缓存地区
      protected function getDistrict()
      {
@@ -508,7 +502,7 @@ class StaffController extends Controller
      }
 
     /**
-     * 组装导入数据。
+     * 组装导入数据为(key=>value)形式。
      *
      * @param Request $request
      * @return void
@@ -519,11 +513,13 @@ class StaffController extends Controller
         $data = array_filter($request->input('data', []));
         $cols = $request->input('cols', []);
         if (count($data) <= 1) return false;
+
         foreach ($data as $key => $value) {
             if ($key >= 1) {
                 $temp[$key] = collect($cols)->combine($value)->filter();
             }
         }
+
         return $temp;
     }
     
@@ -599,7 +595,7 @@ class StaffController extends Controller
                 }
             ],
         ];
-        $messages = [
+        $message = [
             'in' => ':attribute 必须在【:values】中选择。',
             'max' => ':attribute 不能大于 :max 个字。',
             'exists' => ':attribute 填写错误。',
@@ -617,6 +613,47 @@ class StaffController extends Controller
             ]);
         }
 
-        return Validator::make($value->toArray(), $rules, $messages);
+        return Validator::make($value->toArray(), $rules, $message);
+    }
+
+    /**
+     * 入转调离操作验证.
+     * 
+     * @param  array $value
+     * @return mixed
+     */
+    protected function processValidator($value)
+    {
+        $rules = [
+            'staff_sn' => 'required|exists:staff,staff_sn',
+            'operate_at' => 'required|date_format:Y-m-d',
+            'operation_type' => 'required|in:entry,employ,transfer,leave,reinstate,active,leaving',
+            'operation_remark' => 'max:100',
+        ];
+        $message = [
+            'required' => ':attribute 为必填项，不能为空。',
+            'in' => ':attribute 必须在【:values】中选择。',
+            'max' => ':attribute 不能大于 :max 个字。',
+            'exists' => ':attribute 填写错误。',
+            'date_format' => '时间格式错误',
+        ];
+
+        $type = $value['operation_type'];
+
+        if ($type == 'employ') { //转正
+            $rules = array_merge($rules, [
+                'status_id' => 'required|in:2',
+            ]);
+        } elseif ($type == 'transfer') {
+            $rules = array_merge($rules, [
+                'status_id' => 'required|in:2',
+            ]);
+        } elseif ($type == 'leave') {
+            $rules = array_merge($rules, [
+                'status_id' => 'required|in:-1,-2,-3,-4',
+            ]);
+        }
+
+        return Validator::make($value, $rules, $message)->validate();
     }
 }

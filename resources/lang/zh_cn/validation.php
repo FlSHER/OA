@@ -150,9 +150,11 @@ return [
         'dingtalk_number' => '钉钉编号',
         'remark' => '备注',
         'shop_sn' => '店铺编号',
+        'status_id' => '员工状态',
         'department' => '部门',
         'cost_brand' => '费用品牌',
         'operate_at' => '执行时间',
+        'operation_type' => '操作类型',
         'operation_remark' => '执行备注',
     ],
 
