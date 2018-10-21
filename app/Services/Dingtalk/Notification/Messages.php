@@ -24,7 +24,7 @@ class Messages
     public function sendJobNotification($request)
     {
         $agentId = App::find($request->input('oa_client_id'))->agent_id;
-        $data = $request->except('oa_client_id');
+        $data = $request->except('oa_client_id','step_run_id');
         $dingUserId = Staff::find($data['userid_list'])->pluck('dingding')->all();
         $data['agent_id'] = $agentId;
         $data['userid_list'] = implode(',', $dingUserId);
@@ -64,6 +64,8 @@ class Messages
         $messageData['create_realname'] = Auth::user() ? Auth::user()->realname : '系统';
         $messageData['msgtype'] = $data['msg']['msgtype'];
         $messageData['data'] = $data;
+        if(request()->has('step_run_id'))
+            $messageData['step_run_id'] = request()->get('step_run_id');
         $message = Message::create($messageData);
         return $message;
     }
