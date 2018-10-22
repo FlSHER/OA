@@ -13,15 +13,15 @@ class SendTodo implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $sendAddTodo;
+    protected $sendTodo;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($sendAddTodo)
+    public function __construct($sendTodo)
     {
-        $this->sendAddTodo = $sendAddTodo;
+        $this->sendTodo = $sendTodo;
     }
 
     /**
@@ -31,15 +31,7 @@ class SendTodo implements ShouldQueue
      */
     public function handle()
     {
-        $result = $this->sendAddTodo;
-        if(!empty($result->record_id)){
-            $this->addTodoCallback($result);
-        }
+        $this->sendTodo;
     }
 
-    protected function addTodoCallback($todoData)
-    {
-        $data = $todoData->only(['step_run_id','record_id']);
-        $result = Curl::setUrl($todoData->callback)->sendMessageByPost($data);
-    }
 }

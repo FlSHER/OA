@@ -27,12 +27,7 @@ class MessageController extends Controller
      */
     public function sendJobNotificationMessage(Request $request)
     {
-        $agentId = App::find($request->input('oa_client_id'))->agent_id;
-        $data = $request->except('oa_client_id');
-        $dingUserId = Staff::find($data['userid_list'])->pluck('dingding')->all();
-        $data['agent_id'] = $agentId;
-        $data['userid_list'] = implode(',',$dingUserId);
-        $result = $this->message->sendJobNotificationMessage($data);
-        return $this->response->post($result);
+        $data = $this->message->sendJobNotification($request);
+        return $this->response->post($data);
     }
 }

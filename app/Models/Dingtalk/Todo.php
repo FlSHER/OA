@@ -22,7 +22,7 @@ class Todo extends Model
         'record_id',
         'request_id',
         'step_run_id',
-        'callback',
+        'is_finish',
     ];
     protected $casts = [
         'data' => 'array',

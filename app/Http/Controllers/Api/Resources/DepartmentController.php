@@ -20,6 +20,9 @@ class DepartmentController extends Controller
     public function index(Request $request)
     {
         $list = Department::query()
+            ->when(!empty($request->withTrashed), function ($query) {
+                return $query->withTrashed();
+            })
             ->filterByQueryString()
             ->sortByQueryString()
             ->withPagination();

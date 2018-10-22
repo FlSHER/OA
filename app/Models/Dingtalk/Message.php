@@ -12,14 +12,12 @@ class Message extends Model
         'agent_id',
         'create_staff',
         'create_realname',
-        'userid_list',
-        'dept_id_list',
-        'to_all_user',
+        'msgtype',
+        'data',
+        'step_run_id',
         'errcode',
         'task_id',
         'request_id',
-        'msgtype',
-        'data',
     ];
 
     protected $casts = [
