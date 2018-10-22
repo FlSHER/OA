@@ -51,7 +51,7 @@ class PayService
             'status_id' => 7,
             'payer_sn' => Auth::id(),
             'payer_name' => Auth::user()->realname,
-            'paid_at' => date('Y-m-d')
+            'paid_at' => date('Y-m-d H:i:s')
         ];
 
         DB::connection('reimburse_mysql')->beginTransaction();
@@ -61,7 +61,7 @@ class PayService
             DB::connection('reimburse_mysql')->commit();
         } catch (\Exception $e) {
             DB::connection('reimburse_mysql')->rollBack();
-            abort(400, '转账通过失败');
+            abort(400, '转账失败');
         }
         return $data;
     }
