@@ -51,7 +51,7 @@ class PayService
             'status_id' => 7,
             'payer_sn' => Auth::id(),
             'payer_name' => Auth::user()->realname,
-            'paid_at' => date('Y-m-d')
+            'paid_at' => date('Y-m-d H:i:s')
         ];
 
         DB::connection('reimburse_mysql')->beginTransaction();
