@@ -22,20 +22,14 @@ use App\Http\Requests\ImportStaffRequest;
 use App\Http\Requests\UpdateStaffRequest;
 use App\Http\Resources\HR\StaffCollection;
 use App\Http\Resources\CurrentUserResource;
-use App\Contracts\OperationLog;
-use App\Contracts\CURD;
 use App\Services\StaffService;
 
 class StaffController extends Controller
 {
-    protected $logService;
-    protected $curdService;
     protected $staffService;
 
-    public function __construct(OperationLog $logService, CURD $curd, StaffService $staffService)
+    public function __construct(StaffService $staffService)
     {
-        $this->logService = $logService;
-        $this->curdService = $curd->log($this->logService);
         $this->staffService = $staffService;
     }
 
@@ -86,7 +80,7 @@ class StaffController extends Controller
     {
         $data = $request->all();
 
-        $curd = $this->curdService->create($data);
+        $curd = $this->staffService->create($data);
 
         if ($curd['status'] == 1) {
             $staff = Staff::query()
@@ -111,7 +105,7 @@ class StaffController extends Controller
     {
         $data = $request->all();
 
-        $curd = $this->curdService->update($data);
+        $curd = $this->staffService->update($data);
 
         if ($curd['status'] == 1) {
             $result = $staff->where('staff_sn', $staff->staff_sn)->first();
@@ -177,9 +171,12 @@ class StaffController extends Controller
     {
         $data = $request->all();
         $this->processValidator($data);
-        return $this->staffService->beforAction($data);
+        $this->staffService->update($data);
 
-        // return 
+        return response()->json([
+            'message' => '转正成功',
+            'changes' => $data,
+        ], 201);
     }
 
     public function getCurrentUser()
@@ -351,7 +348,7 @@ class StaffController extends Controller
             }
             $makeVal = $this->makeFillStaff($value);
             $makeVal['operation_type'] = 'import_transfer';
-            $this->curdService->update($makeVal);
+            $this->staffService->update($makeVal);
         }
 
         return response()->json(['message' => '更新成功'], 201);
@@ -378,7 +375,7 @@ class StaffController extends Controller
 
             $makeVal = $this->makeFillStaff($value);
             $makeVal['operation_type'] = 'import_entry';
-            $curd = $this->curdService->create($makeVal);
+            $curd = $this->staffService->create($makeVal);
             // 费用品牌
             if ($curd['status'] == 1 && isset($value['cost_brand'])) {
                 $staff = Staff::query()->orderBy('staff_sn', 'desc')->first();
@@ -644,13 +641,20 @@ class StaffController extends Controller
             $rules = array_merge($rules, [
                 'status_id' => 'required|in:2',
             ]);
-        } elseif ($type == 'transfer') {
+        } elseif ($type == 'transfer') { //变动
             $rules = array_merge($rules, [
-                'status_id' => 'required|in:2',
+                'status_id' => 'required|in:-1,2,3',
+                'department_id' => 'required|exists:departments,id',
+                'brand_id' => 'required|exists:brands,id',
+                'shop_sn' => 'max:10|exists:shops,shop_sn',
+                'cost_brands' => ['required|array'],
+                'position_id' => 'required|exists:positions,id',
+
             ]);
         } elseif ($type == 'leave') {
             $rules = array_merge($rules, [
                 'status_id' => 'required|in:-1,-2,-3,-4',
+                'skip_leaving' => 'in:0,1',
             ]);
         }
 

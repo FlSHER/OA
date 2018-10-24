@@ -72,44 +72,44 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
 Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
     Route::namespace('Resources')->group(function () {
         // staff router
-        Route::group(['prefix' => 'staffs'], function () {
-            // 获取员工列表 /api/staffs
+        Route::group(['prefix' => 'staff'], function () {
+            // 获取员工列表 /api/staff
             Route::get('/', 'StaffController@index');
 
-            // 添加单个员工 /api/staffs
+            // 添加单个员工 /api/staff
             Route::post('/', 'StaffController@store');
 
-            // 编辑单个员工 /api/staffs/:staff
+            // 编辑单个员工 /api/staff/:staff
             Route:: put('{staff}', 'StaffController@update')->where(['staff' => '[0-9]+']);
 
-            // 获取单个员工 /api/staffs/:staff
+            // 获取单个员工 /api/staff/:staff
             Route::get('{staff}', 'StaffController@show')->where(['staff' => '[0-9]+']);
 
-            // 软删除单个员工. /api/staffs/:staff
+            // 软删除单个员工. /api/staff/:staff
             Route::delete('{staff}', 'StaffController@destroy')->where(['staff' => '[0-9]+']);
 
-            // 重置密码 /api/staffs/:staff/reset
+            // 重置密码 /api/staff/:staff/reset
             Route::post('{staff}/reset', 'StaffController@resetPass')->where(['staff' => '[0-9]+']);
 
-            // 激活员工 /api/staffs/:staff/unlock
+            // 激活员工 /api/staff/:staff/unlock
             Route::patch('{staff}/unlock', 'StaffController@unlock')->where(['staff' => '[0-9]+']);
             
-            // 员工转正 /api/staffs/:staff/process
+            // 员工转正 /api/staff/:staff/process
             Route::patch('{staff}/process', 'StaffController@process')->where(['staff' => '[0-9]+']);
 
-            // 人事变动 /api/staffs/:staff/transfer
+            // 人事变动 /api/staff/:staff/transfer
             Route::patch('{staff}/transfer', 'StaffController@transfer')->where(['staff' => '[0-9]+']);
 
-            // 离职 /api/staffs/:staff/leave
+            // 离职 /api/staff/:staff/leave
             Route::patch('{staff}/leave', 'StaffController@leave')->where(['staff' => '[0-9]+']);
 
-            //  再入职 /api/staffs/:staff/again-entry
+            //  再入职 /api/staff/:staff/again-entry
             Route::patch('{staff}/again-entry', 'StaffController@againEntry')->where(['staff' => '[0-9]+']);
 
-            // 员工批量导入 /api/staffs/import
+            // 员工批量导入 /api/staff/import
             Route::post('import', 'StaffController@import');
             
-            // 批量导出 /api/staffs/export
+            // 批量导出 /api/staff/export
             Route::post('export', 'StaffController@export');
 
         });

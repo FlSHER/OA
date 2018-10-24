@@ -2,49 +2,177 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Log;
 use App\Models\HR\Staff as StaffModel;
 use Illuminate\Http\Exception\HttpResponseException;
+use App\Services\Tools\OperationLogs\StaffOperationLogService;
 
 class StaffService
 {
-	protected $dirty;
+    protected $dirty = [];
 
-	protected $model;
+    /**
+     * 创建
+     * @param type $data
+     * @return typeg
+     */
+    public function create($data)
+    {
+        $this->save($data);
+        return ['status' => 1, 'message' => '添加成功'];
+    }
 
-	protected $attributes = null;
+    /**
+     * 更新
+     * @param type $data
+     * @return type
+     */
+    public function update($data)
+    {
+        $this->save($data);
+        if ($this->isDirty()) {
+            return ['status' => 1, 'message' => '编辑成功'];
+        } else {
+            return ['status' => -1, 'message' => '未发现改动'];
+        }
+    }
 
+    public function save(array $data)
+    {
+        if (isset($data['staff_sn']) && !empty($data['staff_sn'])) {
+            $model = StaffModel::find($data['staff_sn']);
+        } else {
+            $model = new StaffModel();
+        }
+        $this->fillDataAndSave($model, $data);
+    }
 
-    public function beforAction(array $data)
-	{
-		$model = $this->makeModel($data);
-		// 操作设置
-		$this->operating($model, $data);
-		$operationType = $data['operation_type'];
-		if ($operationType == 'leave' && $model->status_id != -2) {
+    /**
+     * 保存一条数据
+     * 
+     * @param type $model
+     * @param type $data
+     * @throws \Illuminate\Database\QueryException
+     */
+    protected function fillDataAndSave($model, $data)
+    {
+        
+        $this->reset();
+        \DB::beginTransaction();
+        try {
+            $this->setRelation($model, $data);
+            $model->fill($data);
+            $this->saving($model, $data); //前置操作
+            $this->addDirty($model);
+            if (!$this->hasTransfer($model, $data)) { //没有预约操作才走更新
+                $model->save();
+                $this->saved($model, $data); //后置操作
+                if ($this->isDirty()) {
+                    $log = new StaffOperationLogService();
+                    $log->model($model)->write($this->dirty, $data);
+                }
+            } else {
+                $this->appendOperationType($model, $data);
+            }
+            \DB::commit();
+        } catch (\Exception $err) {
+            Log::error($err->getMessage());
+            \DB::rollBack();
+            throw $err;
+        }
+    }
+
+    /**
+     * 记录更详细的变更类型.
+     * 
+     * @param  [type] $model
+     * @param  array $data
+     */
+    public function appendOperationType($model, $data)
+    {
+        $type = $data['operation_type'];
+        if (in_array($type, ['transfer', 'import_transfer'])
+            && array_has($this->dirty, 'position_id')
+        ) { // 职位变更 默认为升职 降职未考虑
+            $newData = array_merge($data, [
+                'operation_type' => 'rise_position',
+            ]);
+
+            $log = new StaffOperationLogService();
+            $log->model($model)->write($this->dirty, $newData);
+        }
+        
+    }
+
+    /**
+     * 是否有可预约操作。
+     * 
+     * @param  [type]  $model
+     * @param  [type]  $data
+     * @return boolean
+     */
+    protected function hasTransfer($model, $data)
+    {
+        $operationType = $data['operation_type'];
+
+        if (in_array($operationType, ['transfer', 'import_transfer']) 
+            && strtotime($data['operate_at']) > time()
+            && empty($model->tmp)
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * 更新关系关联
+     * @param App\Models\HR\Staff $model
+     * @param array $data
+     */
+    protected function setRelation($model, $data)
+    {   
+        if (array_has($data, 'relative')) {
+            $model->relative()->sync($data['relative']);
+        }
+
+        if (array_has($data, 'cost_brands')) {
+            $model->cost_brands()->sync($data['cost_brands']);
+        }
+    }
+
+    public function saving($model, array $data)
+    {
+        // 操作设置
+        $this->operating($model, $data);
+        $operationType = $data['operation_type'];
+        if ($operationType == 'leave' && $model->status_id != -2) {
             $this->setLeaving($model);
         } elseif (in_array($operationType, ['transfer', 'import_transfer']) && strtotime($data['operate_at']) > time()) {
             $this->transferLater($model, $data);
         }
-		
-	}
+        
+    }
 
-	private function makeModel(array $data)
-	{
-		if (isset($data['staff_sn']) && !empty($data['staff_sn'])) {
-			$model = StaffModel::find($data['staff_sn']);
-        } else {
-            $model = new StaffModel();
+    protected function saved($model, $data)
+    {
+        // 如果是离职操作并且跳过了离职交接 修改状态为已离职
+        if ($data['operation_type'] == 'leave' && array_has($data, 'skip_leaving') && $data['skip_leaving']) {
+            $data['operation_type'] = 'leaving';
+            $this->save($data);
         }
-        $model->fill($data);
+    }
 
-        return $model;
-	}
-
-	private function setLeaving($model)
+    /**
+     * 设置离职记录。
+     * 
+     * @param [type] $model
+     */
+    private function setLeaving($model)
     {
         $model->leaving()->create([
-        	'staff_sn' => $model->staff_sn,
-        	'original_status_id' => $model->status_id,
+            'staff_sn' => $model->staff_sn,
+            'original_status_id' => $model->status_id,
         ]);
         $model->setAttribute('status_id', 0);
     }
@@ -79,6 +207,23 @@ class StaffService
     }
 
     /**
+     * 重置 Dirty，LogService
+     */
+    public function reset()
+    {
+        $this->dirty = [];
+    }
+
+    /**
+     * 检查模型及其关联是否有Dirty（变动）
+     * @return type
+     */
+    protected function isDirty()
+    {
+        return !empty($this->dirty);
+    }
+
+    /**
      * 获取带有原值的Dirty
      * @param type $model
      * @return type
@@ -95,10 +240,10 @@ class StaffService
         return $dirty;
     }
 
-	private function operating($model, array $data)
+    private function operating($model, array $data)
     {
         $operateAt = $data['operate_at'];
-    	$operationType = $data['operation_type'];
+        $operationType = $data['operation_type'];
 
         switch ($operationType) {
             case 'entry':
@@ -122,10 +267,4 @@ class StaffService
         }
     }
 
-	public function makeFillData(array $fillable)
-	{
-
-	}
-
-	
-}	
+}   

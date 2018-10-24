@@ -49,9 +49,9 @@ class ToolServiceProvider extends ServiceProvider
          */
         $this->app->bind('App\Contracts\CURD', 'App\Contracts\CURD');
 
-        $this->app->when('App\Http\Controllers\Api\Resources\StaffController')
-            ->needs('App\Contracts\CURD')
-            ->give(\App\Services\Tools\CURDs\StaffCurdService::class);
+        // $this->app->when('App\Http\Controllers\Api\Resources\StaffController')
+        //     ->needs('App\Contracts\CURD')
+        //     ->give(\App\Services\Tools\CURDs\StaffCurdService::class);
 
         $this->app->when('App\Http\Controllers\HR\StaffController')
             ->needs('App\Contracts\CURD')
@@ -68,10 +68,6 @@ class ToolServiceProvider extends ServiceProvider
          * 操作日志
          */
         $this->app->bind('App\Contracts\OperationLog', \App\Contracts\OperationLog::class);
-
-        $this->app->when('App\Http\Controllers\Api\Resources\StaffController')
-            ->needs('App\Contracts\OperationLog')
-            ->give(\App\Services\Tools\OperationLogs\StaffOperationLogService::class);
             
         $this->app->when('App\Http\Controllers\HR\StaffController')
             ->needs('App\Contracts\OperationLog')
