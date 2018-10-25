@@ -192,6 +192,42 @@ class StaffController extends Controller
         ], 201);
     }
 
+    /**
+     * 人事变动操作。
+     * 
+     * @param  Request $request
+     * @return mixed
+     */
+    public function transfer(Request $request)
+    {
+        $data = $request->all();
+        $this->processValidator($data);
+        $this->staffService->update($data);
+
+        return response()->json([
+            'message' => '操作成功',
+            'changes' => $data,
+        ], 201);
+    }
+
+    /**
+     * 离职操作。
+     * 
+     * @param  Request $request
+     * @return mixed
+     */
+    public function leave(Request $request)
+    {
+        $data = $request->all();
+        $this->processValidator($data);
+        $this->staffService->update($data);
+
+        return response()->json([
+            'message' => '离职成功',
+            'changes' => $data,
+        ], 201);
+    }
+
     public function getCurrentUser()
     {
         $staffSn = app('CurrentUser')->staff_sn;
@@ -664,11 +700,18 @@ class StaffController extends Controller
                 'position_id' => 'required|exists:positions,id',
 
             ]);
-        } elseif ($type == 'leave') {
+        } elseif ($type == 'leave') { // 离职中
             $rules = array_merge($rules, [
                 'status_id' => 'required|in:-1,-2,-3,-4',
-                'skip_leaving' => 'in:0,1',
+                'skip_leaving' => 'in:0',
             ]);
+        } elseif ($type == 'leaving') { // 已离职
+            $rules = array_merge($rules, [
+                'status_id' => 'required|in:-1,-2,-3,-4',
+                'skip_leaving' => 'in:1',
+            ]);
+        } elseif ($type == 'reinstate') { // 再入职
+
         }
 
         return Validator::make($value, $rules, $message)->validate();

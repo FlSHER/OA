@@ -246,17 +246,17 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             // 激活员工 /api/hr/staff/:staff/unlock
             Route::patch('/{staff}/unlock', 'StaffController@unlock')->where(['staff' => '[0-9]+']);
             
-            // 员工转正 /api/hr/staff/:staff/process
-            Route::patch('/{staff}/process', 'StaffController@process')->where(['staff' => '[0-9]+']);
+            // 员工转正 /api/hr/staff/process
+            Route::patch('/process', 'StaffController@process')->where(['staff' => '[0-9]+']);
 
-            // 人事变动 /api/hr/staff/:staff/transfer
-            Route::patch('/{staff}/transfer', 'StaffController@transfer')->where(['staff' => '[0-9]+']);
+            // 人事变动 /api/hr/staff/transfer
+            Route::patch('/transfer', 'StaffController@transfer')->where(['staff' => '[0-9]+']);
 
-            // 离职 /api/hr/staff/:staff/leave
-            Route::patch('/{staff}/leave', 'StaffController@leave')->where(['staff' => '[0-9]+']);
+            // 离职 /api/hr/staff/leave
+            Route::patch('/leave', 'StaffController@leave')->where(['staff' => '[0-9]+']);
 
-            //  再入职 /api/hr/staff/:staff/again-entry
-            Route::patch('/{staff}/again-entry', 'StaffController@againEntry')->where(['staff' => '[0-9]+']);
+            //  再入职 /api/hr/staff/again-entry
+            Route::patch('/again-entry', 'StaffController@againEntry')->where(['staff' => '[0-9]+']);
 
             // 员工批量导入 /api/hr/staff/import
             Route::post('/import', 'StaffController@import');
