@@ -70,198 +70,326 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
 
 Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
 
-    // api 其他应用使用接口
-    Route::group(['namespace' => 'Resources', 'prefix' => 'staff'], function () {
-        // 获取员工列表 /api/staff
-        Route::get('/', 'StaffController@index');
+    Route::group(['namespace' => 'Resources'], function () {
+        // api 其他应用使用接口
+        Route::group(['prefix' => 'staff'], function () {
+            // 获取员工列表 /api/staff
+            Route::get('/', 'StaffController@index');
 
-        // 添加单个员工 /api/staff
-        Route::post('/', 'StaffController@store');
+            // 添加单个员工 /api/staff
+            Route::post('/', 'StaffController@store');
 
-        // 编辑单个员工 /api/staff/:staff
-        Route::patch('{staff}', 'StaffController@update')->where(['staff' => '[0-9]+']);
+            // 编辑单个员工 /api/staff/:staff
+            Route::patch('{staff}', 'StaffController@update')->where(['staff' => '[0-9]+']);
 
-        // 获取单个员工 /api/staff/:staff
-        Route::get('{staff}', 'StaffController@show')->where(['staff' => '[0-9]+']);
+            // 获取单个员工 /api/staff/:staff
+            Route::get('{staff}', 'StaffController@show')->where(['staff' => '[0-9]+']);
+        });
+
+        // department router
+        Route::group(['prefix' => 'department'], function () {
+
+            // 获取部门列表
+            // get /api/department
+            Route::get('/', 'DepartmentController@index');
+
+            // 获取全部部门
+            // get /api/department/tree
+            Route::get('tree', 'DepartmentController@tree');
+
+            // 部门排序
+            // get /api/department/sort
+            Route::patch('sort', 'DepartmentController@sortBy');
+
+            // 添加部门
+            // post /api/department
+            Route::post('/', 'DepartmentController@store');
+
+            // 编辑部门
+            // patch /api/department/:department
+            Route::patch('{department}', 'DepartmentController@update')->where(['department' => '[0-9]+']);
+
+            // 获取单个部门详情
+            // get /api/department/:department
+            Route::get('{department}', 'DepartmentController@show')->where(['department' => '[0-9]+']);
+
+            // 删除部门
+            // delete /api/department/:department
+            Route::delete('{department}', 'DepartmentController@destroy');
+        });
+
+        // position router
+        Route::group(['prefix' => 'position'], function (){
+
+            // 获取职位列表
+            // /api/position
+            Route::get('/', 'PositionController@index');
+
+            // 新增职位
+            // /api/position
+            Route::post('/', 'PositionController@store');
+
+            // 编辑职位
+            // /api/position/:position
+            Route::patch('{position}', 'PositionController@update')->where(['position' => '[0-9]+']);
+
+            // 删除职位
+            // /api/position/:position
+            Route::delete('{position}', 'PositionController@destroy')->where(['position' => '[0-9]+']);
+        });
+
+        // brand router
+        Route::group(['prefix' => 'brand'], function () {
+
+            // 获取品牌列表
+            // /api/brand
+            Route::get('/', 'BrandController@index');
+
+            // 添加品牌
+            // /api/brand
+            Route::post('/', 'BrandController@store');
+
+            // 编辑品牌
+            // /api/brand/:brand
+            Route::patch('{brand}', 'BrandController@update')->where(['brand' => '[0-9]+']);
+
+            //  删除品牌
+            // /api/brand/:brand
+            Route::delete('{brand}', 'BrandController@destroy')->where(['brand' => '[0-9]+']);
+        });
+
+        // shop router
+        Route::group(['prefix' => 'shop'], function () {
+
+            // 获取店铺列表  /api/shop
+            Route::get('/', 'ShopController@index');
+
+            // 新增店铺 /api/shop
+            Route::post('/', 'ShopController@store');
+
+            // 店铺定位 /api/shop/position
+            Route::post('position', 'ShopController@position');
+            
+           // 编辑店铺 /api/shop/:shop
+           Route::patch('{shop}', 'ShopController@update')->where(['shop' => '[0-9]+']);
+
+           // 删除店铺 /api/shop/:shop
+           Route::delete('{shop}', 'ShopController@destroy')->where(['shop' => '[0-9]+']);
+        });
+
+        // rbac router
+        Route::group(['prefix' => 'authorities'], function () {
+
+            // 权限列表
+            // /api/authorities
+            Route::get('/', 'RbacController@index');
+
+            // 添加权限
+            // /api/authorities
+            Route::post('/', 'RbacController@store');
+
+            // 修改权限
+            // /api/authorities/:authority
+            Route::patch('{authority}', 'RbacController@update')->where(['authority' => '[0-9]+']);
+
+            // 删除权限
+            // /api/authorities/:authority
+            Route::delete('{authority}', 'RbacController@destroy')->where(['authority' => '[0-9]+']);
+        });
+
+        //role router
+        Route::group(['prefix' => 'roles'], function () {
+
+            // 角色列表
+            // /api/roles
+            Route::get('/', 'RoleController@index');
+
+            // 创建角色
+            // /api/roles/:role
+            Route::post('/', 'RoleController@store');
+
+            // 编辑角色
+            // /api/roles
+            Route::patch('{role}', 'RoleController@update')->where(['role' => '[0-9]+']);
+
+            // 删除角色
+            // /api/roles/:role
+            Route::delete('{role}', 'RoleController@destroy')->where(['role' => '[0-9]+']);
+        });
     });
+
     // hr 后台专用接口
     Route::group(['namespace' => 'HR', 'prefix' => 'hr'], function () {
-        // 获取当前登陆用户信息
-        Route::get('current-user', 'StaffController@getCurrentUser');
+        // staff router
+        Route::group(['prefix' => 'staff'], function () {
+            // 获取当前登陆用户信息
+            Route::get('current-user', 'StaffController@getCurrentUser');
 
-        // 获取员工列表 /api/hr/staff
-        Route::get('staff', 'StaffController@index');
+            // 获取员工列表 /api/hr/staff
+            Route::get('/', 'StaffController@index');
 
-        // 添加单个员工 /api/hr/staff
-        Route::post('staff', 'StaffController@store');
+            // 添加单个员工 /api/hr/staff
+            Route::post('/', 'StaffController@store');
 
-        // 编辑单个员工 /api/hr/staff/:staff
-        Route::patch('staff/{staff}', 'StaffController@update')->where(['staff' => '[0-9]+']);
+            // 编辑单个员工 /api/hr/staff/:staff
+            Route::patch('/{staff}', 'StaffController@update')->where(['staff' => '[0-9]+']);
 
-        // 获取单个员工 /api/hr/staff/:staff
-        Route::get('staff/{staff}', 'StaffController@show')->where(['staff' => '[0-9]+']);
+            // 获取单个员工 /api/hr/staff/:staff
+            Route::get('/{staff}', 'StaffController@show')->where(['staff' => '[0-9]+']);
 
-        // 软删除单个员工. /api/hr/staff/:staff
-        Route::delete('staff/{staff}', 'StaffController@destroy')->where(['staff' => '[0-9]+']);
+            // 软删除单个员工. /api/hr/staff/:staff
+            Route::delete('/{staff}', 'StaffController@destroy')->where(['staff' => '[0-9]+']);
 
-        // 重置密码 /api/hr/staff/:staff/reset
-        Route::post('staff/{staff}/reset', 'StaffController@resetPass')->where(['staff' => '[0-9]+']);
+            // 重置密码 /api/hr/staff/:staff/reset
+            Route::post('/{staff}/reset', 'StaffController@resetPass')->where(['staff' => '[0-9]+']);
 
-        // 激活员工 /api/hr/staff/:staff/unlock
-        Route::patch('staff/{staff}/unlock', 'StaffController@unlock')->where(['staff' => '[0-9]+']);
-        
-        // 员工转正 /api/hr/staff/:staff/process
-        Route::patch('staff/{staff}/process', 'StaffController@process')->where(['staff' => '[0-9]+']);
+            // 激活员工 /api/hr/staff/:staff/unlock
+            Route::patch('/{staff}/unlock', 'StaffController@unlock')->where(['staff' => '[0-9]+']);
+            
+            // 员工转正 /api/hr/staff/:staff/process
+            Route::patch('/{staff}/process', 'StaffController@process')->where(['staff' => '[0-9]+']);
 
-        // 人事变动 /api/hr/staff/:staff/transfer
-        Route::patch('staff/{staff}/transfer', 'StaffController@transfer')->where(['staff' => '[0-9]+']);
+            // 人事变动 /api/hr/staff/:staff/transfer
+            Route::patch('/{staff}/transfer', 'StaffController@transfer')->where(['staff' => '[0-9]+']);
 
-        // 离职 /api/hr/staff/:staff/leave
-        Route::patch('staff/{staff}/leave', 'StaffController@leave')->where(['staff' => '[0-9]+']);
+            // 离职 /api/hr/staff/:staff/leave
+            Route::patch('/{staff}/leave', 'StaffController@leave')->where(['staff' => '[0-9]+']);
 
-        //  再入职 /api/hr/staff/:staff/again-entry
-        Route::patch('staff/{staff}/again-entry', 'StaffController@againEntry')->where(['staff' => '[0-9]+']);
+            //  再入职 /api/hr/staff/:staff/again-entry
+            Route::patch('/{staff}/again-entry', 'StaffController@againEntry')->where(['staff' => '[0-9]+']);
 
-        // 员工批量导入 /api/hr/staff/import
-        Route::post('staff/import', 'StaffController@import');
-        
-        // 批量导出 /api/hr/staff/export
-        Route::post('staff/export', 'StaffController@export');
-    });
+            // 员工批量导入 /api/hr/staff/import
+            Route::post('/import', 'StaffController@import');
+            
+            // 批量导出 /api/hr/staff/export
+            Route::post('/export', 'StaffController@export');
+        }); 
 
-    // department router
-    Route::group(['namespace' => 'Resources', 'prefix' => 'department'], function () {
+        // department router
+        Route::group(['prefix' => 'department'], function () {
 
-        // 获取部门列表
-        // get /api/department
-        Route::get('/', 'DepartmentController@index');
+            // 获取部门列表 get /api/department
+            Route::get('/', 'DepartmentController@index');
 
-        // 获取全部部门
-        // get /api/department/tree
-        Route::get('tree', 'DepartmentController@tree');
+            // 获取全部部门 get /api/department/tree
+            Route::get('tree', 'DepartmentController@tree');
 
-        // 部门排序
-        // get /api/department/sort
-        Route::patch('sort', 'DepartmentController@sortBy');
+            // 部门排序 get /api/department/sort
+            Route::patch('sort', 'DepartmentController@sortBy');
 
-        // 添加部门
-        // post /api/department
-        Route::post('/', 'DepartmentController@store');
+            // 添加部门 post /api/department
+            Route::post('/', 'DepartmentController@store');
 
-        // 编辑部门
-        // patch /api/department/:department
-        Route::patch('{department}', 'DepartmentController@update')->where(['department' => '[0-9]+']);
+            // 编辑部门 patch /api/department/:department
+            Route::patch('{department}', 'DepartmentController@update')->where(['department' => '[0-9]+']);
 
-        // 获取单个部门详情
-        // get /api/department/:department
-        Route::get('{department}', 'DepartmentController@show')->where(['department' => '[0-9]+']);
+            // 获取单个部门详情 get /api/department/:department
+            Route::get('{department}', 'DepartmentController@show')->where(['department' => '[0-9]+']);
 
-        // 删除部门
-        // delete /api/department/:department
-        Route::delete('{department}', 'DepartmentController@destroy');
-    });
+            // 删除部门 delete /api/department/:department
+            Route::delete('{department}', 'DepartmentController@destroy');
+        });
 
-    // position router
-    Route::group(['namespace' => 'Resources', 'prefix' => 'position'], function (){
+        // position router
+        Route::group(['prefix' => 'position'], function (){
 
-        // 获取职位列表
-        // /api/position
-        Route::get('/', 'PositionController@index');
+            // 获取职位列表
+            // /api/position
+            Route::get('/', 'PositionController@index');
 
-        // 新增职位
-        // /api/position
-        Route::post('/', 'PositionController@store');
+            // 新增职位
+            // /api/position
+            Route::post('/', 'PositionController@store');
 
-        // 编辑职位
-        // /api/position/:position
-        Route::patch('{position}', 'PositionController@update')->where(['position' => '[0-9]+']);
+            // 编辑职位
+            // /api/position/:position
+            Route::patch('{position}', 'PositionController@update')->where(['position' => '[0-9]+']);
 
-        // 删除职位
-        // /api/position/:position
-        Route::delete('{position}', 'PositionController@destroy')->where(['position' => '[0-9]+']);
-    });
+            // 删除职位
+            // /api/position/:position
+            Route::delete('{position}', 'PositionController@destroy')->where(['position' => '[0-9]+']);
+        });
 
-    // brand router
-    Route::group(['namespace' => 'Resources', 'prefix' => 'brand'], function () {
+        // brand router
+        Route::group(['prefix' => 'brand'], function () {
 
-        // 获取品牌列表
-        // /api/brand
-        Route::get('/', 'BrandController@index');
+            // 获取品牌列表
+            // /api/brand
+            Route::get('/', 'BrandController@index');
 
-        // 添加品牌
-        // /api/brand
-        Route::post('/', 'BrandController@store');
+            // 添加品牌
+            // /api/brand
+            Route::post('/', 'BrandController@store');
 
-        // 编辑品牌
-        // /api/brand/:brand
-        Route::patch('{brand}', 'BrandController@update')->where(['brand' => '[0-9]+']);
+            // 编辑品牌
+            // /api/brand/:brand
+            Route::patch('{brand}', 'BrandController@update')->where(['brand' => '[0-9]+']);
 
-        //  删除品牌
-        // /api/brand/:brand
-        Route::delete('{brand}', 'BrandController@destroy')->where(['brand' => '[0-9]+']);
-    });
+            //  删除品牌
+            // /api/brand/:brand
+            Route::delete('{brand}', 'BrandController@destroy')->where(['brand' => '[0-9]+']);
+        });
 
-    // shop router
-    Route::group(['namespace' => 'Resources', 'prefix' => 'shop'], function () {
+        // shop router
+        Route::group(['prefix' => 'shop'], function () {
 
-        // 获取店铺列表
-        // /api/shop
-        Route::get('/', 'ShopController@index');
+            // 获取店铺列表  /api/shop
+            Route::get('/', 'ShopController@index');
 
-        // 新增店铺
-        // /api/shop
-        Route::post('/', 'ShopController@store');
+            // 新增店铺 /api/shop
+            Route::post('/', 'ShopController@store');
 
-        // 店铺定位
-        // /api/shop/position
-        Route::post('position', 'ShopController@position');
-        
-       // 编辑店铺
-       // /api/shop/:shop
-       Route::patch('{shop}', 'ShopController@update')->where(['shop' => '[0-9]+']);
+            // 店铺定位 /api/shop/position
+            Route::post('position', 'ShopController@position');
+            
+           // 编辑店铺 /api/shop/:shop
+           Route::patch('{shop}', 'ShopController@update')->where(['shop' => '[0-9]+']);
 
-       // 删除店铺
-       // /api/shop/:shop
-       Route::delete('{shop}', 'ShopController@destroy')->where(['shop' => '[0-9]+']);
-    });
+           // 删除店铺 /api/shop/:shop
+           Route::delete('{shop}', 'ShopController@destroy')->where(['shop' => '[0-9]+']);
 
-    // rbac router
-    Route::group(['namespace' => 'Resources', 'prefix' => 'authorities'], function () {
+           // 开闭店流程 /api/shop/:shop
+           Route::patch('{shop}/process', 'ShopController@process')->where(['shop' => '[0-9]+']);
+        });
 
-        // 权限列表
-        // /api/authorities
-        Route::get('/', 'RbacController@index');
+        // rbac router
+        Route::group(['prefix' => 'authorities'], function () {
 
-        // 添加权限
-        // /api/authorities
-        Route::post('/', 'RbacController@store');
+            // 权限列表
+            // /api/authorities
+            Route::get('/', 'RbacController@index');
 
-        // 修改权限
-        // /api/authorities/:authority
-        Route::patch('{authority}', 'RbacController@update')->where(['authority' => '[0-9]+']);
+            // 添加权限
+            // /api/authorities
+            Route::post('/', 'RbacController@store');
 
-        // 删除权限
-        // /api/authorities/:authority
-        Route::delete('{authority}', 'RbacController@destroy')->where(['authority' => '[0-9]+']);
-    });
+            // 修改权限
+            // /api/authorities/:authority
+            Route::patch('{authority}', 'RbacController@update')->where(['authority' => '[0-9]+']);
 
-    //role router
-    Route::group(['namespace' => 'Resources', 'prefix' => 'roles'], function () {
+            // 删除权限
+            // /api/authorities/:authority
+            Route::delete('{authority}', 'RbacController@destroy')->where(['authority' => '[0-9]+']);
+        });
 
-        // 角色列表
-        // /api/roles
-        Route::get('/', 'RoleController@index');
+        //role router
+        Route::group(['prefix' => 'roles'], function () {
 
-        // 创建角色
-        // /api/roles/:role
-        Route::post('/', 'RoleController@store');
+            // 角色列表
+            // /api/roles
+            Route::get('/', 'RoleController@index');
 
-        // 编辑角色
-        // /api/roles
-        Route::patch('{role}', 'RoleController@update')->where(['role' => '[0-9]+']);
+            // 创建角色
+            // /api/roles/:role
+            Route::post('/', 'RoleController@store');
 
-        // 删除角色
-        // /api/roles/:role
-        Route::delete('{role}', 'RoleController@destroy')->where(['role' => '[0-9]+']);
+            // 编辑角色
+            // /api/roles
+            Route::patch('{role}', 'RoleController@update')->where(['role' => '[0-9]+']);
+
+            // 删除角色
+            // /api/roles/:role
+            Route::delete('{role}', 'RoleController@destroy')->where(['role' => '[0-9]+']);
+        });
     });
 });

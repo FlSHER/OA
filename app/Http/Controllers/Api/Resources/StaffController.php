@@ -117,4 +117,17 @@ class StaffController extends Controller
         return new StaffResource($staff);
     }
 
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\HR\Staff $staff
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Staff $staff)
+    {
+        $staff->delete();
+
+        return response()->json(null, 204);
+    }
+
 }
