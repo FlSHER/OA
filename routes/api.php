@@ -61,6 +61,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
         Route::apiResource('shops', 'ShopController');
         Route::apiResource('roles', 'RoleController');
         Route::get('educations', 'BasicInfoController@indexEducation');
+        Route::get('current-user', 'StaffController@getCurrentUser');
     });
     Route::prefix('table')->group(function () {
         Route::post('staff', 'Resources\StaffController@index');
@@ -222,8 +223,6 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
     Route::group(['namespace' => 'HR', 'prefix' => 'hr'], function () {
         // staff router
         Route::group(['prefix' => 'staff'], function () {
-            // 获取当前登陆用户信息
-            Route::get('current-user', 'StaffController@getCurrentUser');
 
             // 获取员工列表 /api/hr/staff
             Route::get('/', 'StaffController@index');

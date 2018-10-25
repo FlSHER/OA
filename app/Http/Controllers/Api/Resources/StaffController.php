@@ -10,6 +10,7 @@ use App\Http\Requests\StoreStaffRequest;
 use App\Http\Requests\UpdateStaffRequest;
 use App\Http\Resources\HR\StaffResource;
 use App\Http\Resources\HR\StaffCollection;
+use App\Http\Resources\CurrentUserResource;
 
 class StaffController extends Controller
 {
@@ -130,4 +131,21 @@ class StaffController extends Controller
         return response()->json(null, 204);
     }
 
+    public function getCurrentUser()
+    {
+        $staffSn = app('CurrentUser')->staff_sn;
+        if ($staffSn == 999999) {
+            $currentUser = config('auth.developer');
+            $currentUser['authorities'] = [
+                'oa' => app('Authority')->getAuthoritiesByStaffSn($staffSn),
+                'available_brands' => app('Authority')->getAvailableBrandsByStaffSn($staffSn),
+                'available_departments' => app('Authority')->getAvailableDepartmentsByStaffSn($staffSn),
+                'available_shops' => app('Authority')->getAvailableShopsByStaffSn($staffSn),
+            ];
+            return $currentUser;
+        } else {
+            $currentUser = Staff::find($staffSn);
+            return new CurrentUserResource($currentUser);
+        }
+    }
 }
