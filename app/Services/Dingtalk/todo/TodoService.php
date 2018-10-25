@@ -10,39 +10,69 @@ namespace App\Services\Dingtalk\todo;
 
 use App\Jobs\Dingtalk\SendTodo;
 use App\Models\Dingtalk\Todo;
+use App\Models\HR\Staff;
 use Curl;
 use Illuminate\Support\Facades\Auth;
 
 class TodoService
 {
-    public function sendAddTodo($data)
+    /**
+     * 发送待办
+     * @param $request
+     * @return int
+     */
+    public function sendAddTodo($request)
     {
-        try {
-            SendTodo::dispatch($this->addTodo($data));
-            return 1;
-        } catch (\Exception $e) {
+        //待办通知数据存入数据库
+        try{
+            $data = $request->except(['step_run_id']);
+            $data['userid'] = Staff::find($request->input('userid'))->dingding;
+            //待办数据存入数据库
+            $todo = $this->makeTodoDataToDatabase($data);
+        }catch(\Exception $e){
             return 0;
         }
+
+        //发送待办通知
+        try{
+            SendTodo::dispatch($this->addTodo($data,$todo));
+        }catch (\Exception $e){
+
+        }
+        return 1;
     }
 
-    public function sendUpdateTodo($data)
+    /**
+     * 更新待办通知
+     * @param $request
+     * @return int
+     */
+    public function sendUpdateTodo($request)
     {
-        try {
-            SendTodo::dispatch($this->updateTodo($data));
-            return 1;
-        } catch (\Exception $e) {
+        try{
+            $todoData = Todo::where('step_run_id',$request->input('step_run_id'))->select('record_id','todo_userid')->first();
+            $data = [
+                'userid' => $todoData->todo_userid,
+                'record_id'=>$todoData->record_id,
+            ];
+        }catch(\Exception $e){
             return 0;
         }
+
+        try {
+            SendTodo::dispatch($this->updateTodo($data));
+        } catch (\Exception $e) {
+
+        }
+        return 1;
     }
 
     /**
      * 发送钉钉待办事项
      * @param $data
      */
-    public function addTodo(array $data)
+    public function addTodo(array $data,$todo)
     {
-        //待办数据存入数据库
-        $todo = $this->makeTodoDataToDatabase($data);
         $url = config('dingding.todo.add') . '?access_token=' . app('Dingtalk')->getAccessToken();
         $result = Curl::setUrl($url)->sendMessageByPost($data);
         //发送信息结果存入数据库

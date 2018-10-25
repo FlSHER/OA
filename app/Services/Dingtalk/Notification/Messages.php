@@ -23,13 +23,18 @@ class Messages
      */
     public function sendJobNotification($request)
     {
-        $agentId = App::find($request->input('oa_client_id'))->agent_id;
-        $data = $request->except('oa_client_id','step_run_id');
-        $dingUserId = Staff::find($data['userid_list'])->pluck('dingding')->all();
-        $data['agent_id'] = $agentId;
-        $data['userid_list'] = implode(',', $dingUserId);
-        $message = $this->messageToDatabase($data);
-        return $this->sendJobNotificationMessage($data, $message);
+        try{
+            $agentId = App::find($request->input('oa_client_id'))->agent_id;
+            $data = $request->except('oa_client_id','step_run_id');
+            $dingUserId = Staff::find($data['userid_list'])->pluck('dingding')->all();
+            $data['agent_id'] = $agentId;
+            $data['userid_list'] = implode(',', $dingUserId);
+            $message = $this->messageToDatabase($data);
+        }catch(\Exception $e){
+            return 0;
+        }
+        $this->sendJobNotificationMessage($data, $message);
+        return 1;
     }
 
     /**
@@ -44,9 +49,8 @@ class Messages
             $message->task_id = array_has($result, 'task_id') ? $result['task_id'] : null;
             $message->request_id = array_has($result, 'request_id') ? $result['request_id'] : null;
             $message->save();
-            return 1;
         } catch (\Exception $e) {
-            return 0;
+
         }
     }
 
