@@ -236,20 +236,69 @@ class StaffController extends Controller
      */
     public function export(Request $request)
     {
-        $hasAuth = app('Authority')->checkAuthority(190);
-        if (!$hasAuth) {
-            return $this->exportStaffInfo($request);
-        }   
-        $data = [$request->input('maxCols')];
+        $data = [];
+        $hasAuth = app('Authority')->checkAuthority(190); 
         $staff = Staff::query()
-            ->with('status', 'brand', 'department', 'position')
+            ->with('status', 'brand', 'department', 'position', 'shop')
             ->filterByQueryString()
             ->sortByQueryString()
             ->get();
-        $staff->map(function ($item, $key) use (&$data) {
-            // 查询地区名称
-            $temp = [];
-            $district = District::whereIn('id', [
+
+        $staff->map(function ($item, $key) use (&$data, $hasAuth) {
+
+            // 基础数据
+            $exportData = $this->makeExportBaseData($item);
+
+            // 筛选掉无权限查看的员工
+            $checkBrand = app('Authority')->checkBrand($item->brand_id);
+            $checkDepart = app('Authority')->checkDepartment($item->department_id);
+
+            // push 高级权限数据
+            if ($hasAuth && ($checkBrand || $checkDepart) && $item->status_id < 0) {
+
+                $exportData = array_merge($exportData, $this->makeExportHighData($item));
+            }
+            
+            $data[$key] = $exportData;
+        });
+        
+        return response()->json($data, 201);
+    }
+
+    /**
+     * 组装导出基础数据。
+     * 
+     * @param  [type] $item
+     * @return array
+     */
+    protected function makeExportBaseData($item)
+    {
+        return [
+            'staff_sn' => $item->staff_sn,
+            'realname' => $item->realname,
+            'gender' => $item->gender,
+            'brand' => $item->brand->name,
+            'cost_brand' => $item->cost_brands->implode('name', '/'),
+            'shop_sn' => $item->shop_sn,
+            'shop_name' => $item->shop->name ?? '',
+            'department' => $item->department->name,
+            'position' => $item->position->name,
+            'status' => $item->status->name,
+            'hired_at' => $item->hired_at,
+        ];
+    }
+
+    /**
+     * 组装导出高级权限用户数据。
+     * 
+     * @param  $item
+     * @return array
+     */
+    protected function makeExportHighData($item)
+    {
+        // 查询地区名称
+        $temp = [];
+        $district = District::whereIn('id', [
                 $item->household_province_id,
                 $item->household_city_id,
                 $item->household_county_id,
@@ -257,103 +306,41 @@ class StaffController extends Controller
                 $item->living_city_id,
                 $item->living_county_id,
             ])->get();
-            $district->map(function ($city, $ck) use (&$temp) {
-                $temp[$city->id] = $city;
-            });
-            $makeHouseholdCity = [
-                $district->contains($item->household_province_id) ? $temp[$item->household_province_id]['name'] : '',
-                $district->contains($item->household_city_id) ? $temp[$item->household_city_id]['name'] : '',
-                $district->contains($item->household_county_id) ? $temp[$item->household_county_id]['name'] : '',
-            ];
-            $makeLivingCity = [
-                $district->contains($item->living_province_id) ? $temp[$item->living_province_id]['name'] : '',
-                $district->contains($item->living_city_id) ? $temp[$item->living_city_id]['name'] : '',
-                $district->contains($item->living_county_id) ? $temp[$item->living_county_id]['name'] : '',
-            ];
-            // 筛选掉无权限查看的员工
-            $checkBrand = app('Authority')->checkBrand($item->brand_id);
-            $checkDepart = app('Authority')->checkDepartment($item->department_id);
-            if ((!$checkBrand || !$checkDepart) && $item->status_id > 0) {
-                $data[$key+1] = [
-                    $item->staff_sn,
-                    $item->realname,
-                    $item->gender,
-                    $item->brand->name,
-                    $item->cost_brands->implode('name', '/'),
-                    $item->department->name,
-                    $item->shop_sn,
-                    $item->position->name,
-                    $item->status->name,
-                    $item->hired_at,
-                ]; 
-            } else {
-                $data[$key+1] = [
-                    $item->staff_sn,
-                    $item->realname,
-                    $item->gender,
-                    $item->brand->name,
-                    $item->cost_brands->implode('name', '/'),
-                    $item->department->full_name,
-                    $item->shop_sn,
-                    $item->position->name,
-                    $item->status->name,
-                    $item->hired_at,
-                    $item->mobile,
-                    $item->id_card_number,
-                    $item->account_number,
-                    $item->account_name,
-                    $item->account_bank,
-                    $item->national,
-                    $item->wechat_number,
-                    $item->education,
-                    $item->politics,
-                    $item->marital_status,
-                    $item->height,
-                    $item->weight,
-                    implode(' ', $makeHouseholdCity).' '.$item->household_address,
-                    implode(' ', $makeLivingCity).' '.$item->living_address,
-                    $item->native_place,
-                    $item->concat_name,
-                    $item->concat_tel,
-                    $item->concat_type,
-                    $item->remark,
-                ]; 
-            }
+        $district->map(function ($city) use (&$temp) {
+            $temp[$city->id] = $city;
         });
-        
-        return response()->json($data, 201);
-    }
+        $makeHouseholdCity = [
+            $district->contains($item->household_province_id) ? $temp[$item->household_province_id]['name'] : '',
+            $district->contains($item->household_city_id) ? $temp[$item->household_city_id]['name'] : '',
+            $district->contains($item->household_county_id) ? $temp[$item->household_county_id]['name'] : '',
+        ];
+        $makeLivingCity = [
+            $district->contains($item->living_province_id) ? $temp[$item->living_province_id]['name'] : '',
+            $district->contains($item->living_city_id) ? $temp[$item->living_city_id]['name'] : '',
+            $district->contains($item->living_county_id) ? $temp[$item->living_county_id]['name'] : '',
+        ];
 
-    /**
-     * 普通权限导出用户信息.
-     *
-     * @param Request $request
-     * @return void
-     */
-    protected function exportStaffInfo(Request $request)
-    { 
-        $data = [$request->input('minCols')];
-        $staff = Staff::query()
-            ->with('status', 'brand', 'department', 'position')
-            ->filterByQueryString()
-            ->sortByQueryString()
-            ->get();
-        $staff->map(function ($item, $key) use (&$data) {
-            $data[$key+1] = [
-                $item->staff_sn,
-                $item->realname,
-                $item->gender,
-                $item->brand->name,
-                $item->cost_brands->implode('name', '/'),
-                $item->shop_sn,
-                $item->department->name,
-                $item->position->name,
-                $item->status->name,
-                $item->hired_at,
-            ];
-        });
-        
-        return response()->json($data, 201);
+        return [
+            'mobile' => $item->mobile,
+            'id_card_number' => $item->id_card_number,
+            'account_number' => $item->account_number,
+            'account_name' => $item->account_name,
+            'account_bank' => $item->account_bank,
+            'national' => $item->national,
+            'wechat_number' => $item->wechat_number,
+            'education' => $item->education,
+            'politics' => $item->politics,
+            'marital_status' => $item->marital_status,
+            'height' => $item->height,
+            'weight' => $item->weight,
+            'household_city' => implode(' ', $makeHouseholdCity).' '.$item->household_address,
+            'living_city' => implode(' ', $makeLivingCity).' '.$item->living_address,
+            'native_place' => $item->native_place,
+            'concat_name' => $item->concat_name,
+            'concat_tel' => $item->concat_tel,
+            'concat_type' => $item->concat_type,
+            'remark' => $item->remark,
+        ];
     }
 
     /**
