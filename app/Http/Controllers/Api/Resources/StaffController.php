@@ -49,10 +49,10 @@ class StaffController extends Controller
                 }
             });
         })
-        ->with('relative', 'info', 'gender', 'position', 'department', 'brand', 'shop')
-        ->filterByQueryString()
-        ->sortByQueryString()
-        ->withPagination();
+            ->with('relative', 'info', 'gender', 'position', 'department', 'brand', 'shop')
+            ->filterByQueryString()
+            ->sortByQueryString()
+            ->withPagination();
         if (isset($list['data'])) {
             $list['data'] = new StaffCollection(collect($list['data']));
             return $list;
@@ -109,7 +109,7 @@ class StaffController extends Controller
                 $staff->relative()->detach();
                 $staff->relative()->attach($data['relatives']);
             }
-            
+
             $staff->load(['relative', 'info', 'gender', 'position', 'department', 'brand', 'shop']);
 
             return response()->json(new StaffResource($staff), 201);
@@ -169,7 +169,7 @@ class StaffController extends Controller
         $staff->password = $newPass;
         $staff->salt = $salt;
         $staff->save();
-        
+
         return response()->json(['message' => '重置成功'], 201);
     }
 
@@ -202,7 +202,7 @@ class StaffController extends Controller
         $hasAuth = app('Authority')->checkAuthority(190);
         if (!$hasAuth) {
             return $this->exportStaffInfo($request);
-        }   
+        }
         $data = [$request->input('maxCols')];
         $staff = Staff::query()
             ->with('gender', 'brand', 'info', 'department', 'position')
@@ -237,21 +237,7 @@ class StaffController extends Controller
             $checkBrand = app('Authority')->checkBrand($item->brand_id);
             $checkDepart = app('Authority')->checkDepartment($item->department_id);
             if ((!$checkBrand || !$checkDepart) && $item->status_id > 0) {
-                $data[$key+1] = [
-                    $item->staff_sn,
-                    $item->realname,
-                    $item->gender->name,
-                    $item->brand->name,
-                    $item->cost_brands->implode('name', '/'),
-                    $item->department->name,
-                    $item->shop_sn,
-                    $item->position->name,
-                    $item->status->name,
-                    $item->birthday,
-                    $item->hired_at,
-                ]; 
-            } else {
-                $data[$key+1] = [
+                $data[$key + 1] = [
                     $item->staff_sn,
                     $item->realname,
                     $item->gender->name,
@@ -259,6 +245,22 @@ class StaffController extends Controller
                     $item->cost_brands->implode('name', '/'),
                     $item->department->full_name,
                     $item->shop_sn,
+                    $item->shop->name,
+                    $item->position->name,
+                    $item->status->name,
+                    $item->birthday,
+                    $item->hired_at,
+                ];
+            } else {
+                $data[$key + 1] = [
+                    $item->staff_sn,
+                    $item->realname,
+                    $item->gender->name,
+                    $item->brand->name,
+                    $item->cost_brands->implode('name', '/'),
+                    $item->department->full_name,
+                    $item->shop_sn,
+                    $item->shop->name,
                     $item->position->name,
                     $item->status->name,
                     $item->birthday,
@@ -277,17 +279,17 @@ class StaffController extends Controller
                     $item->info->marital_status,
                     $item->info->height,
                     $item->info->weight,
-                    implode(' ', $makeHouseholdCity).' '.$item->info->household_address,
-                    implode(' ', $makeLivingCity).' '.$item->info->living_address,
+                    implode('-', $makeHouseholdCity) . ' ' . $item->info->household_address,
+                    implode('-', $makeLivingCity) . ' ' . $item->info->living_address,
                     $item->info->native_place,
                     $item->info->concat_name,
                     $item->info->concat_tel,
                     $item->info->concat_type,
                     $item->info->remark,
-                ]; 
+                ];
             }
         });
-        
+
         return response()->json($data, 201);
     }
 
@@ -298,7 +300,7 @@ class StaffController extends Controller
      * @return void
      */
     protected function exportStaffInfo(Request $request)
-    { 
+    {
         $data = [$request->input('minCols')];
         $staff = Staff::query()
             ->with('gender', 'brand', 'department', 'position')
@@ -306,20 +308,22 @@ class StaffController extends Controller
             ->sortByQueryString()
             ->get();
         $staff->map(function ($item, $key) use (&$data) {
-            $data[$key+1] = [
+            $data[$key + 1] = [
                 $item->staff_sn,
                 $item->realname,
                 $item->gender->name,
                 $item->brand->name,
                 $item->cost_brands->implode('name', '/'),
+                $item->department->full_name,
                 $item->shop_sn,
-                $item->department->name,
+                $item->shop->name,
                 $item->position->name,
                 $item->status->name,
                 $item->birthday,
+                $item->hired_at,
             ];
         });
-        
+
         return response()->json($data, 201);
     }
 
@@ -340,7 +344,7 @@ class StaffController extends Controller
             $validator = $this->makeValidator($value);
             if ($validator->fails()) {
                 return response()->json([
-                    'message' =>  "导入失败第 {$key} 条数据错误", 
+                    'message' => "导入失败第 {$key} 条数据错误",
                     'errors' => $validator->errors(),
                 ], 422);
             }
@@ -369,7 +373,7 @@ class StaffController extends Controller
             $validator = $this->makeValidator($value);
             if ($validator->fails()) {
                 return response()->json([
-                    'message' =>  "导入失败第 {$key} 条数据错误", 
+                    'message' => "导入失败第 {$key} 条数据错误",
                     'errors' => $validator->errors(),
                 ], 422);
             }
@@ -402,7 +406,7 @@ class StaffController extends Controller
     protected function makeFillStaff($value)
     {
         if (isset($value['staff_sn'])) {
-            $staff= Staff::where('staff_sn', $value['staff_sn'])->first();
+            $staff = Staff::where('staff_sn', $value['staff_sn'])->first();
         } else {
             $staff = new Staff();
             $staff->hired_at = $value['hired_at'] ?? now();
@@ -488,77 +492,77 @@ class StaffController extends Controller
         return $staffInfo;
     }
 
-     // 缓存职位
-     protected function getBrand()
-     {
-         $key = "brand_list";
-         if (Cache::has($key)) return Cache::get($key);
- 
-         $brand = Brand::select('id', 'name')->get();
-         Cache::put($key, $brand, now()->addMinutes(10));
- 
-         return $brand;   
-     }
- 
-     // 缓存部门
-     protected function getDepartment()
-     {
-         $key = "department_list";
-         if (Cache::has($key)) return Cache::get($key);
- 
-         $department = Department::select('id', 'name')->get();
-         Cache::put($key, $department, now()->addMinutes(10));
- 
-         return $department;   
-     }
-     
-     // 缓存职位
-     protected function getPosition()
-     {
-         $key = "position_list";
-         if (Cache::has($key)) return Cache::get($key);
-         
-         $position = Position::select('id', 'name')->get();
-         Cache::put($key, $position, now()->addMinutes(10));
- 
-         return $position;   
-     }
+    // 缓存职位
+    protected function getBrand()
+    {
+        $key = "brand_list";
+        if (Cache::has($key)) return Cache::get($key);
 
-     // 缓存民族
-     protected function getNational()
-     {
+        $brand = Brand::select('id', 'name')->get();
+        Cache::put($key, $brand, now()->addMinutes(10));
+
+        return $brand;
+    }
+
+    // 缓存部门
+    protected function getDepartment()
+    {
+        $key = "department_list";
+        if (Cache::has($key)) return Cache::get($key);
+
+        $department = Department::select('id', 'name')->get();
+        Cache::put($key, $department, now()->addMinutes(10));
+
+        return $department;
+    }
+
+    // 缓存职位
+    protected function getPosition()
+    {
+        $key = "position_list";
+        if (Cache::has($key)) return Cache::get($key);
+
+        $position = Position::select('id', 'name')->get();
+        Cache::put($key, $position, now()->addMinutes(10));
+
+        return $position;
+    }
+
+    // 缓存民族
+    protected function getNational()
+    {
         $key = "national_list";
         if (Cache::has($key)) return Cache::get($key);
-        
+
         $national = National::select('id', 'name')->get();
         Cache::put($key, $national, now()->addMinutes(10));
 
-        return $national; 
-     }
+        return $national;
+    }
 
-     // 缓存政治面貌
-     protected function getPolitics()
-     {
+    // 缓存政治面貌
+    protected function getPolitics()
+    {
         $key = "politics_list";
         if (Cache::has($key)) return Cache::get($key);
-        
+
         $politics = Politics::select('id', 'name')->get();
         Cache::put($key, $politics, now()->addMinutes(10));
 
         return $politics;
-     }
+    }
 
-     // 缓存地区
-     protected function getDistrict()
-     {
-         $key = "district_list";
-         if (Cache::has($key)) return Cache::get($key);
-        
-         $district = District::select('id', 'name')->get();
-         Cache::put($key, $district, now()->addMinutes(10));
- 
-         return $district;
-     }
+    // 缓存地区
+    protected function getDistrict()
+    {
+        $key = "district_list";
+        if (Cache::has($key)) return Cache::get($key);
+
+        $district = District::select('id', 'name')->get();
+        Cache::put($key, $district, now()->addMinutes(10));
+
+        return $district;
+    }
 
     /**
      * 组装导入数据。
@@ -579,7 +583,7 @@ class StaffController extends Controller
         }
         return $temp;
     }
-    
+
     /**
      * 导入信息合法性验证.
      *
@@ -617,7 +621,7 @@ class StaffController extends Controller
                         $name = end($department);
                     }
                     if (!Department::where('name', $name)->count()) {
-                        $fail('没有部门名称为 “'.$value.'” 的部门！');
+                        $fail('没有部门名称为 “' . $value . '” 的部门！');
                     }
                 }
             ],
@@ -658,7 +662,7 @@ class StaffController extends Controller
             $messages = array_merge($messages, [
                 'staff_sn.required' => '员工编号不能为空',
                 'staff_sn.exists' => '员工编号不正确',
-                
+
             ]);
         }
 
