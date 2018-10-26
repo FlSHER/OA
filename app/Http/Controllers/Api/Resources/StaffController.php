@@ -205,7 +205,7 @@ class StaffController extends Controller
         }
         $data = [$request->input('maxCols')];
         $staff = Staff::query()
-            ->with('gender', 'brand', 'info', 'department', 'position')
+            ->with('gender', 'brand', 'info', 'department', 'position', 'shop')
             ->filterByQueryString()
             ->sortByQueryString()
             ->get();
