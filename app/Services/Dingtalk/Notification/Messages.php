@@ -26,7 +26,7 @@ class Messages
         try{
             $agentId = App::find($request->input('oa_client_id'))->agent_id;
             $data = $request->except('oa_client_id','step_run_id');
-            $dingUserId = Staff::find($data['userid_list'])->pluck('dingding')->all();
+            $dingUserId = Staff::find($data['userid_list'])->pluck('dingtalk_number')->all();
             $data['agent_id'] = $agentId;
             $data['userid_list'] = implode(',', $dingUserId);
             $message = $this->messageToDatabase($data);
