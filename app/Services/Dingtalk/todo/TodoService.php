@@ -26,8 +26,9 @@ class TodoService
         //待办通知数据存入数据库
         try{
             $data = $request->except(['step_run_id']);
-            $data['userid'] = Staff::find($request->input('userid'))->dingding;
+            $data['userid'] = Staff::find($request->input('userid'))->dingtalk_number;
             //待办数据存入数据库
+            dd($data);
             $todo = $this->makeTodoDataToDatabase($data);
         }catch(\Exception $e){
             return 0;
