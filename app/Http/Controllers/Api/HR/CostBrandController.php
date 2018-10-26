@@ -17,6 +17,7 @@ class CostBrandController extends Controller
     public function index()
     {
         $list = CostBrand::query()
+            ->with('brands')
             ->filterByQueryString()
             ->sortByQueryString()
             ->withPagination();

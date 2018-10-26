@@ -20,6 +20,7 @@ class CostBrandCollection extends ResourceCollection
             return [
                 'id' => $brand->id,
                 'name' => $brand->name,
+                'brands' => $brand->brands,
             ];
         })->toArray();
     }
