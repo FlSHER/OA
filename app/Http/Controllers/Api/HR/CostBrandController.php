@@ -39,16 +39,20 @@ class CostBrandController extends Controller
      */
     public function store(Request $request, CostBrand $brand)
     {
+        $data = $request->all();
         $rules = [
             'name' => 'required|unique:brands',
+            'brands' => 'array',
         ];
         $message = [
             'name.required' => '费用品牌名称不能为空',
             'name.unique' => '费用品牌名称已存在',
+            'brands.array' => '关联品牌数据错误',
         ];
         $this->validate($request, $rules, $message);
-        $brand->name = $request->name;
+        $brand->name = $data['name'];
         $brand->save();
+        $brand->brands()->attach($data['brands']);
 
         return response()->json($brand, 201);
     }
@@ -61,6 +65,8 @@ class CostBrandController extends Controller
      */
     public function show(CostBrand $brand)
     {
+        $brand->load('brands');
+
         return response()->json($brand, 200);
     }
 
@@ -73,15 +79,19 @@ class CostBrandController extends Controller
      */
     public function update(Request $request, CostBrand $brand)
     {
+        $data = $request->all();
         $rules = [
             'name' => 'required',
+            'brands' => 'array',
         ];
         $message = [
             'name.required' => '费用品牌名称不能为空',
+            'brands.array' => '关联品牌数据错误',
         ];
         $this->validate($request, $rules, $message);
-        $brand->name = $request->name;
+        $brand->name = $data['name'];
         $brand->save();
+        $brand->brands()->sync($data['brands']);
 
         return response()->json($brand, 201);
     }
@@ -100,6 +110,7 @@ class CostBrandController extends Controller
         }
 
         $brand->delete();
+        $brand->brands()->detach();
 
         return response()->json(null, 204);
     }
