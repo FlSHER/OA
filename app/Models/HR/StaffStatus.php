@@ -3,10 +3,12 @@
 namespace App\Models\HR;
 
 use App\Scopes\SortScope;
+use App\Models\Traits\ListScopes;
 use Illuminate\Database\Eloquent\Model;
 
 class StaffStatus extends Model
 {
+    use ListScopes;
 
     protected static function boot()
     {

@@ -85,6 +85,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
 
             // 获取单个员工 /api/staff/:staff
             Route::get('{staff}', 'StaffController@show')->where(['staff' => '[0-9]+']);
+
+            // 获取员工状态列表 /api/staff/status
+            Route::get('status', 'StaffController@status');
         });
 
         // department router

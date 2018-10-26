@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Resources;
 
 use App\Models\HR\Staff;
+use App\Models\HR\StaffStatus;
 use Illuminate\Http\Request;
 use App\Services\StaffService;
 use App\Http\Controllers\Controller;
@@ -147,5 +148,20 @@ class StaffController extends Controller
             $currentUser = Staff::find($staffSn);
             return new CurrentUserResource($currentUser);
         }
+    }
+
+    /**
+     * 获取员工状态列表.
+     * 
+     * @return array
+     */
+    public function status()
+    {
+        $list = StaffStatus::query()
+            ->filterByQueryString()
+            ->sortByQueryString()
+            ->get();
+
+        return response()->json($list, 200);
     }
 }
