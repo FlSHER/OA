@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Resources;
+namespace App\Http\Controllers\Api\HR;
 
 use App\Models\HR\Shop;
 use App\Models\HR\Staff;
@@ -138,6 +138,12 @@ class ShopController extends Controller
         $shop->save();
 
         return response()->json(['message' => '操作成功', 'code' => '1'], 201);
+    }
+
+
+    public function process(Request $request, Shop $shop)
+    {
+        $status = $request->input('status_id');
     }
 
     protected function rules(Request $request)

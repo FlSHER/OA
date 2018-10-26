@@ -27,21 +27,47 @@ class Staff extends User
         'username',
         'realname',
         'mobile',
-        'wechat_number',
-        'gender_id',
-        'birthday',
+        'gender',
         'brand_id',
         'department_id',
         'shop_sn',
         'position_id',
-        'dingding',
+        'dingtalk_number',
+        'is_active',
         'status_id',
         'hired_at',
         'employed_at',
         'left_at',
-        'is_active',
         'property',
+        'id_card_number',
+        'account_number',
+        'account_bank',
+        'account_name',
+        'account_active',
+        'recruiter_sn',
+        'recruiter_name',
+        'household_province_id',
+        'household_city_id',
+        'household_county_id',
+        'household_address',
+        'living_province_id',
+        'living_city_id',
+        'living_county_id',
+        'living_address',
+        'national',
+        'marital_status',
+        'politics',
+        'education',
+        'height',
+        'weight',
+        'native_place',
+        'remark',
+        'concat_name',
+        'concat_tel',
+        'concat_type',
+        'wechat_number',
     ];
+
     protected $hidden = ['password', 'salt', 'created_at', 'updated_at', 'deleted_at'];
 
     public function getAuthIdentifierName()
@@ -50,6 +76,41 @@ class Staff extends User
     }
 
     /* ----- 定义关联 Start ----- */
+
+    public function info()
+    { //员工信息
+        return $this->hasOne('App\Models\HR\StaffInfo', 'staff_sn', 'staff_sn')->withTrashed();
+    }
+
+    public function household_province()
+    { //省级区划
+        return $this->belongsTo('App\Models\I\District', 'household_province_id');
+    }
+
+    public function household_city()
+    { //市级区划
+        return $this->belongsTo('App\Models\I\District', 'household_city_id');
+    }
+
+    public function household_county()
+    { //县级区划
+        return $this->belongsTo('App\Models\I\District', 'household_county_id');
+    }
+
+    public function living_province()
+    { //省级区划
+        return $this->belongsTo('App\Models\I\District', 'living_province_id');
+    }
+
+    public function living_city()
+    { //市级区划
+        return $this->belongsTo('App\Models\I\District', 'living_city_id');
+    }
+
+    public function living_county()
+    { //县级区划
+        return $this->belongsTo('App\Models\I\District', 'living_county_id');
+    }
 
     public function role()
     { //角色
@@ -96,16 +157,6 @@ class Staff extends User
         return $this->belongsToMany('App\Models\HR\Shop', 'shop_has_staff', 'staff_sn');
     }
 
-    public function info()
-    { //员工信息
-        return $this->hasOne('App\Models\HR\StaffInfo', 'staff_sn', 'staff_sn');
-    }
-
-    public function gender()
-    { //性别
-        return $this->belongsTo('App\Models\I\Gender');
-    }
-
     public function change_log()
     { //员工信息变动日志
         return $this->hasMany('App\Models\HR\StaffLog', 'staff_sn')->orderBy('created_at', 'desc');
@@ -135,16 +186,18 @@ class Staff extends User
     {//员工评价
         return $this->hasMany('App\Models\HR\Appraise', 'staff_sn', 'staff_sn')->orderBy('create_time', 'desc');
     }
-    /* ----- 定义关联 End ----- */
 
-    /* ----- 访问器 Start ----- */
-
-    public function getLatestLoginTimeAttribute($value)
+    /**
+     * has gender.
+     * 
+     * @author 28youth
+     * @return \Illuminate\Database\Eloquent\Concerns\hasOne
+     */
+    public function igender()
     {
-        return $value > 0 ? date('Y-m-d H:i:s', $value) : '';
+        return $this->hasOne('App\Models\I\Gender', 'name', 'gender');
     }
-
-    /* ----- 访问器 End ----- */
+    /* ----- 定义关联 End ----- */
 
     /* ----- 修改器 Start ----- */
 
@@ -181,50 +234,54 @@ class Staff extends User
         }
     }
 
-    public function setGenderAttribute($value)
+    public function setPoliticsAttribute($value)
     {
-        if (is_string($value)) {
-            $this->attributes['gender_id'] = Gender::where('name', $value)->value('id');
-        }
+        $this->attributes['politics'] = !empty($value) ? $value : '未知';
     }
 
-    public function setNationalAttribute($value)
+    public function setEducationAttribute($value)
     {
-        if (is_string($value)) {
-            $this->attributes['national_id'] = National::where('name', $value)->value('id');
-        }
+        $this->attributes['education'] = !empty($value) ? $value : '未知';;
     }
 
     public function setMaritalStatusAttribute($value)
     {
-        $this->attributes['marital_status_id'] = MaritalStatus::where('name', $value)->value('id');
+        $this->attributes['marital_status'] = !empty($value) ? $value : '未知';
     }
 
-    public function setPoliticsAttribute($value)
+    public function setNationalAttribute($value)
     {
-        if (is_string($value)) {
-            $this->attributes['politics_id'] = Politics::where('name', $value)->value('id');
-        }
+        $this->attributes['national'] = !empty($value) ? $value : '未知';
     }
 
-    public function setHiredAtAttribute($value)
+    public function setHouseholdProvinceIdAttribute($value)
     {
-        $this->attributes['hired_at'] = empty($value) ? null : $value;
+        $this->attributes['household_province_id'] = $value ?: 0;
     }
 
-    public function setEmployedAtAttribute($value)
+    public function setHouseholdCityIdAttribute($value)
     {
-        $this->attributes['employed_at'] = empty($value) ? null : $value;
+        $this->attributes['household_city_id'] = $value ?: 0;
     }
 
-    public function setLeftAtAttribute($value)
+    public function setHouseholdCountyIdAttribute($value)
     {
-        $this->attributes['left_at'] = empty($value) ? null : $value;
+        $this->attributes['household_county_id'] = $value ?: 0;
     }
 
-    public function setBirthdayAttribute($value)
+    public function setLivingProvinceIdAttribute($value)
     {
-        $this->attributes['birthday'] = empty($value) ? null : $value;
+        $this->attributes['living_province_id'] = $value ?: 0;
+    }
+
+    public function setLivingCityIdAttribute($value)
+    {
+        $$this->attributes['living_city_id'] = $value ?: 0;
+    }
+
+    public function setLivingCountyIdAttribute($value)
+    {
+        $this->attributes['living_county_id'] = $value ?: 0;
     }
 
     /* ----- 修改器 End ----- */
@@ -243,7 +300,7 @@ class Staff extends User
 
     public function scopeApi($query)
     {
-        $query->with('brand', 'department', 'position', 'shop', 'status', 'info', 'role');
+        $query->with('brand', 'department', 'position', 'shop', 'status', 'role');
     }
 
     public function scopeWorking($query)

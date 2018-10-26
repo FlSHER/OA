@@ -87,6 +87,8 @@ return [
     'unique'               => ':attribute 已经存在。',
     'uploaded'             => ':attribute 上传失败。',
     'url'                  => 'The :attribute format is invalid.',
+    'cn_phone'             => ':attribute 必须是大陆地区合法手机号码',
+    'ck_identity'          => ':attribute 不是一个有效的身份证号码',
 
     /*
     |--------------------------------------------------------------------------
@@ -116,6 +118,45 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'realname' => '姓名',
+        'brand' => '品牌',
+        'position' => '职位',
+        'mobile' => '手机号',
+        'id_card_number' => '身份证',
+        'gender' => '性别',
+        'property' => '员工属性',
+        'status' => '员工状态',
+        'national' => '民族',
+        'education' => '学历',
+        'politics' => '政治面貌',
+        'marital_status' => '婚姻状况',
+        'household_province' => '户口所在地（省）',
+        'household_city' => '户口所在地（市）',
+        'household_county' => '户口所在地（区/县）',
+        'living_province' => '现居住地（省）',
+        'living_city' => '现居住地（市）',
+        'living_county' => '现居住地（区/县）',
+        'household_address' => '户口所在地（详细地址）',
+        'living_address' => '现居住地（详细地址）',
+        'concat_name' => '紧急联系人',
+        'concat_tel' => '联系人电话',
+        'concat_type' => '联系人类型',
+        'account_bank' => '开户人',
+        'account_name' => '开户人',
+        'account_number' => '银行卡号',
+        'height' => '身高',
+        'weight' => '体重',
+        'dingtalk_number' => '钉钉编号',
+        'remark' => '备注',
+        'shop_sn' => '店铺编号',
+        'status_id' => '员工状态',
+        'department' => '部门',
+        'cost_brand' => '费用品牌',
+        'cost_brands' => '费用品牌',
+        'operate_at' => '执行时间',
+        'operation_type' => '操作类型',
+        'operation_remark' => '执行备注',
+    ],
 
 ];
