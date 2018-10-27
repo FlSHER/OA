@@ -164,4 +164,94 @@ class StaffController extends Controller
 
         return response()->json($list, 200);
     }
+
+    /**
+     * 转正操作(工作流).
+     * 
+     * @param  Request $request
+     * @return mixed
+     */
+    public function process(Request $request)
+    {
+        $data = $request->all();
+        if ($data['type'] == 'finish') {
+            $this->processValidator($data['data']);
+            $this->staffService->update($data['data']);
+
+            return response()->json(['message' => '转正成功'], 201);
+        }
+    }
+
+    /**
+     * 人事变动操作(工作流).
+     * 
+     * @param  Request $request
+     * @return mixed
+     */
+    public function transfer(Request $request)
+    {
+        $data = $request->all();
+        if ($data['type'] == 'finish') {
+            $this->processValidator($data['data']);
+            $this->staffService->update($data['data']);
+
+            return response()->json(['message' => '操作成功'], 201);
+        }
+    }
+
+    /**
+     * 入转调离操作验证.
+     * 
+     * @param  array $value
+     * @return mixed
+     */
+    protected function processValidator($value)
+    {
+        $rules = [
+            'staff_sn' => 'required|exists:staff,staff_sn',
+            'operate_at' => 'required|date_format:Y-m-d',
+            'operation_type' => 'required|in:entry,employ,transfer,leave,reinstate,active,leaving',
+            'operation_remark' => 'max:100',
+        ];
+        $message = [
+            'required' => ':attribute 为必填项，不能为空。',
+            'in' => ':attribute 必须在【:values】中选择。',
+            'max' => ':attribute 不能大于 :max 个字。',
+            'exists' => ':attribute 填写错误。',
+            'date_format' => '时间格式错误',
+        ];
+
+        $type = $value['operation_type'];
+
+        if ($type == 'employ') { //转正
+            $rules = array_merge($rules, [
+                'status_id' => 'required|in:2',
+            ]);
+        } elseif ($type == 'transfer') { //变动
+            $rules = array_merge($rules, [
+                'status_id' => 'required|in:-1,2,3',
+                'department_id' => 'required|exists:departments,id',
+                'brand_id' => 'required|exists:brands,id',
+                'shop_sn' => 'max:10|exists:shops,shop_sn',
+                'cost_brands' => ['required|array'],
+                'position_id' => 'required|exists:positions,id',
+
+            ]);
+        } elseif ($type == 'leave') { // 离职中
+            $rules = array_merge($rules, [
+                'status_id' => 'required|in:-1,-2,-3,-4',
+                'skip_leaving' => 'in:0',
+            ]);
+        } elseif ($type == 'leaving') { // 已离职
+            $rules = array_merge($rules, [
+                'status_id' => 'required|in:-1,-2,-3,-4',
+                'skip_leaving' => 'in:1',
+            ]);
+        } elseif ($type == 'reinstate') { // 再入职
+
+        }
+
+        return Validator::make($value, $rules, $message)->validate();
+    }
+
 }

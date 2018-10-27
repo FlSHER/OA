@@ -86,6 +86,18 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             // 获取单个员工 /api/staff/:staff
             Route::get('{staff}', 'StaffController@show')->where(['staff' => '[0-9]+']);
 
+             // 员工转正 /api/staff/process
+            Route::patch('/process', 'StaffController@process');
+
+            // 人事变动 /api/staff/transfer
+            Route::patch('/transfer', 'StaffController@transfer');
+
+            // 离职 /api/staff/leave
+            Route::patch('/leave', 'StaffController@leave');
+
+            //  再入职 /api/staff/again-entry
+            Route::patch('/again-entry', 'StaffController@againEntry');
+
             // 获取员工状态列表 /api/staff/status
             Route::get('status', 'StaffController@status');
         });
@@ -249,16 +261,16 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             Route::patch('/{staff}/unlock', 'StaffController@unlock')->where(['staff' => '[0-9]+']);
             
             // 员工转正 /api/hr/staff/process
-            Route::patch('/process', 'StaffController@process')->where(['staff' => '[0-9]+']);
+            Route::patch('/process', 'StaffController@process');
 
             // 人事变动 /api/hr/staff/transfer
-            Route::patch('/transfer', 'StaffController@transfer')->where(['staff' => '[0-9]+']);
+            Route::patch('/transfer', 'StaffController@transfer');
 
             // 离职 /api/hr/staff/leave
-            Route::patch('/leave', 'StaffController@leave')->where(['staff' => '[0-9]+']);
+            Route::patch('/leave', 'StaffController@leave');
 
             //  再入职 /api/hr/staff/again-entry
-            Route::patch('/again-entry', 'StaffController@againEntry')->where(['staff' => '[0-9]+']);
+            Route::patch('/again-entry', 'StaffController@againEntry');
 
             // 员工批量导入 /api/hr/staff/import
             Route::post('/import', 'StaffController@import');

@@ -92,7 +92,7 @@ class StaffRequest extends FormRequest
         }
         if ($this->operationMatch($operationType, ['edit', 'entry', 'reinstate'])) {
             $importValidatorPersonal = [
-                'gender.name' => ['required', 'exists:i_gender,name'],
+                'gender' => ['required', 'exists:i_gender,name'],
                 'household_province_id' => ['exists:i_district,name,level,1'],
                 'household_city_id' => ['exists:i_district,name,level,2'],
                 'household_county_id' => ['exists:i_district,name,level,3'],
@@ -133,7 +133,7 @@ class StaffRequest extends FormRequest
         }
         if ($this->operationMatch($operationType, ['edit', 'entry', 'reinstate'])) {
             $formValidatorPersonal = [
-                'gender' => ['required', 'exists:i_gender,name'],
+                // 'gender' => ['required', 'exists:i_gender,name'],
                 'household_province_id' => empty($this->household_province_id) ? [] : ['exists:i_district,id,level,1'],
                 'household_city_id' => empty($this->household_city_id) ? [] : ['exists:i_district,id,level,2'],
                 'household_county_id' => empty($this->household_county_id) ? [] : ['exists:i_district,id,level,3'],
@@ -184,7 +184,7 @@ class StaffRequest extends FormRequest
             'realname' => ['required', 'between:2,10'],
             'mobile' => ['required', 'regex:/^1[3456789][0-9]{9}$/', 'unique:staff,mobile,' . $staffSn . ',staff_sn,deleted_at,NULL', 'unique:staff,username,' . $staffSn . ',staff_sn,deleted_at,NULL'],
             'username' => ['max:16', 'unique:staff,username,' . $staffSn . ',staff_sn,deleted_at,NULL', 'unique:staff,mobile,' . $staffSn . ',staff_sn,deleted_at,NULL'],
-            'id_card_number' => ['required', 'regex:/^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|10|11|12)(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/', 'unique:staff,id_card_number,' . $staffSn . ',staff_sn,deleted_at,NULL'],
+            // 'id_card_number' => ['required', 'regex:/^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|10|11|12)(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/', 'unique:staff,id_card_number,' . $staffSn . ',staff_sn,deleted_at,NULL'],
             'remark' => ['max:200'],
             'account_number' => ['between:16,19'],
             'account_name' => ['between:2,10'],
@@ -198,9 +198,9 @@ class StaffRequest extends FormRequest
             'native_place' => ['max:30'],
             'education' => ['exists:i_education,name'],
             'dingtalk_number' => ['max:50', 'unique:staff,NULL,' . $staffSn . ',staff_sn,deleted_at,NULL'],
-            'concat_name' => ['required', 'between:2,10'],
-            'concat_tel' => ['required', 'regex:/^1[3456789]\d{9}$|^0\d{2,3}-\d{5,9}$/'],
-            'concat_type' => ['required', 'max:5'],
+            // 'concat_name' => ['required', 'between:2,10'],
+            // 'concat_tel' => ['required', 'regex:/^1[3456789]\d{9}$|^0\d{2,3}-\d{5,9}$/'],
+            // 'concat_type' => ['required', 'max:5'],
             'household_address' => ['max:30'],
             'living_address' => ['max:30'],
         ];
