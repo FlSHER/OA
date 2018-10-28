@@ -99,7 +99,16 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             Route::patch('/again-entry', 'StaffController@againEntry');
 
             // 获取员工状态列表 /api/staff/status
-            Route::get('status', 'StaffController@status');
+            Route::get('/status', 'StaffController@status');
+
+            // 获取员工标签 /api/staff/tags
+            Route::get('/tags', 'TagStaffController@index');
+
+            // 添加员工标签 /api/staff/tags/:tag
+            Route::put('/tags/{tag}', 'TagStaffController@store');
+
+            // 删除员工标签 /api/staff/tags/:tag
+            Route::delete('/tags/{tag}', 'TagStaffController@destroy');
         });
 
         // department router
