@@ -421,5 +421,33 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             // /api/roles/:role
             Route::delete('{role}', 'RoleController@destroy')->where(['role' => '[0-9]+']);
         });
+
+        // tag router
+        Route::group(['prefix' => 'tags'], function () {
+
+            // 标签列表 /api/hr/tags
+            Route::get('/', 'TagController@index');
+
+            // 创建标签 /api/hr/tags
+            Route::post('/', 'TagController@store');
+
+            // 更新标签 /api/hr/tags/:tag
+            Route::patch('{tag}', 'TagController@update');
+
+            // 删除标签 /api/hr/tags/:tag
+            Route::delete('{tag}', 'TagController@delete');
+
+            // 标签分类列表 /api/hr/tags/categories
+            Route::get('categories', 'TagController@categories');
+
+            // 创建标签分类 /api/hr/tags/categories
+            Route::post('categories', 'TagController@storeCate');
+
+            // 更新标签分类 /api/hr/tags/categories/:cate
+            Route::patch('categories/{cate}', 'TagController@updateCate');
+
+            // 删除标签分类 /api/hr/tags/categories/:cate
+            Route::delete('categories/{cate}', 'TagController@deleteCate');
+        });
     });
 });

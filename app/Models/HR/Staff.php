@@ -3,10 +3,10 @@
 namespace App\Models\HR;
 
 use Authority;
+use App\Models\Tag;
 use App\Models\Brand;
 use App\Models\I\Gender;
 use App\Models\Position;
-
 use App\Models\Department;
 use App\Models\I\National;
 use App\Models\I\Politics;
@@ -314,5 +314,17 @@ class Staff extends User
     protected function findForPassport($username)
     {
         return $this->where('mobile', $username)->first();
+    }
+
+
+    /**
+     * Has tags of the staff.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+     */
+    public function tags()
+    {
+        return $this->morphToMany(Tag::class, 'taggable', 'taggables')
+            ->withTimestamps();
     }
 }
