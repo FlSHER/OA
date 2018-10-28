@@ -41,6 +41,7 @@ class StaffResource extends Resource
             'position' => $this->position->only(['id', 'name', 'level']),
             'relatives' => $this->relative ? new StaffRelativeCollection($this->relative) : [],
             'department' => $this->department->only(['id', 'full_name', 'manager_sn', 'manager_name']),
+            'cost_brands' => $this->cost_brands,
             'shop' => $this->shop ? $this->shop->only(['shop_sn', 'name', 'manager_sn', 'manager_name']) : null,
             'household_province_name' => $this->household_province ? $this->household_province->name : '',
             'household_city_name' => $this->household_city ? $this->household_city->name : '',

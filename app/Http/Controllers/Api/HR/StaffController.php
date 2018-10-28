@@ -52,7 +52,7 @@ class StaffController extends Controller
                 }
             });
         })
-        ->with('relative', 'position', 'department', 'brand', 'shop')
+        ->with('relative', 'position', 'department', 'brand', 'shop', 'cost_brands')
         ->filterByQueryString()
         ->sortByQueryString()
         ->withPagination();
@@ -80,7 +80,7 @@ class StaffController extends Controller
 
         if ($curd['status'] == 1) {
             $staff = Staff::query()
-                ->with(['relative', 'position', 'department', 'brand', 'shop'])
+                ->with(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands'])
                 ->orderBy('staff_sn', 'desc')
                 ->first();
 
@@ -105,12 +105,12 @@ class StaffController extends Controller
 
         if ($curd['status'] == 1) {
             $result = $staff->where('staff_sn', $staff->staff_sn)->first();
-            $result->load(['relative', 'position', 'department', 'brand', 'shop']);
+            $result->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands']);
 
             return response()->json(new StaffResource($result), 201);
         } elseif ($curd['status'] == -1) {
             $result = $staff->where('staff_sn', $staff->staff_sn)->first();
-            $result->load(['relative', 'position', 'department', 'brand', 'shop']);
+            $result->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands']);
 
             return response()->json(new StaffResource($result), 201);
         }
@@ -124,7 +124,7 @@ class StaffController extends Controller
      */
     public function show(Staff $staff)
     {
-        $staff->load(['relative', 'position', 'department', 'brand', 'shop']);
+        $staff->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands']);
 
         return new StaffResource($staff);
     }
@@ -242,7 +242,7 @@ class StaffController extends Controller
         $data = [];
         $hasAuth = app('Authority')->checkAuthority(190); 
         $staff = Staff::query()
-            ->with('status', 'brand', 'department', 'position', 'shop')
+            ->with('status', 'brand', 'department', 'position', 'shop', 'cost_brands')
             ->filterByQueryString()
             ->sortByQueryString()
             ->get();

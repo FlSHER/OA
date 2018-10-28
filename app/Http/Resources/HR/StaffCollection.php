@@ -38,6 +38,7 @@ class StaffCollection extends ResourceCollection
                 'wechat_number' => $staff->wechat_number,
 
                 'shop' => $staff->shop ? $staff->shop->only(['shop_sn', 'name', 'manager_sn', 'manager_name']) : null,
+                'cost_brands' => $staff->cost_brands,
                 'department' => $staff->department->only(['id', 'full_name', 'manager_sn', 'manager_name']),
                 'relatives' => $staff->relative ? new StaffRelativeCollection($staff->relative) : [],
                 'position' => $staff->position->only(['id', 'name', 'level']),

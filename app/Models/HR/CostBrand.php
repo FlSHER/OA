@@ -11,6 +11,8 @@ class CostBrand extends Model
 	use ListScopes;
     use SoftDeletes;
 
+    protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'pivot'];
+
     public function brands()
     {
         return $this->belongsToMany(Brand::class, 'brand_has_cost_brands', 'cost_brand_id');
