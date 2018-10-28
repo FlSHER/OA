@@ -668,7 +668,7 @@ class StaffController extends Controller
                 'department_id' => 'required|exists:departments,id',
                 'brand_id' => 'required|exists:brands,id',
                 'shop_sn' => 'max:10|exists:shops,shop_sn',
-                'cost_brands' => ['required|array'],
+                'cost_brands' => 'required|array',
                 'position_id' => 'required|exists:positions,id',
 
             ]);
