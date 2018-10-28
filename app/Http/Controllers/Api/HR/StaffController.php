@@ -108,9 +108,12 @@ class StaffController extends Controller
             $result->load(['relative', 'position', 'department', 'brand', 'shop']);
 
             return response()->json(new StaffResource($result), 201);
-        }
+        } elseif ($curd['status'] == -1) {
+            $result = $staff->where('staff_sn', $staff->staff_sn)->first();
+            $result->load(['relative', 'position', 'department', 'brand', 'shop']);
 
-        return response()->json($curd, 422);
+            return response()->json(new StaffResource($result), 201);
+        }
     }
 
     /**

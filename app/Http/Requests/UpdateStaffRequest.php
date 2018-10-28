@@ -60,6 +60,9 @@ class UpdateStaffRequest extends FormRequest
             'status_id' => 'bail|exists:staff_status,id',
             'operate_at' => 'bail|required|date',
             'operation_remark' => 'bail|max:100',
+            'relative.*.relative_sn' => ['required_with:relative_type,relative_name'],
+            'relative.*.relative_type' => ['required_with:relative_sn,relative_name'],
+            'relative.*.relative_name' => ['required_with:relative_type,relative_sn'],
             // 'email' => 'bail|email',
             // 'birthday' => 'bail|date',
             // 'qq_number' => 'bail|integer',
@@ -80,6 +83,7 @@ class UpdateStaffRequest extends FormRequest
             'unique' => ':attribute 已经存在，请重新填写。',
             'required' => ':attribute 为必填项，不能为空。',
             'between' => ':attribute 值 :input 不在 :min - :max 之间。',
+            'required_with' => ':attribute 不能为空。',
         ];
     }
 

@@ -157,6 +157,9 @@ return [
         'operate_at' => '执行时间',
         'operation_type' => '操作类型',
         'operation_remark' => '执行备注',
+        'relative_sn' => '关系人编号',
+        'relative_type' => '关系人类型',
+        'relative_name' => '关系人姓名',
     ],
 
 ];
