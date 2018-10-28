@@ -207,6 +207,8 @@ class StaffController extends Controller
         $this->processValidator($data);
         $this->staffService->update($data);
 
+        $data['cost_brands'] = CostBrand::whereIn('id', $data['cost_brands'])->get();
+
         return response()->json([
             'message' => '操作成功',
             'changes' => $data,
