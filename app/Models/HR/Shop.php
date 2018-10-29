@@ -3,6 +3,7 @@
 namespace App\Models\HR;
 
 use Authority;
+use App\Models\Tag;
 use App\Models\Traits\ListScopes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -29,6 +30,17 @@ class Shop extends Model
         'lat',
         'clock_in',
         'clock_out',
+        'opening_at',
+        'end_at',
+        'status_id',
+        'manager_sn',
+        'manager_name',
+        'manager1_sn',
+        'manager1_name',
+        'manager2_sn',
+        'manager2_name',
+        'manager3_sn',
+        'manager3_name',
     ];
 
     /* ----- 定义关联Start ----- */
@@ -136,7 +148,18 @@ class Shop extends Model
 
     public function scopeApi($query)
     {
-        $query->with(['staff', 'department', 'brand', 'province', 'city', 'county', 'manager']);
+        $query->with(['staff', 'department', 'brand', 'province', 'city', 'county', 'manager', 'manager1', 'manager2', 'manager3', 'tags']);
+    }
+
+    /**
+     * Has tags of the staff.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+     */
+    public function tags()
+    {
+        return $this->morphToMany(Tag::class, 'taggable', 'taggables')
+            ->withTimestamps();
     }
 
     /* ----- 本地作用域 End ----- */

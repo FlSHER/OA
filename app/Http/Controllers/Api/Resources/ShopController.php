@@ -42,17 +42,21 @@ class ShopController extends Controller
         $data = $request->all();
         $shop->fill($data);
 
-        $staff = collect($data['staff'])->pluck('staff_sn');
-        $shop->getConnection()->transaction(function () use ($shop, $staff) {
-            // 更新员工店铺编号
-            $shop->staff()->update(['shop_sn' => '']);
-            Staff::whereIn('staff_sn', $staff)->update(['shop_sn' => $shop->shop_sn]);
+        $shop->getConnection()->transaction(function () use ($shop, $data) {
             $shop->createShopLog();
-
             $shop->save();
+            if (!empty($data['staff'])) {
+                $staffSn = array_column($data['staff'], 'staff_sn');
+                $shop->staff()->update(['shop_sn' => '']);
+                Staff::whereIn('staff_sn', $staffSn)->update(['shop_sn' => $shop->shop_sn]);
+            }
+            if (!empty($data['tags'])) {
+                $tags = array_column($data['tags'], 'id');
+                $shop->tags()->sync($tags);
+            }
         });
 
-        $shop->load(['staff', 'brand', 'department']);
+        $shop->load(['staff', 'brand', 'department', 'manager', 'manager1', 'manager2', 'manager3', 'tags']);
 
         return response()->json($shop, 201);
     }
@@ -65,7 +69,7 @@ class ShopController extends Controller
      */
     public function show(Shop $shop)
     {
-        $shop->load(['brand', 'department', 'staff']);
+        $shop->load(['staff', 'brand', 'department', 'manager', 'manager1', 'manager2', 'manager3', 'tags']);
 
         return response()->json($shop, 200);
     }
@@ -83,17 +87,21 @@ class ShopController extends Controller
         $data = $request->all();
         $shop->fill($data);
 
-        $staff = collect($data['staff'])->pluck('staff_sn');
-        $shop->getConnection()->transaction(function () use ($shop, $staff) {
-            // 更新员工店铺编号
-            $shop->staff()->update(['shop_sn' => '']);
-            Staff::whereIn('staff_sn', $staff)->update(['shop_sn' => $shop->shop_sn]);
+        $shop->getConnection()->transaction(function () use ($shop, $data) {
             $shop->createShopLog();
-
             $shop->save();
+            if (!empty($data['staff'])) {
+                $staffSn = array_column($data['staff'], 'staff_sn');
+                $shop->staff()->update(['shop_sn' => '']);
+                Staff::whereIn('staff_sn', $staffSn)->update(['shop_sn' => $shop->shop_sn]);
+            }
+            if (!empty($data['tags'])) {
+                $tags = array_column($data['tags'], 'id');
+                $shop->tags()->sync($tags);
+            }
         });
 
-        $shop->load(['staff', 'brand', 'department']);
+        $shop->load(['staff', 'brand', 'department', 'manager', 'manager1', 'manager2', 'manager3', 'tags']);
 
         return response()->json($shop, 201);
     }
@@ -143,14 +151,29 @@ class ShopController extends Controller
     protected function rules(Request $request)
     {
         $rules = [
-            'shop_sn' => 'bail|required|unique:shops|max:10',
             'name' => 'bail|required|max:50',
-            'manager_sn' => 'bail|nullable|exists:staff,staff_sn',
+            'shop_sn' => 'bail|required|unique:shops|max:10',
+            'status_id' => 'bail|required|exists:shop_status,id',
             'department_id' => 'bail|exists:departments,id',
             'brand_id' => 'bail|exists:brands,id',
+            'opening_at' => 'bail|required|after_or_equal:'.date('Y-m-d'),
+            'end_at' => 'bail|required|after_or_equal:'.$this->opening_at,
             'province_id' => 'bail|required',
             'city_id' => 'bail|required',
             'county_id' => 'bail|required',
+            'address' => 'bail|max:50',
+            'tags' => 'bail|array',
+            'tags.*.id' => 'bail|exists:tags,id',
+            'manager_sn' => 'bail|exists:staff,staff_sn',
+            'manager_name' => 'bail|max:10',
+            'manager1_sn' => 'bail|exists:staff,staff_sn',
+            'manager1_name' => 'bail|max:10',
+            'manager2_sn' => 'bail|exists:staff,staff_sn',
+            'manager2_name' => 'bail|max:10',
+            'manager3_sn' => 'bail|exists:staff,staff_sn',
+            'manager3_name' => 'bail|max:10',
+            'staff' => 'bail|array',
+            'staff.*.staff_sn' => 'bail|exists:staff,staff_sn',
         ];
         if (strtolower($request->getMethod()) === 'patch') {
             return array_merge($rules, [
@@ -164,15 +187,12 @@ class ShopController extends Controller
     protected function messages()
     {
         return [
-            'shop_sn.required' => '店铺代码不能为空',
-            'shop_sn.unique' => '店铺代码不能重复',
-            'name.required' => '店铺名称不能为空',
-            'manager_sn.exists' => '店长信息未录入系统',
-            'department_id.exists' => '部门信息未录入系统',
-            'brand_id.exists' => '品牌信息未录入信息',
-            'province_id.required' => '店铺省地区不能为空',
-            'city_id.required' => '店铺城市不能为空',
-            'county_id.required' => '店铺地区不能为空',
+            'required' => ':attribute 为必填项，不能为空。',
+            'unique' => ':attribute 已经存在，请重新填写。',
+            'array' => ':attribute 数据格式错误。',
+            'max' => ':attribute 不能大于 :max 个字。',
+            'exists' => ':attribute 填写错误。',
+            'after_or_equal' => ':attribute 不能小于 :values。',
         ];
     }
 }

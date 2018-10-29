@@ -75,6 +75,7 @@ class SystemServiceProvider extends ServiceProvider
     {
         $this->setMorphMap([
             'staff' => \App\Models\HR\Staff::class,
+            'shop' => \App\Models\HR\Shop::class,
         ]);
     }
 

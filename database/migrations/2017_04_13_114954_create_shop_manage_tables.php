@@ -32,29 +32,12 @@ class CreateShopManageTables extends Migration
             $table->time('clock_in')->default('09:00:00')->comment('上班时间');
             $table->time('clock_out')->default('21:00:00')->comment('下班时间');
             $table->char('geo_hash', 20)->default('')->comment('地理位置范围');
-            $table->tinyInteger('status_id')->default(0)->comment('店铺状态');
-            $table->char('manager_sn', 6)->default('')->comment('店长员工编号');
-            $table->char('manager_name', 10)->default('')->comment('店长姓名');
-            $table->char('manager1_sn', 6)->default('')->comment('一级负责人编号');
-            $table->char('manager1_name', 10)->default('')->comment('一级负责人姓名');
-            $table->char('manager2_sn', 6)->default('')->comment('二级负责人编号');
-            $table->char('manager2_name', 10)->default('')->comment('二级负责人姓名');
-            $table->char('manager3_sn', 6)->default('')->comment('三级负责人编号');
-            $table->char('manager3_name', 10)->default('')->comment('三级负责人姓名');
 
             $table->timestamps();
             $table->softDeletes();
             $table->unique('shop_sn');
             $table->index('brand_id');
             $table->index('department_id');
-            $table->foreign('status_id')->references('id')->on('shop_status');
-        });
-
-        // 店铺状态
-        Schema::create('shop_status', function (Blueprint $table) {
-            $table->tinyIncrements('id');
-            $table->char('name', 10)->comment('状态名称');
-            $table->unsignedTinyInteger('sort')->default(0)->comment('排序');
         });
     }
 
@@ -66,7 +49,6 @@ class CreateShopManageTables extends Migration
     public function down()
     {
         Schema::dropIfExists('shops');
-        Schema::dropIfExists('shop_status');
     }
 
 }

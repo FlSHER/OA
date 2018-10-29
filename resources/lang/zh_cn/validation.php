@@ -119,6 +119,7 @@ return [
     */
 
     'attributes' => [
+        // 员工字段
         'realname' => '姓名',
         'brand' => '品牌',
         'position' => '职位',
@@ -150,7 +151,7 @@ return [
         'dingtalk_number' => '钉钉编号',
         'remark' => '备注',
         'shop_sn' => '店铺编号',
-        'status_id' => '员工状态',
+        'status_id' => '状态',
         'department' => '部门',
         'cost_brand' => '费用品牌',
         'cost_brands' => '费用品牌',
@@ -160,6 +161,27 @@ return [
         'relative_sn' => '关系人编号',
         'relative_type' => '关系人类型',
         'relative_name' => '关系人姓名',
+
+        // 店铺字段
+        'name' => '店铺名称',
+        'department_id' => '部门',
+        'brand_id' => '品牌',
+        'opening_at' => '开业时间',
+        'end_at' => '结束时间',
+        'province_id' => '省',
+        'city_id' => '市',
+        'county_id' => '地区',
+        'address' => '详细地址',
+        'tags' => '标签',
+        'manager_sn' => '店长编号',
+        'manager_name' => '店长姓名',
+        'manager1_sn' => '一级负责人编号',
+        'manager1_name' => '一级负责人姓名',
+        'manager2_sn' => '二级负责人编号',
+        'manager2_name' => '二级负责人姓名',
+        'manager3_sn' => '三级负责人编号',
+        'manager3_name' => '三级负责人姓名',
+        'staff' => '店员',
     ],
 
 ];
