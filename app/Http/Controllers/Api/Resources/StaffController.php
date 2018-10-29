@@ -36,7 +36,7 @@ class StaffController extends Controller
             $newFilters = preg_replace('/role\.id=.*?(;|$)/', '$3', $request->filters);
             $request->offsetSet('filters', $newFilters);
         }
-        $list = Staff::when($roleId, function ($query) use ($roleId) {
+        $list = Staff::withApi()->when($roleId, function ($query) use ($roleId) {
             $query->whereHas('role', function ($query) use ($roleId) {
                 if (is_array($roleId)) {
                     $query->whereIn('id', $roleId);
@@ -45,7 +45,6 @@ class StaffController extends Controller
                 }
             });
         })
-        ->with('relative', 'position', 'department', 'brand', 'shop')
         ->filterByQueryString()
         ->sortByQueryString()
         ->withPagination();
@@ -72,10 +71,7 @@ class StaffController extends Controller
         $curd = $this->staffService->create($data);
 
         if ($curd['status'] == 1) {
-            $staff = Staff::query()
-                ->with(['relative', 'position', 'department', 'brand', 'shop'])
-                ->orderBy('staff_sn', 'desc')
-                ->first();
+            $staff = Staff::withApi()->orderBy('staff_sn', 'desc')->first();
 
             return response()->json(new StaffResource($staff), 201);
         }
@@ -97,8 +93,7 @@ class StaffController extends Controller
         $curd = $this->staffService->update($data);
 
         if ($curd['status'] == 1) {
-            $result = $staff->where('staff_sn', $staff->staff_sn)->first();
-            $result->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands']);
+            $result = $staff->withApi()->where('staff_sn', $staff->staff_sn)->first();
 
             return response()->json(new StaffResource($result), 201);
         }
@@ -114,7 +109,7 @@ class StaffController extends Controller
      */
     public function show(Staff $staff)
     {
-        $staff->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands']);
+        $staff->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'tags']);
 
         return new StaffResource($staff);
     }

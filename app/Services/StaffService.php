@@ -132,8 +132,8 @@ class StaffService
      */
     protected function setRelation($model, $data)
     {   
-        if (array_has($data, 'relative')) {
-            $model->relative()->sync($data['relative']);
+        if (array_has($data, 'relatives')) {
+            $model->relative()->sync($data['relatives']);
         }
 
         if (array_has($data, 'cost_brands')) {

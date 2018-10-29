@@ -303,6 +303,11 @@ class Staff extends User
         $query->with('brand', 'department', 'position', 'shop', 'status', 'role');
     }
 
+    public function scopeWithApi($query)
+    {
+        return $query->with(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'tags']);
+    }
+
     public function scopeWorking($query)
     {
         $query->where('status_id', '>=', 0)->where('is_active', 1);
