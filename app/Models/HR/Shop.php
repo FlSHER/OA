@@ -43,6 +43,36 @@ class Shop extends Model
         return $this->hasOne('App\Models\HR\Staff', 'staff_sn', 'manager_sn');
     }
 
+    /**
+     * first manager.
+     * 
+     * @return \Illuminate\Database\Eloquent\Concerns\hasOne
+     */
+    public function manager1()
+    {
+        return $this->hasOne(Staff::class, 'staff_sn', 'manager1_sn');
+    }
+
+    /**
+     * second manager.
+     * 
+     * @return \Illuminate\Database\Eloquent\Concerns\hasOne
+     */
+    public function manager2()
+    {
+        return $this->hasOne(Staff::class, 'staff_sn', 'manager2_sn');
+    }
+
+    /**
+     * three level manager.
+     * 
+     * @return \Illuminate\Database\Eloquent\Concerns\hasOne
+     */
+    public function manager3()
+    {
+        return $this->hasOne(Staff::class, 'staff_sn', 'manager3_sn');
+    }
+
     public function department()
     { //所属部门
         return $this->belongsTo('App\Models\Department', 'department_id')->withTrashed();

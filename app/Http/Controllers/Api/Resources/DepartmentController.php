@@ -124,13 +124,9 @@ class DepartmentController extends Controller
      *
      * @return mixed
      */
-    public function tree()
+    public function tree(Department $department)
     {
-        return Department::get()->map(function ($item) {
-            $item->parent_id = $item->parent_id ? : null;
-
-            return $item;
-        });
+        return response()->json($department->get())
     }
 
     public function getChildrenAndStaff(Department $department)
