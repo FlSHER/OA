@@ -126,7 +126,7 @@ class DepartmentController extends Controller
      */
     public function tree(Department $department)
     {
-        return response()->json($department->get())
+        return response()->json($department->get());
     }
 
     public function getChildrenAndStaff(Department $department)
