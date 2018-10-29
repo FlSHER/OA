@@ -48,7 +48,7 @@ class TagController extends Controller
         $tag->fill($request->all());
         $tag->save();
 
-        return response()->json(['message' => '添加成功'], 201);
+        return response()->json($tag->load('category'), 201);
     }
 
     /**
@@ -80,7 +80,7 @@ class TagController extends Controller
         $tag->fill($request->all());
         $tag->save();
 
-        return response()->json(['message' => '修改成功'], 201);
+        return response()->json($tag->load('category'), 201);
     }
 
     /**
@@ -138,7 +138,7 @@ class TagController extends Controller
         $cate->fill($request->all());
         $cate->save();
 
-        return response()->json(['message' => '创建分类成功'], 201);
+        return response()->json($cate, 201);
     }
 
     /**
@@ -167,7 +167,7 @@ class TagController extends Controller
         $cate->fill($request->all());
         $cate->save();
 
-        return response()->json(['message' => '修改成功'], 201);
+        return response()->json($cate, 201);
     }
 
     /**
