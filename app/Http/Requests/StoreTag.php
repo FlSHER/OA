@@ -26,6 +26,7 @@ class StoreTag extends FormRequest
     {
         return [
             'name' => 'required|max:10|unique:tags',
+            'description' => 'string|max:50',
             'tag_category_id' => 'required|exists:tag_categories,id',
         ];
     }
@@ -41,6 +42,7 @@ class StoreTag extends FormRequest
             'name.required' => '标签名称必填',
             'name.max' => '标签名称过长',
             'name.unique' => '标签已经存在',
+            'description.max' => '标签描述过长',
             'tag_category_id.required' => '标签分类必填',
             'tag_category_id.exists' => '标签分类不存在',
         ];

@@ -66,11 +66,13 @@ class TagController extends Controller
                 Rule::unique('tags')->ignore($tag->id),
             ],
             'tag_category_id' => 'exists:tag_categories,id',
+            'description' => 'max:50',
             'weight' => 'numeric|min:0',
         ], [
             'name.max' => '标签名称过长',
             'name.unique' => '标签已经存在',
             'tag_category_id.exists' => '标签分类不存在',
+            'description.max' => '标签描述过长',
             'weight.numeric' => '权重值必须为数字',
             'weight.min' => '权重值不能小于0',
         ]);
@@ -125,6 +127,7 @@ class TagController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|unique:tag_categories|max:10',
+            'color' => 'string|max:7',
             'weight' => 'numeric|min:0',
         ], [
             'name.required' => '标签分类名称必填',
@@ -152,6 +155,7 @@ class TagController extends Controller
                 'max:10',
                 Rule::unique('tag_categories')->ignore($cate->id),
             ],
+            'color' => 'string|max:7',
             'weight' => 'numeric|min:0',
         ], [
             'name.max' => '标签分类名称过长',
