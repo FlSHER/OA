@@ -169,10 +169,14 @@ class StaffController extends Controller
      */
     public function process(Request $request)
     {
-        $data = $request->all();
-        if ($data['type'] == 'finish') {
-            $this->processValidator($data['data']);
-            $this->staffService->update($data['data']);
+        $data = $request->input('data', []);
+        if ($request->type == 'finish') {
+            $params = array_merge($data, [
+                'operation_type' => 'employ',
+                'staff_sn' => $data['staff']['value'];
+            ]);
+            $this->processValidator($params);
+            $this->staffService->update($params);
 
             return response()->json(['message' => '转正成功'], 201);
         }
