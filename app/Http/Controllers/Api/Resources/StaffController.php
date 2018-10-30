@@ -173,7 +173,7 @@ class StaffController extends Controller
         if ($request->type == 'finish') {
             $params = array_merge($data, [
                 'operation_type' => 'employ',
-                'staff_sn' => $data['staff']['value'];
+                'staff_sn' => $data['staff']['value'],
             ]);
             $this->processValidator($params);
             $this->staffService->update($params);
