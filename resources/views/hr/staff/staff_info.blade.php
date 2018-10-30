@@ -199,7 +199,7 @@
                         <div class="clearfix">
                             <label class="control-label col-lg-3"><strong>钉钉编码：</strong></label>
                             <div class="col-lg-3">
-                                <p class="form-control-static">{{$staff->dingding}}</p>
+                                <p class="form-control-static">{{$staff->dingtalk_number}}</p>
                             </div>
                         </div>
                     </div>

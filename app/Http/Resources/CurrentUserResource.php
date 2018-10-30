@@ -44,7 +44,7 @@ class CurrentUserResource extends Resource
             'left_at' => $this->left_at,
             'gender' => $this->gender,
             'id_card_number' => $this->id_card_number,
-            'dingtalk_number' => $this->dingding,
+            'dingtalk_number' => $this->dingtalk_number,
             'wechat_number' => $this->wechat_number,
             'roles' => $this->roles,
             'is_active' => $this->is_active,

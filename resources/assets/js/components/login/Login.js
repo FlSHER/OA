@@ -37,7 +37,7 @@ class LoginForm extends Component {
                          prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
                          type="password" placeholder="密码（123456）" />
                 </FormItem>
-                <Input type="hidden" name="dingding" />
+                <Input type="hidden" name="dingtalk_number" />
                 <FormItem>
                   {/*<a style={{float: 'right'}} href="">忘记密码</a>*/}
                   <Button type="primary" size="large" htmlType="submit" style={{ width: '100%' }}>
@@ -90,8 +90,8 @@ class LoginForm extends Component {
               }, 500);
             }).catch((err) => {
               if (err.response && err.response.data && err.response.data.message) {
-                if (err.response.headers.dingding) {
-                  this.form.props.form.setFieldsValue({ dingding: err.response.headers.dingding });
+                if (err.response.headers.dingtalk_number) {
+                  this.form.props.form.setFieldsValue({ dingtalk_number: err.response.headers.dingtalk_number });
                 }
                 message.error(err.response.data.message);
               } else {

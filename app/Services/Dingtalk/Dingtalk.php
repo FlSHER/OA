@@ -197,7 +197,7 @@ class Dingtalk
 
     public function startApprovalProcess($agentId, $processCode, $approvers_sn, $formData, $initiatorSn = null)
     {
-        $dingId = empty($initiatorSn) ? app('CurrentUser')->dingding : Staff::find($initiatorSn)->dingding;
+        $dingId = empty($initiatorSn) ? app('CurrentUser')->dingtalk_number : Staff::find($initiatorSn)->dingtalk_number;
         if (empty($dingId)) {
             return '未同步钉钉账号';
         }
@@ -255,11 +255,11 @@ class Dingtalk
         if (is_array($approvers)) {
             $response = [];
             foreach ($approvers as $v) {
-                $response[] = Staff::find($v)->dingding;
+                $response[] = Staff::find($v)->dingtalk_number;
             }
             $response = implode(',', $response);
         } else {
-            $response = Staff::find($approvers)->dingding;
+            $response = Staff::find($approvers)->dingtalk_number;
         }
         return $response;
     }

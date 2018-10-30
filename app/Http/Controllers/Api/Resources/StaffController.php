@@ -12,7 +12,6 @@ use App\Http\Requests\UpdateStaffRequest;
 use App\Http\Resources\HR\StaffResource;
 use App\Http\Resources\HR\StaffCollection;
 use App\Http\Resources\CurrentUserResource;
-use Illuminate\Support\Facades\Log;
 
 class StaffController extends Controller
 {
@@ -170,7 +169,6 @@ class StaffController extends Controller
     public function process(Request $request)
     {
         $data = $request->all();
-        Log::info($data);
         if ($data['type'] == 'finish') {
             $this->processValidator($data['data']);
             $this->staffService->update($data['data']);

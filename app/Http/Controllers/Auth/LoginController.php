@@ -54,8 +54,8 @@ class LoginController extends Controller
 
     protected function authenticated(Request $request, $user)
     {
-        if ($request->has('dingding') && $user->staff_sn != 999999) {
-            $user->update(['dingding' => $request->dingding]);
+        if ($request->has('dingtalk_number') && $user->staff_sn != 999999) {
+            $user->update(['dingtalk_number' => $request->dingtalk_number]);
         }
         $url = redirect()->intended($this->redirectPath())->getTargetUrl();
         if ($request->has('password') && $request->password == 123456) {

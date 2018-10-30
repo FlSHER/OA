@@ -29,7 +29,7 @@ return [
         'cost_brands' => '费用品牌',
         'cost_brands.*.id' => '费用品牌ID',
         'cost_brands.*.name' => '费用品牌名称',
-        'dingding' => '钉钉用户编码',
+        'dingtalk_number' => '钉钉用户编码',
         'is_active' => '是否激活',
         'status_id' => '员工状态ID',
         'status.name' => '员工状态',
