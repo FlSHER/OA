@@ -87,16 +87,16 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             Route::get('{staff}', 'StaffController@show')->where(['staff' => '[0-9]+']);
 
              // 员工转正 /api/staff/process
-            Route::patch('/process', 'StaffController@process');
+            Route::post('/process', 'StaffController@process');
 
             // 人事变动 /api/staff/transfer
-            Route::patch('/transfer', 'StaffController@transfer');
+            Route::post('/transfer', 'StaffController@transfer');
 
             // 离职 /api/staff/leave
-            Route::patch('/leave', 'StaffController@leave');
+            Route::post('/leave', 'StaffController@leave');
 
             //  再入职 /api/staff/again-entry
-            Route::patch('/again-entry', 'StaffController@againEntry');
+            Route::post('/again-entry', 'StaffController@againEntry');
 
             // 获取员工状态列表 /api/staff/status
             Route::get('/status', 'StaffController@status');
