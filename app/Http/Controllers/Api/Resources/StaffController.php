@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Resources;
 
+use Validator;
 use App\Models\HR\Staff;
 use App\Models\HR\StaffStatus;
 use Illuminate\Http\Request;
