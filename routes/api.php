@@ -100,6 +100,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
 
             // 获取员工状态列表 /api/staff/status
             Route::get('/status', 'StaffController@status');
+
+            // 获取员工状态列表 /api/staff/property
+            Route::get('/property', 'StaffController@property');
         });
 
         // department router

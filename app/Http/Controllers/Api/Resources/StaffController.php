@@ -162,6 +162,21 @@ class StaffController extends Controller
     }
 
     /**
+     * 获取员工属性.
+     * 
+     * @return array
+     */
+    public function property()
+    {
+        return [
+            '1' => '108将',
+            '2' => '36天罡',
+            '3' => '24金刚',
+            '4' => '18罗汉',
+        ];
+    }
+
+    /**
      * 转正操作(工作流).
      * 
      * @param  Request $request
