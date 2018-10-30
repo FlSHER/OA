@@ -174,6 +174,22 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             Route::delete('{brand}', 'BrandController@destroy')->where(['brand' => '[0-9]+']);
         });
 
+        // cost brand router
+        Route::group(['prefix' => 'cost_brand'], function () {
+
+            // 获取品牌列表 /api/cost_brand
+            Route::get('/', 'CostBrandController@index');
+
+            // 添加品牌 /api/cost_brand
+            Route::post('/', 'CostBrandController@store');
+
+            // 编辑品牌 /api/cost_brand/:brand
+            Route::patch('{brand}', 'CostBrandController@update')->where(['brand' => '[0-9]+']);
+
+            //  删除品牌 /api/cost_brand/:brand
+            Route::delete('{brand}', 'CostBrandController@destroy')->where(['brand' => '[0-9]+']);
+        });
+
         // shop router
         Route::group(['prefix' => 'shop'], function () {
 
