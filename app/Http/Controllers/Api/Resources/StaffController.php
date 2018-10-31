@@ -61,49 +61,6 @@ class StaffController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreStaffRequest $request)
-    {
-        $data = $request->all();
-
-        $curd = $this->staffService->create($data);
-
-        if ($curd['status'] == 1) {
-            $staff = Staff::withApi()->orderBy('staff_sn', 'desc')->first();
-
-            return response()->json(new StaffResource($staff), 201);
-        }
-
-        return response()->json($curd, 422);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \App\Models\HR\Staff $staff
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateStaffRequest $request, Staff $staff)
-    {
-        $data = $request->all();
-
-        $curd = $this->staffService->update($data);
-
-        if ($curd['status'] == 1) {
-            $result = $staff->withApi()->where('staff_sn', $staff->staff_sn)->first();
-
-            return response()->json(new StaffResource($result), 201);
-        }
-
-        return response()->json($curd, 422);
-    }
-
-    /**
      * Display the specified resource.
      *
      * @param  \App\Models\HR\Staff $staff
@@ -148,6 +105,40 @@ class StaffController extends Controller
     }
 
     /**
+     * 🐟员工入职操作(工作流).
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return mixed
+     */
+    public function entrant(Request $request)
+    {
+        $data = $request->input('data', []);
+        if ($request->type == 'finish') {
+            $household = $data['household'];
+            $living = $data['living'];
+            $params = array_merge($data, [
+                'operation_type' => 'entry',
+                'staff_sn' => $data['staff']['value'],
+                'shop_sn' => $data['shop']['value'],
+                'recruiter_sn' => $data['recruiter']['value'],
+                'recruiter_name' => $data['recruiter']['text'],
+                'household_province' => $household['household_province'],
+                'household_city' => $household['household_city'],
+                'household_county' => $household['household_county'],
+                'household_address' => $household['household_address'],
+                'living_province' => $living['living_province'],
+                'living_city' => $living['living_city'],
+                'living_county' => $living['living_county'],
+                'living_address' => $living['living_address'],
+            ]);
+
+            $this->entrantStaffValidator($params);
+        }
+
+
+    }
+
+    /**
      * 转正操作(工作流).
      * 
      * @param  Request $request
@@ -176,10 +167,35 @@ class StaffController extends Controller
      */
     public function transfer(Request $request)
     {
-        $data = $request->all();
-        if ($data['type'] == 'finish') {
-            $this->processValidator($data['data']);
-            $this->staffService->update($data['data']);
+        $data = $request->input('data', []);
+        if ($request->type == 'finish') {
+            $params = array_merge($data, [
+                'operation_type' => 'transfer',
+                'staff_sn' => $data['staff']['value'],
+            ]);
+            $this->processValidator($params);
+            $this->staffService->update($params);
+
+            return response()->json(['message' => '操作成功'], 201);
+        }
+    }
+
+    /**
+     * 离职操作(工作流).
+     * 
+     * @param  Request $request
+     * @return mixed
+     */
+    public function leave(Request $request)
+    {
+        $data = $request->input('data', []);
+        if ($request->type == 'finish') {
+            $params = array_merge($data, [
+                'operation_type' => 'leave',
+                'staff_sn' => $data['staff']['value'],
+            ]);
+            $this->processValidator($params);
+            $this->staffService->update($params);
 
             return response()->json(['message' => '操作成功'], 201);
         }
@@ -226,17 +242,71 @@ class StaffController extends Controller
         } elseif ($type == 'leave') { // 离职中
             $rules = array_merge($rules, [
                 'status_id' => 'required|in:-1,-2,-3,-4',
-                'skip_leaving' => 'in:0',
-            ]);
-        } elseif ($type == 'leaving') { // 已离职
-            $rules = array_merge($rules, [
-                'status_id' => 'required|in:-1,-2,-3,-4',
-                'skip_leaving' => 'in:1',
+                'skip_leaving' => 'in:0,1',
             ]);
         } elseif ($type == 'reinstate') { // 再入职
 
         }
 
+        return Validator::make($value, $rules, $message)->validate();
+    }
+
+    /**
+     * 员工入转操作验证.
+     * 
+     * @param  array $value
+     * @return mixed
+     */
+    protected function entrantStaffValidator($value)
+    {
+        $rules = [
+            'realname' => 'bail|required|string|max:10',
+            'brand_id' => 'bail|required|exists:brands,id',
+            'department_id' => 'bail|required|exists:departments,id',
+            'position_id' => 'bail|required|exists:positions,id',
+            'mobile' => 'bail|required|unique:staff,mobile|cn_phone',
+            'id_card_number' => 'bail|required|ck_identity',
+            'property' => 'bail|in:0,1,2,3,4',
+            'gender' => 'bail|required|in:未知,男,女',
+            'education' => 'bail|exists:i_education,name',
+            'national' => 'bail|exists:i_national,name',
+            'politics' => 'bail|exists:i_politics,name',
+            'shop_sn' => 'bail|exists:shops,shop_sn|max:10',
+            'status_id' => 'bail|required|exists:staff_status,id',
+            'marital_status' => 'bail|exists:i_marital_status,name',
+            'household_province' => 'bail|exists:i_district,name',
+            'household_city' => 'bail|exists:i_district,name',
+            'household_county' => 'bail|exists:i_district,name',
+            'living_province' => 'bail|exists:i_district,name',
+            'living_city' => 'bail|exists:i_district,name',
+            'living_county' => 'bail|exists:i_district,name',
+            'household_address' => 'bail|string|max:30',
+            'living_address' => 'bail|string|max:30',
+            'concat_name' => 'bail|max:10',
+            'concat_tel' => 'bail|cn_phone',
+            'concat_type' => 'bail|max:5',
+            'dingtalk_number' => 'bail|max:50',
+            'account_bank' => 'bail|max:20',
+            'account_name' => 'bail|max:10',
+            'account_number' => 'bail|between:16,19',
+            'remark' => 'bail|max:100',
+            'height' => 'bail|integer|between:140,220',
+            'weight' => 'bail|integer|between:30,150',
+            'operate_at' => 'bail|required|date',
+            'operation_remark' => 'bail|max:100',
+            'relatives.*.relatives_sn' => ['required_with:relatives_type,relative_name'],
+            'relatives.*.relative_stype' => ['required_with:relatives_sn,relative_name'],
+            'relatives.*.relative_nsame' => ['required_with:relative_tsype,relative_sn'],
+        ];
+        $message = [
+            'in' => ':attribute 必须在【:values】中选择。',
+            'max' => ':attribute 不能大于 :max 个字。',
+            'exists' => ':attribute 填写错误。',
+            'unique' => ':attribute 已经存在，请重新填写。',
+            'required' => ':attribute 为必填项，不能为空。',
+            'between' => ':attribute 值 :input 不在 :min - :max 之间。',
+            'required_with' => ':attribute 不能为空。',
+        ];
         return Validator::make($value, $rules, $message)->validate();
     }
 

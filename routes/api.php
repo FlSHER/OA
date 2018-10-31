@@ -77,14 +77,11 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             // 获取员工列表 /api/staff
             Route::get('/', 'StaffController@index');
 
-            // 添加单个员工 /api/staff
-            Route::post('/', 'StaffController@store');
-
-            // 编辑单个员工 /api/staff/:staff
-            Route::patch('{staff}', 'StaffController@update')->where(['staff' => '[0-9]+']);
-
             // 获取单个员工 /api/staff/:staff
             Route::get('{staff}', 'StaffController@show')->where(['staff' => '[0-9]+']);
+
+            // 员工入职 /api/staff/entrant
+            Route::post('/entrant', 'StaffController@entrant');
 
              // 员工转正 /api/staff/process
             Route::post('/process', 'StaffController@process');

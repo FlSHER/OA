@@ -674,15 +674,10 @@ class StaffController extends Controller
                 'position_id' => 'required|exists:positions,id',
 
             ]);
-        } elseif ($type == 'leave') { // 离职中
+        } elseif ($type == 'leave') { // 离职
             $rules = array_merge($rules, [
                 'status_id' => 'required|in:-1,-2,-3,-4',
-                'skip_leaving' => 'in:0',
-            ]);
-        } elseif ($type == 'leaving') { // 已离职
-            $rules = array_merge($rules, [
-                'status_id' => 'required|in:-1,-2,-3,-4',
-                'skip_leaving' => 'in:1',
+                'skip_leaving' => 'in:0,1',
             ]);
         } elseif ($type == 'reinstate') { // 再入职
 
