@@ -115,6 +115,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
 
             // 获取婚姻状态选项 /api/staff/marital
             Route::get('/marital', 'StaffRelationController@marital');
+
+            // 关系类型选项 /api/staff/relative_type
+            Route::get('/relative_type', 'StaffRelationController@relativeType');
         });
 
         // department router

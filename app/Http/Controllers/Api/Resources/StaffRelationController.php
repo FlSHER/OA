@@ -81,6 +81,16 @@ class StaffRelationController extends Controller
     }
 
     /**
+     * 获取关系类型选项.
+     * 
+     * @return array
+     */
+    public function relativeType()
+    {
+        return response()->json($this->hasCache('staff_relation_relative_type'), 200);
+    }
+
+    /**
      * 缓存不常修改的数据.
      * 
      * @param  array  $data
@@ -105,6 +115,9 @@ class StaffRelationController extends Controller
                 break;
             case 'staff_relation_marital':
                 $data = I\MaritalStatus::get();
+                break;
+            case 'staff_relation_relative_type':
+                $data = HR\StaffRelativeType::get();
                 break;
         }
         Cache::put($cacheKey, $data, now()->addDay());
