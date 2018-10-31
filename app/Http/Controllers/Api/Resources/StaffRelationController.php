@@ -32,6 +32,7 @@ class StaffRelationController extends Controller
     public function property()
     {
         return [
+            ['id' => 0, 'name' => '无'],
             ['id' => 1, 'name' => '108将'],
             ['id' => 2, 'name' => '36天罡'],
             ['id' => 3, 'name' => '24金刚'],
@@ -89,7 +90,7 @@ class StaffRelationController extends Controller
     protected function hasCache($cacheKey)
     {
         if (Cache::has($cacheKey)) {
-            
+
             return Cache::get($cacheKey);
         }
         switch ($cacheKey) {
