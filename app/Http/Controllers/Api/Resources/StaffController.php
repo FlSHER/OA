@@ -148,51 +148,6 @@ class StaffController extends Controller
     }
 
     /**
-     * 获取员工状态列表.
-     * 
-     * @return array
-     */
-    public function status()
-    {
-        $list = StaffStatus::query()
-            ->filterByQueryString()
-            ->sortByQueryString()
-            ->get();
-
-        return response()->json($list, 200);
-    }
-
-    /**
-     * 获取员工属性.
-     * 
-     * @return array
-     */
-    public function property()
-    {
-        return [
-            ['id' => 1, 'name' => '108将'],
-            ['id' => 2, 'name' => '36天罡'],
-            ['id' => 3, 'name' => '24金刚'],
-            ['id' => 4, 'name' => '18罗汉'],
-        ];
-    }
-
-    /**
-     * 获取全部民族.
-     * 
-     * @return array
-     */
-    public function national()
-    {
-        $list = National::query()
-            ->filterByQueryString()
-            ->sortByQueryString()
-            ->get();
-
-        return response()->json($list, 200);
-    }
-
-    /**
      * 转正操作(工作流).
      * 
      * @param  Request $request

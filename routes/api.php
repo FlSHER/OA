@@ -99,13 +99,22 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             Route::post('/again-entry', 'StaffController@againEntry');
 
             // 获取员工状态列表 /api/staff/status
-            Route::get('/status', 'StaffController@status');
+            Route::get('/status', 'StaffRelationController@status');
 
             // 获取员工状态列表 /api/staff/property
-            Route::get('/property', 'StaffController@property');
+            Route::get('/property', 'StaffRelationController@property');
 
             // 获取全部民族列表 /api/staff/national
-            Route::get('/national', 'StaffController@national');
+            Route::get('/national', 'StaffRelationController@national');
+
+            // 获取学历信息 /api/staff/education
+            Route::get('/education', 'StaffRelationController@education');
+
+            // 获取政治面貌信息 /api/staff/politics
+            Route::get('/politics', 'StaffRelationController@politics');
+
+            // 获取婚姻状态选项 /api/staff/marital
+            Route::get('/marital', 'StaffRelationController@marital');
         });
 
         // department router
