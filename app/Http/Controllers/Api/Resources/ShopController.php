@@ -156,7 +156,7 @@ class ShopController extends Controller
             'status_id' => 'bail|required|exists:shop_status,id',
             'department_id' => 'bail|exists:departments,id',
             'brand_id' => 'bail|exists:brands,id',
-            'opening_at' => 'bail|required|after_or_equal:'.date('Y-m-d'),
+            'opening_at' => 'bail|required',
             'end_at' => 'bail|required|after_or_equal:'.$request->opening_at,
             'province_id' => 'bail|required',
             'city_id' => 'bail|required',
