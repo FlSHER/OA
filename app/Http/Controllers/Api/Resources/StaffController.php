@@ -169,10 +169,10 @@ class StaffController extends Controller
     public function property()
     {
         return [
-            ['1' => '108将'],
-            ['2' => '36天罡'],
-            ['3' => '24金刚'],
-            ['4' => '18罗汉'],
+            ['id' => 1, 'name' => '108将'],
+            ['id' => 2, 'name' => '36天罡'],
+            ['id' => 3, 'name' => '24金刚'],
+            ['id' => 4, 'name' => '18罗汉'],
         ];
     }
 
