@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Resources;
 
 use Validator;
 use App\Models\HR\Staff;
+use App\Models\I\National;
 use App\Models\HR\StaffStatus;
 use Illuminate\Http\Request;
 use App\Services\StaffService;
@@ -174,6 +175,21 @@ class StaffController extends Controller
             ['id' => 3, 'name' => '24金刚'],
             ['id' => 4, 'name' => '18罗汉'],
         ];
+    }
+
+    /**
+     * 获取全部民族.
+     * 
+     * @return array
+     */
+    public function national()
+    {
+        $list = National::query()
+            ->filterByQueryString()
+            ->sortByQueryString()
+            ->get();
+
+        return response()->json($list, 200);
     }
 
     /**
