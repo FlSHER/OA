@@ -169,7 +169,7 @@ class Shop extends Model
      *
      * @return void
      */
-    public function createShopLog()
+    public function createShopLog($id)
     {
         $isDirty = $this->isDirty();
         if ($isDirty === true) {
@@ -177,7 +177,7 @@ class Shop extends Model
             $staff = request()->user();
             $logModel = new ShopLog();
             $logModel->fill([
-                'target_id' => $this->id,
+                'target_id' => $id,
                 'admin_sn' => $staff['staff_sn'],
                 'changes' => $dirty,
             ]);
