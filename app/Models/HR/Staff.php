@@ -169,7 +169,8 @@ class Staff extends User
 
     public function relative()
     { //公司内关系人
-        return $this->belongsToMany('App\Models\HR\Staff', 'staff_relatives', 'staff_sn', 'relative_sn')->withPivot('relative_name', 'relative_type', 'relative_sn AS relative_sn');
+        return $this->belongsToMany('App\Models\HR\Staff', 'staff_relatives', 'staff_sn', 'relative_sn')
+            ->withPivot('relative_name', 'relative_type', 'relative_sn');
     }
 
     public function anti_relative()

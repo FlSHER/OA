@@ -29,6 +29,7 @@ return [
         'cost_brands' => '费用品牌',
         'cost_brands.*.id' => '费用品牌ID',
         'cost_brands.*.name' => '费用品牌名称',
+        'cost_brands.*.pivot.cost_brand_id' => '费用品牌ID',
         'dingtalk_number' => '钉钉用户编码',
         'is_active' => '是否激活',
         'status_id' => '员工状态ID',

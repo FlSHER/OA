@@ -60,19 +60,17 @@ class StaffService
         $this->reset();
         \DB::beginTransaction();
         try {
-            $this->setRelation($model, $data);
             $model->fill($data);
             $this->saving($model, $data); //前置操作
             $this->addDirty($model);
             if (!$this->hasTransfer($model, $data)) { //没有预约操作才走更新
                 $model->save();
                 $this->saved($model, $data); //后置操作
+                $this->changeBelongsToMany($model, $data);
                 if ($this->isDirty()) {
                     $log = new StaffOperationLogService();
                     $log->model($model)->write($this->dirty, $data);
                 }
-            } else {
-                $this->appendOperationType($model, $data);
             }
             \DB::commit();
         } catch (\Exception $err) {
@@ -80,28 +78,6 @@ class StaffService
             \DB::rollBack();
             throw $err;
         }
-    }
-
-    /**
-     * 记录更详细的变更类型.
-     * 
-     * @param  [type] $model
-     * @param  array $data
-     */
-    public function appendOperationType($model, $data)
-    {
-        $type = $data['operation_type'];
-        if (in_array($type, ['transfer', 'import_transfer'])
-            && array_has($this->dirty, 'position_id')
-        ) { // 职位变更 默认为升职 降职未考虑
-            $newData = array_merge($data, [
-                'operation_type' => 'rise_position',
-            ]);
-
-            $log = new StaffOperationLogService();
-            $log->model($model)->write($this->dirty, $newData);
-        }
-        
     }
 
     /**
@@ -126,19 +102,91 @@ class StaffService
     }
 
     /**
-     * 更新关系关联
-     * @param App\Models\HR\Staff $model
-     * @param array $data
+     * 多对多关联同步
+     * @param $model
      */
-    protected function setRelation($model, $data)
-    {   
+    protected function changeBelongsToMany($model, $data)
+    {
         if (array_has($data, 'relatives')) {
-            $model->relative()->sync($data['relatives']);
-        }
+            $relatives = collect($data['relatives']) ? : collect([]);
+            $relationQuery = $model->relative();
+            $original = $relationQuery->get();
 
-        if (array_has($data, 'cost_brands')) {
-            $model->cost_brands()->sync($data['cost_brands']);
+            $input = [];
+            $relatives->map(function ($item) use (&$input) {
+                $input[$item['relative_sn']] = $item;
+            });
+
+            $dirty = $relationQuery->sync($input);
+            $changed = $relationQuery->get();
+            if (!empty(array_filter($dirty))) {
+                $this->dirty['relative'] = $this->makeBelongsToManyDirty($dirty, $original, $changed);
+            }
+
         }
+        if (array_has($data, 'cost_brands')) {
+            $cost_brands = collect($data['cost_brands']) ? : collect([]);
+            $relationQuery = $model->cost_brands();
+            $original = $relationQuery->get();
+
+            $input = [];
+            $cost_brands->map(function ($item) use (&$input) {
+                $input['cost_brand_id'] = $item;
+            });
+
+            $dirty = $relationQuery->sync($cost_brands);
+            $changed = $relationQuery->get();
+            if (!empty(array_filter($dirty))) {
+                $this->dirty['cost_brands'] = $this->makeBelongsToManyDirty($dirty, $original, $changed);
+            }
+        }
+    }
+
+    /**
+     * 生成多对多Dirty数据
+     * @param type $response 改变的关系id
+     * @param type $original 改变前的关系数据
+     * @param type $changed 改变后的关系数据
+     * @return type
+     */
+    protected function makeBelongsToManyDirty($response, $original, $changed)
+    {   
+        $newAttached = [];
+        foreach ($response['attached'] as $v) {
+            $pivot = $changed->find($v)->pivot;
+            $order = $this->getPivotAttribute($pivot);
+            $newAttached[$v] = $order;
+        }
+        $response['attached'] = $newAttached;
+        $newDetached = [];
+        foreach ($response['detached'] as $v) {
+            $pivot = $original->find($v)->pivot;
+            $order = $this->getPivotAttribute($pivot);
+            $newDetached[$v] = $order;
+        }
+        $response['detached'] = $newDetached;
+        $newUpdated = [];
+        foreach ($response['updated'] as $v) {
+            $current = $original->find($v)->pivot;
+            $order = $changed->find($v)->pivot->toArray();
+            $newUpdated[$v] = $this->getDirtyWithOriginal($current->fill($order));
+        }
+        $response['updated'] = $newUpdated;
+
+        return $response;
+    }
+
+    /**
+     * 获取中间表的额外字段
+     * @param type $pivot
+     * @return type
+     */
+    protected function getPivotAttribute($pivot)
+    {
+        if (count($pivot->toArray()) === 2) {
+            return array_except($pivot->toArray(), [$pivot->getForeignKey()]);
+        }
+        return array_except($pivot->toArray(), [$pivot->getForeignKey(), $pivot->getOtherKey()]);
     }
 
     public function saving($model, array $data)
@@ -182,9 +230,12 @@ class StaffService
         if (!empty($model->tmp)) {
             throw new HttpResponseException(response('该员工有未执行操作', 403));
         } else {
-            $tmpData = $model->getDirty();
-            $tmpData['operate_at'] = $data['operate_at'];
-            $model->tmp()->create($tmpData);
+            $dirty = $model->getDirty();
+            $model->tmp()->create([
+                'changes' => $dirty,
+                'admin_sn' => $data['admin_sn'] ?? app('CurrentUser')->getStaffSn(),
+                'operate_at' => $data['operate_at'],
+            ]);
             $this->addDirty($model);
             $model->setRawAttributes($model->getOriginal());
         }

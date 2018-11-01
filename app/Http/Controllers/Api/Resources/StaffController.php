@@ -14,6 +14,7 @@ use App\Http\Requests\UpdateStaffRequest;
 use App\Http\Resources\HR\StaffResource;
 use App\Http\Resources\HR\StaffCollection;
 use App\Http\Resources\CurrentUserResource;
+use Illuminate\Support\Facades\Log;
 
 class StaffController extends Controller
 {
@@ -113,12 +114,12 @@ class StaffController extends Controller
     public function entrant(Request $request)
     {
         $data = $request->input('data', []);
+        Log::info($data);
         if ($request->type == 'finish') {
             $household = $data['household'];
             $living = $data['living'];
             $params = array_merge($data, [
                 'operation_type' => 'entry',
-                'staff_sn' => $data['staff']['value'],
                 'shop_sn' => $data['shop']['value'],
                 'recruiter_sn' => $data['recruiter']['value'],
                 'recruiter_name' => $data['recruiter']['text'],
@@ -130,9 +131,10 @@ class StaffController extends Controller
                 'living_city' => $living['living_city'],
                 'living_county' => $living['living_county'],
                 'living_address' => $living['living_address'],
+                'account_active' => ($data['account_active'] == '是') ? 1 : 0,
             ]);
-
-            $this->entrantStaffValidator($params);
+            Log::info($params);
+            // $this->entrantStaffValidator($params);
         }
 
 
