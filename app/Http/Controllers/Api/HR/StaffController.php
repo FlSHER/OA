@@ -138,7 +138,7 @@ class StaffController extends Controller
      */
     public function logs(Staff $staff)
     {
-        $staff->load('change_log');
+        $staff->load(['change_log', 'change_log.admin', 'change_log.staff']);
 
         return response()->json($staff->change_log, 200);
     }
