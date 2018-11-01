@@ -308,6 +308,12 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             
             // 批量导出 /api/hr/staff/export
             Route::post('/export', 'StaffController@export');
+
+            // 变动记录 /api/hr/staff/:staff/logs
+            Route::get('/{staff}/logs', 'StaffController@logs');
+
+            // 预约记录 /api/hr/staff/:staff/reserve
+            Route::get('/{staff}/reserve', 'StaffController@reserve');
         }); 
 
         // department router

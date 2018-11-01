@@ -124,9 +124,36 @@ class StaffController extends Controller
      */
     public function show(Staff $staff)
     {
-        $staff->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'change_log', 'tmp']);
+        $staff->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands']);
 
         return new StaffResource($staff);
+    }
+
+
+    /**
+     * 员工变动日志。
+     * 
+     * @param  Staff  $staff
+     * @return mixed
+     */
+    public function logs(Staff $staff)
+    {
+        $staff->load('change_log');
+
+        return response()->json($staff->change_log, 200);
+    }
+
+    /**
+     * 员工预约任务。
+     * 
+     * @param  Staff  $staff
+     * @return mixed
+     */
+    public function reserve(Staff $staff)
+    {
+        $staff->load('tmp');
+
+        return response()->json($staff->tmp, 200);
     }
 
     /**
