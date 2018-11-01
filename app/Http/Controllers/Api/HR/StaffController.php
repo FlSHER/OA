@@ -129,6 +129,20 @@ class StaffController extends Controller
         return new StaffResource($staff);
     }
 
+
+    /**
+     * 员工变动日志。
+     * 
+     * @param  Staff  $staff
+     * @return mixed
+     */
+    public function logs(Staff $staff)
+    {
+        $staff->load('change_log');
+
+        return response()->json($staff->change_log, 200);
+    }
+
     /**
      * Remove the specified resource from storage.
      *
