@@ -50,6 +50,7 @@ class StaffResource extends Resource
             'living_city_name' => $this->living_city ? $this->living_city->name : '',
             'living_county_name' => $this->living_county ? $this->living_county->name : '',
             
+            'oa' => $this->oa ?? [],
             'height' => $this->height,
             'weight' => $this->weight,
             'recruiter_sn' => $this->recruiter_sn,
