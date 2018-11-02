@@ -126,7 +126,7 @@ class StaffController extends Controller
     public function show(Staff $staff)
     {
         $staff->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands']);
-        $staff->oa = app('Authority')->getAuthoritiesByStaffSn($staff->staff_sn),
+        $staff->oa = app('Authority')->getAuthoritiesByStaffSn($staff->staff_sn);
 
         return new StaffResource($staff);
     }
