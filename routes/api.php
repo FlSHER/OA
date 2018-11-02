@@ -314,6 +314,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
 
             // 预约记录 /api/hr/staff/:staff/reserve
             Route::get('/{staff}/reserve', 'StaffController@reserve');
+
+            // 撤销预约记录 /api/hr/staff/reserve/:tmp
+            Route::delete('/reserve/{tmp}', 'StaffController@restore');
         }); 
 
         // department router

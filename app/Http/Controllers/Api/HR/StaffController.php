@@ -8,6 +8,7 @@ use Validator;
 use App\Models\Brand;
 use App\Models\HR\Staff;
 use App\Models\I\District;
+use App\Models\HR\StaffTmp;
 use App\Models\HR\Position;
 use App\Models\HR\CostBrand;
 use Illuminate\Http\Request;
@@ -125,13 +126,14 @@ class StaffController extends Controller
     public function show(Staff $staff)
     {
         $staff->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands']);
+        $staff->oa = app('Authority')->getAuthoritiesByStaffSn($staff->staff_sn),
 
         return new StaffResource($staff);
     }
 
 
     /**
-     * 员工变动日志。
+     * 员工变动日志列表。
      * 
      * @param  Staff  $staff
      * @return mixed
@@ -144,16 +146,38 @@ class StaffController extends Controller
     }
 
     /**
-     * 员工预约任务。
+     * 员工预约任务列表。
      * 
      * @param  Staff  $staff
      * @return mixed
      */
     public function reserve(Staff $staff)
     {
-        $staff->load('tmp');
+        $staff->load(['tmp', 'tmp.staff', 'tmp.admin']);
 
         return response()->json($staff->tmp, 200);
+    }
+
+    /**
+     * 撤销预约记录.
+     * 
+     * @param  StaffTmp $tmp
+     * @return mixed
+     */
+    public function restore(StaffTmp $tmp)
+    {
+        abort_if($tmp->status !== 1, 422, '禁止取消');
+
+        $staff = Staff::find($tmp->staff_sn);
+        $staff->fill($tmp->changes);
+        $tmp->status_id = 2;
+        $tmp->getConnection()->transaction(function () use ($tmp, $staff) {
+            $staff->save();
+            $tmp->save();
+        });
+        $tmp->load(['staff', 'admin']);
+
+        return response()->json($tmp, 201);
     }
 
     /**
