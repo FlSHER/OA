@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Resources;
 
 use App\Models\HR\Shop;
 use App\Models\HR\Staff;
+use App\Models\HR\ShopStatu;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\HR\ShopCollection;
@@ -120,6 +121,18 @@ class ShopController extends Controller
         });
 
         return response()->json(null, 204);
+    }
+
+    /**
+     * 获取店铺状态列表.
+     * 
+     * @return mixed
+     */
+    public function status()
+    {
+        $list = ShopStatu::get();
+
+        return response()->json($list);
     }
 
     /**
