@@ -122,13 +122,7 @@ class StaffController extends Controller
                 'recruiter_sn' => $data['recruiter']['value'],
                 'recruiter_name' => $data['recruiter']['text'],
                 'account_active' => ($data['account_active'] == '是') ? 1 : 0,
-                'relatives' => array_map(funciton($item) {
-                    return [
-                        'relative_type' => $item['relative_type'],
-                        'relative_sn' => $item['relative_staff']['value'],
-                        'relative_name' => $item['relative_staff']['text'],
-                    ];
-                }, $data['relatives']),
+                'relatives' => $this->makeRelatives($data['relatives']),
             ]);
             Log::info($params);
             // $this->entrantStaffValidator($params);
@@ -136,6 +130,20 @@ class StaffController extends Controller
 
         return response()->json(['status' => 1, 'msg' => 'ok'], 201);
     }
+
+    protected function makeRelatives($original)
+    {
+        $relatives = [];
+        foreach ((array)$original as $key => $val) {
+            $relative[$key] = [
+                'relative_type' => $val['relative_type'],
+                'relative_sn' => $val['relative_staff']['value'],
+                'relative_name' => $val['relative_staff']['text'],
+            ];
+        }
+        return $relatives;
+    }
+
 
     /**
      * 转正操作(工作流).
