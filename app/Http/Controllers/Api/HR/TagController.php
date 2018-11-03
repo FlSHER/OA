@@ -63,6 +63,7 @@ class TagController extends Controller
         $this->validate($request, [
             'name' => [
                 'max:10',
+                'required',
                 Rule::unique('tags')->ignore($tag->id),
             ],
             'tag_category_id' => 'exists:tag_categories,id',
@@ -70,6 +71,7 @@ class TagController extends Controller
             'weight' => 'numeric|min:0',
         ], [
             'name.max' => '标签名称过长',
+            'name.required' => '标签名称必填',
             'name.unique' => '标签已经存在',
             'tag_category_id.exists' => '标签分类不存在',
             'description.max' => '标签描述过长',
