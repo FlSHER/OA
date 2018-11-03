@@ -114,9 +114,15 @@ class StaffController extends Controller
     public function entrant(Request $request)
     {
         $data = $request->input('data', []);
+        $original = array_filter($data, function($k) {
+            return !in_array($k, [
+                'id' ,'run_id', 'shop', 'recruiter', 'household', 'living',
+                'relatives', 'created_at', 'updated_at', 'deleted_at',
+            ]);
+        });
         Log::info($data);
         if ($request->type == 'finish') {
-            $params = array_merge($data, [
+            $params = array_merge($original, [
                 'operation_type' => 'entry',
                 'shop_sn' => $data['shop']['value'],
                 'recruiter_sn' => $data['recruiter']['value'],
