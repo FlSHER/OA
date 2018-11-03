@@ -119,8 +119,7 @@ class StaffController extends Controller
                 'id' ,'run_id', 'shop', 'recruiter', 'household', 'living',
                 'relatives', 'created_at', 'updated_at', 'deleted_at',
             ]);
-        });
-        Log::info($data);
+        }, ARRAY_FILTER_USE_KEY);
         if ($request->type == 'finish') {
             $params = array_merge($original, [
                 'operation_type' => 'entry',
@@ -130,18 +129,20 @@ class StaffController extends Controller
                 'account_active' => ($data['account_active'] == '是') ? 1 : 0,
                 'relatives' => $this->makeRelatives($data['relatives']),
             ]);
-            Log::info($params);
-            // $this->entrantStaffValidator($params);
+            $this->entrantStaffValidator($params);
+            $result = $this->staffService->create($params);
+
+            return response()->json($result, 201);
         }
 
-        return response()->json(['status' => 1, 'msg' => 'ok'], 201);
+        return response()->json(['status' => 0, 'msg' => '流程未完成'], 201);
     }
 
     protected function makeRelatives($original)
     {
         $relatives = [];
         foreach ((array)$original as $key => $val) {
-            $relative[$key] = [
+            $relatives[$key] = [
                 'relative_type' => $val['relative_type'],
                 'relative_sn' => $val['relative_staff']['value'],
                 'relative_name' => $val['relative_staff']['text'],
@@ -265,7 +266,7 @@ class StaffController extends Controller
     }
 
     /**
-     * 员工入转操作验证.
+     * 员工入职操作验证.
      * 
      * @param  array $value
      * @return mixed
@@ -287,12 +288,12 @@ class StaffController extends Controller
             'shop_sn' => 'bail|exists:shops,shop_sn|max:10',
             'status_id' => 'bail|required|exists:staff_status,id',
             'marital_status' => 'bail|exists:i_marital_status,name',
-            'household_province' => 'bail|exists:i_district,name',
-            'household_city' => 'bail|exists:i_district,name',
-            'household_county' => 'bail|exists:i_district,name',
-            'living_province' => 'bail|exists:i_district,name',
-            'living_city' => 'bail|exists:i_district,name',
-            'living_county' => 'bail|exists:i_district,name',
+            'household_province_id' => 'bail|exists:i_district,id',
+            'household_city_id' => 'bail|exists:i_district,id',
+            'household_county_id' => 'bail|exists:i_district,id',
+            'living_province_id' => 'bail|exists:i_district,id',
+            'living_city_id' => 'bail|exists:i_district,id',
+            'living_county_id' => 'bail|exists:i_district,id',
             'household_address' => 'bail|string|max:30',
             'living_address' => 'bail|string|max:30',
             'concat_name' => 'bail|max:10',
@@ -312,14 +313,15 @@ class StaffController extends Controller
             'relatives.*.relative_nsame' => ['required_with:relative_tsype,relative_sn'],
         ];
         $message = [
-            'in' => ':attribute 必须在【:values】中选择。',
-            'max' => ':attribute 不能大于 :max 个字。',
-            'exists' => ':attribute 填写错误。',
-            'unique' => ':attribute 已经存在，请重新填写。',
-            'required' => ':attribute 为必填项，不能为空。',
-            'between' => ':attribute 值 :input 不在 :min - :max 之间。',
-            'required_with' => ':attribute 不能为空。',
+            'in' => ':attribute必须在【:values】中选择。',
+            'max' => ':attribute不能大于 :max 个字。',
+            'exists' => ':attribute填写错误。',
+            'unique' => ':attribute已经存在，请重新填写。',
+            'required' => ':attribute为必填项，不能为空。',
+            'between' => ':attribute参数 :input 不在 :min - :max 之间。',
+            'required_with' => ':attribute不能为空。',
         ];
+
         return Validator::make($value, $rules, $message)->validate();
     }
 
