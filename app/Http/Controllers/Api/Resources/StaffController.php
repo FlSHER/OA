@@ -137,7 +137,7 @@ class StaffController extends Controller
             // $this->entrantStaffValidator($params);
         }
 
-
+        return response()->json(['status' => 1, 'msg' => 'ok'], 201);
     }
 
     /**
