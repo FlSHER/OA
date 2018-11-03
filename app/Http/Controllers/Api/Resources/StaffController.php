@@ -116,22 +116,19 @@ class StaffController extends Controller
         $data = $request->input('data', []);
         Log::info($data);
         if ($request->type == 'finish') {
-            $household = $data['household'];
-            $living = $data['living'];
             $params = array_merge($data, [
                 'operation_type' => 'entry',
                 'shop_sn' => $data['shop']['value'],
                 'recruiter_sn' => $data['recruiter']['value'],
                 'recruiter_name' => $data['recruiter']['text'],
-                'household_province' => $household['household_province'],
-                'household_city' => $household['household_city'],
-                'household_county' => $household['household_county'],
-                'household_address' => $household['household_address'],
-                'living_province' => $living['living_province'],
-                'living_city' => $living['living_city'],
-                'living_county' => $living['living_county'],
-                'living_address' => $living['living_address'],
                 'account_active' => ($data['account_active'] == '是') ? 1 : 0,
+                'relatives' => array_map(funciton($item) {
+                    return [
+                        'relative_type' => $item['relative_type'],
+                        'relative_sn' => $item['relative_staff']['value'],
+                        'relative_name' => $item['relative_staff']['text'],
+                    ];
+                }, $data['relatives']),
             ]);
             Log::info($params);
             // $this->entrantStaffValidator($params);
