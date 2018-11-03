@@ -71,7 +71,7 @@ class TodoService
      * 发送钉钉待办事项
      * @param $data
      */
-    public function addTodo(array $data,$todo)
+    protected function addTodo(array $data,$todo)
     {
         $url = config('dingding.todo.add') . '?access_token=' . app('Dingtalk')->getAccessToken();
         $result = Curl::setUrl($url)->sendMessageByPost($data);
@@ -83,7 +83,7 @@ class TodoService
      * 更新待办
      * @param array $data
      */
-    public function updateTodo(array $data)
+    protected function updateTodo(array $data)
     {
         $url = config('dingding.todo.update') . '?access_token=' . app('Dingtalk')->getAccessToken();
         $result = Curl::setUrl($url)->sendMessageByPost($data);
@@ -130,6 +130,35 @@ class TodoService
         $todo->request_id = $result['request_id'];
         $todo->save();
         return $todo;
+    }
+
+    /**
+     * 获取待办消息列表
+     * @return mixed
+     */
+    public function index()
+    {
+        $data = Todo::filterByQueryString()
+            ->sortByQueryString()
+            ->withPagination();
+        return $data;
+    }
+
+    /**
+     * 重发失败的待办通知
+     * @param $id
+     * @return mixed
+     */
+    public function retraceTodo($id)
+    {
+        $data = Todo::where('id',$id)
+            ->where(function($query){
+                $query->where('errcode','<>',0)
+                    ->orWhereNull('errcode');
+            })
+            ->firstOrFail();
+        $response = $this->addTodo($data->data,$data);
+        return $response;
     }
 
 }

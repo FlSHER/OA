@@ -30,4 +30,23 @@ class MessageController extends Controller
         $data = $this->message->sendJobNotification($request);
         return $this->response->post($data);
     }
+
+    /**
+     * 工作通知列表消息
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    public function index()
+    {
+        $data = $this->message->index();
+        return $this->response->get($data);
+    }
+
+    /**
+     * 重发工作通知失败信息
+     * @param $id
+     */
+    public function retrace($id){
+        $data = $this->message->retraceJob($id);
+        return $this->response->post($data);
+    }
 }

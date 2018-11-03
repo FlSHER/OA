@@ -2,10 +2,13 @@
 
 namespace App\Models\Dingtalk;
 
+use App\Models\Traits\ListScopes;
 use Illuminate\Database\Eloquent\Model;
 
 class Message extends Model
 {
+    use ListScopes;
+
     protected $table = 'dingtalk_messages';
     protected $fillable = [
         'client_id',

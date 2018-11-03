@@ -43,4 +43,26 @@ class TodoController extends Controller
         $response = $this->todo->sendUpdateTodo($request);
         return $this->response->post($response);
     }
+
+    /**
+     * 获取待办消息列表
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    public function index()
+    {
+        $data = $this->todo->index();
+        return $this->response->get($data);
+    }
+
+    /**
+     * 重发失败的待办通知
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    public function retrace(Request $request,$id)
+    {
+        $data = $this->todo->retraceTodo($id);
+        return $this->response->post($data);
+    }
 }
