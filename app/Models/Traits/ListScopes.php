@@ -142,7 +142,11 @@ Trait ListScopes
                 if ($isOrWhere) {
                     $query->orWhere($key, $value);
                 } else {
-                    $query->where($key, $value);
+                    if($value == 'null'){
+                        $query->whereNull($key);
+                    }else{
+                        $query->where($key, $value);
+                    }
                 }
 
                 break;
