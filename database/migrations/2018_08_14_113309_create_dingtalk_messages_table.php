@@ -22,7 +22,7 @@ class CreateDingtalkMessagesTable extends Migration
             $table->char('msgtype',10)->comment('消息请求类型，text，image,file,link,markdown,oa,action_card');
             $table->text('data')->comment('请求data数据');
             $table->unsignedInteger('step_run_id')->nullable()->comment('步骤运行ID');
-            $table->unsignedTinyInteger('errcode')->nullable()->commont('发送状态， 0 成功')->index();
+            $table->char('errcode',20)->nullable()->commont('发送状态， 0 成功')->index();
             $table->char('task_id',100)->nullable()->comment('创建的发送任务id');
             $table->char('request_id',100)->nullable()->comment('返回request的ID');
             $table->timestamps();
