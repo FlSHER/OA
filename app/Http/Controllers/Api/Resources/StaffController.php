@@ -74,19 +74,6 @@ class StaffController extends Controller
         return new StaffResource($staff);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\HR\Staff $staff
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Staff $staff)
-    {
-        $staff->delete();
-
-        return response()->json(null, 204);
-    }
-
     public function getCurrentUser()
     {
         $staffSn = app('CurrentUser')->staff_sn;
@@ -114,12 +101,10 @@ class StaffController extends Controller
     public function entrant(Request $request)
     {
         $data = $request->input('data', []);
-        $original = array_filter($data, function($k) {
-            return !in_array($k, [
-                'id' ,'run_id', 'shop', 'recruiter', 'household', 'living',
-                'relatives', 'created_at', 'updated_at', 'deleted_at',
-            ]);
-        }, ARRAY_FILTER_USE_KEY);
+        $original = $this->filterData($data, [
+            'id' ,'run_id', 'shop', 'recruiter', 'household', 'living',
+            'relatives', 'created_at', 'updated_at', 'deleted_at',
+        ]);
         if ($request->type == 'finish') {
             $params = array_merge($original, [
                 'operation_type' => 'entry',
@@ -135,9 +120,10 @@ class StaffController extends Controller
             return response()->json($result, 201);
         }
 
-        return response()->json(['status' => 0, 'msg' => '流程未完成'], 201);
+        return response()->json(['status' => 0, 'message' => '流程验证错误'], 422);
     }
 
+    // 转换关系数据结构
     protected function makeRelatives($original)
     {
         $relatives = [];
@@ -151,7 +137,6 @@ class StaffController extends Controller
         return $relatives;
     }
 
-
     /**
      * 转正操作(工作流).
      * 
@@ -161,16 +146,21 @@ class StaffController extends Controller
     public function process(Request $request)
     {
         $data = $request->input('data', []);
+        $original = $this->filterData($data, [
+            'id' ,'run_id', 'staff', 'created_at', 'updated_at', 'deleted_at'
+        ]);
         if ($request->type == 'finish') {
-            $params = array_merge($data, [
+            $params = array_merge($original, [
                 'operation_type' => 'employ',
                 'staff_sn' => $data['staff']['value'],
             ]);
             $this->processValidator($params);
-            $this->staffService->update($params);
+            $result = $this->staffService->update($params);
 
-            return response()->json(['message' => '转正成功'], 201);
+            return response()->json($result, 201);
         }
+
+        return response()->json(['status' => 0, 'message' => '流程验证错误'], 422);
     }
 
     /**
@@ -182,16 +172,21 @@ class StaffController extends Controller
     public function transfer(Request $request)
     {
         $data = $request->input('data', []);
+        $original = $this->filterData($data, [
+            'id' ,'run_id', 'staff', 'created_at', 'updated_at', 'deleted_at'
+        ]);
         if ($request->type == 'finish') {
-            $params = array_merge($data, [
+            $params = array_merge($original, [
                 'operation_type' => 'transfer',
                 'staff_sn' => $data['staff']['value'],
             ]);
             $this->processValidator($params);
-            $this->staffService->update($params);
+            $result = $this->staffService->update($params);
 
-            return response()->json(['message' => '操作成功'], 201);
+            return response()->json($result, 201);
         }
+
+        return response()->json(['status' => 0, 'message' => '流程验证错误'], 422);
     }
 
     /**
@@ -203,16 +198,38 @@ class StaffController extends Controller
     public function leave(Request $request)
     {
         $data = $request->input('data', []);
+        $original = $this->filterData($data, [
+            'id' ,'run_id', 'staff', 'created_at', 'updated_at', 'deleted_at'
+        ]);
         if ($request->type == 'finish') {
-            $params = array_merge($data, [
+            $params = array_merge($original, [
                 'operation_type' => 'leave',
                 'staff_sn' => $data['staff']['value'],
+                'skip_leaving' => ($data['skip_leaving'] == '是') ? 1 : 0,
             ]);
             $this->processValidator($params);
-            $this->staffService->update($params);
+            $result = $this->staffService->update($params);
 
-            return response()->json(['message' => '操作成功'], 201);
+            return response()->json($result, 201);
         }
+
+        return response()->json(['status' => 0, 'message' => '流程验证错误'], 422);
+    }
+
+    /**
+     * 过滤回调数据。
+     * 
+     * @param  array $data
+     * @param  array  $fields
+     * @return array
+     */
+    protected function filterData($data, $fields = [])
+    {
+        return array_filter($data, function($k) use ($fields) {
+
+            return !in_array($k, $fields);
+
+        }, ARRAY_FILTER_USE_KEY);
     }
 
     /**
@@ -229,6 +246,31 @@ class StaffController extends Controller
             'operation_type' => 'required|in:entry,employ,transfer,leave,reinstate,active,leaving',
             'operation_remark' => 'max:100',
         ];
+        switch ($value['operation_type']) {
+            case 'employ'://转正
+                $rules = array_merge($rules, [
+                    'status_id' => 'required|in:2',
+                ]);
+                break;
+            case 'leave': //离职
+                $rules = array_merge($rules, [
+                    'status_id' => 'required|in:-1,-2,-3,-4',
+                    'skip_leaving' => 'in:0,1',
+                ]);
+                break;
+            case 'transfer': //人事变动
+                $rules = array_merge($rules, [
+                    'cost_brands' => 'required|array',
+                    'status_id' => 'required|in:1,2,3',
+                    'brand_id' => 'required|exists:brands,id',
+                    'shop_sn' => 'max:10|exists:shops,shop_sn',
+                    'position_id' => 'required|exists:positions,id',
+                    'department_id' => 'required|exists:departments,id',
+                ]);
+                break;
+            case 'reinstate': //再入职
+                break;
+        }
         $message = [
             'required' => ':attribute 为必填项，不能为空。',
             'in' => ':attribute 必须在【:values】中选择。',
@@ -236,31 +278,6 @@ class StaffController extends Controller
             'exists' => ':attribute 填写错误。',
             'date_format' => '时间格式错误',
         ];
-
-        $type = $value['operation_type'];
-
-        if ($type == 'employ') { //转正
-            $rules = array_merge($rules, [
-                'status_id' => 'required|in:2',
-            ]);
-        } elseif ($type == 'transfer') { //变动
-            $rules = array_merge($rules, [
-                'status_id' => 'required|in:-1,2,3',
-                'department_id' => 'required|exists:departments,id',
-                'brand_id' => 'required|exists:brands,id',
-                'shop_sn' => 'max:10|exists:shops,shop_sn',
-                'cost_brands' => ['required|array'],
-                'position_id' => 'required|exists:positions,id',
-
-            ]);
-        } elseif ($type == 'leave') { // 离职中
-            $rules = array_merge($rules, [
-                'status_id' => 'required|in:-1,-2,-3,-4',
-                'skip_leaving' => 'in:0,1',
-            ]);
-        } elseif ($type == 'reinstate') { // 再入职
-
-        }
 
         return Validator::make($value, $rules, $message)->validate();
     }
