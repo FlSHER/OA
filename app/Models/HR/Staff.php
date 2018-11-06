@@ -180,7 +180,7 @@ class Staff extends User
 
     public function tmp()
     { //预约调动
-        return $this->hasOne('App\Models\HR\StaffTmp', 'staff_sn');
+        return $this->hasMany('App\Models\HR\StaffTmp', 'staff_sn', 'staff_sn');
     }
 
     public function appraise()

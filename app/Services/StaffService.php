@@ -4,7 +4,6 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Log;
 use App\Models\HR\Staff as StaffModel;
-use Illuminate\Http\Exception\HttpResponseException;
 use App\Services\Tools\OperationLogs\StaffOperationLogService;
 
 class StaffService
@@ -225,17 +224,25 @@ class StaffService
         $model->setAttribute('status_id', 0);
     }
 
+    /**
+     * 创建一条预约操作.
+     * 
+     * @param  [type] $model
+     * @param  [type] $data
+     */
     private function transferLater($model, $data)
     {
-        if (!empty($model->tmp)) {
-            throw new HttpResponseException(response('该员工有未执行操作', 403));
-        } else {
-            $dirty = $model->getDirty();
+        $dirty = $model->getDirty();
+        if (!empty($dirty)) {
+
+            // $islock = $model->tmp()->where('status', 1)->count();
             $model->tmp()->create([
                 'changes' => $dirty,
                 'admin_sn' => $data['admin_sn'] ?? app('CurrentUser')->getStaffSn(),
                 'operate_at' => $data['operate_at'],
+                'status' => empty($model->tmp) ? 0 : 1,
             ]);
+
             $this->addDirty($model);
             $model->setRawAttributes($model->getOriginal());
         }

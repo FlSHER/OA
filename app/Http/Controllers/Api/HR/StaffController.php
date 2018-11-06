@@ -146,41 +146,6 @@ class StaffController extends Controller
     }
 
     /**
-     * 员工预约任务列表。
-     * 
-     * @param  Staff  $staff
-     * @return mixed
-     */
-    public function reserve(Staff $staff)
-    {
-        $staff->load(['tmp', 'tmp.staff', 'tmp.admin']);
-
-        return response()->json($staff->tmp, 200);
-    }
-
-    /**
-     * 撤销预约记录.
-     * 
-     * @param  StaffTmp $tmp
-     * @return mixed
-     */
-    public function restore(StaffTmp $tmp)
-    {
-        abort_if($tmp->status !== 1, 422, '禁止取消');
-
-        $staff = Staff::find($tmp->staff_sn);
-        $staff->fill($tmp->changes);
-        $tmp->status_id = 2;
-        $tmp->getConnection()->transaction(function () use ($tmp, $staff) {
-            $staff->save();
-            $tmp->save();
-        });
-        $tmp->load(['staff', 'admin']);
-
-        return response()->json($tmp, 201);
-    }
-
-    /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\HR\Staff $staff
@@ -259,10 +224,11 @@ class StaffController extends Controller
         $this->staffService->update($data);
 
         $data['cost_brands'] = CostBrand::whereIn('id', $data['cost_brands'])->get();
+        $operateAt = \Carbon\Carbon::parse($data['operate_at'])->gt(now());
 
         return response()->json([
             'message' => '操作成功',
-            'changes' => $data,
+            'changes' => $operateAt ? [] : $data,
         ], 201);
     }
 
@@ -701,6 +667,31 @@ class StaffController extends Controller
             'operation_type' => 'required|in:entry,employ,transfer,leave,reinstate,active,leaving',
             'operation_remark' => 'max:100',
         ];
+        switch ($value['operation_type']) {
+            case 'employ'://转正
+                $rules = array_merge($rules, [
+                    'status_id' => 'required|in:2',
+                ]);
+                break;
+            case 'leave': //离职
+                $rules = array_merge($rules, [
+                    'status_id' => 'required|in:-1,-2,-3,-4',
+                    'skip_leaving' => 'in:0,1',
+                ]);
+                break;
+            case 'transfer': //人事变动
+                $rules = array_merge($rules, [
+                    'cost_brands' => 'required|array',
+                    'status_id' => 'required|in:1,2,3',
+                    'brand_id' => 'required|exists:brands,id',
+                    'shop_sn' => 'max:10|exists:shops,shop_sn',
+                    'position_id' => 'required|exists:positions,id',
+                    'department_id' => 'required|exists:departments,id',
+                ]);
+                break;
+            case 'reinstate': //再入职
+                break;
+        }
         $message = [
             'required' => ':attribute 为必填项，不能为空。',
             'in' => ':attribute 必须在【:values】中选择。',
@@ -708,31 +699,6 @@ class StaffController extends Controller
             'exists' => ':attribute 填写错误。',
             'date_format' => '时间格式错误',
         ];
-
-        $type = $value['operation_type'];
-
-        if ($type == 'employ') { //转正
-            $rules = array_merge($rules, [
-                'status_id' => 'required|in:2',
-            ]);
-        } elseif ($type == 'transfer') { //变动
-            $rules = array_merge($rules, [
-                'status_id' => 'required|in:-1,2,3',
-                'department_id' => 'required|exists:departments,id',
-                'brand_id' => 'required|exists:brands,id',
-                'shop_sn' => 'max:10|exists:shops,shop_sn',
-                'cost_brands' => 'required|array',
-                'position_id' => 'required|exists:positions,id',
-
-            ]);
-        } elseif ($type == 'leave') { // 离职
-            $rules = array_merge($rules, [
-                'status_id' => 'required|in:-1,-2,-3,-4',
-                'skip_leaving' => 'in:0,1',
-            ]);
-        } elseif ($type == 'reinstate') { // 再入职
-
-        }
 
         return Validator::make($value, $rules, $message)->validate();
     }
