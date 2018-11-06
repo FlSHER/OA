@@ -45,12 +45,9 @@ class StaffTmpController extends Controller
     public function restore(StaffTmp $tmp)
     {
         abort_if($tmp->status !== 1, 422, '禁止还原');
-        $staff = Staff::find($tmp->staff_sn);
-        $staff->fill($tmp->changes);
 
         $tmp->status = 2;
-        $tmp->getConnection()->transaction(function () use ($tmp, $staff) {
-            $staff->save();
+        $tmp->getConnection()->transaction(function () use ($tmp) {
             $tmp->save();
 
             // 解锁下一条被锁定的记录.
