@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Api\Resources;
 
+use Validator;
 use App\Models\HR\Shop;
 use App\Models\HR\Staff;
 use App\Models\HR\ShopStatu;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\HR\ShopCollection;
+use Illuminate\Support\Facades\Log;
 
 class ShopController extends Controller
 {
@@ -39,7 +42,7 @@ class ShopController extends Controller
      */
     public function store(Request $request, Shop $shop)
     {
-        $this->validate($request, $this->rules($request), $this->messages());
+        $this->validate($request, $this->rules($request), $this->message());
         $data = $request->all();
         $shop->fill($data);
 
@@ -84,7 +87,7 @@ class ShopController extends Controller
      */
     public function update(Request $request, Shop $shop)
     {
-        $this->validate($request, $this->rules($request), $this->messages());
+        $this->validate($request, $this->rules($request), $this->message());
         $data = $request->all();
         $shop->fill($data);
 
@@ -146,7 +149,6 @@ class ShopController extends Controller
         $shop = Shop::find($request->id);
         if ($shop === null) {
             return response()->json(['message' => '店铺数据错误', 'code' => '0'], 422);
-            // return '店铺数据错误';
         }
         $amap = createRequest('/api/amap', 'post', [
             'shop_sn' => $shop->shop_sn,
@@ -161,7 +163,79 @@ class ShopController extends Controller
         return response()->json(['message' => '操作成功', 'code' => '1'], 201);
     }
 
-    protected function rules(Request $request)
+    /**
+     * 从流程创建店铺档案.
+     * 
+     * @param  Request $request
+     * @return mixed
+     */
+    public function storeProcess(Request $request)
+    {
+        $data = $request->input('data', []);
+        $original = $this->filterData($data, [
+            'id' ,'run_id', 'location', 'shop_name', 'created_at', 'updated_at', 'deleted_at'
+        ]);
+        Log::info($data);
+        if ($request->type == 'finish') {
+            $params = array_merge($original, [
+                'status_id' => 1,
+                'name' => $data['shop_name'],
+            ]);
+            Log::info($params);
+            $this->validateWith($params);
+            
+            // return response()->json($result, 201);
+        }
+
+        // return response()->json(['status' => 0, 'msg' => '流程验证错误'], 422);
+    }
+
+    /**
+     * 过滤回调数据。
+     * 
+     * @param  array $data
+     * @param  array  $fields
+     * @return array
+     */
+    protected function filterData($data, $fields = [])
+    {
+        return array_filter($data, function($k) use ($fields) {
+
+            return !in_array($k, $fields);
+
+        }, ARRAY_FILTER_USE_KEY);
+    }
+
+    /**
+     * 库房创建店铺档案验证.
+     * 
+     * @param  [type] $value
+     * @return mixed
+     */
+    public function validateWith($value)
+    {
+        $rules = [
+            'name' => 'bail|required|max:50',
+            'shop_sn' => 'bail|required|unique:shops|max:10',
+            'status_id' => 'bail|required|exists:shop_status,id',
+            'department_id' => 'bail|exists:departments,id',
+            'brand_id' => 'bail|exists:brands,id',
+            'province_id' => 'bail|required|exists:i_district,id',
+            'city_id' => 'bail|required|exists:i_district,id',
+            'county_id' => 'bail|required|exists:i_district,id',
+            'address' => 'bail|max:50',
+        ];
+
+        return Validator::make($value, $rules, $this->message())->validate();
+    }
+
+    /**
+     * 店铺验证规则.
+     * 
+     * @param  Request $request
+     * @return array
+     */
+    protected function rules(Request $request): array
     {
         $rules = [
             'name' => 'bail|required|max:50',
@@ -190,14 +264,23 @@ class ShopController extends Controller
         ];
         if (strtolower($request->getMethod()) === 'patch') {
             return array_merge($rules, [
-                'shop_sn' => 'required|max:10',
+                'shop_sn' => [
+                    'required',
+                    'max:10',
+                    Rule::unique('shops')->ignore($request->id),
+                ],
             ]);
         }
 
         return $rules;
     }
 
-    protected function messages()
+    /**
+     * 店铺验证返回错误信息.
+     * 
+     * @return array
+     */
+    protected function message(): array
     {
         return [
             'required' => ':attribute 为必填项，不能为空。',

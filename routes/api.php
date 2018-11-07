@@ -225,6 +225,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
 
            // 获取店铺状态列表 /api/shop/status
            Route::get('/status', 'ShopController@status');
+
+           // 工作流创建店铺档案. /api/shop/create
+           Route::post('/create', 'ShopController@storeProcess');
         });
 
         // rbac router
