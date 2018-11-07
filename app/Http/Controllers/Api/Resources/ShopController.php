@@ -172,16 +172,18 @@ class ShopController extends Controller
     public function storeProcess(Request $request)
     {
         $data = $request->input('data', []);
-        $original = $this->filterData($data, [
-            'shop_sn' ,'brand_id', 'location_province_id',
-            'location_city_id', 'location_county_id', 'location_address',
-        ]);
-        $params = array_merge($original, [
+        $params = [
             'status_id' => 1,
             'name' => $data['shop_name'],
+            'shop_sn' => $data['shop_sn'],
+            'brand_id' => $data['brand_id'],
             'department_id' => $data['department_id']['value'],
+            'province_id' => $data['location_province_id'],
+            'city_id' => $data['location_city_id'],
+            'county_id' => $data['location_county_id'],
+            'address' => $data['location_address'],
 
-        ]);
+        ];
         Log::info($params);
         $validator = $this->validateWithProcess($params);
         if ($validator->fails()) {
@@ -191,22 +193,6 @@ class ShopController extends Controller
         }
 
         return response()->json(['status' => 1, 'msg' => '操作成功'], 201);
-    }
-
-    /**
-     * 过滤回调数据。
-     * 
-     * @param  array $data
-     * @param  array  $fields
-     * @return array
-     */
-    protected function filterData($data, $fields = [])
-    {
-        return array_filter($data, function($k) use ($fields) {
-
-            return in_array($k, $fields);
-
-        }, ARRAY_FILTER_USE_KEY);
     }
 
     /**
@@ -222,10 +208,10 @@ class ShopController extends Controller
             'shop_sn' => 'bail|required|unique:shops|max:10',
             'department_id' => 'bail|exists:departments,id',
             'brand_id' => 'bail|exists:brands,id',
-            'location_province_id' => 'bail|required|exists:i_district,id',
-            'location_city_id' => 'bail|required|exists:i_district,id',
-            'location_county_id' => 'bail|required|exists:i_district,id',
-            'location_address' => 'bail|max:50',
+            'province_id' => 'bail|required|exists:i_district,id',
+            'city_id' => 'bail|required|exists:i_district,id',
+            'county_id' => 'bail|required|exists:i_district,id',
+            'address' => 'bail|max:50',
         ];
 
         return Validator::make($value, $rules, $this->message());
