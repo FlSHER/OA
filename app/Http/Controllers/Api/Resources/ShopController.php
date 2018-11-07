@@ -182,7 +182,7 @@ class ShopController extends Controller
                 'name' => $data['shop_name'],
             ]);
             Log::info($params);
-            $this->validateWith($params);
+            $this->validateWithProcess($params);
             
             // return response()->json($result, 201);
         }
@@ -212,7 +212,7 @@ class ShopController extends Controller
      * @param  [type] $value
      * @return mixed
      */
-    public function validateWith($value)
+    public function validateWithProcess($value)
     {
         $rules = [
             'name' => 'bail|required|max:50',
