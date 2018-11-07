@@ -173,21 +173,24 @@ class ShopController extends Controller
     {
         $data = $request->input('data', []);
         $original = $this->filterData($data, [
-            'id' ,'run_id', 'location', 'shop_name', 'created_at', 'updated_at', 'deleted_at'
+            'shop_sn' ,'brand_id', 'location_province_id',
+            'location_city_id', 'location_county_id', 'location_address',
         ]);
-        Log::info($data);
-        if ($request->type == 'finish') {
-            $params = array_merge($original, [
-                'status_id' => 1,
-                'name' => $data['shop_name'],
-            ]);
-            Log::info($params);
-            $this->validateWithProcess($params);
-            
-            // return response()->json($result, 201);
+        $params = array_merge($original, [
+            'status_id' => 1,
+            'name' => $data['shop_name'],
+            'department_id' => $data['department_id']['value'],
+
+        ]);
+        Log::info($params);
+        $validator = $this->validateWithProcess($params);
+        if ($validator->fails()) {
+            $msg = $validator->errors();
+            Log::info($msg);
+            return response()->json(['status' => 0, 'msg' => '流程验证错误'], 422);
         }
 
-        // return response()->json(['status' => 0, 'msg' => '流程验证错误'], 422);
+        return response()->json(['status' => 1, 'msg' => '操作成功'], 201);
     }
 
     /**
@@ -201,7 +204,7 @@ class ShopController extends Controller
     {
         return array_filter($data, function($k) use ($fields) {
 
-            return !in_array($k, $fields);
+            return in_array($k, $fields);
 
         }, ARRAY_FILTER_USE_KEY);
     }
@@ -217,16 +220,15 @@ class ShopController extends Controller
         $rules = [
             'name' => 'bail|required|max:50',
             'shop_sn' => 'bail|required|unique:shops|max:10',
-            'status_id' => 'bail|required|exists:shop_status,id',
             'department_id' => 'bail|exists:departments,id',
             'brand_id' => 'bail|exists:brands,id',
-            'province_id' => 'bail|required|exists:i_district,id',
-            'city_id' => 'bail|required|exists:i_district,id',
-            'county_id' => 'bail|required|exists:i_district,id',
-            'address' => 'bail|max:50',
+            'location_province_id' => 'bail|required|exists:i_district,id',
+            'location_city_id' => 'bail|required|exists:i_district,id',
+            'location_county_id' => 'bail|required|exists:i_district,id',
+            'location_address' => 'bail|max:50',
         ];
 
-        return Validator::make($value, $rules, $this->message())->validate();
+        return Validator::make($value, $rules, $this->message());
     }
 
     /**
