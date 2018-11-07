@@ -32,7 +32,9 @@ class CreateShopManageTables extends Migration
             $table->time('clock_in')->default('09:00:00')->comment('上班时间');
             $table->time('clock_out')->default('21:00:00')->comment('下班时间');
             $table->char('geo_hash', 20)->default('')->comment('地理位置范围');
-
+            $table->char('manager_sn', 6)->default('')->comment('店长编号');
+            $table->char('manager_name', 10)->default('')->comment('店长姓名');
+            
             $table->timestamps();
             $table->softDeletes();
             $table->unique('shop_sn');

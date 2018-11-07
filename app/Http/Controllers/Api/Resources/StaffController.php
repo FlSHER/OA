@@ -120,7 +120,7 @@ class StaffController extends Controller
             return response()->json($result, 201);
         }
 
-        return response()->json(['status' => 0, 'message' => '流程验证错误'], 422);
+        return response()->json(['status' => 0, 'msg' => '流程验证错误'], 422);
     }
 
     // 转换关系数据结构
@@ -160,7 +160,7 @@ class StaffController extends Controller
             return response()->json($result, 201);
         }
 
-        return response()->json(['status' => 0, 'message' => '流程验证错误'], 422);
+        return response()->json(['status' => 0, 'msg' => '流程验证错误'], 422);
     }
 
     /**
@@ -186,7 +186,7 @@ class StaffController extends Controller
             return response()->json($result, 201);
         }
 
-        return response()->json(['status' => 0, 'message' => '流程验证错误'], 422);
+        return response()->json(['status' => 0, 'msg' => '流程验证错误'], 422);
     }
 
     /**
@@ -213,7 +213,7 @@ class StaffController extends Controller
             return response()->json($result, 201);
         }
 
-        return response()->json(['status' => 0, 'message' => '流程验证错误'], 422);
+        return response()->json(['status' => 0, 'msg' => '流程验证错误'], 422);
     }
 
     /**

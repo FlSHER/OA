@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\HR;
 use App\Models\HR\Shop;
 use App\Models\HR\Staff;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\HR\ShopCollection;
 
@@ -183,7 +184,11 @@ class ShopController extends Controller
         ];
         if (strtolower($request->getMethod()) === 'patch') {
             return array_merge($rules, [
-                'shop_sn' => 'required|max:10',
+                'shop_sn' => [
+                    'required',
+                    'max:10',
+                    Rule::unique('shops')->ignore($request->id),
+                ],
             ]);
         }
 

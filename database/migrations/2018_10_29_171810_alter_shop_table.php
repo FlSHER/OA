@@ -21,8 +21,8 @@ class AlterShopTable extends Migration
             $table->char('manager2_name', 10)->default('')->comment('二级负责人姓名');
             $table->char('manager3_sn', 6)->default('')->comment('三级负责人编号');
             $table->char('manager3_name', 10)->default('')->comment('三级负责人姓名');
-            $table->time('opening_at')->comment('开业时间');
-            $table->time('end_at')->comment('结束时间');
+            $table->dateTime('opening_at')->nullable()->comment('开业时间');
+            $table->dateTime('end_at')->nullable()->comment('结束时间');
 
             $table->foreign('status_id')->references('id')->on('shop_status');
         });
@@ -44,8 +44,6 @@ class AlterShopTable extends Migration
     {
         Schema::table('shops', function (Blueprint $table) {
             $table->dropColumn('status_id');
-            $table->dropColumn('manager_sn');
-            $table->dropColumn('manager_name');
             $table->dropColumn('manager1_sn');
             $table->dropColumn('manager1_name');
             $table->dropColumn('manager2_sn');

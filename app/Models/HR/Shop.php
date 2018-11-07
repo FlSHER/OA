@@ -15,6 +15,8 @@ class Shop extends Model
 
     protected $connection = 'mysql';
 
+    protected $hidden = ['password', 'salt', 'deleted_at'];
+
     protected $fillable = [
         'shop_sn',
         'name',
