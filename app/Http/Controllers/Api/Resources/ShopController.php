@@ -174,23 +174,24 @@ class ShopController extends Controller
         $data = $request->input('data', []);
         $params = [
             'status_id' => 1,
-            'name' => $data['shop_name'],
-            'shop_sn' => $data['shop_sn'],
-            'brand_id' => $data['brand_id'],
-            'department_id' => $data['department_id']['value'],
-            'province_id' => $data['location_province_id'],
-            'city_id' => $data['location_city_id'],
-            'county_id' => $data['location_county_id'],
-            'address' => $data['location_address'],
-
+            'name' => $data['shop_name'] ?? null,
+            'shop_sn' => $data['shop_sn'] ?? null,
+            'brand_id' => $data['brand_id'] ?? null,
+            'department_id' => $data['department_id']['value'] ?? null,
+            'province_id' => $data['location_province_id'] ?? null,
+            'city_id' => $data['location_city_id'] ?? null,
+            'county_id' => $data['location_county_id'] ?? null,
+            'address' => $data['location_address'] ?? null,
         ];
-        Log::info($params);
         $validator = $this->validateWithProcess($params);
         if ($validator->fails()) {
-            $msg = $validator->errors();
-            Log::info($msg);
-            return response()->json(['status' => 0, 'msg' => '流程验证错误'], 422);
+            $errors = $validator->errors();
+            return response()->json(['status' => 0, 'msg' => $errors->first()], 422);
         }
+        $shopModel = new Shop();
+        $shopModel->fill($params);
+        $shopModel->save();
+        $shopModel->createShopLog($shopModel->id);
 
         return response()->json(['status' => 1, 'msg' => '操作成功'], 201);
     }
@@ -211,7 +212,7 @@ class ShopController extends Controller
             'province_id' => 'bail|required|exists:i_district,id',
             'city_id' => 'bail|required|exists:i_district,id',
             'county_id' => 'bail|required|exists:i_district,id',
-            'address' => 'bail|max:50',
+            'address' => 'bail|required|max:50',
         ];
 
         return Validator::make($value, $rules, $this->message());
@@ -271,12 +272,12 @@ class ShopController extends Controller
     protected function message(): array
     {
         return [
-            'required' => ':attribute 为必填项，不能为空。',
-            'unique' => ':attribute 已经存在，请重新填写。',
-            'array' => ':attribute 数据格式错误。',
-            'max' => ':attribute 不能大于 :max 个字。',
-            'exists' => ':attribute 填写错误。',
-            'after_or_equal' => ':attribute 不能小于 :values。',
+            'required' => ':attribute为必填项，不能为空。',
+            'unique' => ':attribute已经存在，请重新填写。',
+            'array' => ':attribute数据格式错误。',
+            'max' => ':attribute不能大于 :max 个字。',
+            'exists' => ':attribute填写错误。',
+            'after_or_equal' => ':attribute不能小于 :values。',
         ];
     }
 }

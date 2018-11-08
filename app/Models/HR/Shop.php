@@ -173,9 +173,8 @@ class Shop extends Model
      */
     public function createShopLog($id)
     {
-        $isDirty = $this->isDirty();
-        if ($isDirty === true) {
-            $dirty = $this->getDirty();
+        $dirty = $this->getDirty();
+        if (!empty($dirty)) {
             $staff = request()->user();
             $logModel = new ShopLog();
             $logModel->fill([

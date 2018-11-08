@@ -11,12 +11,13 @@ class ShopStatusSeeder extends Seeder {
      */
     public function run() {
         $data = [
-            ['name' => '筹备', 'sort' => '1'],
-            ['name' => '开店', 'sort' => '2'],
-            ['name' => '闭店', 'sort' => '3'],
+            ['name' => '未营业', 'sort' => 1],
+            ['name' => '营业中', 'sort' => 2],
+            ['name' => '闭店', 'sort' => 3],
+            ['name' => '取消', 'sort' => 4],
         ];
         DB::table('shop_status')->truncate();
         DB::table('shop_status')->insert($data);
     }
-
+ 
 }
