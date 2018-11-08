@@ -228,6 +228,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
 
            // 工作流创建店铺档案. /api/shop/create
            Route::post('/create', 'ShopController@storeProcess');
+
+           // 修改店铺状态 /api/shop/:shop/state
+           Route::post('/{shop}/state', 'ShopController@changeState');
         });
 
         // rbac router

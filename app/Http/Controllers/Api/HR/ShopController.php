@@ -45,7 +45,6 @@ class ShopController extends Controller
 
         $shop->getConnection()->transaction(function () use ($shop, $data) {
             $shop->save();
-            $shop->createShopLog($shop->id);
             if (!empty($data['staff'])) {
                 $staffSn = array_column($data['staff'], 'staff_sn');
                 $shop->staff()->update(['shop_sn' => '']);
@@ -90,7 +89,6 @@ class ShopController extends Controller
 
         $shop->getConnection()->transaction(function () use ($shop, $data) {
             $shop->save();
-            $shop->createShopLog($shop->id);
             if (!empty($data['staff'])) {
                 $staffSn = array_column($data['staff'], 'staff_sn');
                 $shop->staff()->update(['shop_sn' => '']);

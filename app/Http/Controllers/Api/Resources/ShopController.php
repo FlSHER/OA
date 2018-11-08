@@ -9,6 +9,7 @@ use App\Models\HR\ShopStatu;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\HR\ShopResource;
 use App\Http\Resources\HR\ShopCollection;
 use Illuminate\Support\Facades\Log;
 
@@ -48,7 +49,6 @@ class ShopController extends Controller
 
         $shop->getConnection()->transaction(function () use ($shop, $data) {
             $shop->save();
-            $shop->createShopLog($shop->id);
             if (!empty($data['staff'])) {
                 $staffSn = array_column($data['staff'], 'staff_sn');
                 $shop->staff()->update(['shop_sn' => '']);
@@ -93,7 +93,6 @@ class ShopController extends Controller
 
         $shop->getConnection()->transaction(function () use ($shop, $data) {
             $shop->save();
-            $shop->createShopLog($shop->id);
             if (!empty($data['staff'])) {
                 $staffSn = array_column($data['staff'], 'staff_sn');
                 $shop->staff()->update(['shop_sn' => '']);
@@ -191,9 +190,31 @@ class ShopController extends Controller
         $shopModel = new Shop();
         $shopModel->fill($params);
         $shopModel->save();
-        $shopModel->createShopLog($shopModel->id);
 
         return response()->json(['status' => 1, 'msg' => '操作成功'], 201);
+    }
+
+    /**
+     * 改变店铺状态.
+     * 
+     * @param  Request $request
+     * @param  Shop    $shop
+     * @return mixed
+     */
+    public function changeState(Request $request, Shop $shop)
+    {
+        $this->validate($request, [
+            'status_id' => 'required|exists:shop_status,id',
+        ], [
+            'status_id.required' => '店铺状态不能为空',
+            'status_id.exists' => '店铺状态错误',
+        ]);
+        $shop->status_id = $request->status_id;
+        $shop->save();
+
+        $shop->load(['manager', 'brand', 'department', 'staff', 'tags']);
+
+        return response()->json(new ShopResource($shop), 200);
     }
 
     /**

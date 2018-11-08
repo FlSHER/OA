@@ -7,6 +7,7 @@ use App\Models\Tag;
 use App\Models\Traits\ListScopes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 
 class Shop extends Model
 {
@@ -44,6 +45,24 @@ class Shop extends Model
         'manager3_sn',
         'manager3_name',
     ];
+
+    protected $dirtyAttributes = [];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        // 获取 dirty
+        static::saving(function($shop){
+            $dirty = $shop->getDirty();
+            $shop->dirtyAttributes = $dirty;
+        });
+
+        // 保存 dirty
+        static::saved(function($shop){
+            $shop->recordLog();
+        });
+    }
 
     /* ----- 定义关联Start ----- */
 
@@ -171,16 +190,15 @@ class Shop extends Model
      *
      * @return void
      */
-    public function createShopLog($id)
+    public function recordLog()
     {
-        $dirty = $this->getDirty();
-        if (!empty($dirty)) {
+        if (!empty($this->dirtyAttributes)) {
             $staff = request()->user();
             $logModel = new ShopLog();
             $logModel->fill([
-                'target_id' => $id,
+                'target_id' => $this->id,
                 'admin_sn' => $staff['staff_sn'],
-                'changes' => $dirty,
+                'changes' => $this->dirtyAttributes,
             ]);
             $logModel->save();
         }
