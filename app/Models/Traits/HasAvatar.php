@@ -2,6 +2,7 @@
 
 namespace App\Models\Traits;
 
+use Image as ImageFacade;
 use Intervention\Image\Image;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\UploadedFile;
@@ -78,6 +79,30 @@ trait HasAvatar
     }
 
     /**
+     * 保存员工头像.
+     *
+     * @param UploadedFile $avatar
+     * @return string|false
+     */
+    public function storeAvatar(UploadedFile $avatar, string $prefix = '')
+    {
+        $extension = strtolower($avatar->extension());
+        if (! in_array($extension, $this->getAvatarExtensions())) {
+            throw new \Exception('保存的头像格式不符合要求');
+        }
+        if ($extension !== 'gif') {
+            ini_set('memory_limit', '-1');
+            ImageFacade::make($avatar->getRealPath())->orientate()->save($avatar->getRealPath(), 100);
+        }
+
+        $filename = $this->makeAvatarPath($prefix);
+        $path = pathinfo($filename, PATHINFO_DIRNAME);
+        $name = pathinfo($filename, PATHINFO_BASENAME).'.'.$extension;
+        
+        return $avatar->storeAs($path, $name, config('filesystems.disks.public.visibility'));
+    }
+
+    /**
      * 验证文件是否需要处理，如果需要则执行回调.
      *
      * @param string $filename
@@ -136,7 +161,7 @@ trait HasAvatar
         }
     }
 
-	/**
+    /**
      * 验证文件,文件存在，则直接返回，否则执行回调.
      *
      * @param string $filename
@@ -226,7 +251,7 @@ trait HasAvatar
      */
     protected function makeUrl(string $filename): string
     {
-    	$disk = $this->filesystem()->disk(
+        $disk = $this->filesystem()->disk(
             config('filesystems.disks.public.visibility')
         );
 
@@ -253,30 +278,6 @@ trait HasAvatar
         }
 
         return null;
-    }
-
-    /**
-     * 保存员工头像.
-     *
-     * @param UploadedFile $avatar
-     * @return string|false
-     */
-    public function storeAvatar(UploadedFile $avatar, string $prefix = '')
-    {
-        $extension = strtolower($avatar->extension());
-        if (! in_array($extension, $this->getAvatarExtensions())) {
-            throw new \Exception('保存的头像格式不符合要求');
-        }
-        if ($extension !== 'gif') {
-            ini_set('memory_limit', '-1');
-            Image::make($avatar->getRealPath())->orientate()->save($avatar->getRealPath(), 100);
-        }
-
-        $filename = $this->makeAvatarPath($prefix);
-        $path = pathinfo($filename, PATHINFO_DIRNAME);
-        $name = pathinfo($filename, PATHINFO_BASENAME).'.'.$extension;
-        
-        return $avatar->storeAs($path, $name, config('filesystems.disks.public.visibility'));
     }
 
     /**
