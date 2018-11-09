@@ -3,23 +3,23 @@
 namespace App\Models\HR;
 
 use Authority;
-use App\Models\Tag;
-use App\Models\Brand;
-use App\Models\I\Gender;
-use App\Models\Position;
-use App\Models\Department;
-use App\Models\I\National;
-use App\Models\I\Politics;
-use App\Models\I\MaritalStatus;
-use App\Models\Traits\ListScopes;
+use App\Models;
+use App\Models\Traits;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Controllers\Api\Resources\StaffAvatarController;
 
 class Staff extends User
 {
-    use HasApiTokens, Notifiable, SoftDeletes, ListScopes;
+    use Notifiable,
+        SoftDeletes,
+        HasApiTokens,
+        Traits\HasAvatar,
+        Traits\ListScopes;
 
     protected $connection = 'mysql';
     protected $primaryKey = 'staff_sn';
@@ -67,6 +67,8 @@ class Staff extends User
         'concat_type',
         'wechat_number',
     ];
+
+    protected $appends = ['avatar'];
 
     protected $hidden = ['password', 'salt', 'created_at', 'updated_at', 'deleted_at'];
 
@@ -205,14 +207,14 @@ class Staff extends User
     public function setBrandAttribute($value)
     {
         if (is_string($value)) {
-            $this->attributes['brand_id'] = Brand::where('name', $value)->value('id');
+            $this->attributes['brand_id'] = Models\Brand::where('name', $value)->value('id');
         }
     }
 
     public function setDepartmentAttribute($value)
     {
         if (is_string($value)) {
-            $this->attributes['department_id'] = Department::where('full_name', $value)->value('id');
+            $this->attributes['department_id'] = Models\Department::where('full_name', $value)->value('id');
         }
     }
 
@@ -224,7 +226,7 @@ class Staff extends User
     public function setPositionAttribute($value)
     {
         if (is_string($value)) {
-            $this->attributes['position_id'] = Position::where('name', $value)->value('id');
+            $this->attributes['position_id'] = Models\Position::where('name', $value)->value('id');
         }
     }
 
@@ -322,6 +324,26 @@ class Staff extends User
         return $this->where('mobile', $username)->first();
     }
 
+    public function getAvatarKey()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Get avatar attribute.
+     *
+     * @return string|null
+     */
+    public function getAvatarAttribute()
+    {
+        if (! $this->avatarPath()) {
+            return null;
+        }
+
+        // return $this->avatar(50);
+        return action('\\'.StaffAvatarController::class.'@show', ['staff' => $this]);
+    }
+
 
     /**
      * Has tags of the staff.
@@ -330,7 +352,7 @@ class Staff extends User
      */
     public function tags()
     {
-        return $this->morphToMany(Tag::class, 'taggable', 'taggables')
+        return $this->morphToMany(Models\Tag::class, 'taggable', 'taggables')
             ->withTimestamps();
     }
 }

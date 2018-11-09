@@ -41,6 +41,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
         Route::post('update', 'AppraiseController@update');//修改
     });
 });
+
+// 获取头像
+Route::get('/staff/{staff}/avatar', 'Api\Resources\StaffAvatarController@show');
 Route::get('/get_auth_code', ['uses' => 'Api\OAuthController@getAuthCode'])->middleware('auth');
 Route::any('/get_token', ['uses' => 'Api\OAuthController@getAppToken']);
 Route::any('/refresh_token', ['uses' => 'Api\OAuthController@refreshAppToken']);
@@ -115,6 +118,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
 
             // 关系类型选项 /api/staff/relative_type
             Route::get('/relative_type', 'StaffRelationController@relativeType');
+
+            // 上传员工头像
+            Route::post('/avatar', 'StaffAvatarController@update');
         });
 
         // department router
