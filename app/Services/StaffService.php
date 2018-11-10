@@ -62,7 +62,7 @@ class StaffService
             $model->fill($data);
             $this->saving($model, $data); //前置操作
             $this->addDirty($model);
-            if (!$this->hasTransfer($model, $data)) { //没有预约操作才走更新
+            if (!$this->hasTransfer($model, $data)) {
                 $model->save();
                 $this->saved($model, $data); //后置操作
                 $this->changeBelongsToMany($model, $data);
@@ -80,7 +80,7 @@ class StaffService
     }
 
     /**
-     * 是否有可预约操作。
+     * 是否可预约操作。
      * 
      * @param  [type]  $model
      * @param  [type]  $data
@@ -89,14 +89,12 @@ class StaffService
     protected function hasTransfer($model, $data)
     {
         $operationType = $data['operation_type'];
-
-        if (in_array($operationType, ['transfer', 'import_transfer']) 
-            && strtotime($data['operate_at']) > time()
-            && empty($model->tmp)
+        if (
+            in_array($operationType, ['transfer', 'import_transfer']) && 
+            strtotime($data['operate_at']) > strtotime(date('Y-m-d'))
         ) {
             return true;
         }
-
         return false;
     }
 
@@ -190,21 +188,30 @@ class StaffService
 
     public function saving($model, array $data)
     {
-        // 操作设置
         $this->operating($model, $data);
+
         $operationType = $data['operation_type'];
-        if ($operationType == 'leave' && $model->status_id != -2) {
+        if (
+            ($operationType === 'leave') && 
+            ($model->status_id !== -2)
+        ) {
             $this->setLeaving($model);
-        } elseif (in_array($operationType, ['transfer', 'import_transfer']) && strtotime($data['operate_at']) > time()) {
+        } elseif (
+            in_array($operationType, ['transfer', 'import_transfer']) && 
+            strtotime($data['operate_at']) > strtotime(date('Y-m-d'))
+        ) {
             $this->transferLater($model, $data);
         }
-        
     }
 
     protected function saved($model, $data)
     {
         // 如果是离职操作并且跳过了离职交接 修改状态为已离职
-        if ($data['operation_type'] == 'leave' && array_has($data, 'skip_leaving') && $data['skip_leaving']) {
+        if (
+            array_has($data, 'skip_leaving') && 
+            $data['operation_type'] === 'leave' && 
+            $data['skip_leaving']
+        ) {
             $data['operation_type'] = 'leaving';
             $this->save($data);
         }
@@ -240,7 +247,7 @@ class StaffService
                 'changes' => $dirty,
                 'admin_sn' => $data['admin_sn'] ?? app('CurrentUser')->getStaffSn(),
                 'operate_at' => $data['operate_at'],
-                'status' => empty($model->tmp) ? 0 : 1,
+                'status' => $model->tmp->isEmpty() ? 1 : 0,
             ]);
 
             $this->addDirty($model);
