@@ -143,23 +143,16 @@ class ShopController extends Controller
      * @param Request $request
      * @return void
      */
-    public function position(Request $request)
+    protected function position(Shop $shop)
     {
-        $shop = Shop::find($request->id);
-        if ($shop === null) {
-            return response()->json(['message' => '店铺数据错误', 'code' => '0'], 422);
+        if (!empty($shop->lat) && !empty($shop->lng)) {
+            createRequest('/api/amap', 'post', [
+                'shop_sn' => $shop->shop_sn,
+                'shop_name' => $shop->name,
+                'latitude' => $shop->lat,
+                'longitude' => $shop->lng
+            ]);
         }
-        $amap = createRequest('/api/amap', 'post', [
-            'shop_sn' => $shop->shop_sn,
-            'shop_name' => $shop->name,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude
-        ]);
-        $shop->lng = $request->longitude;
-        $shop->lat = $request->latitude;
-        $shop->save();
-
-        return response()->json(['message' => '操作成功', 'code' => '1'], 201);
     }
 
     /**

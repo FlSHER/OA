@@ -432,9 +432,6 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
 
            // 删除店铺 /api/shop/:shop
            Route::delete('{shop}', 'ShopController@destroy')->where(['shop' => '[0-9]+']);
-
-           // 开闭店流程 /api/shop/:shop
-           Route::patch('{shop}/process', 'ShopController@process')->where(['shop' => '[0-9]+']);
         });
 
         // rbac router
