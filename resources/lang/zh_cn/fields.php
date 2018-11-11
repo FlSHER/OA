@@ -96,7 +96,7 @@ return [
             'active' => '激活',
             'delete' => '删除',
             'leaving' => '离职交接',
-            'rise_position' => '职位变动',
+            'position' => '职位变动',
         ],
         'operation_remark' => '操作备注',
     ],

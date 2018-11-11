@@ -263,12 +263,13 @@ class StaffService
      */
     protected function addDirty($model, $relation = null)
     {
-        if (empty($relation)) {
-            $newDirty = $this->getDirtyWithOriginal($model);
-        } else {
-            $newDirty = [$relation => $this->getDirtyWithOriginal($model)];
+        $dirty = $this->getDirtyWithOriginal($model);
+
+        if (! empty($relation)) {
+            $dirty = [$relation => $dirty];
         }
-        $this->dirty = array_collapse([$this->dirty, $newDirty]);
+
+        $this->dirty = array_collapse([$this->dirty, $dirty]);
     }
 
     /**
