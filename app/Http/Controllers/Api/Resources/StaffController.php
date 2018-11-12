@@ -173,12 +173,13 @@ class StaffController extends Controller
     {
         $data = $request->input('data', []);
         $original = $this->filterData($data, [
-            'id' ,'run_id', 'staff', 'created_at', 'updated_at', 'deleted_at'
+            'id' ,'run_id', 'staff', 'department_id', 'created_at', 'updated_at', 'deleted_at'
         ]);
         if ($request->type === 'finish') {
             $params = array_merge($original, [
                 'operation_type' => 'transfer',
                 'staff_sn' => $data['staff']['value'],
+                'department_id' => $data['department_id']['value'],
             ]);
             $this->processValidator($params);
             $result = $this->staffService->update($params);
@@ -226,12 +227,13 @@ class StaffController extends Controller
     {
         $data = $request->input('data', []);
         $original = $this->filterData($data, [
-            'id', 'run_id', 'staff', 'created_at', 'updated_at', 'deleted_at'
+            'id', 'run_id', 'department_id', 'staff', 'created_at', 'updated_at', 'deleted_at'
         ]);
         if ($request->type === 'finish') {
             $params = array_merge($original, [
                 'operation_type' => 'position',
                 'staff_sn' => $data['staff']['value'],
+                'department_id' => $data['department_id']['value'],
             ]);
             Log::info($params);
             $this->processValidator($params);
@@ -239,7 +241,7 @@ class StaffController extends Controller
 
             return response()->json($result, 201);
         }
-        
+
         return response()->json(['status' => 0, 'msg' => '流程验证错误'], 422);
     }
 
@@ -298,6 +300,7 @@ class StaffController extends Controller
             case 'position': //晋升流程
                 $rules = array_merge($rules, [
                     'position_id' => 'required|exists:positions,id',
+                    'department_id' => 'required|exists:departments,id',
                 ]);
                 break;
             case 'reinstate': //再入职
