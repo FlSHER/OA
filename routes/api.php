@@ -156,6 +156,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             // 删除部门
             // delete /api/department/:department
             Route::delete('{department}', 'DepartmentController@destroy');
+
+            // get /api/department/get_tree/:department
+            Route::get('get_tree/{department}', 'DepartmentController@getTreeById');
         });
 
         // position router

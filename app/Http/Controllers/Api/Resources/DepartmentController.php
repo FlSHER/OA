@@ -170,4 +170,17 @@ class DepartmentController extends Controller
 
         return response()->json(['message' => '操作成功'], 201);
     }
+
+    /**
+     * 返回部门树形结构.
+     * 
+     * @param  Department $department
+     * @return mixed
+     */
+    public function getTreeById(Department $department)
+    {
+        $department->load('parent');
+
+        return response()->json($department);
+    }
 }

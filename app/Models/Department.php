@@ -2,19 +2,26 @@
 
 namespace App\Models;
 
+use DB;
+use App\Models\HR\Staff;
+use App\Models\Traits\ListScopes;
+use App\Services\AuthorityService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Services\AuthorityService;
-use App\Models\HR\Staff;
-use DB;
 
 class Department extends Model
 {
+    use SoftDeletes, ListScopes;
 
-    use SoftDeletes;
-
-    protected $connection = 'mysql';
     protected $guarded = ['id', 'manager_name'];
+
+    protected $fillable = [
+        'name',
+        'brand_id',
+        'manager_sn',
+        'manager_name',
+        'parent_id'
+    ];
 
     /* ----- 定义关联Start ----- */
 
@@ -23,7 +30,12 @@ class Department extends Model
         return $this->belongsTo('App\Models\Department', 'parent_id');
     }
 
-    public function _children()
+    public function parent()
+    {
+        return $this->_parent()->with('parent');
+    }
+
+    public function children()
     { //下级部门
         return $this->hasMany('App\Models\Department', 'parent_id')->orderBy('sort', 'asc');
     }
@@ -55,7 +67,7 @@ class Department extends Model
 
     public function brand()
     { //品牌
-        return $this->belongsTo('App\Models\Brand');
+        return $this->belongsTo('App\Models\Brand')->withTrashed();
     }
 
     /* ----- 定义关联End ----- */
@@ -155,6 +167,17 @@ class Department extends Model
 
     /* ----- 本地作用域 End ----- */
 
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        self::saving(function ($post) {
+            $post->changeFullName();
+        });
+        self::saved(function ($post) {
+            $post->changeRoleAuthority();
+        });
+    }
+
     public static function deleteByTrees($departmentId)
     {
         $self = self::find($departmentId);
@@ -190,7 +213,7 @@ class Department extends Model
     /**
      * 更新部门全称
      */
-    public function changeFullName()
+    private function changeFullName()
     {
         if ($this->isDirty('parent_id') || $this->isDirty('name')) {
             $newFullName = $this->parent_id > 0 ? $this->_parent->full_name . '-' . $this->name : $this->name;
@@ -203,17 +226,20 @@ class Department extends Model
     }
 
     private function changeChildrenFullName($fullName)
-    {
-        $this->_children->each(function ($item) use ($fullName) {
-            $item->full_name = $fullName . '-' . $item->name;
-            $item->save();
-        });
+    {   
+        if(isset($this->_children) && $this->_children)
+        {
+            $this->_children->each(function ($item) use ($fullName) {
+                $item->full_name = $fullName . '-' . $item->name;
+                $item->save();
+            });
+        }
     }
 
     /**
      * 根据父级继承部门权限
      */
-    public function changeRoleAuthority()
+    private function changeRoleAuthority()
     {
         if ($this->isDirty('parent_id')) {
             $originalParentId = $this->getOriginal('parent_id');
@@ -229,11 +255,14 @@ class Department extends Model
 
     private function changeChildrenRoleAuthority($rolesOrigin, $rolesNew)
     {
-        $this->_children->each(function ($item) use ($rolesOrigin, $rolesNew) {
-            $item->role()->detach(array_diff($rolesOrigin, $rolesNew));
-            $item->role()->attach(array_diff($rolesNew, $rolesOrigin));
-            $item->changeChildrenRoleAuthority($rolesOrigin, $rolesNew);
-        });
+        if(isset($this->_children) && $this->_children)
+        {
+            $this->_children->each(function ($item) use ($rolesOrigin, $rolesNew) {
+                $item->role()->detach(array_diff($rolesOrigin, $rolesNew));
+                $item->role()->attach(array_diff($rolesNew, $rolesOrigin));
+                $item->changeChildrenRoleAuthority($rolesOrigin, $rolesNew);
+            });
+        }
     }
 
 }
