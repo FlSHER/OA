@@ -93,7 +93,7 @@ class StaffController extends Controller
     }
 
     /**
-     * 🐟员工入职操作(工作流).
+     * 🐟员工入职流程.
      *
      * @param  \Illuminate\Http\Request $request
      * @return mixed
@@ -105,7 +105,7 @@ class StaffController extends Controller
             'id' ,'run_id', 'shop', 'recruiter', 'household', 'living',
             'relatives', 'created_at', 'updated_at', 'deleted_at',
         ]);
-        if ($request->type == 'finish') {
+        if ($request->type === 'finish') {
             $params = array_merge($original, [
                 'operation_type' => 'entry',
                 'shop_sn' => $data['shop']['value'],
@@ -138,7 +138,7 @@ class StaffController extends Controller
     }
 
     /**
-     * 转正操作(工作流).
+     * 转正流程.
      * 
      * @param  Request $request
      * @return mixed
@@ -149,7 +149,7 @@ class StaffController extends Controller
         $original = $this->filterData($data, [
             'id' ,'run_id', 'staff', 'created_at', 'updated_at', 'deleted_at'
         ]);
-        if ($request->type == 'finish') {
+        if ($request->type === 'finish') {
             $params = array_merge($original, [
                 'operation_type' => 'employ',
                 'staff_sn' => $data['staff']['value'],
@@ -164,7 +164,7 @@ class StaffController extends Controller
     }
 
     /**
-     * 人事变动操作(工作流).
+     * 人事变动流程.
      * 
      * @param  Request $request
      * @return mixed
@@ -175,7 +175,7 @@ class StaffController extends Controller
         $original = $this->filterData($data, [
             'id' ,'run_id', 'staff', 'created_at', 'updated_at', 'deleted_at'
         ]);
-        if ($request->type == 'finish') {
+        if ($request->type === 'finish') {
             $params = array_merge($original, [
                 'operation_type' => 'transfer',
                 'staff_sn' => $data['staff']['value'],
@@ -190,7 +190,7 @@ class StaffController extends Controller
     }
 
     /**
-     * 离职操作(工作流).
+     * 离职流程.
      * 
      * @param  Request $request
      * @return mixed
@@ -201,7 +201,7 @@ class StaffController extends Controller
         $original = $this->filterData($data, [
             'id' ,'run_id', 'staff', 'created_at', 'updated_at', 'deleted_at'
         ]);
-        if ($request->type == 'finish') {
+        if ($request->type === 'finish') {
             $params = array_merge($original, [
                 'operation_type' => 'leave',
                 'staff_sn' => $data['staff']['value'],
@@ -213,6 +213,33 @@ class StaffController extends Controller
             return response()->json($result, 201);
         }
 
+        return response()->json(['status' => 0, 'msg' => '流程验证错误'], 422);
+    }
+
+    /**
+     * 晋升流程.
+     * 
+     * @param  Request $request
+     * @return mixed
+     */
+    public function promotion(Request $request)
+    {
+        $data = $request->input('data', []);
+        $original = $this->filterData($data, [
+            'id', 'run_id', 'staff', 'created_at', 'updated_at', 'deleted_at'
+        ]);
+        if ($request->type === 'finish') {
+            $params = array_merge($original, [
+                'operation_type' => 'position',
+                'staff_sn' => $data['staff']['value'],
+            ]);
+            Log::info($params);
+            $this->processValidator($params);
+            $result = $this->staffService->update($params);
+
+            return response()->json($result, 201);
+        }
+        
         return response()->json(['status' => 0, 'msg' => '流程验证错误'], 422);
     }
 
@@ -243,7 +270,7 @@ class StaffController extends Controller
         $rules = [
             'staff_sn' => 'required|exists:staff,staff_sn',
             'operate_at' => 'required|date_format:Y-m-d',
-            'operation_type' => 'required|in:entry,employ,transfer,leave,reinstate,active,leaving',
+            'operation_type' => 'required|in:entry,employ,transfer,leave,reinstate,active,leaving,position',
             'operation_remark' => 'max:100',
         ];
         switch ($value['operation_type']) {
@@ -266,6 +293,11 @@ class StaffController extends Controller
                     'shop_sn' => 'max:10|exists:shops,shop_sn',
                     'position_id' => 'required|exists:positions,id',
                     'department_id' => 'required|exists:departments,id',
+                ]);
+                break;
+            case 'position': //晋升流程
+                $rules = array_merge($rules, [
+                    'position_id' => 'required|exists:positions,id',
                 ]);
                 break;
             case 'reinstate': //再入职
