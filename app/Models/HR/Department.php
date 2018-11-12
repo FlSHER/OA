@@ -35,7 +35,7 @@ class Department extends Model
         return $this->_parent()->with('parent');
     }
     
-    public function children()
+    public function _children()
     { //下级部门
         return $this->hasMany('App\Models\Department', 'parent_id')->orderBy('sort', 'asc');
     }

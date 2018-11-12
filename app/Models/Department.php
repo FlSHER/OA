@@ -101,12 +101,13 @@ class Department extends Model
 
     public function getChildrenIdsAttribute()
     {
-        $children = $this->_children;
-        $childrenIds = $this->_children->pluck('id');
-        foreach ($children as $child) {
-            $childrenIds = array_collapse([$childrenIds, $child->childrenIds]);
+        if (isset($this->_children) && $this->_children) {
+            $childrenIds = $this->_children->pluck('id');
+            foreach ($this->_children as $child) {
+                $childrenIds = array_collapse([$childrenIds, $child->childrenIds]);
+            }
+            return $childrenIds;
         }
-        return $childrenIds;
     }
 
     public function getTopAttribute()
