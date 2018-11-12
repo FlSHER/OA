@@ -179,11 +179,13 @@ class StaffController extends Controller
             $params = array_merge($original, [
                 'operation_type' => 'transfer',
                 'staff_sn' => $data['staff']['value'],
+                'shop_sn' => $data['shop_sn']['value'] ?? '',
                 'department_id' => $data['department_id']['value'],
             ]);
+            Log::info($params);
             $this->processValidator($params);
             $result = $this->staffService->update($params);
-
+            Log::info($result);
             return response()->json($result, 201);
         }
 
@@ -235,7 +237,6 @@ class StaffController extends Controller
                 'staff_sn' => $data['staff']['value'],
                 'department_id' => $data['department_id']['value'],
             ]);
-            Log::info($params);
             $this->processValidator($params);
             $result = $this->staffService->update($params);
 
