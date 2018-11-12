@@ -173,19 +173,17 @@ class StaffController extends Controller
     {
         $data = $request->input('data', []);
         $original = $this->filterData($data, [
-            'id' ,'run_id', 'staff', 'department_id', 'created_at', 'updated_at', 'deleted_at'
+            'id' ,'run_id', 'staff', 'created_at', 'updated_at', 'deleted_at'
         ]);
         if ($request->type === 'finish') {
             $params = array_merge($original, [
                 'operation_type' => 'transfer',
                 'staff_sn' => $data['staff']['value'],
                 'shop_sn' => $data['shop_sn']['value'] ?? '',
-                'department_id' => $data['department_id']['value'],
             ]);
-            Log::info($params);
             $this->processValidator($params);
             $result = $this->staffService->update($params);
-            Log::info($result);
+
             return response()->json($result, 201);
         }
 
