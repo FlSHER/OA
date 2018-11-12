@@ -23,7 +23,10 @@ class AlterShopTable extends Migration
             $table->char('manager3_name', 10)->default('')->comment('三级负责人姓名');
             $table->dateTime('opening_at')->nullable()->comment('开业时间');
             $table->dateTime('end_at')->nullable()->comment('结束时间');
-
+            $table->decimal('total_area', 5, 2)->nullable()->comment('店铺总面积');
+            $table->enum('shop_type', ['A', 'AA', 'B'])->default('A')->comment('店铺类型');
+            $table->enum('work_type', ['早班', '晚班', '全日制'])->default('全日制')->comment('上班类型');
+            
             $table->foreign('status_id')->references('id')->on('shop_status');
         });
 
@@ -52,6 +55,10 @@ class AlterShopTable extends Migration
             $table->dropColumn('manager3_name');
             $table->dropColumn('opening_at');
             $table->dropColumn('end_at');
+
+            $table->dropColumn('total_area');
+            $table->dropColumn('shop_type');
+            $table->dropColumn('work_type');
         });
 
         Schema::dropIfExists('shop_status');
