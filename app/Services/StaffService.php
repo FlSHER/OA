@@ -252,6 +252,14 @@ class StaffService
 
             $this->addDirty($model);
             $model->setRawAttributes($model->getOriginal());
+
+            // 如果有职位变动 直接添加一条记录
+            if (array_has($dirty, 'position_id')) {
+                $log = new StaffOperationLogService();
+                $log->model($model)->write([
+                    'position_id' => $this->dirty['position_id']
+                ], $data);
+            }
         }
     }
 
