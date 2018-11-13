@@ -10,29 +10,30 @@ class StaffService
 {
     protected $dirty = [];
 
-    /**
-     * 创建
-     * @param type $data
-     * @return typeg
-     */
     public function create($data)
     {
         $this->save($data);
-        return ['status' => 1, 'message' => '添加成功'];
+
+        return [
+            'status' => 1,
+            'message' => '添加成功'
+        ];
     }
 
-    /**
-     * 更新
-     * @param type $data
-     * @return type
-     */
     public function update($data)
     {
         $this->save($data);
+
         if ($this->isDirty()) {
-            return ['status' => 1, 'message' => '编辑成功'];
+            return [
+                'status' => 1,
+                'message' => '编辑成功'
+            ];
         } else {
-            return ['status' => -1, 'message' => '未发现改动'];
+            return [
+                'status' => -1, 
+                'message' => '未发现改动'
+            ];
         }
     }
 
@@ -55,16 +56,16 @@ class StaffService
      */
     protected function fillDataAndSave($model, $data)
     {
-        
         $this->reset();
+
         \DB::beginTransaction();
         try {
             $model->fill($data);
-            $this->saving($model, $data); //前置操作
-            $this->addDirty($model);
-            if (!$this->hasTransfer($model, $data)) {
+            $this->saving($model, $data);
+            if (! $this->hasTransfer($data)) {
+                $this->addDirty($model);
                 $model->save();
-                $this->saved($model, $data); //后置操作
+                $this->saved($model, $data);
                 $this->changeBelongsToMany($model, $data);
                 if ($this->isDirty()) {
                     $log = new StaffOperationLogService();
@@ -72,7 +73,9 @@ class StaffService
                 }
             }
             \DB::commit();
+
         } catch (\Exception $err) {
+
             Log::error($err->getMessage());
             \DB::rollBack();
             throw $err;
@@ -82,11 +85,10 @@ class StaffService
     /**
      * 是否可预约操作。
      * 
-     * @param  [type]  $model
      * @param  [type]  $data
      * @return boolean
      */
-    protected function hasTransfer($model, $data)
+    protected function hasTransfer($data)
     {
         $operationType = $data['operation_type'];
         if (
@@ -241,7 +243,6 @@ class StaffService
     {
         $dirty = $model->getDirty();
         if (!empty($dirty)) {
-
             // $islock = $model->tmp()->where('status', 1)->count();
             $model->tmp()->create([
                 'changes' => $dirty,
@@ -262,7 +263,6 @@ class StaffService
             }
         }
     }
-
 
     /**
      * 加入Dirty
