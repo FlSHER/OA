@@ -110,7 +110,11 @@ class StaffController extends Controller
                 'account_active' => ($data['account_active'] == '是') ? 1 : 0,
                 'relatives' => $this->makeRelatives($data['relatives']),
             ]);
-            $this->entrantStaffValidator($params);
+            $validator = $this->entrantStaffValidator($params);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                return response()->json(['status' => 0, 'msg' => $errors->first()], 422);
+            }
             $result = $this->staffService->create($params);
 
             return response()->json($result, 201);
@@ -150,7 +154,11 @@ class StaffController extends Controller
                 'operation_type' => 'employ',
                 'staff_sn' => $data['staff']['value'],
             ]);
-            $this->processValidator($params);
+            $validator = $this->processValidator($params);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                return response()->json(['status' => 0, 'msg' => $errors->first()], 422);
+            }
             $result = $this->staffService->update($params);
 
             return response()->json($result, 201);
@@ -177,7 +185,11 @@ class StaffController extends Controller
                 'staff_sn' => $data['staff']['value'],
                 'shop_sn' => $data['shop_sn']['value'] ?? '',
             ]);
-            $this->processValidator($params);
+            $validator = $this->processValidator($params);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                return response()->json(['status' => 0, 'msg' => $errors->first()], 422);
+            }
             $result = $this->staffService->update($params);
 
             return response()->json($result, 201);
@@ -204,7 +216,11 @@ class StaffController extends Controller
                 'staff_sn' => $data['staff']['value'],
                 'skip_leaving' => ($data['skip_leaving'] == '是') ? 1 : 0,
             ]);
-            $this->processValidator($params);
+            $validator = $this->processValidator($params);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                return response()->json(['status' => 0, 'msg' => $errors->first()], 422);
+            }
             $result = $this->staffService->update($params);
 
             return response()->json($result, 201);
@@ -231,7 +247,11 @@ class StaffController extends Controller
                 'staff_sn' => $data['staff']['value'],
                 'department_id' => $data['department_id']['value'],
             ]);
-            $this->processValidator($params);
+            $validator = $this->processValidator($params);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                return response()->json(['status' => 0, 'msg' => $errors->first()], 422);
+            }
             $result = $this->staffService->update($params);
 
             return response()->json($result, 201);
@@ -301,15 +321,8 @@ class StaffController extends Controller
             case 'reinstate': //再入职
                 break;
         }
-        $message = [
-            'required' => ':attribute 为必填项，不能为空。',
-            'in' => ':attribute 必须在【:values】中选择。',
-            'max' => ':attribute 不能大于 :max 个字。',
-            'exists' => ':attribute 填写错误。',
-            'date_format' => '时间格式错误',
-        ];
 
-        return Validator::make($value, $rules, $message)->validate();
+        return Validator::make($value, $rules, $this->message());
     }
 
     /**
@@ -359,7 +372,18 @@ class StaffController extends Controller
             'relatives.*.relative_stype' => ['required_with:relatives_sn,relative_name'],
             'relatives.*.relative_nsame' => ['required_with:relative_tsype,relative_sn'],
         ];
-        $message = [
+
+        return Validator::make($value, $rules, $this->message());
+    }
+
+    /**
+     * 统一返回验证错误信息.
+     * 
+     * @return array
+     */
+    public function message(): array
+    {
+        return [
             'in' => ':attribute必须在【:values】中选择。',
             'max' => ':attribute不能大于 :max 个字。',
             'exists' => ':attribute填写错误。',
@@ -367,9 +391,8 @@ class StaffController extends Controller
             'required' => ':attribute为必填项，不能为空。',
             'between' => ':attribute参数 :input 不在 :min - :max 之间。',
             'required_with' => ':attribute不能为空。',
+            'date_format' => '时间格式错误',
         ];
-
-        return Validator::make($value, $rules, $message)->validate();
     }
 
 }
