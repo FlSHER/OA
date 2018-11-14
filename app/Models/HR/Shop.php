@@ -190,7 +190,7 @@ class Shop extends Model
     public function setOpeningAt()
     {
         $dirty = $this->dirtyAttributes;
-        if (!empty($dirty) && array_has('status_id', $dirty)) {
+        if (!empty($dirty) && array_has($dirty, 'status_id')) {
             if ($dirty['status_id'] == 2) {
 
                 $this->attributes['opening_at'] = date('Y-m-d');
