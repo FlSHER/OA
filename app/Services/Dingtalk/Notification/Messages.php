@@ -26,10 +26,11 @@ class Messages
         try {
             $agentId = App::find($request->input('oa_client_id'))->agent_id;
             $data = $request->except('oa_client_id', 'step_run_id');
-            $dingUserId = Staff::find($data['userid_list'])->pluck('dingtalk_number')->all();
+            $staffs = Staff::find($data['userid_list']);
+            $dingTalkNumber = $staffs->pluck('dingtalk_number')->all();
             $data['agent_id'] = $agentId;
-            $data['userid_list'] = implode(',', $dingUserId);
-            $message = $this->messageToDatabase($data);
+            $data['userid_list'] = implode(',', $dingTalkNumber);
+            $message = $this->messageToDatabase($data,$staffs);
         } catch (\Exception $e) {
             return 0;
         }
@@ -60,13 +61,15 @@ class Messages
      * @param array $request
      * @param array $result
      */
-    protected function messageToDatabase(array $data)
+    protected function messageToDatabase(array $data,$staffs)
     {
         if (request()->has('oa_client_id'))
             $messageData['client_id'] = request()->get('oa_client_id');
         $messageData['agent_id'] = $data['agent_id'];
         $messageData['create_staff'] = Auth::id() ?? '0';
         $messageData['create_realname'] = Auth::user() ? Auth::user()->realname : '系统';
+        $messageData['to_staff_sn'] = $staffs->pluck('staff_sn')->all();
+        $messageData['to_realname']= $staffs->pluck('realname')->all();
         $messageData['msgtype'] = $data['msg']['msgtype'];
         $messageData['data'] = $data;
         if (request()->has('step_run_id'))
