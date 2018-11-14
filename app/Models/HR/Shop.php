@@ -55,6 +55,7 @@ class Shop extends Model
         static::saving(function($shop){
             $dirty = $shop->getDirty();
             $shop->dirtyAttributes = $dirty;
+            $shop->setOpeningAt();
         });
 
         // 保存 dirty
@@ -180,6 +181,23 @@ class Shop extends Model
                 'changes' => $this->dirtyAttributes,
             ]);
             $logModel->save();
+        }
+    }
+
+    /**
+     * 根据店铺状态设置开闭店时间.
+     */
+    public function setOpeningAt()
+    {
+        $dirty = $this->dirtyAttributes;
+        if (!empty($dirty) && array_has('status_id', $dirty)) {
+            if ($dirty['status_id'] == 2) {
+
+                $this->attributes['opening_at'] = date('Y-m-d');
+            } elseif ($dirty['status_id'] == 4) {
+
+                $this->attributes['end_at'] = date('Y-m-d');
+            }
         }
     }
 }
