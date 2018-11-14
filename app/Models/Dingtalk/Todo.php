@@ -14,6 +14,7 @@ class Todo extends Model
         'create_staff',
         'create_realname',
         'todo_staff',
+        'todo_name',
         'todo_userid',
         'create_time',
         'title',
