@@ -8,7 +8,6 @@ use Validator;
 use App\Models\Brand;
 use App\Models\HR\Staff;
 use App\Models\I\District;
-use App\Models\HR\StaffTmp;
 use App\Models\HR\Position;
 use App\Models\HR\CostBrand;
 use Illuminate\Http\Request;
@@ -118,7 +117,7 @@ class StaffController extends Controller
      */
     public function show(Staff $staff)
     {
-        $staff->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands']);
+        $staff->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'tags']);
         $staff->oa = app('Authority')->getAuthoritiesByStaffSn($staff->staff_sn);
 
         return new StaffResource($staff);

@@ -4,13 +4,9 @@ namespace App\Http\Controllers\Api\Resources;
 
 use Validator;
 use App\Models\HR\Staff;
-use App\Models\I\National;
-use App\Models\HR\StaffStatus;
 use Illuminate\Http\Request;
 use App\Services\StaffService;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreStaffRequest;
-use App\Http\Requests\UpdateStaffRequest;
 use App\Http\Resources\HR\StaffResource;
 use App\Http\Resources\HR\StaffCollection;
 use App\Http\Resources\CurrentUserResource;
