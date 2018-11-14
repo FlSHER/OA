@@ -57,7 +57,7 @@ class ShopController extends Controller
             }
         });
 
-        $shop->load(['staff', 'brand', 'department', 'manager', 'manager1', 'manager2', 'manager3', 'tags']);
+        $shop->load(['staff', 'brand', 'department', 'manager', 'assistant', 'tags']);
 
         return response()->json($shop, 201);
     }
@@ -70,7 +70,7 @@ class ShopController extends Controller
      */
     public function show(Shop $shop)
     {
-        $shop->load(['staff', 'brand', 'department', 'manager', 'manager1', 'manager2', 'manager3', 'tags']);
+        $shop->load(['staff', 'brand', 'department', 'manager', 'assistant', 'tags']);
 
         return response()->json($shop, 200);
     }
@@ -103,7 +103,7 @@ class ShopController extends Controller
             }
         });
 
-        $shop->load(['staff', 'brand', 'department', 'manager', 'manager1', 'manager2', 'manager3', 'tags']);
+        $shop->load(['staff', 'brand', 'department', 'manager', 'assistant', 'tags']);
 
         return response()->json($shop, 201);
     }
@@ -156,16 +156,13 @@ class ShopController extends Controller
             'city_id' => 'bail|required|exists:i_district,id',
             'county_id' => 'bail|required|exists:i_district,id',
             'address' => 'bail|max:50',
+            'real_address' => 'bail|max:50',
             'tags' => 'bail|array',
             'tags.*.id' => 'bail|exists:tags,id',
             'manager_sn' => 'bail|exists:staff,staff_sn',
             'manager_name' => 'bail|max:10',
-            'manager1_sn' => 'bail|exists:staff,staff_sn',
-            'manager1_name' => 'bail|max:10',
-            'manager2_sn' => 'bail|exists:staff,staff_sn',
-            'manager2_name' => 'bail|max:10',
-            'manager3_sn' => 'bail|exists:staff,staff_sn',
-            'manager3_name' => 'bail|max:10',
+            'assistant_sn' => 'bail|exists:staff,staff_sn',
+            'assistant_name' => 'bail|max:10',
             'staff' => 'bail|array',
             'staff.*.staff_sn' => 'bail|exists:staff,staff_sn',
         ];

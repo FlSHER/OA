@@ -21,8 +21,6 @@ class Shop extends Model
     protected $fillable = [
         'shop_sn',
         'name',
-        'manager_sn',
-        'manager_name',
         'department_id',
         'brand_id',
         'province_id',
@@ -31,6 +29,7 @@ class Shop extends Model
         'address',
         'lng',
         'lat',
+        'real_address',
         'clock_in',
         'clock_out',
         'opening_at',
@@ -38,12 +37,12 @@ class Shop extends Model
         'status_id',
         'manager_sn',
         'manager_name',
-        'manager1_sn',
-        'manager1_name',
-        'manager2_sn',
-        'manager2_name',
-        'manager3_sn',
-        'manager3_name',
+        'assistant_sn',
+        'assistant_name',
+        'total_area',
+        'shop_type',
+        'work_type',
+        'work_schedule_id',
     ];
 
     protected $dirtyAttributes = [];
@@ -77,33 +76,13 @@ class Shop extends Model
     }
 
     /**
-     * first manager.
+     * assistant.
      * 
      * @return \Illuminate\Database\Eloquent\Concerns\hasOne
      */
-    public function manager1()
+    public function assistant()
     {
-        return $this->hasOne(Staff::class, 'staff_sn', 'manager1_sn');
-    }
-
-    /**
-     * second manager.
-     * 
-     * @return \Illuminate\Database\Eloquent\Concerns\hasOne
-     */
-    public function manager2()
-    {
-        return $this->hasOne(Staff::class, 'staff_sn', 'manager2_sn');
-    }
-
-    /**
-     * three level manager.
-     * 
-     * @return \Illuminate\Database\Eloquent\Concerns\hasOne
-     */
-    public function manager3()
-    {
-        return $this->hasOne(Staff::class, 'staff_sn', 'manager3_sn');
+        return $this->hasOne(Staff::class, 'staff_sn', 'assistant_sn');
     }
 
     public function department()
@@ -169,7 +148,7 @@ class Shop extends Model
 
     public function scopeApi($query)
     {
-        $query->with(['staff', 'department', 'brand', 'province', 'city', 'county', 'manager', 'manager1', 'manager2', 'manager3', 'tags']);
+        $query->with(['staff', 'department', 'brand', 'province', 'city', 'county', 'manager', 'assistant', 'tags']);
     }
 
     /**

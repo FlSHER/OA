@@ -45,12 +45,12 @@ class ShopCollection extends ResourceCollection
                 'tags' => $shop->tags,
                 'end_at' => $shop->end_at,
                 'opening_at' => $shop->opening_at,
-                'manager1_sn' => $shop->manager1_sn,
-                'manager1_name' => $shop->manager1_name,
-                'manager2_sn' => $shop->manager2_sn,
-                'manager2_name' => $shop->manager2_name,
-                'manager3_sn' => $shop->manager3_sn,
-                'manager3_name' => $shop->manager3_name,
+                'assistant_sn' => $shop->assistant_sn,
+                'assistant_name' => $shop->assistant_name,
+                'real_address' => $shop->real_address,
+                'total_area' => $shop->total_area,
+                'shop_type' => $shop->shop_type,
+                'work_type' => $shop->work_type,
                 'status_id' => $shop->status_id,
             ];
         })->toArray();

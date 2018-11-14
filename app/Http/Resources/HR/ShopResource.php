@@ -44,12 +44,12 @@ class ShopResource extends Resource
             'tags' => $this->tags,
             'end_at' => $this->end_at,
             'opening_at' => $this->opening_at,
-            'manager1_sn' => $this->manager1_sn,
-            'manager1_name' => $this->manager1_name,
-            'manager2_sn' => $this->manager2_sn,
-            'manager2_name' => $this->manager2_name,
-            'manager3_sn' => $this->manager3_sn,
-            'manager3_name' => $this->manager3_name,
+            'assistant_sn' => $this->assistant_sn,
+            'assistant_name' => $this->assistant_name,
+            'real_address' => $this->real_address,
+            'total_area' => $this->total_area,
+            'shop_type' => $this->shop_type,
+            'work_type' => $this->work_type,
             'status_id' => $this->status_id,
         ];
     }
