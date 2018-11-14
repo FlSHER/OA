@@ -16,7 +16,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreStaffRequest;
 use App\Http\Resources\HR\StaffResource;
 use App\Http\Requests\UpdateStaffRequest;
-use App\Http\Resources\CurrentUserResource;
 use App\Http\Resources\HR\StaffCollection;
 use App\Services\StaffService;
 
@@ -624,14 +623,6 @@ class StaffController extends Controller
                 }
             ],
         ];
-        $message = [
-            'in' => ':attribute 必须在【:values】中选择。',
-            'max' => ':attribute 不能大于 :max 个字。',
-            'exists' => ':attribute 填写错误。',
-            'unique' => ':attribute 已经存在，请重新填写。',
-            'required' => ' :attribute 为必填项，不能为空。',
-        ];
-
         if (isset($value['staff_sn'])) {
             $rules = array_merge($rules, [
                 'staff_sn' => 'bail|required|exists:staff,staff_sn',
@@ -642,7 +633,7 @@ class StaffController extends Controller
             ]);
         }
 
-        return Validator::make($value->toArray(), $rules, $message);
+        return Validator::make($value->toArray(), $rules, $this->message());
     }
 
     /**
@@ -684,14 +675,24 @@ class StaffController extends Controller
             case 'reinstate': //再入职
                 break;
         }
-        $message = [
-            'required' => ':attribute 为必填项，不能为空。',
-            'in' => ':attribute 必须在【:values】中选择。',
-            'max' => ':attribute 不能大于 :max 个字。',
-            'exists' => ':attribute 填写错误。',
+
+        return Validator::make($value, $rules, $this->message())->validate();
+    }
+
+    /**
+     * 统一处理验证错误信息.
+     * 
+     * @return array
+     */
+    protected function message(): array
+    {
+        return [
+            'required' => ':attribute为必填项，不能为空。',
+            'unique' => ':attribute已经存在，请重新填写。',
+            'in' => ':attribute必须在【:values】中选择。',
+            'max' => ':attribute不能大于 :max 个字。',
+            'exists' => ':attribute填写错误。',
             'date_format' => '时间格式错误',
         ];
-
-        return Validator::make($value, $rules, $message)->validate();
     }
 }
