@@ -22,8 +22,12 @@ class TagController extends Controller
      */
     public function index(Request $request)
     {
+        $type = in_array($type = $request->query('type', 'staff'), ['staff', 'shops']) ? $type : 'staff';
         $tags = TagModel::query()
             ->with('category')
+            ->whereHas('category', function($query) use ($type) {
+                $query->where('type', $type);
+            })  
             ->filterByQueryString()
             ->withPagination();
 
@@ -110,7 +114,9 @@ class TagController extends Controller
      */
     public function categories(Request $request)
     {
+        $type = in_array($type = $request->query('type', 'staff'), ['staff', 'shops']) ? $type : 'staff';
         $categories = TagCategoryModel::withCount('tags')
+            ->where('type', $type)
             ->orderBy('weight', 'desc')
             ->orderBy('id', 'desc')
             ->get();
@@ -129,9 +135,12 @@ class TagController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|unique:tag_categories|max:10',
+            'type' => 'required|in:staff,shops',
             'color' => 'string|max:7',
             'weight' => 'numeric|min:0',
         ], [
+            'type.required' => '标签分类类型必填',
+            'type.in' => '标签分类类型错误',
             'name.required' => '标签分类名称必填',
             'name.max' => '标签分类名称过长',
             'name.unique' => '标签分类已经存在',

@@ -5,13 +5,10 @@ namespace App\Http\Controllers\Api\HR;
 use Cache;
 use Encypt;
 use Validator;
+use App\Models\HR;
 use App\Models\Brand;
-use App\Models\HR\Staff;
 use App\Models\I\District;
-use App\Models\HR\Position;
-use App\Models\HR\CostBrand;
 use Illuminate\Http\Request;
-use App\Models\HR\Department;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreStaffRequest;
 use App\Http\Resources\HR\StaffResource;
@@ -42,7 +39,7 @@ class StaffController extends Controller
             $newFilters = preg_replace('/role\.id=.*?(;|$)/', '$3', $request->filters);
             $request->offsetSet('filters', $newFilters);
         }
-        $list = Staff::when($roleId, function ($query) use ($roleId) {
+        $list = HR\Staff::when($roleId, function ($query) use ($roleId) {
             $query->whereHas('role', function ($query) use ($roleId) {
                 if (is_array($roleId)) {
                     $query->whereIn('id', $roleId);
@@ -78,7 +75,7 @@ class StaffController extends Controller
         $curd = $this->staffService->create($data);
 
         if ($curd['status'] == 1) {
-            $staff = Staff::query()
+            $staff = HR\Staff::query()
                 ->with(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands'])
                 ->orderBy('staff_sn', 'desc')
                 ->first();
@@ -96,7 +93,7 @@ class StaffController extends Controller
      * @param  \App\Models\HR\Staff $staff
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateStaffRequest $request, Staff $staff)
+    public function update(UpdateStaffRequest $request, HR\Staff $staff)
     {
         $data = $request->all();
 
@@ -114,7 +111,7 @@ class StaffController extends Controller
      * @param  \App\Models\HR\Staff $staff
      * @return \Illuminate\Http\Response
      */
-    public function show(Staff $staff)
+    public function show(HR\Staff $staff)
     {
         $staff->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'tags']);
         $staff->oa = app('Authority')->getAuthoritiesByStaffSn($staff->staff_sn);
@@ -129,11 +126,15 @@ class StaffController extends Controller
      * @param  Staff  $staff
      * @return mixed
      */
-    public function logs(Staff $staff)
+    public function logs(HR\Staff $staff)
     {
-        $staff->load(['change_log', 'change_log.admin', 'change_log.staff']);
+        $logs = HR\StaffLog::with('staff', 'admin')
+            ->where('staff_sn', $staff->staff_sn)
+            ->whereNotIn('operation_type', ['edit', 'active', 'delete', 'leaving'])
+            ->orderBy('id', 'asc')
+            ->get();
 
-        return response()->json($staff->change_log, 200);
+        return response()->json($logs, 200);
     }
 
     /**
@@ -142,7 +143,7 @@ class StaffController extends Controller
      * @param  \App\Models\HR\Staff $staff
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Staff $staff)
+    public function destroy(HR\Staff $staff)
     {
         $staff->delete();
 
@@ -155,7 +156,7 @@ class StaffController extends Controller
      * @param \App\Models\HR\Staff $staff
      * @return mixed
      */
-    public function resetPass(Staff $staff)
+    public function resetPass(HR\Staff $staff)
     {
         $salt = mt_rand(100000, 999999);
         $newPass = Encypt::password('123456', $salt);
@@ -173,7 +174,7 @@ class StaffController extends Controller
      * @param  \App\Models\HR\Staff $staff
      * @return mixed
      */
-    public function unlock(Staff $staff)
+    public function unlock(HR\Staff $staff)
     {
         $staff->is_active = 1;
         $staff->save();
@@ -214,7 +215,7 @@ class StaffController extends Controller
         $this->processValidator($data);
         $this->staffService->update($data);
 
-        $data['cost_brands'] = CostBrand::whereIn('id', $data['cost_brands'])->get();
+        $data['cost_brands'] = HR\CostBrand::whereIn('id', $data['cost_brands'])->get();
         $operateAt = \Carbon\Carbon::parse($data['operate_at'])->gt(now());
 
         return response()->json([
@@ -251,7 +252,7 @@ class StaffController extends Controller
     {
         $data = [];
         $hasAuth = app('Authority')->checkAuthority(190); 
-        $staff = Staff::query()
+        $staff = HR\Staff::query()
             ->with('status', 'brand', 'department', 'position', 'shop', 'cost_brands')
             ->filterByQueryString()
             ->sortByQueryString()
@@ -409,9 +410,9 @@ class StaffController extends Controller
             $curd = $this->staffService->create($makeVal);
             // 费用品牌
             if ($curd['status'] == 1 && isset($value['cost_brand'])) {
-                $staff = Staff::query()->orderBy('staff_sn', 'desc')->first();
+                $staff = HR\Staff::query()->orderBy('staff_sn', 'desc')->first();
                 $cost = explode('/', $value['cost_brand']);
-                $costIds = CostBrand::whereIn('name', $cost)->pluck('id')->toArray();
+                $costIds = HR\CostBrand::whereIn('name', $cost)->pluck('id')->toArray();
                 $staff->cost_brands()->attach($costIds);
             }
         }
@@ -429,7 +430,7 @@ class StaffController extends Controller
     {
         $data = ['operate_at' => now()->toDateString(), 'operation_remark' => ''];
         if (isset($value['staff_sn'])) {
-            $data['realname'] = Staff::where('staff_sn', $value['staff_sn'])->value('realname');
+            $data['realname'] = HR\Staff::where('staff_sn', $value['staff_sn'])->value('realname');
         }
         foreach ($value as $k => $v) {
             if (in_array($k, [
@@ -499,7 +500,7 @@ class StaffController extends Controller
          $key = "department_list";
          if (Cache::has($key)) return Cache::get($key);
  
-         $department = Department::select('id', 'name')->get();
+         $department = HR\Department::select('id', 'name')->get();
          Cache::put($key, $department, now()->addMinutes(10));
  
          return $department;   
@@ -511,7 +512,7 @@ class StaffController extends Controller
          $key = "position_list";
          if (Cache::has($key)) return Cache::get($key);
          
-         $position = Position::select('id', 'name')->get();
+         $position = HR\Position::select('id', 'name')->get();
          Cache::put($key, $position, now()->addMinutes(10));
  
          return $position;   
@@ -547,7 +548,6 @@ class StaffController extends Controller
                 $temp[$key] = collect($cols)->combine($value)->filter();
             }
         }
-
         return $temp;
     }
     
@@ -599,7 +599,7 @@ class StaffController extends Controller
                         $department = explode('-', $value);
                         $name = end($department);
                     }
-                    if (!Department::where('name', $name)->count()) {
+                    if (!HR\Department::where('name', $name)->count()) {
                         $fail('没有部门名称为 “'.$value.'” 的部门！');
                     }
                 }
@@ -607,7 +607,7 @@ class StaffController extends Controller
             'cost_brand' => [
                 'bail',
                 function ($attribute, $value, $fail) {
-                    $cost = CostBrand::pluck('name');
+                    $cost = HR\CostBrand::pluck('name');
                     if (strpos($value, '/') !== false) {
                         $values = explode('/', $value);
                         foreach ($values as $key => $val) {
@@ -694,5 +694,17 @@ class StaffController extends Controller
             'exists' => ':attribute填写错误。',
             'date_format' => '时间格式错误',
         ];
+    }
+
+    /**
+     * 获取处理后的员工日志.
+     * 
+     * @param  string $values
+     * @return mixed
+     */
+    public function formatLogs(Staff $staff)
+    {
+        $staff->load('change_log');
+
     }
 }
