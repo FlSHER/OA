@@ -236,11 +236,51 @@ class StaffController extends Controller
         $data = $request->all();
         $this->processValidator($data);
         $this->staffService->update($data);
+        $data['status_id'] = $data['skip_leaving'] ? $data['status_id'] : 0;
 
         return response()->json([
             'message' => '离职成功',
             'changes' => $data,
         ], 201);
+    }
+
+    /**
+     * 处理离职交接.
+     * 
+     * @param  Request $request
+     * @return mixed
+     */
+    public function leaving(Request $request)
+    {
+        $leaving = HR\Staff::find($request->staff_sn)->leaving;
+        if ($request->has('operate_at')) {
+            $leavingInfo = [
+                'staff_sn' => $leaving->staff_sn,
+                'status_id' => $leaving->original_status_id,
+                'operate_at' => $request->operate_at,
+                'operation_type' => 'leaving',
+                'operation_remark' => $request->operation_remark,
+            ];
+            if (!empty($request->left_at)) {
+                $leavingInfo['left_at'] = $request->left_at;
+            }
+            $request->replace($leavingInfo);
+            $leaving->delete();
+            return $this->staffService->update($request->all());
+        } else {
+            $operatorSn = app('CurrentUser')->staff_sn;
+            $operatorName = app('CurrentUser')->realname;
+            $data = $request->all();
+            foreach ($data as $k => $v) {
+                if (is_array($v)) {
+                    $data[$k . '_operator_sn'] = $operatorSn;
+                    $data[$k . '_operator_name'] = $operatorName;
+                    $data[$k . '_operate_at'] = time();
+                }
+            }
+            $leaving->fill($data)->save();
+            return ['status' => 1, 'message' => '交接成功'];
+        }
     }
 
     /**

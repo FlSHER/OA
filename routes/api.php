@@ -321,6 +321,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             // 离职 /api/hr/staff/leave
             Route::patch('/leave', 'StaffController@leave');
 
+            // 离职交接 /api/hr/staff/leaving
+            Route::patch('/leaving', 'StaffController@leaving');
+
             //  再入职 /api/hr/staff/again-entry
             Route::patch('/again-entry', 'StaffController@againEntry');
 

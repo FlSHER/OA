@@ -208,7 +208,7 @@ class StaffService
 
     protected function saved($model, $data)
     {
-        // 如果是离职操作并且跳过了离职交接 修改状态为已离职
+        // 如果是离职操作并且跳过了离职交接 修改操作类型
         if (
             array_has($data, 'skip_leaving') && 
             $data['operation_type'] === 'leave' && 
