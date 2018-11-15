@@ -323,6 +323,9 @@ class StaffService
             case 'entry':
                 $model->setAttribute('hired_at', $operateAt);
                 break;
+            case 'import_entry':
+                $model->setAttribute('hired_at', $operateAt);
+                break;
             case 'reinstate':
                 $model->setAttribute('hired_at', $operateAt);
                 $model->setAttribute('employed_at', null);

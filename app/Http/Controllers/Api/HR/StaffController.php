@@ -9,6 +9,7 @@ use App\Models\HR;
 use App\Models\Brand;
 use App\Models\I\District;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreStaffRequest;
 use App\Http\Resources\HR\StaffResource;
@@ -369,7 +370,6 @@ class StaffController extends Controller
             return $this->createStaffs($request);
         }
         $data = $this->combineImportData($request);
-
         foreach ($data as $key => $value) {
             $validator = $this->makeValidator($value);
             if ($validator->fails()) {
@@ -380,10 +380,11 @@ class StaffController extends Controller
             }
             $makeVal = $this->makeFillStaff($value);
             $makeVal['operation_type'] = 'import_transfer';
+            $makeVal['operation_remark'] = 'Excel批量更新';
             $this->staffService->update($makeVal);
         }
 
-        return response()->json(['message' => '更新成功'], 201);
+        return response()->json(['message' => '更新成功，请刷新页面更新信息'], 201);
     }
 
     /**
@@ -404,9 +405,9 @@ class StaffController extends Controller
                     'errors' => $validator->errors(),
                 ], 422);
             }
-
             $makeVal = $this->makeFillStaff($value);
             $makeVal['operation_type'] = 'import_entry';
+            $makeVal['operation_remark'] = 'Excel批量导入';
             $curd = $this->staffService->create($makeVal);
             // 费用品牌
             if ($curd['status'] == 1 && isset($value['cost_brand'])) {
@@ -417,7 +418,7 @@ class StaffController extends Controller
             }
         }
 
-        return response()->json(['message' => '导入成功'], 201);
+        return response()->json(['message' => '导入成功，请刷新页面更新信息'], 201);
     }
 
     /**
@@ -428,54 +429,54 @@ class StaffController extends Controller
      */
     protected function makeFillStaff($value)
     {
-        $data = ['operate_at' => now()->toDateString(), 'operation_remark' => ''];
+        $data = ['operate_at' => now()->toDateString()];
         if (isset($value['staff_sn'])) {
+            $data['staff_sn'] = $value['staff_sn'];
             $data['realname'] = HR\Staff::where('staff_sn', $value['staff_sn'])->value('realname');
         }
         foreach ($value as $k => $v) {
             if (in_array($k, [
                 'realname', 'mobile', 'shop_sn', 'dingtalk_number', 'wechat_number', 'national', 'politics', 'gender',
-                'marital_status', 'id_card_number', 'account_number', 'account_bank', 'account_name', 'height',
-                'weight', 'household_address', 'living_address', 'native_place', 'education', 'remark',
-                'concat_name', 'concat_tel', 'concat_type'
+                'marital_status', 'id_card_number', 'account_number', 'account_bank', 'account_name', 'height', 'weight',
+                'household_address', 'living_address', 'native_place', 'education', 'remark', 'concat_name', 'concat_tel', 'concat_type'
             ])) {
                 $data[$k] = $v;
             }
             if ($v && $k === 'brand') {
-                $data['brand_id'] = $this->getBrand()->where('name', $v)->pluck('id')->last();
-            }
-            if ($v && $k === 'department') {
+                $data['brand_id'] = $this->getBrand($v);
+
+            } elseif ($v && $k === 'department') {
                 $name = $v;
                 if (strpos($v, '-') !== false) {
                     $department = explode('-', $v);
                     $name = end($department);
                 }
-                $data['department_id'] = $this->getDepartment()->where('name', $name)->pluck('id')->last();
-            }
-            if ($v && $k === 'position') {
-                $data['position_id'] = $this->getPosition()->where('name', $v)->pluck('id')->last();
-            }
-            if ($v && $k === 'status') {
+                $data['department_id'] = $this->getDepartment($name);
+
+            } elseif ($v && $k === 'position') {
+                $data['position_id'] = $this->getPosition($v);
+
+            } elseif ($v && $k === 'status') {
                 $status = ['试用期' => 1, '在职' => 2, '停薪留职' => 3, '离职' => -1, '自动离职' => -2, '开除' => -3, '劝退' => -4];
                 $data['status_id'] = $status[$v];
-            }
-            if ($v && $k === 'household_province') {
-                $data['household_province_id'] = $this->getDistrict()->where('name', $v)->pluck('id')->last();
-            }
-            if ($v && $k === 'household_city') {
-                $data['household_city_id'] = $this->getDistrict()->where('name', $v)->pluck('id')->last();
-            }
-            if ($v && $k === 'household_county') {
-                $data['household_county_id'] = $this->getDistrict()->where('name', $v)->pluck('id')->last();
-            }
-            if ($v && $k === 'living_province') {
-                $data['living_province_id'] = $this->getDistrict()->where('name', $v)->pluck('id')->last();
-            }
-            if ($v && $k === 'living_city') {
-                $data['living_city_id'] = $this->getDistrict()->where('name', $v)->pluck('id')->last();
-            }
-            if ($v && $k === 'living_county') {
-                $data['living_county_id'] = $this->getDistrict()->where('name', $v)->pluck('id')->last();
+
+            } elseif ($v && $k === 'household_province') {
+                $data['household_province_id'] = $this->getDistrict($v);
+
+            } elseif ($v && $k === 'household_city') {
+                $data['household_city_id'] = $this->getDistrict($v);
+
+            } elseif ($v && $k === 'household_county') {
+                $data['household_county_id'] = $this->getDistrict($v);
+
+            } elseif ($v && $k === 'living_province') {
+                $data['living_province_id'] = $this->getDistrict($v);
+
+            } elseif ($v && $k === 'living_city') {
+                $data['living_city_id'] = $this->getDistrict($v);
+
+            } elseif ($v && $k === 'living_county') {
+                $data['living_county_id'] = $this->getDistrict($v);
             }
         }
 
@@ -483,51 +484,59 @@ class StaffController extends Controller
     }
 
      // 缓存职位
-     protected function getBrand()
+     protected function getBrand($name)
      {
-         $key = "brand_list";
-         if (Cache::has($key)) return Cache::get($key);
+        $key = "brand_list";
+        $brand = Cache::get($key, function () use ($key) {
+            $brand = Brand::select('id', 'name')->get();
+            Cache::put($key, $brand, now()->addMinutes(10));
+
+            return $brand;
+        });
  
-         $brand = Brand::select('id', 'name')->get();
-         Cache::put($key, $brand, now()->addMinutes(10));
- 
-         return $brand;   
+        return $brand->where('name', $name)->pluck('id')->last();   
      }
  
      // 缓存部门
-     protected function getDepartment()
+     protected function getDepartment($name)
      {
-         $key = "department_list";
-         if (Cache::has($key)) return Cache::get($key);
+        $key = "department_list";
+        $department = Cache::get($key, function () use ($key) {
+            $department = HR\Department::select('id', 'name')->get();
+            Cache::put($key, $department, now()->addMinutes(10));
+
+            return $department;
+        });
  
-         $department = HR\Department::select('id', 'name')->get();
-         Cache::put($key, $department, now()->addMinutes(10));
- 
-         return $department;   
+        return $department->where('name', $name)->pluck('id')->last();   
      }
      
      // 缓存职位
-     protected function getPosition()
+     protected function getPosition($name)
      {
-         $key = "position_list";
-         if (Cache::has($key)) return Cache::get($key);
-         
-         $position = HR\Position::select('id', 'name')->get();
-         Cache::put($key, $position, now()->addMinutes(10));
+        $key = "position_list";
+        $position = Cache::get($key, function () use ($key) {
+            $position = HR\Position::select('id', 'name')->get();
+            Cache::put($key, $position, now()->addMinutes(10));
+
+            return $position;
+        });
  
-         return $position;   
+        return $position->where('name', $name)->pluck('id')->last();   
      }
 
      // 缓存地区
-     protected function getDistrict()
+     protected function getDistrict($name)
      {
-         $key = "district_list";
-         if (Cache::has($key)) return Cache::get($key);
-        
-         $district = District::select('id', 'name')->get();
-         Cache::put($key, $district, now()->addMinutes(10));
- 
-         return $district;
+        $key = "district_list";
+        $district = Cache::get($key, function () use ($key) {
+            $district = District::select('id', 'name')->get();
+            Cache::put($key, $district, now()->addMinutes(10));
+
+            return $district;
+        });
+
+        return $district->where('name', $name)->pluck('id')->last();
      }
 
     /**
@@ -625,11 +634,15 @@ class StaffController extends Controller
         ];
         if (isset($value['staff_sn'])) {
             $rules = array_merge($rules, [
-                'staff_sn' => 'bail|required|exists:staff,staff_sn',
-                'mobile' => 'bail|cn_phone',
-                'id_card_number' => 'bail|ck_identity',
-                'dingtalk_number' => 'bail|max:50',
-                'realname' => 'bail|string|max:10',
+                'staff_sn' => 'required|exists:staff,staff_sn',
+                'mobile' => [
+                    'required',
+                    'cn_phone',
+                    Rule::unique('staff')->ignore($value['staff_sn'], 'staff_sn'),
+                ],
+                'id_card_number' => 'ck_identity',
+                'dingtalk_number' => 'max:50',
+                'realname' => 'string|max:10',
             ]);
         }
 
