@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TagCategory extends Model
 {
-    protected $fillable = ['name', 'color', 'weight'];
+    protected $fillable = ['name', 'type', 'color', 'weight'];
 
     protected $hidden = ['created_at', 'updated_at'];
 
