@@ -50,7 +50,7 @@ class TransferStaff extends Command
      */
     public function handle()
     {
-        $list = StaffTmp::whereDate('operate_at', '<=', date('Y-m-d'))->get();
+        $list = StaffTmp::whereDate('operate_at', '<=', date('Y-m-d'))->where('status', '<>', 2)->get();
         try {
 
             \DB::beginTransaction();
