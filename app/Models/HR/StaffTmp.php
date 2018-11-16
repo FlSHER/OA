@@ -5,11 +5,9 @@ namespace App\Models\HR;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
-class StaffTmp extends Model {
-
+class StaffTmp extends Model
+{
     protected $table = 'staff_tmp';
-
-    protected $primaryKey = 'staff_sn';
 
     protected $casts = [
     	'changes' => 'array'
