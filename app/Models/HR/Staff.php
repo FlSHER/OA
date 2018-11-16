@@ -279,7 +279,7 @@ class Staff extends User
 
     public function setLivingCityIdAttribute($value)
     {
-        $$this->attributes['living_city_id'] = $value ?: 0;
+        $this->attributes['living_city_id'] = $value ?: 0;
     }
 
     public function setLivingCountyIdAttribute($value)
