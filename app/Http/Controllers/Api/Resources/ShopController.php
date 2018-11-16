@@ -55,8 +55,7 @@ class ShopController extends Controller
                 Staff::whereIn('staff_sn', $staffSn)->update(['shop_sn' => $shop->shop_sn]);
             }
             if (!empty($data['tags'])) {
-                $tags = array_column($data['tags'], 'id');
-                $shop->tags()->sync($tags);
+                $shop->tags()->sync($data['tags']);
             }
         });
 
@@ -99,8 +98,7 @@ class ShopController extends Controller
                 Staff::whereIn('staff_sn', $staffSn)->update(['shop_sn' => $shop->shop_sn]);
             }
             if (!empty($data['tags'])) {
-                $tags = array_column($data['tags'], 'id');
-                $shop->tags()->sync($tags);
+                $shop->tags()->sync($data['tags']);
             }
         });
 
@@ -248,8 +246,8 @@ class ShopController extends Controller
             'status_id' => 'bail|required|exists:shop_status,id',
             'department_id' => 'bail|exists:departments,id',
             'brand_id' => 'bail|exists:brands,id',
-            'opening_at' => 'bail|required',
-            'end_at' => 'bail|required|after_or_equal:'.$request->opening_at,
+            'opening_at' => 'bail|date_format:Y-m-d',
+            'end_at' => 'bail|date_format:Y-m-d|after_or_equal:'.$request->opening_at,
             'province_id' => 'bail|required|exists:i_district,id',
             'city_id' => 'bail|required|exists:i_district,id',
             'county_id' => 'bail|required|exists:i_district,id',
