@@ -42,20 +42,19 @@ class DepartmentController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Department $department)
     {
         $rules = [
             'name' => ['required', 'unique:departments'],
-            'manager_name' => ['required', 'exists:staff,realname'],
+            'manager_sn' => ['required', 'exists:staff,staff_sn'],
         ];
         $messages = [
             'name.required' => '部门名称不能为空',
             'name.unique' => '部门名称已存在',
-            'manager_name.required' => '部门负责人必填',
-            'manager_name.exists' => '部门负责人不存在',
+            'manager_sn.required' => '部门负责人必填',
+            'manager_sn.exists' => '部门负责人不存在',
         ];
         $this->validate($request, $rules, $messages);
-        $department = new Department();
         $department->fill($request->all());
         $department->save();
 
@@ -84,18 +83,14 @@ class DepartmentController extends Controller
     {
         $rules = [
             'name' => ['required'],
-            'manager_name' => ['exists:staff,realname'],
+            'manager_sn' => ['exists:staff,staff_sn'],
         ];
         $messages = [
             'name.required' => '部门名称不能为空',
-            'manager_name.exists' => '部门负责人不存在',
+            'manager_sn.exists' => '部门负责人不存在',
         ];
         $this->validate($request, $rules, $messages);
-        $department->name = $request->name;
-        $department->brand_id = $request->brand_id;
-        $department->manager_sn = $request->staff_sn;
-        $department->manager_name = $request->staff_name;
-        $department->parent_id = $request->parent_id ? : 0;
+        $department->fill($request->all());
         $department->save();
 
         return response()->json($department, 201);

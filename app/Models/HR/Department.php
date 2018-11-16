@@ -141,13 +141,18 @@ class Department extends Model
 
     /* ----- 修改器Start ----- */
 
-    public function setManagerSnAttribute($value)
+    public function setParentIdAttribute($value)
     {
-        if (!empty($value)) {
-            $this->attributes['manager_sn'] = $value;
-            $this->attributes['manager_name'] = Staff::find($value)->realname;
-        }
+        $this->attributes['parent_id'] = $value ?: 0;
     }
+
+    // public function setManagerSnAttribute($value)
+    // {
+    //     if (!empty($value)) {
+    //         $this->attributes['manager_sn'] = $value;
+    //         $this->attributes['manager_name'] = Staff::find($value)->realname;
+    //     }
+    // }
 
     /* ----- 修改器End ----- */
 
