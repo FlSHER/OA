@@ -63,9 +63,8 @@ class StoreStaffRequest extends FormRequest
             'relatives.*.relatives_sn' => ['required_with:relatives_type,relative_name'],
             'relatives.*.relative_stype' => ['required_with:relatives_sn,relative_name'],
             'relatives.*.relative_nsame' => ['required_with:relative_tsype,relative_sn'],
-            // 'email' => 'bail|email',
-            // 'birthday' => 'bail|date',
-            // 'qq_number' => 'bail|integer',
+            'tags' => 'bail|array',
+            'tags.*.id' => 'bail|exists:tags,id',
         ];
     }
 

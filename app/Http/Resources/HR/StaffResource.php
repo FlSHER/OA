@@ -36,6 +36,7 @@ class StaffResource extends Resource
             'dingtalk_number' => $this->dingtalk_number,
             'wechat_number' => $this->wechat_number,
 
+            'tags' => $this->tags,
             'brand' => $this->brand->only(['id', 'name']),
             'status' => $this->status->only(['id', 'name']),
             'position' => $this->position->only(['id', 'name', 'level']),

@@ -54,6 +54,7 @@ class StaffCollection extends ResourceCollection
                 'position' => $staff->position->only(['id', 'name', 'level']),
                 'status' => $staff->status->only(['id', 'name']),
                 'brand' => $staff->brand->only(['id', 'name']),
+                'tags' => $staff->tags,
 
                 'height' => $staff->height,
                 'weight' => $staff->weight,

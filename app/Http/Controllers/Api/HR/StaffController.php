@@ -49,7 +49,7 @@ class StaffController extends Controller
                 }
             });
         })
-        ->with('relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'status')
+        ->with('relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'status', 'tags')
         ->filterByQueryString()
         ->sortByQueryString()
         ->withPagination();

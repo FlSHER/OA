@@ -63,9 +63,8 @@ class UpdateStaffRequest extends FormRequest
             'relatives.*.relative_sn' => ['required_with:relative_type,relative_name'],
             'relatives.*.relative_type' => ['required_with:relative_sn,relative_name'],
             'relatives.*.relative_name' => ['required_with:relative_type,relative_sn'],
-            // 'email' => 'bail|email',
-            // 'birthday' => 'bail|date',
-            // 'qq_number' => 'bail|integer',
+            'tags' => 'bail|array',
+            'tags.*.id' => 'bail|exists:tags,id',
         ];
     }
 

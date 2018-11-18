@@ -139,6 +139,17 @@ class StaffService
                 $this->dirty['cost_brands'] = $this->makeBelongsToManyDirty($dirty, $original, $changed);
             }
         }
+        if (array_has($data, 'tags')) {
+            $tags = $data['tags'] ? : [];
+            $relationQuery = $model->tags();
+            $original = $relationQuery->get();
+
+            $dirty = $relationQuery->sync($tags);
+            $changed = $relationQuery->get();
+            if (!empty(array_filter($dirty))) {
+                $this->dirty['tags'] = $this->makeBelongsToManyDirty($dirty, $original, $changed);
+            }
+        }
     }
 
     /**
