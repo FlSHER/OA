@@ -104,12 +104,14 @@ class DepartmentController extends Controller
      */
     public function destroy(Department $department)
     {
-        $hasStaff = $department->staff->isNotEmpty();
-        if ($hasStaff) {
-            return response()->json(['message' => '有在职员工使用的部门不能删除'], 422);
+        \DB::beginTransaction();
+        
+        $response = Department::deleteByTrees($department->id);
+        if ($response['status'] == 1) {
+            \DB::commit();
+        } else {
+            \DB::rollBack();
         }
-
-        $department->delete();
 
         return response()->json(null, 204);
     }
