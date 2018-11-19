@@ -200,7 +200,7 @@ class StaffController extends Controller
         $staff->save();
 
         return response()->json([
-            'message' => '激活成功',
+            'message' => '锁定成功',
             'changes' => ['is_active' => 0],
         ], 201);
     }
@@ -257,6 +257,8 @@ class StaffController extends Controller
         $this->staffService->update($data);
         if ($data['skip_leaving']) {
             $data['is_active'] = 0;
+        } else {
+            $data['status_id'] = 0;
         }
 
         return response()->json([
