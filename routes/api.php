@@ -311,6 +311,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
 
             // 激活员工 /api/hr/staff/:staff/unlock
             Route::patch('/{staff}/unlock', 'StaffController@unlock')->where(['staff' => '[0-9]+']);
+
+            // 锁定员工 /api/hr/staff/:staff/locked
+            Route::patch('/{staff}/locked', 'StaffController@locked')->where(['staff' => '[0-9]+']);
             
             // 员工转正 /api/hr/staff/process
             Route::patch('/process', 'StaffController@process');

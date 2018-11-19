@@ -170,19 +170,38 @@ class StaffController extends Controller
     }
 
     /**
-     * 解锁用户.
+     * 解锁员工.
      * 
      * @param  \App\Models\HR\Staff $staff
      * @return mixed
      */
     public function unlock(HR\Staff $staff)
     {
+        abort_if($staff->is_active !== 0, 422, '员工未锁定，无法激活！');
         $staff->is_active = 1;
         $staff->save();
 
         return response()->json([
             'message' => '激活成功',
             'changes' => ['is_active' => 1],
+        ], 201);
+    }
+
+    /**
+     * 锁定员工.
+     * 
+     * @param  \App\Models\HR\Staff $staff
+     * @return mixed
+     */
+    public function locked(HR\Staff $staff)
+    {
+        abort_if($staff->is_active !== 1, 422, '员工未激活，无法锁定！');
+        $staff->is_active = 0;
+        $staff->save();
+
+        return response()->json([
+            'message' => '激活成功',
+            'changes' => ['is_active' => 0],
         ], 201);
     }
 
