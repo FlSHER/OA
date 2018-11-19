@@ -702,7 +702,7 @@ class StaffController extends Controller
         $rules = [
             'staff_sn' => 'required|exists:staff,staff_sn',
             'operate_at' => 'required|date_format:Y-m-d',
-            'operation_type' => 'required|in:entry,employ,transfer,leave,reinstate,active,leaving',
+            'operation_type' => 'required|in:entry,employ,transfer,leave,active,leaving',
             'operation_remark' => 'max:100',
         ];
         switch ($value['operation_type']) {
@@ -726,8 +726,6 @@ class StaffController extends Controller
                     'position_id' => 'required|exists:positions,id',
                     'department_id' => 'required|exists:departments,id',
                 ]);
-                break;
-            case 'reinstate': //再入职
                 break;
         }
 
