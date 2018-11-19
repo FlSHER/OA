@@ -236,7 +236,9 @@ class StaffController extends Controller
         $data = $request->all();
         $this->processValidator($data);
         $this->staffService->update($data);
-        $data['status_id'] = $data['skip_leaving'] ? $data['status_id'] : 0;
+        if ($data['skip_leaving']) {
+            $data['is_active'] = 0;
+        }
 
         return response()->json([
             'message' => '离职成功',
