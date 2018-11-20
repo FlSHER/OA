@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\HR\CostBrand;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreStaffRequest extends FormRequest
@@ -25,6 +26,7 @@ class StoreStaffRequest extends FormRequest
      */
     public function rules(): array
     {
+        $brand_id = $this->brand_id;
         return [
         	'realname' => 'bail|required|string|max:10',
             'brand_id' => 'bail|required|exists:brands,id',
@@ -65,7 +67,16 @@ class StoreStaffRequest extends FormRequest
             'relatives.*.relative_nsame' => ['required_with:relative_tsype,relative_sn'],
             'tags' => 'bail|array',
             'tags.*.id' => 'bail|exists:tags,id',
-        ];
+            'cost_brands' => [
+                function ($attribute, $value, $fail) use ($brand_id) {
+                    $brands = CostBrand::with('brands')->whereIn('id', $value)->get();
+                    $brands->map(function ($item) use ($fail, $brand_id) {
+                        if (! $item->brands->contains($brand_id)) {
+                            $fail("{$item->name} 不是所属品牌的费用品牌");
+                        }
+                    });
+                }
+            ],
     }
 
     /**
@@ -85,5 +96,5 @@ class StoreStaffRequest extends FormRequest
             'required_with' => ':attribute 不能为空。',
         ];
     }
-
+    
 }
