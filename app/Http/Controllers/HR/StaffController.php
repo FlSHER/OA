@@ -215,7 +215,7 @@ class StaffController extends Controller
         if ($request->has('operate_at')) {
             $this->validate($request, [
                 'operate_at' => ['required', 'date'],
-            ]);
+            ], [], ['operate_at' => '办结时间']);
             $leavingInfo = [
                 'staff_sn' => $leaving->staff_sn,
                 'status_id' => $leaving->original_status_id,
