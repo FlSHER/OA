@@ -46,12 +46,11 @@ class DepartmentController extends Controller
     {
         $rules = [
             'name' => ['required', 'unique:departments'],
-            'manager_sn' => ['required', 'exists:staff,staff_sn'],
+            'manager_sn' => ['exists:staff,staff_sn'],
         ];
         $messages = [
             'name.required' => '部门名称不能为空',
             'name.unique' => '部门名称已存在',
-            'manager_sn.required' => '部门负责人必填',
             'manager_sn.exists' => '部门负责人不存在',
         ];
         $this->validate($request, $rules, $messages);
