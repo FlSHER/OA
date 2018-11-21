@@ -6,11 +6,11 @@
 
 namespace App\Providers;
 
-use App\Models\Department;
 use App\Support\ParserIdentity;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\Log;
 
 class SystemServiceProvider extends ServiceProvider
 {
@@ -22,14 +22,6 @@ class SystemServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Department::saving(function (Department $department) {
-            $department->changeFullName();
-        });
-
-        Department::saved(function (Department $department) {
-            $department->changeRoleAuthority();
-        });
-
         // 注册中国大陆手机号码验证规则
         Validator::extend('cn_phone', function (...$parameters) {
             return (bool) preg_match('/^(\+?0?86\-?)?1[3-9]\d{9}$/', $parameters[1]);

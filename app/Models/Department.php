@@ -23,6 +23,19 @@ class Department extends Model
         'parent_id'
     ];
 
+
+    public static function boot()
+    {
+        parent::boot();
+
+        self::saving(function ($post) {
+            $post->changeFullName();
+        });
+        self::saved(function ($post) {
+            $post->changeRoleAuthority();
+        });
+    }
+
     /* ----- 定义关联Start ----- */
 
     public function _parent()
@@ -142,12 +155,9 @@ class Department extends Model
 
     /* ----- 修改器Start ----- */
 
-    public function setManagerSnAttribute($value)
+    public function setParentIdAttribute($value)
     {
-        if (!empty($value)) {
-            $this->attributes['manager_sn'] = $value;
-            $this->attributes['manager_name'] = Staff::find($value)->realname;
-        }
+        $this->attributes['parent_id'] = $value ?: 0;
     }
 
     /* ----- 修改器End ----- */
@@ -167,18 +177,6 @@ class Department extends Model
     }
 
     /* ----- 本地作用域 End ----- */
-
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-        self::saving(function ($post) {
-            $post->changeFullName();
-        });
-        self::saved(function ($post) {
-            $post->changeRoleAuthority();
-        });
-    }
-
     public static function deleteByTrees($departmentId)
     {
         $self = self::find($departmentId);
