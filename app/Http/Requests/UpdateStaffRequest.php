@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\HR\CostBrand;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateStaffRequest extends FormRequest

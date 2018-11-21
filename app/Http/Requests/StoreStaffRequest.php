@@ -77,6 +77,7 @@ class StoreStaffRequest extends FormRequest
                     });
                 }
             ],
+        ];
     }
 
     /**
