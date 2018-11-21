@@ -213,6 +213,9 @@ class StaffController extends Controller
     {
         $leaving = Staff::find($request->staff_sn)->leaving;
         if ($request->has('operate_at')) {
+            $this->validate($request, [
+                'operate_at' => ['required', 'date'],
+            ]);
             $leavingInfo = [
                 'staff_sn' => $leaving->staff_sn,
                 'status_id' => $leaving->original_status_id,
@@ -224,8 +227,9 @@ class StaffController extends Controller
                 $leavingInfo['left_at'] = $request->left_at;
             }
             $request->replace($leavingInfo);
+            $response = $this->curdService->update($request->all());
             $leaving->delete();
-            return $this->curdService->update($request->all());
+            return $response;
         } else {
             $operatorSn = app('CurrentUser')->staff_sn;
             $operatorName = app('CurrentUser')->realname;
