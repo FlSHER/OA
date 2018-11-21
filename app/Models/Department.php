@@ -88,6 +88,11 @@ class Department extends Model
 
     /* ----- 访问器Start ----- */
 
+    public function getParentIdAttribute($value)
+    {
+        return intval($value);
+    }
+
     public function getParentIdsAttribute()
     {
         $parent = $this->_parent;
