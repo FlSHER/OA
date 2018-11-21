@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\HR;
 
 use Illuminate\Http\Request;
-use App\Models\HR\Department;
+use App\Models\Department;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\HR\StaffCollection;
 use App\Http\Resources\HR\DepartmentResource;
@@ -60,7 +60,7 @@ class DepartmentController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\HR\Department $department
+     * @param  \App\Models\Department $department
      * @return \Illuminate\Http\Response
      */
     public function show(Department $department)
@@ -72,7 +72,7 @@ class DepartmentController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @param  \App\Models\HR\Department $department
+     * @param  \App\Models\Department $department
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Department $department)
@@ -95,7 +95,7 @@ class DepartmentController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\HR\Department $department
+     * @param  \App\Models\Department $department
      * @return \Illuminate\Http\Response
      */
     public function destroy(Department $department)
