@@ -252,8 +252,9 @@ class StaffService
             // $islock = $model->tmp()->where('status', 1)->count();
             // 判断费用品牌是否变更
             if (!empty($data['cost_brands'])) {
-                $count = $model->cost_brands()->pluck('id')->sum();
-                if (array_sum($data['cost_brands']) !== $count) {
+                $current = array_map(function ($key) { return (int) $key; }, $data['cost_brands']);
+                $original = $model->cost_brands()->pluck('id')->toArray();
+                if (!empty(array_diff($original, $current)) || !empty(array_diff($current, $original))) {
                     $dirty['cost_brands'] = $data['cost_brands'];
                 }
             }
