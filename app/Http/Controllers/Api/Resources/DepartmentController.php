@@ -111,6 +111,8 @@ class DepartmentController extends Controller
         if ($response['status'] == 1) {
             \DB::commit();
         } else {
+
+            return response()->json($response, 422);
             \DB::rollBack();
         }
 
