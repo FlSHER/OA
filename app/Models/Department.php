@@ -20,7 +20,8 @@ class Department extends Model
         'brand_id',
         'manager_sn',
         'manager_name',
-        'parent_id'
+        'parent_id',
+        'is_locked'
     ];
 
 

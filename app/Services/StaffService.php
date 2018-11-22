@@ -124,14 +124,9 @@ class StaffService
 
         }
         if (array_has($data, 'cost_brands')) {
-            $cost_brands = collect($data['cost_brands']) ? : collect([]);
+            $cost_brands = $data['cost_brands'] ? : [];
             $relationQuery = $model->cost_brands();
             $original = $relationQuery->get();
-
-            $input = [];
-            $cost_brands->map(function ($item) use (&$input) {
-                $input['cost_brand_id'] = $item;
-            });
 
             $dirty = $relationQuery->sync($cost_brands);
             $changed = $relationQuery->get();
@@ -255,6 +250,13 @@ class StaffService
         $dirty = $model->getDirty();
         if (!empty($dirty)) {
             // $islock = $model->tmp()->where('status', 1)->count();
+            // 判断费用品牌是否变更
+            if (!empty($data['cost_brands'])) {
+                $count = $model->cost_brands()->pluck('id')->sum();
+                if (array_sum($data['cost_brands']) !== $count) {
+                    $dirty['cost_brands'] = $data['cost_brands'];
+                }
+            }
             $model->tmp()->create([
                 'changes' => $dirty,
                 'admin_sn' => $data['admin_sn'] ?? app('CurrentUser')->getStaffSn(),
@@ -266,10 +268,10 @@ class StaffService
             $model->setRawAttributes($model->getOriginal());
 
             // 如果有职位变动 直接添加一条记录
-            if (array_has($dirty, 'position_id')) {
+            if (!empty($dirty['position_id'])) {
                 $log = new StaffOperationLogService();
                 $log->model($model)->write([
-                    'position_id' => $this->dirty['position_id']
+                    'position_id' => $dirty['position_id']
                 ], $data);
             }
         }

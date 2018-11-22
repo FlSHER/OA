@@ -740,7 +740,7 @@ class StaffController extends Controller
                 break;
             case 'transfer': //人事变动
                 $rules = array_merge($rules, [
-                    'cost_brands' => 'required|array',
+                    'cost_brands' => 'array',
                     'status_id' => 'required|in:1,2,3',
                     'brand_id' => 'required|exists:brands,id',
                     'shop_sn' => 'max:10|exists:shops,shop_sn',
