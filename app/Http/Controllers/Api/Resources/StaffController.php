@@ -236,7 +236,7 @@ class StaffController extends Controller
             // 筛选掉无权限查看的员工
             $checkBrand = app('Authority')->checkBrand($item->brand_id);
             $checkDepart = app('Authority')->checkDepartment($item->department_id);
-            if ((!$checkBrand || !$checkDepart) && $item->status_id > 0) {
+            if (($checkBrand || $checkDepart) && $item->status_id < 0) {
                 $data[$key + 1] = [
                     $item->staff_sn,
                     $item->realname,
@@ -250,6 +250,7 @@ class StaffController extends Controller
                     $item->status->name,
                     $item->birthday,
                     $item->hired_at,
+                    $item->info->remark,
                 ];
             } else {
                 $data[$key + 1] = [
@@ -285,7 +286,6 @@ class StaffController extends Controller
                     $item->info->concat_name,
                     $item->info->concat_tel,
                     $item->info->concat_type,
-                    $item->info->remark,
                 ];
             }
         });
@@ -321,6 +321,7 @@ class StaffController extends Controller
                 $item->status->name,
                 $item->birthday,
                 $item->hired_at,
+                $item->info->remark,
             ];
         });
 
