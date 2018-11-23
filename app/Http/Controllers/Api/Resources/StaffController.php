@@ -322,6 +322,7 @@ class StaffController extends Controller
                 $item->status->name,
                 $item->birthday,
                 $item->hired_at,
+                $item->info->remark,
             ];
         });
 
