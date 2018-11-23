@@ -249,7 +249,7 @@ class StaffService
     {
         $dirty = $model->getDirty();
         if (!empty($dirty)) {
-            // $islock = $model->tmp()->where('status', 1)->count();
+            $islock = $model->tmp()->where('status', 1)->count();
             // 判断费用品牌是否变更
             if (!empty($data['cost_brands'])) {
                 $current = array_map(function ($key) { return (int) $key; }, $data['cost_brands']);
@@ -262,7 +262,7 @@ class StaffService
                 'changes' => $dirty,
                 'admin_sn' => $data['admin_sn'] ?? app('CurrentUser')->getStaffSn(),
                 'operate_at' => $data['operate_at'],
-                'status' => $model->tmp->isEmpty() ? 1 : 0,
+                'status' => $islock ? 0 : 1,
             ]);
 
             $this->addDirty($model);
