@@ -317,7 +317,7 @@ class StaffController extends Controller
                 $item->cost_brands->implode('name', '/'),
                 $item->department->full_name,
                 $item->shop_sn,
-                $item->shop->name,
+                $item->shop ? $item->shop->name : '',
                 $item->position->name,
                 $item->status->name,
                 $item->birthday,
