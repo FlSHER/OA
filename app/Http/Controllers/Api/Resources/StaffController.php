@@ -250,6 +250,7 @@ class StaffController extends Controller
                     $item->status->name,
                     $item->birthday,
                     $item->hired_at,
+                    $item->info->remark,
                 ];
             } else {
                 $data[$key + 1] = [
@@ -265,6 +266,7 @@ class StaffController extends Controller
                     $item->status->name,
                     $item->birthday,
                     $item->hired_at,
+                    $item->info->remark,
                     $item->mobile,
                     $item->info->id_card_number,
                     $item->info->account_number,
@@ -285,7 +287,6 @@ class StaffController extends Controller
                     $item->info->concat_name,
                     $item->info->concat_tel,
                     $item->info->concat_type,
-                    $item->info->remark,
                 ];
             }
         });
