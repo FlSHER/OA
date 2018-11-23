@@ -209,7 +209,7 @@ class StaffController extends Controller
             ->filterByQueryString()
             ->sortByQueryString()
             ->get();
-        $staff->map(function ($item, $key) use (&$data) {
+        $staff->map(function ($item, $key) use (&$data, $hasAuth) {
             // 查询地区名称
             $temp = [];
             $district = District::whereIn('id', [
