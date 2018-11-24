@@ -331,10 +331,10 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
             Route::patch('/again-entry', 'StaffController@againEntry');
 
             // 员工批量导入 /api/hr/staff/import
-            Route::post('/import', 'StaffController@import');
+            Route::post('/import', 'ExcelStaffController@import');
             
             // 批量导出 /api/hr/staff/export
-            Route::post('/export', 'StaffController@export');
+            Route::post('/export', 'ExcelStaffController@export');
 
             // 变动记录 /api/hr/staff/:staff/logs
             Route::get('/{staff}/logs', 'StaffController@logs');

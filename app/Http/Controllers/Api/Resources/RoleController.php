@@ -123,6 +123,7 @@ class RoleController extends Controller
 
             if (!empty($data['authority'])) {
                 $role->authority()->sync($data['authority']);
+                session()->forget('authorities');
             }
             
             if (!empty($data['staff'])) {
