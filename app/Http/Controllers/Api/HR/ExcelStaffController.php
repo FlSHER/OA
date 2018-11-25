@@ -76,7 +76,7 @@ class ExcelStaffController extends Controller
             'cost_brand' => $item->cost_brands->implode('name', '/'),
             'shop_sn' => $item->shop_sn,
             'shop_name' => $item->shop->name ?? '',
-            'department' => $item->department->name,
+            'department' => $item->department->full_name,
             'position' => $item->position->name,
             'status' => $item->status->name,
             'hired_at' => $item->hired_at,
