@@ -132,7 +132,7 @@ class ExcelStaffController extends Controller
             'height' => $item->height,
             'weight' => $item->weight,
             'household_city' => $makeHouseholdCity.' '.$item->household_address,
-            'living_city' => $makeLivingCity' '.$item->living_address,
+            'living_city' => $makeLivingCity.' '.$item->living_address,
             'native_place' => $item->native_place,
             'concat_name' => $item->concat_name,
             'concat_tel' => $item->concat_tel,
