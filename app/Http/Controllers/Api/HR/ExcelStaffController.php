@@ -14,15 +14,15 @@ use App\Services\StaffService;
 
 class ExcelStaffController extends Controller
 {
-	
-	protected $staffService;
+    
+    protected $staffService;
 
     public function __construct(StaffService $staffService)
     {
         $this->staffService = $staffService;
     }
 
-	/**
+    /**
      * 批量导出.
      *
      * @param Request $request
@@ -67,7 +67,7 @@ class ExcelStaffController extends Controller
      */
     protected function makeExportBaseData($item)
     {
-    	$property = ['无', '108将', '36天罡', '24金刚', '18罗汉'];
+        $property = ['无', '108将', '36天罡', '24金刚', '18罗汉'];
         return [
             'staff_sn' => $item->staff_sn,
             'realname' => $item->realname,
@@ -96,28 +96,27 @@ class ExcelStaffController extends Controller
     protected function makeExportHighData($item)
     {
         // 查询地区名称
-        $temp = [];
         $district = District::whereIn('id', [
-                $item->household_province_id,
-                $item->household_city_id,
-                $item->household_county_id,
-                $item->living_province_id,
-                $item->living_city_id,
-                $item->living_county_id,
-            ])->get();
-        $district->map(function ($city) use (&$temp) {
-            $temp[$city->id] = $city;
+            $item->household_province_id,
+            $item->household_city_id,
+            $item->household_county_id,
+            $item->living_province_id,
+            $item->living_city_id,
+            $item->living_county_id,
+        ])->get();
+        $temp = $district->mapWithKeys(function ($city) {
+            return [$city->id => $city->name];
         });
-        $makeHouseholdCity = [
-            $district->contains($item->household_province_id) ? $temp[$item->household_province_id]['name'] : '',
-            $district->contains($item->household_city_id) ? $temp[$item->household_city_id]['name'] : '',
-            $district->contains($item->household_county_id) ? $temp[$item->household_county_id]['name'] : '',
-        ];
-        $makeLivingCity = [
-            $district->contains($item->living_province_id) ? $temp[$item->living_province_id]['name'] : '',
-            $district->contains($item->living_city_id) ? $temp[$item->living_city_id]['name'] : '',
-            $district->contains($item->living_county_id) ? $temp[$item->living_county_id]['name'] : '',
-        ];
+        $makeHouseholdCity = implode(' ', [
+            $temp[$item->household_province_id] ?? '',
+            $temp[$item->household_county_id] ?? '',
+            $temp[$item->household_city_id] ?? '',
+        ]);
+        $makeLivingCity = implode(' ', [
+            $temp[$item->living_province_id] ?? '',
+            $temp[$item->living_county_id] ?? '',
+            $temp[$item->living_city_id] ?? '',
+        ]);
 
         return [
             'mobile' => $item->mobile,
@@ -132,8 +131,8 @@ class ExcelStaffController extends Controller
             'marital_status' => $item->marital_status,
             'height' => $item->height,
             'weight' => $item->weight,
-            'household_city' => implode(' ', $makeHouseholdCity).' '.$item->household_address,
-            'living_city' => implode(' ', $makeLivingCity).' '.$item->living_address,
+            'household_city' => $makeHouseholdCity.' '.$item->household_address,
+            'living_city' => $makeLivingCity' '.$item->living_address,
             'native_place' => $item->native_place,
             'concat_name' => $item->concat_name,
             'concat_tel' => $item->concat_tel,
