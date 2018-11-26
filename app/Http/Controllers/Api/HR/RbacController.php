@@ -47,6 +47,8 @@ class RbacController extends Controller
         ];
         $this->validate($request, $rules, $message);
         $authority->fill($request->all());
+        $authority->is_lock = $request->is_lock ?: 0;
+        $authority->is_public = $request->is_public ?: 0;
         $authority->save();
 
         return response()->json($authority, 201);
