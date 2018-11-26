@@ -8,7 +8,6 @@ use App\Http\Requests\StoreTag;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TagCollection;
 use App\Models\Tag as TagModel;
-use App\Models\TagCategory as TagCategoryModel;
 
 
 class TagController extends Controller
@@ -95,7 +94,7 @@ class TagController extends Controller
      * @param  \App\Models\Tag $tag
      * @return mixed
      */
-    public function delete(TagModel $tag)
+    public function destroy(TagModel $tag)
     {
         if (!$tag->taggable()->count()) {
             $tag->delete();
@@ -107,94 +106,15 @@ class TagController extends Controller
     }
 
     /**
-     * 获取全部标签分类.
+     * 获取单个标签信息.
      * 
-     * @param  \Illuminate\Http\Request $request
+     * @param  \App\Models\Tag $tag
      * @return mixed
      */
-    public function categories(Request $request)
-    {
-        $type = in_array($type = $request->query('type', 'staff'), ['staff', 'shops']) ? $type : 'staff';
-        $categories = TagCategoryModel::withCount('tags')
-            ->where('type', $type)
-            ->orderBy('weight', 'desc')
-            ->orderBy('id', 'desc')
-            ->get();
+    public function show(TagModel $tag)
+    {   
+        $tag->load('category');
 
-        return response()->json($categories);
-    }
-
-    /**
-     * 存储标签分类.
-     * 
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\TagCategory $cate
-     * @return mixed
-     */
-    public function storeCate(Request $request, TagCategoryModel $cate)
-    {
-        $this->validate($request, [
-            'name' => 'required|unique:tag_categories|max:10',
-            'type' => 'required|in:staff,shops',
-            'color' => 'string|max:7',
-            'weight' => 'numeric|min:0',
-        ], [
-            'type.required' => '标签分类类型必填',
-            'type.in' => '标签分类类型错误',
-            'name.required' => '标签分类名称必填',
-            'name.max' => '标签分类名称过长',
-            'name.unique' => '标签分类已经存在',
-        ]);
-
-        $cate->fill($request->all());
-        $cate->save();
-
-        return response()->json($cate, 201);
-    }
-
-    /**
-     * 更新标签分类.
-     * 
-     * @param  \Illuminate\Http\Request $request
-     * @param  \App\Models\TagCategory $cate
-     * @return mixed
-     */
-    public function updateCate(Request $request, TagCategoryModel $cate)
-    {
-        $this->validate($request, [
-            'name' => [
-                'max:10',
-                Rule::unique('tag_categories')->ignore($cate->id),
-            ],
-            'color' => 'string|max:7',
-            'weight' => 'numeric|min:0',
-        ], [
-            'name.max' => '标签分类名称过长',
-            'name.unique' => '标签分类已经存在',
-            'weight.numeric' => '权重值必须为数字',
-            'weight.min' => '权重值不能小于0',
-        ]);
-
-        $cate->fill($request->all());
-        $cate->save();
-
-        return response()->json($cate, 201);
-    }
-
-    /**
-     * 删除标签分类.
-     * 
-     * @param  \App\Models\TagCategory $cate
-     * @return mixed
-     */
-    public function deleteCate(TagCategoryModel $cate)
-    {
-        if (!$cate->tags()->count()) {
-            $cate->delete();
-
-            return response()->json(null, 204);
-        }
-
-        return response()->json(['message' => '该分类下还有标签存在，请先删除标签再删除分类'], 422);
+        return response()->json($tag);
     }
 }
