@@ -7,6 +7,7 @@ use App\Models\HR\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\HR\ShopResource;
 use App\Http\Resources\HR\ShopCollection;
 
 class ShopController extends Controller

@@ -41,12 +41,13 @@ class CostBrandController extends Controller
     {
         $data = $request->all();
         $rules = [
-            'name' => 'required|unique:brands',
+            'name' => 'required|unique:brands|max:10',
             'brands' => 'array',
         ];
         $message = [
             'name.required' => '费用品牌名称不能为空',
             'name.unique' => '费用品牌名称已存在',
+            'name.max' => '费用品牌名称不能超过 :max 个字',
             'brands.array' => '关联品牌数据错误',
         ];
         $this->validate($request, $rules, $message);
@@ -63,11 +64,11 @@ class CostBrandController extends Controller
      * @param  \App\Models\HR\Brand $brand
      * @return \Illuminate\Http\Response
      */
-    public function show(CostBrand $brand)
+    public function show(CostBrand $cost_brand)
     {
-        $brand->load('brands');
+        $cost_brand->load('brands');
 
-        return response()->json($brand, 200);
+        return response()->json($cost_brand, 200);
     }
 
     /**
@@ -77,23 +78,24 @@ class CostBrandController extends Controller
      * @param  \App\Models\HR\Brand $brand
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, CostBrand $brand)
+    public function update(Request $request, CostBrand $cost_brand)
     {
         $data = $request->all();
         $rules = [
-            'name' => 'required',
+            'name' => 'required|max:10',
             'brands' => 'array',
         ];
         $message = [
             'name.required' => '费用品牌名称不能为空',
+            'name.max' => '费用品牌名称不能超过 :max 个字',
             'brands.array' => '关联品牌数据错误',
         ];
         $this->validate($request, $rules, $message);
-        $brand->name = $data['name'];
-        $brand->save();
-        $brand->brands()->sync($data['brands']);
+        $cost_brand->name = $data['name'];
+        $cost_brand->save();
+        $cost_brand->brands()->sync($data['brands']);
 
-        return response()->json($brand->load('brands'), 201);
+        return response()->json($cost_brand->load('brands'), 201);
     }
 
     /**
@@ -102,15 +104,15 @@ class CostBrandController extends Controller
      * @param  \App\Models\HR\Brand $brand
      * @return \Illuminate\Http\Response
      */
-    public function destroy(CostBrand $brand)
+    public function destroy(CostBrand $cost_brand)
     {
-        $hasBrand = $brand->brands->isNotEmpty();
+        $hasBrand = $cost_brand->brands->isNotEmpty();
         if ($hasBrand) {
             return response()->json(['message' => '有品牌使用的费用品牌不能删除'], 422);
         }
 
-        $brand->delete();
-        $brand->brands()->detach();
+        $cost_brand->delete();
+        $cost_brand->brands()->detach();
 
         return response()->json(null, 204);
     }

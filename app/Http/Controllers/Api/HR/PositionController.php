@@ -40,12 +40,13 @@ class PositionController extends Controller
     public function store(Request $request, Position $position)
     {
         $rules = [
-            'name' => 'required|unique:positions',
+            'name' => 'required|unique:positions|max:10',
             'level' => 'required|integer|max:100',
         ];
         $message = [
             'name.required' => '职位名称不能为空',
             'name.unique' => '职位名称已存在',
+            'name.max' => '职位名称不能超过 :max 个字',
             'level.required' => '职级不能为空',
             'level.max' => '职级不能大于 :max',
         ]; 
@@ -89,11 +90,12 @@ class PositionController extends Controller
     public function update(Request $request, Position $position)
     {
         $rules = [
-            'name' => 'required',
+            'name' => 'required|max:10',
             'level' => 'required',
         ];
         $message = [
             'name.required' => '职位名称不能为空',
+            'name.max' => '职位名称不能超过 :max 个字',
             'level.required' => '职级不能为空', 
         ];
         $this->validate($request, $rules, $message);

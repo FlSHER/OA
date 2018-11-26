@@ -39,10 +39,11 @@ class BrandController extends Controller
     public function store(Request $request, Brand $brand)
     {
         $rules = [
-            'name' => 'required|unique:brands',
+            'name' => 'required|unique:brands|max:10',
         ];
         $message = [
             'name.required' => '品牌名称不能为空',
+            'name.max' => '品牌名称不能超过 :max 个字',
             'name.unique' => '品牌名称已存在',
         ];
         $this->validate($request, $rules, $message);
@@ -74,10 +75,11 @@ class BrandController extends Controller
     public function update(Request $request, Brand $brand)
     {
         $rules = [
-            'name' => 'required',
+            'name' => 'required|max:10',
         ];
         $message = [
             'name.required' => '品牌名称不能为空',
+            'name.max' => '品牌名称不能超过 :max 个字',
         ];
         $this->validate($request, $rules, $message);
         $brand->name = $request->name;
