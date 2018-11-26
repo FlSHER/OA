@@ -20,6 +20,8 @@ class Shop extends Model
 
     protected $primaryKey = 'shop_sn';
 
+    protected $keyType = 'string';
+
     protected $fillable = [
         'shop_sn',
         'name',
