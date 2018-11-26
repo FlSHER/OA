@@ -18,7 +18,8 @@ class ShopController extends Controller
      */
     public function index()
     {
-        $list = Shop::api()
+        $list = Shop::query()
+            ->with(['manager', 'department', 'brand', 'staff', 'tags'])
             ->filterByQueryString()
             ->sortByQueryString()
             ->withPagination();
@@ -39,7 +40,7 @@ class ShopController extends Controller
      */
     public function store(Request $request, Shop $shop)
     {
-        $this->validate($request, $this->rules($request), $this->messages());
+        $this->validate($request, $this->rules($request), $this->message());
         $data = $request->all();
         $shop->fill($data);
 
@@ -56,9 +57,9 @@ class ShopController extends Controller
             }
         });
 
-        $shop->load(['staff', 'brand', 'department', 'manager', 'assistant', 'tags']);
+        $shop->load(['staff', 'brand', 'department', 'manager', 'tags']);
 
-        return response()->json($shop, 201);
+        return response()->json(new ShopResource($shop), 201);
     }
 
     /**
@@ -69,9 +70,9 @@ class ShopController extends Controller
      */
     public function show(Shop $shop)
     {
-        $shop->load(['staff', 'brand', 'department', 'manager', 'assistant', 'tags']);
+        $shop->load(['manager', 'department', 'brand', 'staff', 'tags']);
 
-        return response()->json($shop, 200);
+        return response()->json(new ShopResource($shop), 200);
     }
 
     /**
@@ -83,7 +84,7 @@ class ShopController extends Controller
      */
     public function update(Request $request, Shop $shop)
     {
-        $this->validate($request, $this->rules($request), $this->messages());
+        $this->validate($request, $this->rules($request), $this->message());
         $data = $request->all();
         $shop->fill($data);
 
@@ -101,9 +102,9 @@ class ShopController extends Controller
             }
         });
 
-        $shop->load(['staff', 'brand', 'department', 'manager', 'assistant', 'tags']);
+        $shop->load(['staff', 'brand', 'department', 'manager', 'tags']);
 
-        return response()->json($shop, 201);
+        return response()->json(new ShopResource($shop), 201);
     }
 
     /**
@@ -177,7 +178,7 @@ class ShopController extends Controller
         return $rules;
     }
 
-    protected function messages()
+    protected function message()
     {
         return [
             'required' => ':attribute 为必填项，不能为空。',

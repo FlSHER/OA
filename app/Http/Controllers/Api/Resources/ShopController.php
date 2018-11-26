@@ -22,7 +22,8 @@ class ShopController extends Controller
      */
     public function index()
     {
-        $list = Shop::api()
+        $list = Shop::query()
+            ->with(['manager', 'department', 'brand', 'staff', 'tags'])
             ->filterByQueryString()
             ->sortByQueryString()
             ->withPagination();
@@ -49,6 +50,7 @@ class ShopController extends Controller
 
         $shop->getConnection()->transaction(function () use ($shop, $data) {
             $shop->save();
+            $this->position($shop);
             if (!empty($data['staff'])) {
                 $staffSn = array_column($data['staff'], 'staff_sn');
                 $shop->staff()->update(['shop_sn' => '']);
@@ -59,9 +61,9 @@ class ShopController extends Controller
             }
         });
 
-        $shop->load(['staff', 'brand', 'department', 'manager', 'assistant', 'tags']);
+        $shop->load(['staff', 'brand', 'department', 'manager', 'tags']);
 
-        return response()->json($shop, 201);
+        return response()->json(new ShopResource($shop), 201);
     }
 
     /**
@@ -72,9 +74,9 @@ class ShopController extends Controller
      */
     public function show(Shop $shop)
     {
-        $shop->load(['staff', 'brand', 'department', 'manager', 'assistant', 'tags']);
+        $shop->load(['manager', 'department', 'brand', 'staff', 'tags']);
 
-        return response()->json($shop, 200);
+        return response()->json(new ShopResource($shop), 200);
     }
 
     /**
@@ -92,6 +94,7 @@ class ShopController extends Controller
 
         $shop->getConnection()->transaction(function () use ($shop, $data) {
             $shop->save();
+            $this->position($shop);
             if (!empty($data['staff'])) {
                 $staffSn = array_column($data['staff'], 'staff_sn');
                 $shop->staff()->update(['shop_sn' => '']);
@@ -102,9 +105,9 @@ class ShopController extends Controller
             }
         });
 
-        $shop->load(['staff', 'brand', 'department', 'manager', 'assistant', 'tags']);
+        $shop->load(['staff', 'brand', 'department', 'manager', 'tags']);
 
-        return response()->json($shop, 201);
+        return response()->json(new ShopResource($shop), 201);
     }
 
     /**
