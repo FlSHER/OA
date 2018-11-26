@@ -18,6 +18,8 @@ class Shop extends Model
 
     protected $hidden = ['password', 'salt', 'deleted_at'];
 
+    protected $primaryKey = 'shop_sn';
+
     protected $fillable = [
         'shop_sn',
         'name',
