@@ -176,16 +176,16 @@ class Shop extends Model
      */
     public function recordLog()
     {
-        if (!empty($this->dirtyAttributes)) {
-            $staff = request()->user();
-            $logModel = new ShopLog();
-            $logModel->fill([
-                'admin_sn' => $staff['staff_sn'],
-                'changes' => $this->dirtyAttributes,
-                'shop_sn' => $this->dirtyAttributes['shop_sn'] ?? $this->shop_sn,
-            ]);
-            $logModel->save();
-        }
+        // if (!empty($this->dirtyAttributes)) {
+        //     $staff = request()->user();
+        //     $logModel = new ShopLog();
+        //     $logModel->fill([
+        //         'admin_sn' => $staff['staff_sn'],
+        //         'changes' => $this->dirtyAttributes,
+        //         'shop_sn' => $this->dirtyAttributes['shop_sn'] ?? $this->shop_sn,
+        //     ]);
+        //     $logModel->save();
+        // }
     }
 
     /**
