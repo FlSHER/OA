@@ -52,20 +52,36 @@ Route::get('/dingtalk/register_approval_callback', ['uses' => 'Api\DingtalkContr
 Route::any('/dingtalk/approval_callback', ['uses' => 'Api\DingtalkController@approvalCallback']); //钉钉审批回调
 
 Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
+    // 通用 api 资源路由
     Route::namespace('Resources')->group(function () {
-        // Route::apiResource('staff', 'StaffController');
-        Route::apiResource('departments', 'DepartmentController');
+        Route::apiResource('shops', 'ShopController');// 店铺 api 资源路由
+        Route::apiResource('roles', 'RoleController');// 角色 api 资源路由
+        Route::apiResource('staff', 'StaffController');// 员工 api 资源路由
+        Route::apiResource('brands', 'BrandController');// 品牌 api 资源路由
+        Route::apiResource('authorities', 'RbacController');// 权限 api 资源路由
+        Route::apiResource('positions', 'PositionController');// 职位 api 资源路由
+        Route::apiResource('cost_brands', 'CostBrandController');// 费用品牌 api 资源路由
+        Route::apiResource('departments', 'DepartmentController');// 部门 api 资源路由
+        Route::get('current-user', 'StaffController@getCurrentUser');// 当前登录员工
         Route::group(['prefix' => 'departments/{department}'], function () {
             Route::get('children-and-staff', 'DepartmentController@getChildrenAndStaff');
             Route::get('staff', 'DepartmentController@getStaff');
         });
-        Route::apiResource('brands', 'BrandController');
-        Route::apiResource('positions', 'PositionController');
-        Route::apiResource('shops', 'ShopController');
-        Route::apiResource('roles', 'RoleController');
         Route::get('educations', 'BasicInfoController@indexEducation');
     });
-    Route::get('current-user', 'Resources\StaffController@getCurrentUser');
+    // 后台 api 资源路由
+    Route::namespace('HR')->group(function () {
+        Route::apiResource('hr/tags', 'TagController');// 标签 api 资源路由
+        Route::apiResource('hr/shops', 'ShopController');// 店铺 api 资源路由
+        Route::apiResource('hr/roles', 'RoleController');// 角色 api 资源路由
+        Route::apiResource('hr/staff', 'StaffController');// 员工 api 资源路由        
+        Route::apiResource('hr/brands', 'BrandController');// 品牌 api 资源路由
+        Route::apiResource('hr/authorities', 'RbacController');// 权限 api 资源路由
+        Route::apiResource('hr/positions', 'PositionController');// 职位 api 资源路由
+        Route::apiResource('hr/cost_brands', 'CostBrandController');// 费用品牌 api 资源路由
+        Route::apiResource('hr/departments', 'DepartmentController');// 部门 api 资源路由
+        Route::apiResource('hr/tag/categories', 'TagCateController');// 标签分类 api 资源路由
+    });
     Route::prefix('table')->group(function () {
         Route::post('staff', 'Resources\StaffController@index');
         Route::post('shop', 'TableController@getShop');
@@ -75,54 +91,47 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
 Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
     Route::group(['namespace' => 'Resources'], function () {
 
-        // 员工 api 资源路由
-        Route::apiResource('staff', 'StaffController');
-
         // 员工入职流程 /api/staff/entrant
-        Route::post('/staff/entrant', 'StaffController@entrant');
+        Route::post('staff/entrant', 'StaffController@entrant');
 
          // 员工转正流程 /api/staff/process
-        Route::post('/staff/process', 'StaffController@process');
+        Route::post('staff/process', 'StaffController@process');
 
         // 人事变动流程 /api/staff/transfer
-        Route::post('/staff/transfer', 'StaffController@transfer');
+        Route::post('staff/transfer', 'StaffController@transfer');
 
         // 离职流程 /api/staff/leave
-        Route::post('/staff/leave', 'StaffController@leave');
+        Route::post('staff/leave', 'StaffController@leave');
 
         //  再入职流程 /api/staff/again-entry
-        Route::post('/staff/again-entry', 'StaffController@againEntry');
+        Route::post('staff/again-entry', 'StaffController@againEntry');
 
         // 晋升流程  /api/staff/promotion
-        Route::post('/staff/promotion', 'StaffController@promotion');
+        Route::post('staff/promotion', 'StaffController@promotion');
 
         // 获取员工状态列表 /api/staff/status
-        Route::get('/staff/status', 'StaffRelationController@status');
+        Route::get('staff/status', 'StaffRelationController@status');
 
         // 获取员工状态列表 /api/staff/property
-        Route::get('/staff/property', 'StaffRelationController@property');
+        Route::get('staff/property', 'StaffRelationController@property');
 
         // 获取全部民族列表 /api/staff/national
-        Route::get('/staff/national', 'StaffRelationController@national');
+        Route::get('staff/national', 'StaffRelationController@national');
 
         // 获取学历信息 /api/staff/education
-        Route::get('/staff/education', 'StaffRelationController@education');
+        Route::get('staff/education', 'StaffRelationController@education');
 
         // 获取政治面貌信息 /api/staff/politics
-        Route::get('/staff/politics', 'StaffRelationController@politics');
+        Route::get('staff/politics', 'StaffRelationController@politics');
 
         // 获取婚姻状态选项 /api/staff/marital
-        Route::get('/staff/marital', 'StaffRelationController@marital');
+        Route::get('staff/marital', 'StaffRelationController@marital');
 
         // 关系类型选项 /api/staff/relative_type
-        Route::get('/staff/relative_type', 'StaffRelationController@relativeType');
+        Route::get('staff/relative_type', 'StaffRelationController@relativeType');
 
         // 上传员工头像
-        Route::post('/staff/avatar', 'StaffAvatarController@update');
-
-        
-        // 部门 api 资源路由
-        Route::apiResource('departments', 'DepartmentController');
+        Route::post('staff/avatar', 'StaffAvatarController@update');
 
         // 获取全部部门 get /api/departments/tree
         Route::get('departments/tree', 'DepartmentController@tree');
@@ -132,18 +141,6 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
 
         // get /api/departments/get_tree/:department
         Route::get('departments/get_tree/{department}', 'DepartmentController@getTreeById');
-
-        // 职位 api 资源路由
-        Route::apiResource('positions', 'PositionController');
-
-        // 品牌 api 资源路由
-        Route::apiResource('brands', 'BrandController');
-
-        // 费用品牌 api 资源路由
-        Route::apiResource('cost_brands', 'CostBrandController');
-
-        // 店铺 api 资源路由
-        Route::apiResource('shops', 'ShopController');
 
         // 店铺定位 /api/shops/position
         Route::post('shops/position', 'ShopController@position');
@@ -156,62 +153,49 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
 
         // 修改店铺状态 /api/shop/:shops/state
         Route::post('shops/{shop}/state', 'ShopController@changeState');
-
-        // 权限 api 资源路由
-        Route::apiResource('authorities', 'RbacController');
-
-        // 角色 api 资源路由
-        Route::apiResource('roles', 'RoleController');
     });
 
     // hr 后台专用接口
     Route::group(['namespace' => 'HR', 'prefix' => 'hr'], function () {
 
-        // 员工 api 资源路由
-        Route::apiResource('staff', 'StaffController');
-
         // 重置密码 /api/hr/staff/:staff/reset
-        Route::post('/staff/{staff}/reset', 'StaffController@resetPass');
+        Route::post('staff/{staff}/reset', 'StaffController@resetPass');
 
         // 激活员工 /api/hr/staff/:staff/unlock
-        Route::patch('/staff/{staff}/unlock', 'StaffController@unlock');
+        Route::patch('staff/{staff}/unlock', 'StaffController@unlock');
 
         // 锁定员工 /api/hr/staff/:staff/locked
-        Route::patch('/staff/{staff}/locked', 'StaffController@locked');
+        Route::patch('staff/{staff}/locked', 'StaffController@locked');
         
         // 员工转正 /api/hr/staff/process
-        Route::patch('/staff/process', 'StaffController@process');
+        Route::patch('staff/process', 'StaffController@process');
 
         // 人事变动 /api/hr/staff/transfer
-        Route::patch('/staff/transfer', 'StaffController@transfer');
+        Route::patch('staff/transfer', 'StaffController@transfer');
 
         // 离职 /api/hr/staff/leave
-        Route::patch('/staff/leave', 'StaffController@leave');
+        Route::patch('staff/leave', 'StaffController@leave');
 
         // 离职交接 /api/hr/staff/leaving
-        Route::patch('/staff/leaving', 'StaffController@leaving');
+        Route::patch('staff/leaving', 'StaffController@leaving');
 
         //  再入职 /api/hr/staff/again-entry
-        Route::patch('/staff/again-entry', 'StaffController@againEntry');
+        Route::patch('staff/again-entry', 'StaffController@againEntry');
 
         // 员工批量导入 /api/hr/staff/import
-        Route::post('/staff/import', 'ExcelStaffController@import');
+        Route::post('staff/import', 'ExcelStaffController@import');
         
         // 批量导出 /api/hr/staff/export
-        Route::post('/staff/export', 'ExcelStaffController@export');
+        Route::post('staff/export', 'ExcelStaffController@export');
 
         // 变动记录 /api/hr/staff/:staff/logs
-        Route::get('/staff/{staff}/logs', 'StaffController@logs');
+        Route::get('staff/{staff}/logs', 'StaffController@logs');
 
         // 预约记录 /api/hr/staff/:staff/reserve
-        Route::get('/staff/{staff}/reserve', 'StaffTmpController@index');
+        Route::get('staff/{staff}/reserve', 'StaffTmpController@index');
 
         // 撤销预约记录 /api/hr/staff/reserve/:tmp
-        Route::delete('/staff/reserve/{tmp}', 'StaffTmpController@restore');
-
-
-        // 部门 api 资源路由
-        Route::apiResource('departments', 'DepartmentController');
+        Route::delete('staff/reserve/{tmp}', 'StaffTmpController@restore');
 
         // 获取全部部门 get /api/hr/departments/tree
         Route::get('departments/tree', 'DepartmentController@tree');
@@ -219,31 +203,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
         // 部门排序 get /api/hr/departments/sort
         Route::patch('departments/sort', 'DepartmentController@sortBy');
 
-        // 职位 api 资源路由
-        Route::apiResource('positions', 'PositionController');
-
-        // 品牌 api 资源路由
-        Route::apiResource('brands', 'BrandController');
-
-        // 费用品牌 api 资源路由
-        Route::apiResource('cost_brands', 'CostBrandController');
-
-        // 店铺 api 资源路由
-        Route::apiResource('shops', 'ShopController');
-
         // 店铺定位 /api/hr/shops/position
         Route::post('shops/position', 'ShopController@position');
-
-        // 权限 api 资源路由
-        Route::apiResource('authorities', 'RbacController');
-
-        // 角色 api 资源路由
-        Route::apiResource('roles', 'RoleController');
-
-        // 标签 api 资源路由
-        Route::apiResource('tags', 'TagController');
-
-        // 标签分类 api 资源路由
-        Route::apiResource('tag/categories', 'TagCateController');
     });
 });
