@@ -270,7 +270,7 @@ class ShopController extends Controller
                 'shop_sn' => [
                     'required',
                     'max:10',
-                    Rule::unique('shops')->ignore($request->id),
+                    Rule::unique('shops')->ignore($request->shop_sn, 'shop_sn'),
                 ],
             ]);
         }

@@ -16,7 +16,7 @@ class Shop extends Model
 
     protected $connection = 'mysql';
 
-    protected $hidden = ['password', 'salt', 'deleted_at'];
+    protected $hidden = ['id', 'password', 'salt', 'deleted_at'];
 
     protected $primaryKey = 'shop_sn';
 
@@ -180,9 +180,9 @@ class Shop extends Model
             $staff = request()->user();
             $logModel = new ShopLog();
             $logModel->fill([
-                'target_id' => $this->id,
                 'admin_sn' => $staff['staff_sn'],
                 'changes' => $this->dirtyAttributes,
+                'shop_sn' => $this->dirtyAttributes['shop_sn'] ?? $this->shop_sn,
             ]);
             $logModel->save();
         }
