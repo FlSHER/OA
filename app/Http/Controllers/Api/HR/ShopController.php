@@ -118,6 +118,7 @@ class ShopController extends Controller
     {
         $shop->getConnection()->transaction(function () use ($shop) {
             $shop->staff()->update(['shop_sn' => '']);
+            $shop->tags()->detach();
             $shop->delete();
         });
 
