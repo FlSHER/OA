@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTaggablesTable extends Migration
+class CreateStaffHasTagsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,11 @@ class CreateTaggablesTable extends Migration
      */
     public function up()
     {
-        Schema::create('taggables', function (Blueprint $table) {
+        Schema::create('staff_has_tags', function (Blueprint $table) {
+            $table->char('staff_sn', 10)->commit('店铺编号');
             $table->integer('tag_id')->unsigned()->comment('标签ID');
-            $table->morphs('taggable');
-            $table->timestamps();
+            
+            $table->unique(['staff_sn', 'tag_id']);
         });
     }
 
@@ -27,6 +28,6 @@ class CreateTaggablesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('taggables');
+        Schema::dropIfExists('staff_has_tags');
     }
 }

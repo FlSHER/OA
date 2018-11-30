@@ -4,6 +4,7 @@ namespace App\Models\HR;
 
 use Authority;
 use App\Models\Tag;
+use App\Models\ShopHasTag;
 use App\Models\Traits\ListScopes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -18,9 +19,14 @@ class Shop extends Model
 
     protected $hidden = ['id', 'password', 'salt', 'deleted_at'];
 
+    // 使用自定义主键
     protected $primaryKey = 'shop_sn';
 
+    // 使用字符串主键
     protected $keyType = 'string';
+
+    // 使用非递增或者非数字的主键
+    public $incrementing = false;
 
     protected $fillable = [
         'shop_sn',
@@ -163,8 +169,7 @@ class Shop extends Model
      */
     public function tags()
     {
-        return $this->morphToMany(Tag::class, 'taggable', 'taggables')
-            ->withTimestamps();
+        return $this->belongsToMany(Tag::class, 'shop_has_tags', 'shop_sn', 'tag_id');
     }
 
     /* ----- 本地作用域 End ----- */

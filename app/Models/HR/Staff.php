@@ -352,7 +352,6 @@ class Staff extends User
      */
     public function tags()
     {
-        return $this->morphToMany(Models\Tag::class, 'taggable', 'taggables')
-            ->withTimestamps();
+        return $this->belongsToMany(Tag::class, 'staff_has_tags', 'staff_sn', 'tag_id');
     }
 }

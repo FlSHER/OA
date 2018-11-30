@@ -96,7 +96,7 @@ class TagController extends Controller
      */
     public function destroy(TagModel $tag)
     {
-        if (!$tag->taggable()->count()) {
+        if (!$tag->staff()->count() && !$tag->shop()->count()) {
             $tag->delete();
 
             return response()->json(null, 204);

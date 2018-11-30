@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\HR;
 use App\Models\Traits\ListScopes;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,8 +20,13 @@ class Tag extends Model
         return $this->hasOne(TagCategory::class, 'id', 'tag_category_id');
     }
 
-    public function taggable()
+    public function staff()
     {
-        return $this->hasMany(Taggable::class, 'tag_id', 'id');
+        return $this->belongsToMany(HR\Staff::class, 'staff_has_tags', 'tag_id', 'staff_sn');
+    }
+
+    public function shop()
+    {
+        return $this->belongsToMany(HR\Shop::class, 'shop_has_tags', 'tag_id', 'shop_sn');
     }
 }
