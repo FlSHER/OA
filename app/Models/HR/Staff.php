@@ -3,7 +3,7 @@
 namespace App\Models\HR;
 
 use Authority;
-use App\Models;
+use App\Models\Tag;
 use App\Models\Traits;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Foundation\Auth\User;
