@@ -6,6 +6,7 @@ use Cache;
 use Validator;
 use App\Models\HR;
 use App\Models\Brand;
+use App\Models\Department;
 use App\Models\I\District;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -341,7 +342,7 @@ class ExcelStaffController extends Controller
      {
         $key = "department_list";
         $department = Cache::get($key, function () use ($key) {
-            $department = HR\Department::select('id', 'name')->get();
+            $department = Department::select('id', 'name')->get();
             Cache::put($key, $department, now()->addMinutes(10));
 
             return $department;
@@ -419,33 +420,38 @@ class ExcelStaffController extends Controller
             'dingtalk_number' => 'max:50',
             'remark' => 'max:100',
             'department' => [
-                'bail',
                 function ($attribute, $value, $fail) {
-                    $name = $value;
-                    if (strpos($value, '-') !== false) {
-                        $department = explode('-', $value);
-                        $name = end($department);
-                    }
-                    if (!HR\Department::where('name', $name)->count()) {
+                    $department = array_filter(explode('-', $value));
+                    $name = end($department);
+                    if (!Department::where('name', $name)->count()) {
                         $fail('没有部门名称为 “'.$value.'” 的部门！');
                     }
                 }
             ],
             'cost_brand' => [
-                'bail',
-                function ($attribute, $value, $fail) {
-                    $cost = HR\CostBrand::pluck('name');
-                    if (strpos($value, '/') !== false) {
-                        $values = explode('/', $value);
-                        foreach ($values as $key => $val) {
-                            if (!$cost->contains($val)) {
-                                $fail('没有名称为 “'.$val.'” 的费用品牌！');
-                            }
+                'required_with:brand',
+                function ($attribute, $content, $fail) use ($value) {
+                    $brandName = HR\CostBrand::pluck('name');
+                    $costBrands = array_filter(explode('/', $content));
+                    $brand = collect($costBrands)->map(function ($brand) use ($brandName) {
+                        if (! $brandName->contains($brand)) {
+                            return $brand;
                         }
-                    } else {
-                        if (!$cost->contains($value)) {
-                            $fail('没有名称为 “'.$value.'” 的费用品牌！');
+                    })->filter();
+                    if ($brand->isNotEmpty()) {
+                        $fail("“{$brand->implode('，')}” 费用品牌不存在！");
+                    }
+                    
+                    // 验证品牌/费用品牌的关联性
+                    $brand_id = $this->getBrand($value['brand']);
+                    $brands = HR\CostBrand::with('brands')->whereIn('name', $costBrands)->get();
+                    $brand = $brands->map(function ($item) use ($fail, $brand_id) {
+                        if (! $item->brands->contains($brand_id)) {
+                            return $item->name;
                         }
+                    })->filter();
+                    if ($brand->isNotEmpty()) {
+                        $fail("“{$brand->implode('，')}” 不是所属品牌的费用品牌");
                     }
                 }
             ],
