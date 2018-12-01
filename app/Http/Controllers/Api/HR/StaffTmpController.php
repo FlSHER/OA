@@ -93,6 +93,9 @@ class StaffTmpController extends Controller
             if (is_array($change)) {
                 $key = $trans[$key];
                 $value = CostBrand::whereIn('id', $change)->pluck('name');
+            } else {
+                $key = $trans[$key];
+                $value = $change;
             }
             $changes[$key] = $value;
         }
