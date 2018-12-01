@@ -89,8 +89,7 @@ class StaffTmpController extends Controller
                 $relationKey = $relationMap[$key];
                 $key = $trans[$relationKey];
                 $value = $this->getRelationName($relationKey, $change);
-            }
-            if (is_array($change)) {
+            } elseif (is_array($change)) {
                 $key = $trans[$key];
                 $value = CostBrand::whereIn('id', $change)->pluck('name');
             } else {
