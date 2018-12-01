@@ -23,6 +23,188 @@ class ExcelStaffController extends Controller
     }
 
     /**
+     * 批量操作员工.
+     * 
+     * @param  Request $request
+     * @return mixed
+     */
+    public function import(Request $request)
+    {
+        $type = $request->input('type');
+
+        return app()->call([
+            $this, camel_case('import_' . $type)
+        ]);
+    }
+
+    /**
+     * 批量导入.
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function importAdd(Request $request)
+    {
+        $data = $this->combineImportData($request);
+        foreach ($data as $key => $value) {
+            $validator = $this->makeValidator($value);
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' =>  "导入失败第 {$key} 条数据错误", 
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+            $makeVal = $this->makeFillStaff($value);
+            $makeVal['operation_type'] = 'import_entry';
+            $makeVal['operation_remark'] = 'Excel批量导入';
+            $curd = $this->staffService->create($makeVal);
+        }
+
+        return response()->json(['message' => '操作成功'], 201);
+    }
+
+    /**
+     * 批量更新.
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function importEdit(Request $request)
+    {
+        $data = $this->combineImportData($request);
+        foreach ($data as $key => $value) {
+            $validator = $this->makeValidator($value);
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' =>  "编辑失败第 {$key} 条数据错误", 
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+            $makeVal = $this->makeFillStaff($value);
+            $makeVal['operation_type'] = 'edit';
+            $makeVal['operation_remark'] = 'Excel批量编辑';
+            $this->staffService->update($makeVal);
+        }
+
+        return response()->json(['message' => '操作成功'], 201);
+    }
+
+    /**
+     * 批量变动.
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function importTransfer(Request $request)
+    {
+        $data = $this->combineImportData($request);
+        foreach ($data as $key => $value) {
+            $validator = $this->makeValidator($value);
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' =>  "更新失败第 {$key} 条数据错误", 
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+            $makeVal = $this->makeFillStaff($value);
+            $makeVal['operation_type'] = 'import_transfer';
+            $makeVal['operation_remark'] = 'Excel批量更新';
+            $this->staffService->update($makeVal);
+        }
+
+        return response()->json(['message' => '操作成功'], 201);
+    }
+
+    /**
+     * 组装导入数据为(key=>value)形式。
+     *
+     * @param Request $request
+     * @return void
+     */
+    protected function combineImportData(Request $request)
+    {
+        $temp = [];
+        $data = array_filter($request->input('data', []));
+        $cols = $request->input('cols', []);
+        if (count($data) <= 1) return false;
+
+        foreach ($data as $key => $value) {
+            if ($key >= 1) {
+                $temp[$key] = collect($cols)->combine($value)->filter();
+            }
+        }
+        return $temp;
+    }
+
+    /**
+     * 将表单数据转为数据库需要的数据.
+     *
+     * @param array $value
+     * @return void
+     */
+    protected function makeFillStaff($value)
+    {
+        $data = ['operate_at' => now()->toDateString()];
+        if (!empty($value['staff_sn'])) {
+            $data['staff_sn'] = $value['staff_sn'];
+            $data['realname'] = HR\Staff::where('staff_sn', $value['staff_sn'])->value('realname');
+        }
+        // 费用品牌
+        if (!empty($value['cost_brand'])) {
+            $cost = explode('/', $value['cost_brand']);
+            $costIds = HR\CostBrand::whereIn('name', $cost)->pluck('id')->toArray();
+            $data['cost_brands'] = $costIds;
+        }
+        foreach ($value as $k => $v) { 
+            if (in_array($k, [
+                'realname', 'mobile', 'shop_sn', 'dingtalk_number', 'wechat_number', 'national', 'politics', 'gender',
+                'marital_status', 'id_card_number', 'account_number', 'account_bank', 'account_name', 'height', 'weight',
+                'household_address', 'living_address', 'native_place', 'education', 'remark', 'concat_name', 'concat_tel', 'concat_type'
+            ])) {
+                $data[$k] = $v;
+            }
+            if ($v && $k === 'brand') {
+                $data['brand_id'] = $this->getBrand($v);
+
+            } elseif ($v && $k === 'department') {
+                $name = $v;
+                if (strpos($v, '-') !== false) {
+                    $department = explode('-', $v);
+                    $name = end($department);
+                }
+                $data['department_id'] = $this->getDepartment($name);
+
+            } elseif ($v && $k === 'position') {
+                $data['position_id'] = $this->getPosition($v);
+
+            } elseif ($v && $k === 'status') {
+                $status = ['试用期' => 1, '在职' => 2, '停薪留职' => 3, '离职' => -1, '自动离职' => -2, '开除' => -3, '劝退' => -4];
+                $data['status_id'] = $status[$v];
+
+            } elseif ($v && $k === 'household_province') {
+                $data['household_province_id'] = $this->getDistrict($v);
+
+            } elseif ($v && $k === 'household_city') {
+                $data['household_city_id'] = $this->getDistrict($v);
+
+            } elseif ($v && $k === 'household_county') {
+                $data['household_county_id'] = $this->getDistrict($v);
+
+            } elseif ($v && $k === 'living_province') {
+                $data['living_province_id'] = $this->getDistrict($v);
+
+            } elseif ($v && $k === 'living_city') {
+                $data['living_city_id'] = $this->getDistrict($v);
+
+            } elseif ($v && $k === 'living_county') {
+                $data['living_county_id'] = $this->getDistrict($v);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * 批量导出.
      *
      * @param Request $request
@@ -140,151 +322,6 @@ class ExcelStaffController extends Controller
         ];
     }
 
-    /**
-     * 批量导入||批量更新.
-     *
-     * @param Request $request
-     * @return void
-     */
-    public function import(Request $request)
-    {
-        if (count($request->input('cols')) > 25) {
-            return $this->createStaffs($request);
-        }
-        $data = $this->combineImportData($request);
-        foreach ($data as $key => $value) {
-            $validator = $this->makeValidator($value);
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' =>  "更新失败第 {$key} 条数据错误", 
-                    'errors' => $validator->errors(),
-                ], 422);
-            }
-            $makeVal = $this->makeFillStaff($value);
-            $makeVal['operation_type'] = 'import_transfer';
-            $makeVal['operation_remark'] = 'Excel批量更新';
-            $this->staffService->update($makeVal);
-        }
-
-        return response()->json(['message' => '更新成功，请刷新页面更新信息'], 201);
-    }
-
-    /**
-     * 批量创建员工.
-     *
-     * @param Request $request
-     * @return void
-     */
-    public function createStaffs(Request $request)
-    {
-        $data = $this->combineImportData($request);
-
-        foreach ($data as $key => $value) {
-            $validator = $this->makeValidator($value);
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' =>  "导入失败第 {$key} 条数据错误", 
-                    'errors' => $validator->errors(),
-                ], 422);
-            }
-            $makeVal = $this->makeFillStaff($value);
-            $makeVal['operation_type'] = 'import_entry';
-            $makeVal['operation_remark'] = 'Excel批量导入';
-            $curd = $this->staffService->create($makeVal);
-        }
-
-        return response()->json(['message' => '导入成功，请刷新页面更新信息'], 201);
-    }
-
-    /**
-     * 组装导入数据为(key=>value)形式。
-     *
-     * @param Request $request
-     * @return void
-     */
-    protected function combineImportData(Request $request)
-    {
-        $temp = [];
-        $data = array_filter($request->input('data', []));
-        $cols = $request->input('cols', []);
-        if (count($data) <= 1) return false;
-
-        foreach ($data as $key => $value) {
-            if ($key >= 1) {
-                $temp[$key] = collect($cols)->combine($value)->filter();
-            }
-        }
-        return $temp;
-    }
-
-    /**
-     * 将表单数据转为数据库需要的数据.
-     *
-     * @param array $value
-     * @return void
-     */
-    protected function makeFillStaff($value)
-    {
-        $data = ['operate_at' => now()->toDateString()];
-        if (!empty($value['staff_sn'])) {
-            $data['staff_sn'] = $value['staff_sn'];
-            $data['realname'] = HR\Staff::where('staff_sn', $value['staff_sn'])->value('realname');
-        }
-        // 费用品牌
-        if (!empty($value['cost_brand'])) {
-            $cost = explode('/', $value['cost_brand']);
-            $costIds = HR\CostBrand::whereIn('name', $cost)->pluck('id')->toArray();
-            $data['cost_brands'] = $costIds;
-        }
-        foreach ($value as $k => $v) { 
-            if (in_array($k, [
-                'realname', 'mobile', 'shop_sn', 'dingtalk_number', 'wechat_number', 'national', 'politics', 'gender',
-                'marital_status', 'id_card_number', 'account_number', 'account_bank', 'account_name', 'height', 'weight',
-                'household_address', 'living_address', 'native_place', 'education', 'remark', 'concat_name', 'concat_tel', 'concat_type'
-            ])) {
-                $data[$k] = $v;
-            }
-            if ($v && $k === 'brand') {
-                $data['brand_id'] = $this->getBrand($v);
-
-            } elseif ($v && $k === 'department') {
-                $name = $v;
-                if (strpos($v, '-') !== false) {
-                    $department = explode('-', $v);
-                    $name = end($department);
-                }
-                $data['department_id'] = $this->getDepartment($name);
-
-            } elseif ($v && $k === 'position') {
-                $data['position_id'] = $this->getPosition($v);
-
-            } elseif ($v && $k === 'status') {
-                $status = ['试用期' => 1, '在职' => 2, '停薪留职' => 3, '离职' => -1, '自动离职' => -2, '开除' => -3, '劝退' => -4];
-                $data['status_id'] = $status[$v];
-
-            } elseif ($v && $k === 'household_province') {
-                $data['household_province_id'] = $this->getDistrict($v);
-
-            } elseif ($v && $k === 'household_city') {
-                $data['household_city_id'] = $this->getDistrict($v);
-
-            } elseif ($v && $k === 'household_county') {
-                $data['household_county_id'] = $this->getDistrict($v);
-
-            } elseif ($v && $k === 'living_province') {
-                $data['living_province_id'] = $this->getDistrict($v);
-
-            } elseif ($v && $k === 'living_city') {
-                $data['living_city_id'] = $this->getDistrict($v);
-
-            } elseif ($v && $k === 'living_county') {
-                $data['living_county_id'] = $this->getDistrict($v);
-            }
-        }
-
-        return $data;
-    }
-
      // 缓存职位
      protected function getBrand($name)
      {
@@ -350,37 +387,37 @@ class ExcelStaffController extends Controller
     protected function makeValidator($value)
     {
         $rules = [
-            'realname' => 'bail|required|string|max:10',
-            'brand' => 'bail|exists:brands,name',
-            'position' => 'bail|exists:positions,name',
-            'mobile' => 'bail|required|unique:staff,mobile|cn_phone',
-            'id_card_number' => 'bail|required|ck_identity',
-            'gender' => 'bail|in:未知,男,女',
-            'property' => 'bail|in:0,1,2,3,4',
-            'status' => 'bail|exists:staff_status,name',
-            'national' => 'bail|exists:i_national,name',
-            'education' => 'bail|exists:i_education,name',
-            'politics' => 'bail|exists:i_politics,name',
-            'shop_sn' => 'bail|exists:shops,shop_sn|max:10',
-            'marital_status' => 'bail|exists:i_marital_status,name',
-            'household_province' => 'bail|exists:i_district,name',
-            'household_city' => 'bail|exists:i_district,name',
-            'household_county' => 'bail|exists:i_district,name',
-            'living_province' => 'bail|exists:i_district,name',
-            'living_city' => 'bail|exists:i_district,name',
-            'living_county' => 'bail|exists:i_district,name',
-            'household_address' => 'bail|string|max:30',
-            'living_address' => 'bail|string|max:30',
-            'concat_name' => 'bail|required|max:10',
-            'concat_tel' => 'bail|required|cn_phone',
-            'concat_type' => 'bail|required|max:5',
-            'account_bank' => 'bail|max:20',
-            'account_name' => 'bail|max:10',
-            'account_number' => 'bail|between:16,19',
-            'height' => 'bail|integer|between:140,220',
-            'weight' => 'bail|integer|between:30,150',
-            'dingtalk_number' => 'bail|max:50',
-            'remark' => 'bail|max:100',
+            'realname' => 'required|string|max:10',
+            'brand' => 'exists:brands,name',
+            'position' => 'exists:positions,name',
+            'mobile' => 'required|unique:staff,mobile|cn_phone',
+            'id_card_number' => 'required|ck_identity',
+            'gender' => 'in:未知,男,女',
+            'property' => 'in:0,1,2,3,4',
+            'status' => 'exists:staff_status,name',
+            'national' => 'exists:i_national,name',
+            'education' => 'exists:i_education,name',
+            'politics' => 'exists:i_politics,name',
+            'shop_sn' => 'exists:shops,shop_sn|max:10',
+            'marital_status' => 'exists:i_marital_status,name',
+            'household_province' => 'exists:i_district,name',
+            'household_city' => 'exists:i_district,name',
+            'household_county' => 'exists:i_district,name',
+            'living_province' => 'exists:i_district,name',
+            'living_city' => 'exists:i_district,name',
+            'living_county' => 'exists:i_district,name',
+            'household_address' => 'string|max:30',
+            'living_address' => 'string|max:30',
+            'concat_name' => 'required|max:10',
+            'concat_tel' => 'required|cn_phone',
+            'concat_type' => 'required|max:5',
+            'account_bank' => 'max:20',
+            'account_name' => 'max:10',
+            'account_number' => 'between:16,19',
+            'height' => 'integer|between:140,220',
+            'weight' => 'integer|between:30,150',
+            'dingtalk_number' => 'max:50',
+            'remark' => 'max:100',
             'department' => [
                 'bail',
                 function ($attribute, $value, $fail) {
@@ -416,14 +453,16 @@ class ExcelStaffController extends Controller
         if (isset($value['staff_sn'])) {
             $rules = array_merge($rules, [
                 'staff_sn' => 'required|exists:staff,staff_sn',
-                'mobile' => [
-                    'required',
-                    'cn_phone',
-                    Rule::unique('staff')->ignore($value['staff_sn'], 'staff_sn'),
-                ],
                 'id_card_number' => 'ck_identity',
                 'dingtalk_number' => 'max:50',
                 'realname' => 'string|max:10',
+                'concat_tel' => 'cn_phone',
+                'concat_name' => 'max:10',
+                'concat_type' => 'max:5',
+                'mobile' => [
+                    'cn_phone',
+                    Rule::unique('staff')->ignore($value['staff_sn'], 'staff_sn'),
+                ],
             ]);
         }
 
@@ -438,11 +477,13 @@ class ExcelStaffController extends Controller
     protected function message(): array
     {
         return [
-            'required' => ':attribute为必填项，不能为空。',
-            'unique' => ':attribute已经存在，请重新填写。',
             'in' => ':attribute必须在【:values】中选择。',
             'max' => ':attribute不能大于 :max 个字。',
             'exists' => ':attribute填写错误。',
+            'unique' => ':attribute已经存在，请重新填写。',
+            'required' => ':attribute为必填项，不能为空。',
+            'between' => ':attribute参数 :input 不在 :min - :max 之间。',
+            'required_with' => ':attribute不能为空。',
             'date_format' => '时间格式错误',
         ];
     }
