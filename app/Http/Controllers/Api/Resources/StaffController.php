@@ -209,7 +209,8 @@ class StaffController extends Controller
             ->filterByQueryString()
             ->sortByQueryString()
             ->get();
-        $staff->map(function ($item, $key) use (&$data) {
+        $property = ['无', '108将', '36天罡', '24金刚', '18罗汉'];
+        $staff->map(function ($item, $key) use (&$data, $property) {
             // 查询地区名称
             $temp = [];
             $district = District::whereIn('id', [
@@ -250,6 +251,9 @@ class StaffController extends Controller
                     $item->status->name,
                     $item->birthday,
                     $item->hired_at,
+                    $item->employed_at,
+                    $item->left_at,
+                    $property[$item->property],
                     $item->info->remark,
                 ];
             } else {
@@ -266,6 +270,9 @@ class StaffController extends Controller
                     $item->status->name,
                     $item->birthday,
                     $item->hired_at,
+                    $item->employed_at,
+                    $item->left_at,
+                    $property[$item->property],
                     $item->info->remark,
                     $item->mobile,
                     $item->info->id_card_number,
@@ -308,7 +315,8 @@ class StaffController extends Controller
             ->filterByQueryString()
             ->sortByQueryString()
             ->get();
-        $staff->map(function ($item, $key) use (&$data) {
+        $property = ['无', '108将', '36天罡', '24金刚', '18罗汉'];
+        $staff->map(function ($item, $key) use (&$data, $property) {
             $data[$key + 1] = [
                 $item->staff_sn,
                 $item->realname,
@@ -322,6 +330,9 @@ class StaffController extends Controller
                 $item->status->name,
                 $item->birthday,
                 $item->hired_at,
+                $item->employed_at,
+                $item->left_at,
+                $property[$item->property],
                 $item->info->remark,
             ];
         });
