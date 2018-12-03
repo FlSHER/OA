@@ -109,7 +109,7 @@ class ExcelStaffController extends Controller
             }
             $makeVal = $this->makeFillStaff($value);
             $makeVal['operation_type'] = 'import_transfer';
-            $makeVal['operation_remark'] = 'Excel批量更新';
+            $makeVal['operation_remark'] = 'Excel批量变动';
             $this->staffService->update($makeVal);
         }
 

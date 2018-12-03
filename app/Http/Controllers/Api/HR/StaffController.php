@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\HR;
 
 use Encypt;
 use Validator;
+use Carbon\Carbon;
 use App\Models\HR;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -127,7 +128,7 @@ class StaffController extends Controller
     {
         $logs = HR\StaffLog::with('staff', 'admin')
             ->where('staff_sn', $staff->staff_sn)
-            ->whereNotIn('operation_type', ['edit', 'active', 'delete', 'leaving'])
+            ->whereNotIn('operation_type', ['edit', 'active', 'delete'])
             ->orderBy('id', 'asc')
             ->get();
 
@@ -232,7 +233,7 @@ class StaffController extends Controller
         $this->staffService->update($data);
 
         $data['cost_brands'] = HR\CostBrand::whereIn('id', $data['cost_brands'])->get();
-        $operateAt = \Carbon\Carbon::parse($data['operate_at'])->gt(now());
+        $operateAt = Carbon::parse($data['operate_at'])->gt(now());
 
         return response()->json([
             'message' => '操作成功',
@@ -285,7 +286,13 @@ class StaffController extends Controller
             }
             $request->replace($leavingInfo);
             $leaving->delete();
-            return $this->staffService->update($request->all());
+            $result = $this->staffService->update($request->all());
+            $operateAt = Carbon::parse($request->operate_at);
+            if ($result['status'] === 1) {
+                return response()->json($request->all(), 201);
+            } else {
+                return response()->json($result, 201);
+            }
         } else {
             $operatorSn = app('CurrentUser')->staff_sn;
             $operatorName = app('CurrentUser')->realname;
@@ -360,15 +367,4 @@ class StaffController extends Controller
         ];
     }
 
-    /**
-     * 获取处理后的员工日志.
-     * 
-     * @param  string $values
-     * @return mixed
-     */
-    public function formatLogs(Staff $staff)
-    {
-        $staff->load('change_log');
-
-    }
 }
