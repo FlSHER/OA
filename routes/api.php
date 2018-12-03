@@ -190,6 +190,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
         Route::apiResource('hr/cost_brands', 'CostBrandController');// 费用品牌
         Route::apiResource('hr/departments', 'DepartmentController');// 部门
         Route::apiResource('hr/tag/categories', 'TagCateController');// 标签分类
+        Route::apiResource('hr/department/cates', 'DepartmentCategoryController');// 部门分类
     });
     Route::prefix('table')->group(function () {
         Route::post('staff', 'Resources\StaffController@index');
