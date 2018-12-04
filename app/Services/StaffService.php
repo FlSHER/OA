@@ -92,7 +92,7 @@ class StaffService
     {
         $operationType = $data['operation_type'];
         if (
-            in_array($operationType, ['transfer', 'import_transfer']) && 
+            in_array($operationType, ['transfer', 'import_transfer', 'employ']) && 
             strtotime($data['operate_at']) > strtotime(date('Y-m-d'))
         ) {
             return true;
@@ -205,7 +205,7 @@ class StaffService
         ) {
             $this->setLeaving($model);
         } elseif (
-            in_array($operationType, ['transfer', 'import_transfer']) && 
+            in_array($operationType, ['transfer', 'import_transfer', 'employ']) && 
             strtotime($data['operate_at']) > strtotime(date('Y-m-d'))
         ) {
             $this->transferLater($model, $data);

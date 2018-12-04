@@ -213,10 +213,11 @@ class StaffController extends Controller
         $data = $request->all();
         $this->processValidator($data);
         $this->staffService->update($data);
+        $operateAt = Carbon::parse($data['operate_at'])->gt(now());
 
         return response()->json([
-            'message' => '转正成功',
-            'changes' => $data,
+            'message' => '操作成功',
+            'changes' => $operateAt ? [] : $data,
         ], 201);
     }
 
