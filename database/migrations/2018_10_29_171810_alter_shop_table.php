@@ -14,7 +14,7 @@ class AlterShopTable extends Migration
     public function up()
     {
         Schema::table('shops', function (Blueprint $table) {
-            $table->tinyInteger('status_id')->default(0)->comment('店铺状态');
+            $table->tinyInteger('status_id')->default(1)->comment('店铺状态');
             $table->char('assistant_sn', 6)->default('')->comment('助店人编号');
             $table->char('assistant_name', 10)->default('')->comment('助店人姓名');
             $table->char('real_address', 50)->default('')->comment('真实定位地址');
