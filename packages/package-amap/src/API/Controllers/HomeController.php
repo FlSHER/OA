@@ -86,7 +86,6 @@ class HomeController
     public function index(Request $request, AroundAmap $around)
     {
         $aroundAmap = $around->find($request->shop_sn);
-        // dd($amap);
         if ($aroundAmap) {
             return $this->update($request, $aroundAmap);
         } else {
@@ -122,21 +121,21 @@ class HomeController
             '_name' => $shopname,
             '_location' => $_location,
             'shop_sn' => $shopsn,
-            ]);
-            $prams = [
-                'data' => $data,
-                'key' => $this->amap_key,
-                'tableid' => $this->amap_tableId,
-            ];
-            $prams['sig'] = md5(urldecode(http_build_query($prams, '', '&')).$this->amap_sig);
-            $result = json_decode($this->client->post($this->createUri, [
-                'form_params' => $prams,
+        ]);
+        $prams = [
+            'data' => $data,
+            'key' => $this->amap_key,
+            'tableid' => $this->amap_tableId,
+        ];
+        $prams['sig'] = md5(urldecode(http_build_query($prams, '', '&')).$this->amap_sig);
+        $result = json_decode($this->client->post($this->createUri, [
+            'form_params' => $prams,
                 'headers' => [
                     'Content-Type' => 'application/x-www-form-urlencoded',
                 ],
-                ])
-                ->getBody()
-                ->getContents(), true);
+            ])
+            ->getBody()
+            ->getContents(), true);
                 
         if ($result['status'] === 1) {
             $around->_id = $result['_id'];
@@ -186,7 +185,7 @@ class HomeController
         ];
         $prams['sig'] = md5(urldecode(http_build_query($prams, '', '&')).$this->amap_sig);
         $result = json_decode($this->client->post($this->updateUri, [
-                'form_params' => $prams,
+            'form_params' => $prams,
                 'headers' => [
                     'Content-Type' => 'application/x-www-form-urlencoded',
                 ],
@@ -222,13 +221,13 @@ class HomeController
         ];
         $parmas['sig'] = md5(urldecode(http_build_query($parmas, '', '&')).$this->amap_sig);
         $result = json_decode($this->client->post($this->deleteUri, [
-        'form_params' => $parmas,
-        'headers' => [
-                'Content-Type' => 'application/x-www-form-urlencoded',
-            ],
-        ])
-        ->getBody()
-        ->getContents(), true);
+            'form_params' => $parmas,
+                'headers' => [
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                ],
+            ])
+            ->getBody()
+            ->getContents(), true);
 
         if ($result['status'] && ! $result['fail']) {
             $aroundAmap->delete();

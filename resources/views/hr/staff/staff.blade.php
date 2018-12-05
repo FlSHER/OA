@@ -149,7 +149,7 @@
         { data: "position.name", title: "职位", type: 'select', searchable: false },
         { data: "position.level", title: "职级", type: 'select', visible: false, searchable: false },
         { data: "status.name", title: "状态", type: 'select', searchable: false },
-        { data: "gender.name", title: "性别", type: 'select', visible: false, searchable: false },
+        { data: "gender", title: "性别", type: 'select', visible: false, searchable: false },
         { data: "birthday", title: "生日", type: 'date', visible: false, searchable: false },
         { data: "hired_at", title: "入职时间", type: 'date', sortable: true, visible: false, searchable: false },
         { data: "employed_at", title: "转正时间", type: 'date', sortable: true, visible: false, searchable: false },

@@ -40,7 +40,7 @@ class NormalLoginForm extends Component {
                                        prefix={<Icon type="lock" style={{color: 'rgba(0,0,0,.25)'}}/>}
                                        type="password" placeholder="确认新密码"/>
                             </FormItem>
-                            <Input name="dingding" type="hidden"/>
+                            <Input name="dingtalk_number" type="hidden"/>
                             <FormItem>
                                 {/*<a style={{float: 'right'}} href="">忘记密码</a>*/}
                                 <Button type="primary" size="large" htmlType="submit" style={{width: '100%'}}>

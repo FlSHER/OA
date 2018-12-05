@@ -31,11 +31,11 @@ class StaffLog extends Model {
     /* ----- 定义关联Start ----- */
 
     public function staff() { //员工
-        return $this->belongsTo('App\Models\HR\Staff', 'staff_sn', 'staff_sn')->withTrashed();
+        return $this->belongsTo('App\Models\HR\Staff', 'staff_sn', 'staff_sn')->select('staff_sn', 'realname')->withTrashed();
     }
 
     public function admin() { //操作人员
-        return $this->belongsTo('App\Models\HR\Staff', 'admin_sn', 'staff_sn')->withTrashed();
+        return $this->belongsTo('App\Models\HR\Staff', 'admin_sn', 'staff_sn')->select('staff_sn', 'realname')->withTrashed();
     }
 
     /* ----- 定义关联End ----- */

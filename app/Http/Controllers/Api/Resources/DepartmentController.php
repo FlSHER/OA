@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Resources;
 
 use Illuminate\Http\Request;
-use App\Models\HR\Department;
+use App\Models\Department;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\HR\StaffCollection;
 use App\Http\Resources\HR\DepartmentResource;
@@ -42,20 +42,19 @@ class DepartmentController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Department $department)
     {
         $rules = [
-            'name' => ['required', 'unique:departments'],
-            'manager_name' => ['required', 'exists:staff,realname'],
+            'name' => 'required|unique:departments|max:10',
+            'manager_sn' => ['exists:staff,staff_sn'],
         ];
         $messages = [
             'name.required' => '部门名称不能为空',
             'name.unique' => '部门名称已存在',
-            'manager_name.required' => '部门负责人必填',
-            'manager_name.exists' => '部门负责人不存在',
+            'name.max' => '部门名称不能超过 :max 个字',
+            'manager_sn.exists' => '部门负责人不存在',
         ];
         $this->validate($request, $rules, $messages);
-        $department = new Department();
         $department->fill($request->all());
         $department->save();
 
@@ -65,11 +64,13 @@ class DepartmentController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\HR\Department $department
+     * @param  \App\Models\Department $department
      * @return \Illuminate\Http\Response
      */
     public function show(Department $department)
     {
+        $department->load('brand', '_parent', '_children');
+
         return new DepartmentResource($department);
     }
 
@@ -77,25 +78,22 @@ class DepartmentController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @param  \App\Models\HR\Department $department
+     * @param  \App\Models\Department $department
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Department $department)
     {
         $rules = [
-            'name' => ['required'],
-            'manager_name' => ['exists:staff,realname'],
+            'name' => 'required|max:10',
+            'manager_sn' => ['exists:staff,staff_sn'],
         ];
         $messages = [
             'name.required' => '部门名称不能为空',
-            'manager_name.exists' => '部门负责人不存在',
+            'name.max' => '部门名称不能超过 :max 个字',
+            'manager_sn.exists' => '部门负责人不存在',
         ];
         $this->validate($request, $rules, $messages);
-        $department->name = $request->name;
-        $department->brand_id = $request->brand_id;
-        $department->manager_sn = $request->staff_sn;
-        $department->manager_name = $request->staff_name;
-        $department->parent_id = $request->parent_id ? : 0;
+        $department->fill($request->all());
         $department->save();
 
         return response()->json($department, 201);
@@ -104,17 +102,21 @@ class DepartmentController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\HR\Department $department
+     * @param  \App\Models\Department $department
      * @return \Illuminate\Http\Response
      */
     public function destroy(Department $department)
     {
-        $hasStaff = $department->staff->isNotEmpty();
-        if ($hasStaff) {
-            return response()->json(['message' => '有在职员工使用的部门不能删除'], 422);
-        }
+        \DB::beginTransaction();
+        
+        $response = Department::deleteByTrees($department->id);
+        if ($response['status'] == 1) {
+            \DB::commit();
+        } else {
 
-        $department->delete();
+            return response()->json($response, 422);
+            \DB::rollBack();
+        }
 
         return response()->json(null, 204);
     }
@@ -124,13 +126,9 @@ class DepartmentController extends Controller
      *
      * @return mixed
      */
-    public function tree()
+    public function tree(Department $department)
     {
-        return Department::get()->map(function ($item) {
-            $item->parent_id = $item->parent_id ? : null;
-
-            return $item;
-        });
+        return response()->json($department->get());
     }
 
     public function getChildrenAndStaff(Department $department)
@@ -173,5 +171,18 @@ class DepartmentController extends Controller
         }
 
         return response()->json(['message' => '操作成功'], 201);
+    }
+
+    /**
+     * 返回部门树形结构.
+     * 
+     * @param  Department $department
+     * @return mixed
+     */
+    public function getTreeById(Department $department)
+    {
+        $department->load('parent');
+
+        return response()->json($department);
     }
 }

@@ -23,13 +23,19 @@ class Messages
      */
     public function sendJobNotification($request)
     {
-        $agentId = App::find($request->input('oa_client_id'))->agent_id;
-        $data = $request->except('oa_client_id','step_run_id');
-        $dingUserId = Staff::find($data['userid_list'])->pluck('dingding')->all();
-        $data['agent_id'] = $agentId;
-        $data['userid_list'] = implode(',', $dingUserId);
-        $message = $this->messageToDatabase($data);
-        return $this->sendJobNotificationMessage($data, $message);
+        try {
+            $agentId = App::find($request->input('oa_client_id'))->agent_id;
+            $data = $request->except('oa_client_id', 'step_run_id');
+            $staffs = Staff::find($data['userid_list']);
+            $dingTalkNumber = $staffs->pluck('dingtalk_number')->all();
+            $data['agent_id'] = $agentId;
+            $data['userid_list'] = implode(',', $dingTalkNumber);
+            $message = $this->messageToDatabase($data,$staffs);
+        } catch (\Exception $e) {
+            return 0;
+        }
+        $this->sendJobNotificationMessage($data, $message);
+        return 1;
     }
 
     /**
@@ -44,9 +50,9 @@ class Messages
             $message->task_id = array_has($result, 'task_id') ? $result['task_id'] : null;
             $message->request_id = array_has($result, 'request_id') ? $result['request_id'] : null;
             $message->save();
-            return 1;
+            return $message;
         } catch (\Exception $e) {
-            return 0;
+
         }
     }
 
@@ -55,18 +61,53 @@ class Messages
      * @param array $request
      * @param array $result
      */
-    protected function messageToDatabase(array $data)
+    protected function messageToDatabase(array $data,$staffs)
     {
         if (request()->has('oa_client_id'))
             $messageData['client_id'] = request()->get('oa_client_id');
         $messageData['agent_id'] = $data['agent_id'];
         $messageData['create_staff'] = Auth::id() ?? '0';
         $messageData['create_realname'] = Auth::user() ? Auth::user()->realname : '系统';
+        $messageData['to_staff_sn'] = $staffs->pluck('staff_sn')->all();
+        $messageData['to_realname']= $staffs->pluck('realname')->all();
         $messageData['msgtype'] = $data['msg']['msgtype'];
         $messageData['data'] = $data;
-        if(request()->has('step_run_id'))
+        if (request()->has('step_run_id'))
             $messageData['step_run_id'] = request()->get('step_run_id');
         $message = Message::create($messageData);
         return $message;
+    }
+
+    /**
+     * 工作通知列表
+     * @return mixed
+     */
+    public function index()
+    {
+        $clientId = request()->has('client_id') ? request('client_id') : false;
+        $data = Message::when($clientId, function ($query) use ($clientId) {
+            return $query->where('client_id', $clientId);
+        })
+            ->filterByQueryString()
+            ->sortByQueryString()
+            ->withPagination();
+        return $data;
+    }
+
+    /**
+     * 重发失败的工作通知信息
+     * @param $id
+     * @return mixed
+     */
+    public function retraceJob($id)
+    {
+        $data = Message::where('id', $id)
+            ->where(function ($query) {
+                $query->where('errcode', '<>', 0)
+                    ->orWhereNull('errcode');
+            })
+            ->firstOrFail();
+        $response = $this->sendJobNotificationMessage($data->data, $data);
+        return $response;
     }
 }

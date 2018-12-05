@@ -114,23 +114,20 @@ class RoleController extends Controller
             $role->save();
 
             if (!empty($data['brand'])) {
-                $role->brand()->detach();
-                $role->brand()->attach($data['brand']);
+                $role->brand()->sync($data['brand']);
             }
 
             if (!empty($data['department'])) {
-                $role->department()->detach();
-                $role->department()->attach($data['department']);
+                $role->department()->sync($data['department']);
             }
 
             if (!empty($data['authority'])) {
-                $role->authority()->detach();
-                $role->authority()->attach($data['authority']);
+                $role->authority()->sync($data['authority']);
+                session()->forget('authorities');
             }
             
             if (!empty($data['staff'])) {
-                $role->staff()->detach();
-                $role->staff()->attach($data['staff']);
+                $role->staff()->sync($data['staff']);
             }
 
             $role->load([

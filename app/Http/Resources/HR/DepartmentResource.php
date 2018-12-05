@@ -20,7 +20,9 @@ class DepartmentResource extends Resource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'brand_id' => $this->brand_id,
             'full_name' => $this->full_name,
+            'parent_id' => $this->parent_id,
             'is_locked' => $this->is_locked,
             'is_public' => $this->is_public,
             'manager_sn' => $this->manager_sn,

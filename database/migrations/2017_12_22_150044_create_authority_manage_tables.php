@@ -22,7 +22,7 @@ class CreateAuthorityManageTables extends Migration
             $table->tinyInteger('is_menu')->unsigned()->comment('是否展示为菜单');
             $table->char('menu_name', 10)->comment('菜单名称');
             $table->char('menu_logo', 50)->comment('菜单图标');
-            $table->tinyInteger('is_active')->unsigned()->default(0)->comment('是否激活');
+            $table->tinyInteger('is_lock')->unsigned()->default(0)->comment('是否锁定');
             $table->tinyInteger('is_public')->unsigned()->default(0)->comment('是否对所有人开放');
             $table->smallInteger('app_id')->unsigned()->comment('应用ID');
             $table->timestamps();

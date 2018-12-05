@@ -11,7 +11,8 @@ class DatabaseSeeder extends Seeder {
      */
     public function run() {
         $this->call(StaffRelativeTypeSeeder::class);
-        $this->call(StaffTransferTagSeeder::class);
+        // $this->call(StaffTransferTagSeeder::class);
+        $this->call(ShopStatusSeeder::class);
     }
 
 }

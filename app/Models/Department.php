@@ -2,25 +2,51 @@
 
 namespace App\Models;
 
+use DB;
+use App\Models\HR\Staff;
+use App\Models\Traits\ListScopes;
+use App\Services\AuthorityService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Services\AuthorityService;
-use App\Models\HR\Staff;
-use DB;
 
 class Department extends Model
 {
+    use SoftDeletes, ListScopes;
 
-    use SoftDeletes;
-
-    protected $connection = 'mysql';
     protected $guarded = ['id', 'manager_name'];
+
+    protected $fillable = [
+        'name',
+        'brand_id',
+        'manager_sn',
+        'manager_name',
+        'parent_id',
+        'is_locked'
+    ];
+
+
+    public static function boot()
+    {
+        parent::boot();
+
+        self::saving(function ($post) {
+            $post->changeFullName();
+        });
+        self::saved(function ($post) {
+            $post->changeRoleAuthority();
+        });
+    }
 
     /* ----- 定义关联Start ----- */
 
     public function _parent()
     { //上级部门
         return $this->belongsTo('App\Models\Department', 'parent_id');
+    }
+
+    public function parent()
+    {
+        return $this->_parent()->with('parent');
     }
 
     public function _children()
@@ -55,13 +81,18 @@ class Department extends Model
 
     public function brand()
     { //品牌
-        return $this->belongsTo('App\Models\Brand');
+        return $this->belongsTo('App\Models\Brand')->withTrashed();
     }
 
     /* ----- 定义关联End ----- */
 
 
     /* ----- 访问器Start ----- */
+
+    public function getParentIdAttribute($value)
+    {
+        return intval($value);
+    }
 
     public function getParentIdsAttribute()
     {
@@ -89,12 +120,13 @@ class Department extends Model
 
     public function getChildrenIdsAttribute()
     {
-        $children = $this->_children;
-        $childrenIds = $this->_children->pluck('id');
-        foreach ($children as $child) {
-            $childrenIds = array_collapse([$childrenIds, $child->childrenIds]);
+        if (isset($this->_children) && $this->_children) {
+            $childrenIds = $this->_children->pluck('id');
+            foreach ($this->_children as $child) {
+                $childrenIds = array_collapse([$childrenIds, $child->childrenIds]);
+            }
+            return $childrenIds;
         }
-        return $childrenIds;
     }
 
     public function getTopAttribute()
@@ -129,12 +161,9 @@ class Department extends Model
 
     /* ----- 修改器Start ----- */
 
-    public function setManagerSnAttribute($value)
+    public function setParentIdAttribute($value)
     {
-        if (!empty($value)) {
-            $this->attributes['manager_sn'] = $value;
-            $this->attributes['manager_name'] = Staff::find($value)->realname;
-        }
+        $this->attributes['parent_id'] = $value ?: 0;
     }
 
     /* ----- 修改器End ----- */
@@ -154,7 +183,6 @@ class Department extends Model
     }
 
     /* ----- 本地作用域 End ----- */
-
     public static function deleteByTrees($departmentId)
     {
         $self = self::find($departmentId);
@@ -190,7 +218,7 @@ class Department extends Model
     /**
      * 更新部门全称
      */
-    public function changeFullName()
+    private function changeFullName()
     {
         if ($this->isDirty('parent_id') || $this->isDirty('name')) {
             $newFullName = $this->parent_id > 0 ? $this->_parent->full_name . '-' . $this->name : $this->name;
@@ -203,17 +231,20 @@ class Department extends Model
     }
 
     private function changeChildrenFullName($fullName)
-    {
-        $this->_children->each(function ($item) use ($fullName) {
-            $item->full_name = $fullName . '-' . $item->name;
-            $item->save();
-        });
+    {   
+        if(isset($this->_children) && $this->_children)
+        {
+            $this->_children->each(function ($item) use ($fullName) {
+                $item->full_name = $fullName . '-' . $item->name;
+                $item->save();
+            });
+        }
     }
 
     /**
      * 根据父级继承部门权限
      */
-    public function changeRoleAuthority()
+    private function changeRoleAuthority()
     {
         if ($this->isDirty('parent_id')) {
             $originalParentId = $this->getOriginal('parent_id');
@@ -229,11 +260,14 @@ class Department extends Model
 
     private function changeChildrenRoleAuthority($rolesOrigin, $rolesNew)
     {
-        $this->_children->each(function ($item) use ($rolesOrigin, $rolesNew) {
-            $item->role()->detach(array_diff($rolesOrigin, $rolesNew));
-            $item->role()->attach(array_diff($rolesNew, $rolesOrigin));
-            $item->changeChildrenRoleAuthority($rolesOrigin, $rolesNew);
-        });
+        if(isset($this->_children) && $this->_children)
+        {
+            $this->_children->each(function ($item) use ($rolesOrigin, $rolesNew) {
+                $item->role()->detach(array_diff($rolesOrigin, $rolesNew));
+                $item->role()->attach(array_diff($rolesNew, $rolesOrigin));
+                $item->changeChildrenRoleAuthority($rolesOrigin, $rolesNew);
+            });
+        }
     }
 
 }

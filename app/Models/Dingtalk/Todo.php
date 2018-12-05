@@ -2,15 +2,19 @@
 
 namespace App\Models\Dingtalk;
 
+use App\Models\Traits\ListScopes;
 use Illuminate\Database\Eloquent\Model;
 
 class Todo extends Model
 {
+    use ListScopes;
+
     protected $table = 'dingtalk_todos';
     protected $fillable = [
         'create_staff',
         'create_realname',
         'todo_staff',
+        'todo_name',
         'todo_userid',
         'create_time',
         'title',

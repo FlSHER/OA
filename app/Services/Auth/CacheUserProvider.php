@@ -45,11 +45,11 @@ class CacheUserProvider extends EloquentUserProvider
                 abort(400, '钉钉免登失败，请手动登录');
             }
             $dingtalkId = $userInfo['userid'];
-            $user = parent::retrieveByCredentials(['dingding' => $dingtalkId, 'is_active' => 1]);
+            $user = parent::retrieveByCredentials(['dingtalk_number' => $dingtalkId, 'is_active' => 1]);
             if ($user) {
                 return $user;
             } else {
-                abort(400, '钉钉账号未同步，请手动登录', ['dingding' => $dingtalkId]);
+                abort(400, '钉钉账号未同步，请手动登录', ['dingtalk_number' => $dingtalkId]);
             }
         } elseif ($credentials['mobile'] == $developer['username']) {
             $developer['password'] = Encypt::password($developer['password'], $developer['salt']);

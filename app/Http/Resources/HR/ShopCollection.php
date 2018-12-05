@@ -34,14 +34,24 @@ class ShopCollection extends ResourceCollection
                 'address' => $shop->address,
                 'clock_out' => $shop->clock_out,
                 'clock_in' => $shop->clock_in,
+                'brand' => $shop->brand->only('id', 'name'),
+                'department' => $shop->department->only('id', 'name', 'full_name', 'parent_id'),
                 'staff' => $shop->staff->map(function ($staff) {
                     return [
                         'staff_sn' => $staff->staff_sn,
                         'realname' => $staff->realname,
                     ];
                 }),
-                'department' => $shop->department,
-                'brand' => $shop->brand,
+                'tags' => $shop->tags,
+                'end_at' => $shop->end_at,
+                'opening_at' => $shop->opening_at,
+                'assistant_sn' => $shop->assistant_sn,
+                'assistant_name' => $shop->assistant_name,
+                'real_address' => $shop->real_address,
+                'total_area' => $shop->total_area,
+                'shop_type' => $shop->shop_type,
+                'work_type' => $shop->work_type,
+                'status_id' => $shop->status_id,
             ];
         })->toArray();
     }

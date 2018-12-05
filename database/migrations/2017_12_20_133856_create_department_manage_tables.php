@@ -17,13 +17,14 @@ class CreateDepartmentManageTables extends Migration
             $table->smallIncrements('id');
             $table->char('name', 20)->comment('部门名称');
             $table->char('full_name', 100)->comment('部门全称');
-            $table->tinyInteger('brand_id')->unsigned()->comment('所属品牌ID');
-            $table->smallInteger('parent_id')->unsigned()->comment('上级部门ID');
-            $table->tinyInteger('is_locked')->unsigned()->comment('是否加锁');
-            $table->tinyInteger('is_public')->unsigned()->comment('是否对所有人开放');
-            $table->tinyInteger('sort')->unsigned()->comment('排序');
-            $table->mediumInteger('manager_sn')->unsigned()->comment('店长员工编号');
-            $table->char('manager_name', 10)->comment('店长姓名');
+            $table->tinyInteger('brand_id')->default(1)->comment('所属品牌ID');
+            $table->smallInteger('parent_id')->default(0)->comment('上级部门ID');
+            $table->tinyInteger('is_locked')->default(0)->comment('是否加锁');
+            $table->tinyInteger('is_public')->default(0)->comment('是否对所有人开放');
+            $table->tinyInteger('sort')->default(99)->comment('排序');
+            $table->char('manager_sn', 6)->default('')->comment('部门管理者编号');
+            $table->char('manager_name', 10)->default('')->comment('部门管理者姓名');
+
             $table->timestamps();
             $table->softDeletes();
         });

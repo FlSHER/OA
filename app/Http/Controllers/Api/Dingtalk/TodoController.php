@@ -30,9 +30,7 @@ class TodoController extends Controller
      */
     public function add(Request $request)
     {
-        $data = $request->except(['step_run_id']);
-        $data['userid'] = Staff::find($request->input('userid'))->dingding;
-        $response = $this->todo->sendAddTodo($data);
+        $response = $this->todo->sendAddTodo($request);
         return $this->response->post($response);
     }
 
@@ -42,12 +40,29 @@ class TodoController extends Controller
      */
     public function update(Request $request)
     {
-        $todoData = Todo::where('step_run_id',$request->input('step_run_id'))->select('record_id','todo_userid')->first();
-        $data = [
-            'userid' => $todoData->todo_userid,
-            'record_id'=>$todoData->record_id,
-        ];
-        $response = $this->todo->sendUpdateTodo($data);
+        $response = $this->todo->sendUpdateTodo($request);
         return $this->response->post($response);
+    }
+
+    /**
+     * 获取待办消息列表
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    public function index()
+    {
+        $data = $this->todo->index();
+        return $this->response->get($data);
+    }
+
+    /**
+     * 重发失败的待办通知
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    public function retrace(Request $request,$id)
+    {
+        $data = $this->todo->retraceTodo($id);
+        return $this->response->post($data);
     }
 }

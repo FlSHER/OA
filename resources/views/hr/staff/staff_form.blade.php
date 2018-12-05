@@ -363,7 +363,7 @@
                                     <div class="col-sm-1"></div>
                                     <label class="control-label col-sm-2">钉钉编号</label>
                                     <div class="col-sm-4">
-                                        <input class="form-control" name="dingding" type="text" title="钉钉编号" />
+                                        <input class="form-control" name="dingtalk_number" type="text" title="钉钉编号" />
                                     </div>
                                 </div>
                             @endif

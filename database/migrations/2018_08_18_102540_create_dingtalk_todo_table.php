@@ -18,13 +18,14 @@ class CreateDingtalkTodoTable extends Migration
             $table->unsignedInteger('create_staff')->comment('创建人工号');
             $table->char('create_realname',20)->comment('创建人');
             $table->unsignedInteger('todo_staff')->comment('待办人工号');
+            $table->char('todo_name',20)->comment('待办人');
             $table->char('todo_userid',100)->comment('待办人钉钉号');
             $table->unsignedBigInteger('create_time')->comment('待办时间。Unix时间戳，毫秒级');
             $table->string('title')->comment('待办事项的标题');
             $table->string('url')->comment('待办事项的跳转链接');
             $table->text('form_item_list')->comment('待办事项表单 title表单标题、content表单内容');
             $table->text('data')->comment('待办提交的data数据');
-            $table->tinyInteger('errcode')->nullable()->comment('返回码 0 成功');
+            $table->char('errcode',20)->nullable()->comment('返回码 0 成功');
             $table->string('errmsg')->nullable()->comment('对返回码的文本描述内容');
             $table->string('record_id')->nullable()->comment('待办事项唯一id，更新待办事项的时候需要用到');
             $table->string('request_id')->nullable()->comment('request_id');

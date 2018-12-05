@@ -28,6 +28,11 @@ class Brand extends Model
             ->orderBy('sort', 'asc');
     }
 
+    public function cost_brands()
+    {
+        return $this->belongsToMany(CostBrand::class, 'brand_has_cost_brands', 'brand_id');
+    }
+
     /* ----- 定义关联End ----- */
 
     /* ----- 访问器Start ----- */

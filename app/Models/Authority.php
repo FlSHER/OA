@@ -77,4 +77,13 @@ class Authority extends Model
         $this->attributes['parent_id'] = (int)$value;
     }
 
+    public function setIsLockAttribute($value)
+    {
+        $this->attributes['is_lock'] = $value ?: 0;
+    }
+
+    public function setIsPublicAttribute($value)
+    {
+        $this->attributes['is_public'] = $value ?: 0;
+    }
 }

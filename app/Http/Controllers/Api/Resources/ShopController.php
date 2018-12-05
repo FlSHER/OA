@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers\Api\Resources;
 
+use Validator;
 use App\Models\HR\Shop;
 use App\Models\HR\Staff;
+use App\Models\HR\ShopStatu;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\HR\ShopResource;
 use App\Http\Resources\HR\ShopCollection;
+use Illuminate\Support\Facades\Log;
 
 class ShopController extends Controller
 {
@@ -17,7 +22,8 @@ class ShopController extends Controller
      */
     public function index()
     {
-        $list = Shop::api()
+        $list = Shop::query()
+            ->with(['manager', 'department', 'brand', 'staff', 'tags'])
             ->filterByQueryString()
             ->sortByQueryString()
             ->withPagination();
@@ -38,23 +44,26 @@ class ShopController extends Controller
      */
     public function store(Request $request, Shop $shop)
     {
-        $this->validate($request, $this->rules($request), $this->messages());
+        $this->validate($request, $this->rules($request), $this->message());
         $data = $request->all();
         $shop->fill($data);
 
-        $staff = collect($data['staff'])->pluck('staff_sn');
-        $shop->getConnection()->transaction(function () use ($shop, $staff) {
-            // 更新员工店铺编号
-            $shop->staff()->update(['shop_sn' => '']);
-            Staff::whereIn('staff_sn', $staff)->update(['shop_sn' => $shop->shop_sn]);
-            $shop->createShopLog();
-
+        $shop->getConnection()->transaction(function () use ($shop, $data) {
             $shop->save();
+            $this->position($shop);
+            if (!empty($data['staff'])) {
+                $staffSn = array_column($data['staff'], 'staff_sn');
+                $shop->staff()->update(['shop_sn' => '']);
+                Staff::whereIn('staff_sn', $staffSn)->update(['shop_sn' => $shop->shop_sn]);
+            }
+            if (!empty($data['tags'])) {
+                $shop->tags()->sync($data['tags']);
+            }
         });
 
-        $shop->load(['staff', 'brand', 'department']);
+        $shop->load(['staff', 'brand', 'department', 'manager', 'tags']);
 
-        return response()->json($shop, 201);
+        return response()->json(new ShopResource($shop), 201);
     }
 
     /**
@@ -65,9 +74,9 @@ class ShopController extends Controller
      */
     public function show(Shop $shop)
     {
-        $shop->load(['brand', 'department', 'staff']);
+        $shop->load(['manager', 'department', 'brand', 'staff', 'tags']);
 
-        return response()->json($shop, 200);
+        return response()->json(new ShopResource($shop), 200);
     }
 
     /**
@@ -79,23 +88,26 @@ class ShopController extends Controller
      */
     public function update(Request $request, Shop $shop)
     {
-        $this->validate($request, $this->rules($request), $this->messages());
+        $this->validate($request, $this->rules($request), $this->message());
         $data = $request->all();
         $shop->fill($data);
 
-        $staff = collect($data['staff'])->pluck('staff_sn');
-        $shop->getConnection()->transaction(function () use ($shop, $staff) {
-            // 更新员工店铺编号
-            $shop->staff()->update(['shop_sn' => '']);
-            Staff::whereIn('staff_sn', $staff)->update(['shop_sn' => $shop->shop_sn]);
-            $shop->createShopLog();
-
+        $shop->getConnection()->transaction(function () use ($shop, $data) {
             $shop->save();
+            $this->position($shop);
+            if (!empty($data['staff'])) {
+                $staffSn = array_column($data['staff'], 'staff_sn');
+                $shop->staff()->update(['shop_sn' => '']);
+                Staff::whereIn('staff_sn', $staffSn)->update(['shop_sn' => $shop->shop_sn]);
+            }
+            if (!empty($data['tags'])) {
+                $shop->tags()->sync($data['tags']);
+            }
         });
 
-        $shop->load(['staff', 'brand', 'department']);
+        $shop->load(['staff', 'brand', 'department', 'manager', 'tags']);
 
-        return response()->json($shop, 201);
+        return response()->json(new ShopResource($shop), 201);
     }
 
     /**
@@ -108,10 +120,23 @@ class ShopController extends Controller
     {
         $shop->getConnection()->transaction(function () use ($shop) {
             $shop->staff()->update(['shop_sn' => '']);
+            $shop->tags()->detach();
             $shop->delete();
         });
 
         return response()->json(null, 204);
+    }
+
+    /**
+     * 获取店铺状态列表.
+     * 
+     * @return mixed
+     */
+    public function status()
+    {
+        $list = ShopStatu::get();
+
+        return response()->json($list);
     }
 
     /**
@@ -120,60 +145,154 @@ class ShopController extends Controller
      * @param Request $request
      * @return void
      */
-    public function position(Request $request)
+    protected function position(Shop $shop)
     {
-        $shop = Shop::find($request->id);
-        if ($shop === null) {
-            return response()->json(['message' => '店铺数据错误', 'code' => '0'], 422);
-            // return '店铺数据错误';
+        if (!empty($shop->lat) && !empty($shop->lng)) {
+            createRequest('/api/amap', 'post', [
+                'shop_sn' => $shop->shop_sn,
+                'shop_name' => $shop->name,
+                'latitude' => $shop->lat,
+                'longitude' => $shop->lng
+            ]);
         }
-        $amap = createRequest('/api/amap', 'post', [
-            'shop_sn' => $shop->shop_sn,
-            'shop_name' => $shop->name,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude
-        ]);
-        $shop->lng = $request->longitude;
-        $shop->lat = $request->latitude;
-        // $shop->geo_hash = $request->geo_hash;
-        $shop->save();
-
-        return response()->json(['message' => '操作成功', 'code' => '1'], 201);
     }
 
-    protected function rules(Request $request)
+    /**
+     * 从流程创建店铺档案.
+     * 
+     * @param  Request $request
+     * @return mixed
+     */
+    public function storeProcess(Request $request)
+    {
+        $data = $request->input('data', []);
+        $params = [
+            'status_id' => 1,
+            'name' => $data['shop_name'] ?? null,
+            'shop_sn' => $data['shop_sn'] ?? null,
+            'brand_id' => $data['brand_id'] ?? null,
+            'department_id' => $data['department_id']['value'] ?? null,
+            'province_id' => $data['location_province_id'] ?? null,
+            'city_id' => $data['location_city_id'] ?? null,
+            'county_id' => $data['location_county_id'] ?? null,
+            'address' => $data['location_address'] ?? null,
+            'total_area' => $data['total_area'] ?? 0,
+            'shop_type' => $data['shop_type'] ?? '',
+        ];
+        $validator = $this->validateWithProcess($params);
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            return response()->json(['status' => 0, 'msg' => $errors->first()], 422);
+        }
+        $shopModel = new Shop();
+        $shopModel->fill($params);
+        $shopModel->save();
+
+        return response()->json(['status' => 1, 'msg' => '操作成功'], 201);
+    }
+
+    /**
+     * 改变店铺状态.
+     * 
+     * @param  Request $request
+     * @param  Shop    $shop
+     * @return mixed
+     */
+    public function changeState(Request $request, Shop $shop)
+    {
+        $this->validate($request, [
+            'status_id' => 'required|exists:shop_status,id',
+        ], [
+            'status_id.required' => '店铺状态不能为空',
+            'status_id.exists' => '店铺状态错误',
+        ]);
+        $shop->status_id = $request->status_id;
+        $shop->save();
+
+        $shop->load(['manager', 'brand', 'department', 'staff', 'tags']);
+
+        return response()->json(new ShopResource($shop), 200);
+    }
+
+    /**
+     * 库房创建店铺档案验证.
+     * 
+     * @param  [type] $value
+     * @return mixed
+     */
+    public function validateWithProcess($value)
     {
         $rules = [
-            'shop_sn' => 'bail|required|unique:shops|max:10',
             'name' => 'bail|required|max:50',
-            'manager_sn' => 'bail|nullable|exists:staff,staff_sn',
+            'shop_sn' => 'bail|required|unique:shops|max:10',
+            'department_id' => 'bail|required|exists:departments,id',
+            'brand_id' => 'bail|required|exists:brands,id',
+            'province_id' => 'bail|required|exists:i_district,id',
+            'city_id' => 'bail|required|exists:i_district,id',
+            'county_id' => 'bail|required|exists:i_district,id',
+            'address' => 'bail|required|max:50',
+        ];
+
+        return Validator::make($value, $rules, $this->message());
+    }
+
+    /**
+     * 店铺验证规则.
+     * 
+     * @param  Request $request
+     * @return array
+     */
+    protected function rules(Request $request): array
+    {
+        $rules = [
+            'name' => 'bail|required|max:50',
+            'shop_sn' => 'bail|required|unique:shops|max:10',
+            'status_id' => 'bail|required|exists:shop_status,id',
             'department_id' => 'bail|exists:departments,id',
             'brand_id' => 'bail|exists:brands,id',
-            'province_id' => 'bail|required',
-            'city_id' => 'bail|required',
-            'county_id' => 'bail|required',
+            'opening_at' => 'bail|date_format:Y-m-d',
+            'end_at' => 'bail|date_format:Y-m-d|after_or_equal:'.$request->opening_at,
+            'province_id' => 'bail|required|exists:i_district,id',
+            'city_id' => 'bail|required|exists:i_district,id',
+            'county_id' => 'bail|required|exists:i_district,id',
+            'address' => 'bail|max:50',
+            'real_address' => 'bail|max:50',
+            'tags' => 'bail|array',
+            'tags.*.id' => 'bail|exists:tags,id',
+            'manager_sn' => 'bail|exists:staff,staff_sn',
+            'manager_name' => 'bail|max:10',
+            'assistant_sn' => 'bail|exists:staff,staff_sn',
+            'assistant_name' => 'bail|max:10',
+            'staff' => 'bail|array',
+            'staff.*.staff_sn' => 'bail|exists:staff,staff_sn',
         ];
         if (strtolower($request->getMethod()) === 'patch') {
             return array_merge($rules, [
-                'shop_sn' => 'required|max:10',
+                'shop_sn' => [
+                    'required',
+                    'max:10',
+                    Rule::unique('shops')->ignore($request->shop_sn, 'shop_sn'),
+                ],
             ]);
         }
 
         return $rules;
     }
 
-    protected function messages()
+    /**
+     * 店铺验证返回错误信息.
+     * 
+     * @return array
+     */
+    protected function message(): array
     {
         return [
-            'shop_sn.required' => '店铺代码不能为空',
-            'shop_sn.unique' => '店铺代码不能重复',
-            'name.required' => '店铺名称不能为空',
-            'manager_sn.exists' => '店长信息未录入系统',
-            'department_id.exists' => '部门信息未录入系统',
-            'brand_id.exists' => '品牌信息未录入信息',
-            'province_id.required' => '店铺省地区不能为空',
-            'city_id.required' => '店铺城市不能为空',
-            'county_id.required' => '店铺地区不能为空',
+            'required' => ':attribute为必填项，不能为空。',
+            'unique' => ':attribute已经存在，请重新填写。',
+            'array' => ':attribute数据格式错误。',
+            'max' => ':attribute不能大于 :max 个字。',
+            'exists' => ':attribute填写错误。',
+            'after_or_equal' => ':attribute不能小于 :values。',
         ];
     }
 }
