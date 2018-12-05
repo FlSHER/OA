@@ -17,6 +17,7 @@ class BrandController extends Controller
     public function index()
     {
         $list = Brand::query()
+            ->with('cost_brands')
             ->filterByQueryString()
             ->sortByQueryString()
             ->withPagination();
@@ -40,8 +41,10 @@ class BrandController extends Controller
     {
         $rules = [
             'name' => 'required|unique:brands|max:10',
+            'cost_brands' => 'required|array',
         ];
         $message = [
+            'cost_brands.required' => '关联费用品牌不能为空',
             'name.required' => '品牌名称不能为空',
             'name.max' => '品牌名称不能超过 :max 个字',
             'name.unique' => '品牌名称已存在',
@@ -50,6 +53,34 @@ class BrandController extends Controller
         $brand->name = $request->name;
         $brand->is_public = $request->is_public;
         $brand->save();
+        $brand->cost_brands()->attach($request->cost_brands);
+
+        return response()->json($brand, 201);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  \App\Models\HR\Brand $brand
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, Brand $brand)
+    {
+        $rules = [
+            'name' => 'required|max:10',
+            'cost_brands' => 'required|array',
+        ];
+        $message = [
+            'cost_brands.required' => '关联费用品牌不能为空',
+            'name.required' => '品牌名称不能为空',
+            'name.max' => '品牌名称不能超过 :max 个字',
+        ];
+        $this->validate($request, $rules, $message);
+        $brand->name = $request->name;
+        $brand->is_public = $request->is_public;
+        $brand->save();
+        $brand->cost_brands()->sync($request->cost_brands);
 
         return response()->json($brand, 201);
     }
@@ -66,30 +97,6 @@ class BrandController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \App\Models\HR\Brand $brand
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Brand $brand)
-    {
-        $rules = [
-            'name' => 'required|max:10',
-        ];
-        $message = [
-            'name.required' => '品牌名称不能为空',
-            'name.max' => '品牌名称不能超过 :max 个字',
-        ];
-        $this->validate($request, $rules, $message);
-        $brand->name = $request->name;
-        $brand->is_public = $request->is_public;
-        $brand->save();
-
-        return response()->json($brand, 201);
-    }
-
-    /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\HR\Brand $brand
@@ -103,6 +110,7 @@ class BrandController extends Controller
         }
 
         $brand->delete();
+        $brand->cost_brands()->detach();
 
         return response()->json(null, 204);
     }

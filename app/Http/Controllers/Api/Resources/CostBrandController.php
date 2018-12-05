@@ -42,13 +42,13 @@ class CostBrandController extends Controller
         $data = $request->all();
         $rules = [
             'name' => 'required|unique:brands|max:10',
-            'brands' => 'array',
+            'brands' => 'required|array',
         ];
         $message = [
             'name.required' => '费用品牌名称不能为空',
             'name.unique' => '费用品牌名称已存在',
             'name.max' => '费用品牌名称不能超过 :max 个字',
-            'brands.array' => '关联品牌数据错误',
+            'brands.required' => '关联品牌不能为空',
         ];
         $this->validate($request, $rules, $message);
         $brand->name = $data['name'];
@@ -83,12 +83,12 @@ class CostBrandController extends Controller
         $data = $request->all();
         $rules = [
             'name' => 'required|max:10',
-            'brands' => 'array',
+            'brands' => 'required|array',
         ];
         $message = [
             'name.required' => '费用品牌名称不能为空',
             'name.max' => '费用品牌名称不能超过 :max 个字',
-            'brands.array' => '关联品牌数据错误',
+            'brands.required' => '关联品牌不能为空',
         ];
         $this->validate($request, $rules, $message);
         $cost_brand->name = $data['name'];

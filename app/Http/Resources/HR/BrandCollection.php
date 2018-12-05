@@ -21,7 +21,7 @@ class BrandCollection extends ResourceCollection
                 'id' => $brand->id,
                 'name' => $brand->name,
                 'is_public' => $brand->is_public,
-                'positions' => new PositionCollection($brand->position),
+                'cost_brands' => $brand->cost_brands,
             ];
         })->toArray();
     }
