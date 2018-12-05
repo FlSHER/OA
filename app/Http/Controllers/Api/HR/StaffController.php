@@ -293,6 +293,7 @@ class StaffController extends Controller
             return response()->json([
                 'changes' => $request->all(),
                 'message' => '操作成功',
+                'status' => 1,
             ], 201);
         } else {
             $operatorSn = app('CurrentUser')->staff_sn;
