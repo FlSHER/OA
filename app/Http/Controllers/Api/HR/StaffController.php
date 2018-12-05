@@ -289,11 +289,11 @@ class StaffController extends Controller
             $leaving->delete();
             $result = $this->staffService->update($request->all());
             $operateAt = Carbon::parse($request->operate_at);
-            if ($result['status'] === 1) {
-                return response()->json($request->all(), 201);
-            } else {
-                return response()->json($result, 201);
-            }
+            $result['changes'] = $request->all();
+            return response()->json([
+                'changes' => $request->all(),
+                'message' => '操作成功',
+            ], 201);
         } else {
             $operatorSn = app('CurrentUser')->staff_sn;
             $operatorName = app('CurrentUser')->realname;
