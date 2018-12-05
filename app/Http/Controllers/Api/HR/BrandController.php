@@ -55,7 +55,7 @@ class BrandController extends Controller
         $brand->save();
         $brand->cost_brands()->attach($request->cost_brands);
 
-        return response()->json($brand, 201);
+        return response()->json($brand->load('cost_brands'), 201);
     }
 
     /**
@@ -82,7 +82,7 @@ class BrandController extends Controller
         $brand->save();
         $brand->cost_brands()->sync($request->cost_brands);
 
-        return response()->json($brand, 201);
+        return response()->json($brand->load('cost_brands'), 201);
     }
 
     /**
