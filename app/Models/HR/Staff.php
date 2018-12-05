@@ -68,7 +68,7 @@ class Staff extends User
         'wechat_number',
     ];
 
-    protected $appends = ['avatar'];
+    protected $appends = ['avatar', 'dingding'];
 
     protected $hidden = ['password', 'salt', 'created_at', 'updated_at', 'deleted_at'];
 
@@ -192,7 +192,7 @@ class Staff extends User
 
     /**
      * has gender.
-     * 
+     *
      * @author 28youth
      * @return \Illuminate\Database\Eloquent\Concerns\hasOne
      */
@@ -336,12 +336,17 @@ class Staff extends User
      */
     public function getAvatarAttribute()
     {
-        if (! $this->avatarPath()) {
+        if (!$this->avatarPath()) {
             return null;
         }
 
         // return $this->avatar(50);
-        return action('\\'.StaffAvatarController::class.'@show', ['staff' => $this]);
+        return action('\\' . StaffAvatarController::class . '@show', ['staff' => $this]);
+    }
+
+    public function getDingdingAttribute()
+    {
+        return $this->getAttribute('dingtalk_number');
     }
 
 
