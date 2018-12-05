@@ -104,9 +104,13 @@ class BrandController extends Controller
      */
     public function destroy(Brand $brand)
     {
-        $hasStaff = $brand->staffs->isNotEmpty();
-        if ($hasStaff) {
+        if ($brand->staffs->isNotEmpty()) {
+
             return response()->json(['message' => '有在职员工使用的品牌不能删除'], 422);
+
+        } elseif ($brand->cost_brands->isNotEmpty()) {
+
+            return response()->json(['message' => '有费用品牌关联的品牌不能删除'], 422);
         }
 
         $brand->delete();

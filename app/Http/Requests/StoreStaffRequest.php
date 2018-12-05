@@ -88,13 +88,13 @@ class StoreStaffRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'in' => ':attribute 必须在【:values】中选择。',
-            'max' => ':attribute 不能大于 :max 个字。',
-            'exists' => ':attribute 填写错误。',
-            'unique' => ':attribute 已经存在，请重新填写。',
-            'required' => ':attribute 为必填项，不能为空。',
-            'between' => ':attribute 值 :input 不在 :min - :max 之间。',
-            'required_with' => ':attribute 不能为空。',
+            'in' => ':attribute必须在【:values】中选择。',
+            'max' => ':attribute不能大于 :max 个字。',
+            'exists' => ':attribute填写错误。',
+            'unique' => ':attribute已经存在，请重新填写。',
+            'required' => ':attribute为必填项，不能为空。',
+            'between' => ':attribute :input 不在 :min - :max 之间。',
+            'required_with' => ':attribute不能为空。',
         ];
     }
     
