@@ -38,6 +38,9 @@ class CacheUserProvider extends EloquentUserProvider
     public function retrieveByCredentials(array $credentials)
     {
         $developer = config('auth.developer');
+        $query = $this->createModel()->newQuery()
+            ->where('is_active', 1)
+            ->where('status_id', '>=', 0);
         if (array_has($credentials, 'dingtalk_auth_code')) {
             $code = $credentials['dingtalk_auth_code'];
             $userInfo = app('Dingtalk')->passCodeGetUserInfo($code);
@@ -45,7 +48,7 @@ class CacheUserProvider extends EloquentUserProvider
                 abort(400, '钉钉免登失败，请手动登录');
             }
             $dingtalkId = $userInfo['userid'];
-            $user = parent::retrieveByCredentials(['dingtalk_number' => $dingtalkId, 'is_active' => 1]);
+            $user = $query->where('dingtalk_number', $dingtalkId)->first();
             if ($user) {
                 return $user;
             } else {
@@ -55,8 +58,12 @@ class CacheUserProvider extends EloquentUserProvider
             $developer['password'] = Encypt::password($developer['password'], $developer['salt']);
             return new AuthenticatableUser($developer);
         } else {
-            $credentials['is_active'] = 1;
-            return parent::retrieveByCredentials($credentials);
+            $user = $query->where('mobile', $credentials['mobile'])->first();
+            if ($user) {
+                return $user;
+            } else {
+                abort(400, '电话号码错误');
+            }
         }
     }
 

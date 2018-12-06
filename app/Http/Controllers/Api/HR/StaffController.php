@@ -46,10 +46,10 @@ class StaffController extends Controller
                 }
             });
         })
-        ->with('relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'status', 'tags')
-        ->filterByQueryString()
-        ->sortByQueryString()
-        ->withPagination();
+            ->with('relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'status', 'tags')
+            ->filterByQueryString()
+            ->sortByQueryString()
+            ->withPagination();
 
         if (isset($list['data'])) {
             $list['data'] = new StaffCollection(collect($list['data']));
@@ -120,8 +120,8 @@ class StaffController extends Controller
 
     /**
      * 员工变动日志列表。
-     * 
-     * @param  Staff  $staff
+     *
+     * @param  Staff $staff
      * @return mixed
      */
     public function logs(HR\Staff $staff)
@@ -162,13 +162,13 @@ class StaffController extends Controller
         $staff->password = $newPass;
         $staff->salt = $salt;
         $staff->save();
-        
+
         return response()->json(['message' => '重置成功'], 201);
     }
 
     /**
      * 解锁员工.
-     * 
+     *
      * @param  \App\Models\HR\Staff $staff
      * @return mixed
      */
@@ -186,7 +186,7 @@ class StaffController extends Controller
 
     /**
      * 锁定员工.
-     * 
+     *
      * @param  \App\Models\HR\Staff $staff
      * @return mixed
      */
@@ -204,7 +204,7 @@ class StaffController extends Controller
 
     /**
      * 转正操作.
-     * 
+     *
      * @param  Request $request
      * @return mixed
      */
@@ -223,7 +223,7 @@ class StaffController extends Controller
 
     /**
      * 人事变动操作。
-     * 
+     *
      * @param  Request $request
      * @return mixed
      */
@@ -244,7 +244,7 @@ class StaffController extends Controller
 
     /**
      * 离职操作。
-     * 
+     *
      * @param  Request $request
      * @return mixed
      */
@@ -253,12 +253,9 @@ class StaffController extends Controller
         $data = $request->all();
         $this->processValidator($data);
         $this->staffService->update($data);
-        if ($data['skip_leaving']) {
-            $data['is_active'] = 0;
-        } else {
+        if (!$data['skip_leaving']) {
             $data['status_id'] = 0;
         }
-
         return response()->json([
             'message' => '离职成功',
             'changes' => $data,
@@ -267,7 +264,7 @@ class StaffController extends Controller
 
     /**
      * 处理离职交接.
-     * 
+     *
      * @param  Request $request
      * @return mixed
      */
@@ -313,7 +310,7 @@ class StaffController extends Controller
 
     /**
      * 入转调离操作验证.
-     * 
+     *
      * @param  array $value
      * @return mixed
      */
@@ -354,7 +351,7 @@ class StaffController extends Controller
 
     /**
      * 统一处理验证错误信息.
-     * 
+     *
      * @return array
      */
     protected function message(): array
