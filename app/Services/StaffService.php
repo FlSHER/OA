@@ -350,7 +350,7 @@ class StaffService
                 $model->setAttribute('left_at', $operateAt);
                 break;
             case 'leaving':
-                $model->setAttribute('is_active', 0);
+                // $model->setAttribute('is_active', 0);
                 break;
         }
         if (empty($model->employed_at) && $model->status_id > 1) {
