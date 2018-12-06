@@ -93,7 +93,7 @@ class StaffTransfer extends Model
     public function onCreating()
     {
         $this->setAttribute('staff_name', $this->staff->realname);
-        $this->setAttribute('staff_gender', $this->staff->gender->name);
+        $this->setAttribute('staff_gender', $this->staff->gender);
         $this->setAttribute('staff_department_id', $this->staff->department_id);
         $this->setAttribute('staff_department_name', $this->staff->department->name);
         $this->setAttribute('current_shop_sn', $this->staff->shop_sn);
