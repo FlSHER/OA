@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
 use App\Services\StaffService;
+use App\Support\ParserIdentity;
 
 class ExcelStaffController extends Controller
 {
@@ -145,7 +146,8 @@ class ExcelStaffController extends Controller
      */
     protected function makeFillStaff($value)
     {
-        $data = ['operate_at' => now()->toDateString()];
+        $data = [];
+        $data['operate_at'] = !empty($value['operate_at']) ? $value['operate_at'] : now()->toDateString();
         if (!empty($value['staff_sn'])) {
             $data['staff_sn'] = $value['staff_sn'];
             $data['realname'] = HR\Staff::where('staff_sn', $value['staff_sn'])->value('realname');
@@ -251,6 +253,7 @@ class ExcelStaffController extends Controller
     protected function makeExportBaseData($item)
     {
         $property = ['无', '108将', '36天罡', '24金刚', '18罗汉'];
+        $parser = new ParserIdentity($item->id_card_number);
         return [
             'staff_sn' => $item->staff_sn,
             'realname' => $item->realname,
@@ -266,6 +269,8 @@ class ExcelStaffController extends Controller
             'employed_at' => $item->employed_at,
             'left_at' => $item->left_at,
             'property' => $property[$item->property],
+            'account_number' => $item->account_number,
+            'birthday' => $parser->isValidate() ? $parser->birthday() : '',
             'remark' => $item->remark,
         ];
     }
@@ -304,7 +309,6 @@ class ExcelStaffController extends Controller
         return [
             'mobile' => $item->mobile,
             'id_card_number' => $item->id_card_number,
-            'account_number' => $item->account_number,
             'account_name' => $item->account_name,
             'account_bank' => $item->account_bank,
             'national' => $item->national,
