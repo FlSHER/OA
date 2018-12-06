@@ -270,6 +270,8 @@ class ExcelStaffController extends Controller
             'left_at' => $item->left_at,
             'property' => $property[$item->property],
             'account_number' => $item->account_number,
+            'account_name' => $item->account_name,
+            'account_bank' => $item->account_bank,
             'birthday' => $parser->isValidate() ? $parser->birthday() : '',
             'remark' => $item->remark,
         ];
@@ -309,8 +311,6 @@ class ExcelStaffController extends Controller
         return [
             'mobile' => $item->mobile,
             'id_card_number' => $item->id_card_number,
-            'account_name' => $item->account_name,
-            'account_bank' => $item->account_bank,
             'national' => $item->national,
             'wechat_number' => $item->wechat_number,
             'education' => $item->education,

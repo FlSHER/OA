@@ -144,6 +144,11 @@ class Shop extends Model
         $this->attributes['shop_sn'] = trim(strtolower($value));
     }
 
+    public function setAddressAttribute($value)
+    {
+        $this->attributes['address'] = !empty($value) ? $value : '';
+    }
+
     /* ----- 修改器End ----- */
 
     /* ----- 本地作用域 Start ----- */
