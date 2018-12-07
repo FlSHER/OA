@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\HR;
 
-use Cache;
 use Validator;
 use App\Models\HR;
 use App\Models\Brand;
@@ -11,12 +10,25 @@ use App\Models\I\District;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
 use App\Services\StaffService;
 use App\Support\ParserIdentity;
 
 class ExcelStaffController extends Controller
 {
-    
+    /**
+     * 导入错误信息.
+     * 
+     * @var array
+     */
+    protected $errors;
+
+    /**
+     * 上传字段中英文映射.
+     * 
+     * @var array
+     */
+    protected $staffWithMap;
     protected $staffService;
 
     public function __construct(StaffService $staffService)
@@ -47,22 +59,29 @@ class ExcelStaffController extends Controller
      */
     public function importAdd(Request $request)
     {
-        $data = $this->combineImportData($request);
-        foreach ($data as $key => $value) {
-            $validator = $this->makeValidator($value);
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' =>  "导入失败第 {$key} 条数据错误", 
-                    'errors' => $validator->errors(),
-                ], 422);
+        $data = array_filter($request->input('data', []));
+        $formatData = $this->combineImportData($request);
+        foreach ($formatData as $key => $value) {
+            $this->makeValidator($value);
+            if (empty($this->errors)) {
+                $makeVal = $this->makeFillStaff($value);
+                $makeVal['operation_type'] = 'import_entry';
+                $makeVal['operation_remark'] = 'Excel批量导入';
+                $this->staffService->create($makeVal);
+            } else {
+                $error['row'] = $key + 1;
+                $error['rowData'] = $data[$key];
+                $error['message'] = $this->errors;
+                $errors[] = $error;
+                continue;
             }
-            $makeVal = $this->makeFillStaff($value);
-            $makeVal['operation_type'] = 'import_entry';
-            $makeVal['operation_remark'] = 'Excel批量导入';
-            $curd = $this->staffService->create($makeVal);
         }
+        $response['data'] = !empty($body) ? $body : [];
+        $response['errors'] = !empty($errors) ? $errors : [];
+        $response['headers'] = !empty($data[0]) ? $data[0] : [];
+        empty($response['errors']) && $this->cacheClear();
 
-        return response()->json(['message' => '操作成功'], 201);
+        return response()->json($response, 201);
     }
 
     /**
@@ -73,22 +92,29 @@ class ExcelStaffController extends Controller
      */
     public function importEdit(Request $request)
     {
-        $data = $this->combineImportData($request);
-        foreach ($data as $key => $value) {
-            $validator = $this->makeValidator($value);
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' =>  "编辑失败第 {$key} 条数据错误", 
-                    'errors' => $validator->errors(),
-                ], 422);
+        $data = array_filter($request->input('data', []));
+        $formatData = $this->combineImportData($request);
+        foreach ($formatData as $key => $value) {
+            $this->makeValidator($value);
+            if (empty($this->errors)) {
+                $makeVal = $this->makeFillStaff($value);
+                $makeVal['operation_type'] = 'edit';
+                $makeVal['operation_remark'] = 'Excel批量编辑';
+                $this->staffService->update($makeVal);
+            } else {
+                $error['row'] = $key + 1;
+                $error['rowData'] = $data[$key];
+                $error['message'] = $this->errors;
+                $errors[] = $error;
+                continue;
             }
-            $makeVal = $this->makeFillStaff($value);
-            $makeVal['operation_type'] = 'edit';
-            $makeVal['operation_remark'] = 'Excel批量编辑';
-            $this->staffService->update($makeVal);
         }
+        $response['data'] = !empty($body) ? $body : [];
+        $response['errors'] = !empty($errors) ? $errors : [];
+        $response['headers'] = !empty($data[0]) ? $data[0] : [];
+        empty($response['errors']) && $this->cacheClear();
 
-        return response()->json(['message' => '操作成功'], 201);
+        return response()->json($response, 201);
     }
 
     /**
@@ -99,22 +125,29 @@ class ExcelStaffController extends Controller
      */
     public function importTransfer(Request $request)
     {
-        $data = $this->combineImportData($request);
-        foreach ($data as $key => $value) {
-            $validator = $this->makeValidator($value);
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' =>  "更新失败第 {$key} 条数据错误", 
-                    'errors' => $validator->errors(),
-                ], 422);
+        $data = array_filter($request->input('data', []));
+        $formatData = $this->combineImportData($request);
+        foreach ($formatData as $key => $value) {
+            $this->makeValidator($value);
+            if (empty($this->errors)) {
+                $makeVal = $this->makeFillStaff($value);
+                $makeVal['operation_type'] = 'import_transfer';
+                $makeVal['operation_remark'] = 'Excel批量变动';
+                $this->staffService->update($makeVal);
+            } else {
+                $error['row'] = $key + 1;
+                $error['rowData'] = $data[$key];
+                $error['message'] = $this->errors;
+                $errors[] = $error;
+                continue;
             }
-            $makeVal = $this->makeFillStaff($value);
-            $makeVal['operation_type'] = 'import_transfer';
-            $makeVal['operation_remark'] = 'Excel批量变动';
-            $this->staffService->update($makeVal);
         }
+        $response['data'] = !empty($body) ? $body : [];
+        $response['errors'] = !empty($errors) ? $errors : [];
+        $response['headers'] = !empty($data[0]) ? $data[0] : [];
+        empty($response['errors']) && $this->cacheClear();
 
-        return response()->json(['message' => '操作成功'], 201);
+        return response()->json($response, 201);
     }
 
     /**
@@ -130,6 +163,7 @@ class ExcelStaffController extends Controller
         $cols = $request->input('cols', []);
         if (count($data) <= 1) return false;
 
+        $this->staffWithMap = collect($cols)->combine($data[0]);
         foreach ($data as $key => $value) {
             if ($key >= 1) {
                 $temp[$key] = collect($cols)->combine($value)->filter();
@@ -165,8 +199,8 @@ class ExcelStaffController extends Controller
                 'household_address', 'living_address', 'native_place', 'education', 'remark', 'concat_name', 'concat_tel', 'concat_type'
             ])) {
                 $data[$k] = $v;
-            }
-            if ($v && $k === 'brand') {
+
+            } elseif ($v && $k === 'brand') {
                 $data['brand_id'] = $this->getBrand($v);
 
             } elseif ($v && $k === 'department') {
@@ -378,6 +412,14 @@ class ExcelStaffController extends Controller
         return $district->where('name', $name)->pluck('id')->last();
      }
     
+    protected function cacheClear()
+    {
+        Cache::forget('brand_list');
+        Cache::forget('position_list');
+        Cache::forget('district_list');
+        Cache::forget('department_list');
+    }
+
     /**
      * 导入信息合法性验证.
      *
@@ -468,8 +510,13 @@ class ExcelStaffController extends Controller
                 ],
             ]);
         }
-
-        return Validator::make($value->toArray(), $rules, $this->message());
+        $validator = Validator::make($value->toArray(), $rules, $this->message());
+        if ($this->staffWithMap) {
+            foreach ($validator->errors()->getMessages() as $key => $error) {
+                $this->errors[$this->staffWithMap[$key]] = $error;
+            }
+        }
+        // return Validator::make($value->toArray(), $rules, $this->message());
     }
 
     /**

@@ -121,6 +121,7 @@ return [
     'attributes' => [
         // 员工字段
         'realname' => '姓名',
+        'staff_sn' => '员工编号',
         'brand' => '品牌',
         'position' => '职位',
         'mobile' => '手机号',
