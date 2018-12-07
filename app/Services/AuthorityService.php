@@ -220,7 +220,7 @@ class AuthorityService
                 $brandsTmp = $role->brand->pluck('id')->toArray();
                 $brands = array_merge($brands, $brandsTmp);
             }
-            $brands = array_unique($brands);
+            $brands = array_values(array_unique($brands));
         }
         return $brands;
     }
