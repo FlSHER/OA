@@ -308,7 +308,7 @@ class Staff extends User
 
     public function scopeWithApi($query)
     {
-        return $query->with(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'tags']);
+        return $query->with(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'status', 'tags']);
     }
 
     public function scopeWorking($query)

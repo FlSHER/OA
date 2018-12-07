@@ -35,7 +35,7 @@ class StoreStaffRequest extends FormRequest
             'mobile' => 'bail|required|unique:staff,mobile|cn_phone',
             'id_card_number' => 'bail|required|ck_identity',
             'property' => 'bail|in:0,1,2,3,4',
-            'gender' => 'bail|required|in:未知,男,女',
+            'gender' => 'bail|required|in:男,女',
             'education' => 'bail|exists:i_education,name',
             'national' => 'bail|exists:i_national,name',
             'politics' => 'bail|exists:i_politics,name',

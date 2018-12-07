@@ -37,16 +37,16 @@ class StaffController extends Controller
             $newFilters = preg_replace('/role\.id=.*?(;|$)/', '$3', $request->filters);
             $request->offsetSet('filters', $newFilters);
         }
-        $list = HR\Staff::when($roleId, function ($query) use ($roleId) {
-            $query->whereHas('role', function ($query) use ($roleId) {
-                if (is_array($roleId)) {
-                    $query->whereIn('id', $roleId);
-                } else {
-                    $query->where('id', $roleId);
-                }
-            });
-        })
-            ->with('relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'status', 'tags')
+        $list = HR\Staff::withApi()
+            ->when($roleId, function ($query) use ($roleId) {
+                $query->whereHas('role', function ($query) use ($roleId) {
+                    if (is_array($roleId)) {
+                        $query->whereIn('id', $roleId);
+                    } else {
+                        $query->where('id', $roleId);
+                    }
+                });
+            })
             ->filterByQueryString()
             ->sortByQueryString()
             ->withPagination();
@@ -73,8 +73,7 @@ class StaffController extends Controller
         $curd = $this->staffService->create($data);
 
         if ($curd['status'] == 1) {
-            $staff = HR\Staff::query()
-                ->with(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands'])
+            $staff = HR\Staff::withApi()
                 ->orderBy('staff_sn', 'desc')
                 ->first();
 

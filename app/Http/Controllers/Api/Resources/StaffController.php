@@ -35,18 +35,19 @@ class StaffController extends Controller
             $newFilters = preg_replace('/role\.id=.*?(;|$)/', '$3', $request->filters);
             $request->offsetSet('filters', $newFilters);
         }
-        $list = Staff::withApi()->when($roleId, function ($query) use ($roleId) {
-            $query->whereHas('role', function ($query) use ($roleId) {
-                if (is_array($roleId)) {
-                    $query->whereIn('id', $roleId);
-                } else {
-                    $query->where('id', $roleId);
-                }
-            });
-        })
-        ->filterByQueryString()
-        ->sortByQueryString()
-        ->withPagination();
+        $list = Staff::withApi()
+            ->when($roleId, function ($query) use ($roleId) {
+                $query->whereHas('role', function ($query) use ($roleId) {
+                    if (is_array($roleId)) {
+                        $query->whereIn('id', $roleId);
+                    } else {
+                        $query->where('id', $roleId);
+                    }
+                });
+            })
+            ->filterByQueryString()
+            ->sortByQueryString()
+            ->withPagination();
 
         if (isset($list['data'])) {
             $list['data'] = new StaffCollection(collect($list['data']));
@@ -65,7 +66,7 @@ class StaffController extends Controller
      */
     public function show(Staff $staff)
     {
-        $staff->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'tags']);
+        $staff->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'status', 'tags']);
 
         return new StaffResource($staff);
     }
@@ -83,7 +84,8 @@ class StaffController extends Controller
             ];
             return $currentUser;
         } else {
-            $currentUser = Staff::find($staffSn);
+            $currentUser = Staff::withApi()->find($staffSn);
+            
             return new CurrentUserResource($currentUser);
         }
     }
