@@ -12,7 +12,7 @@ class StaffService
 
     public function create($data)
     {
-        $this->save(array_except($data, [$this->primaryKey]));
+        $this->save(array_except($data, ['staff_sn']));
 
         return [
             'status' => 1,
