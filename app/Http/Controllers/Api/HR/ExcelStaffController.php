@@ -161,7 +161,7 @@ class ExcelStaffController extends Controller
         foreach ($value as $k => $v) { 
             if (in_array($k, [
                 'realname', 'mobile', 'shop_sn', 'dingtalk_number', 'wechat_number', 'national', 'politics', 'gender',
-                'marital_status', 'id_card_number', 'account_number', 'account_bank', 'account_name', 'height', 'weight',
+                'marital_status', 'id_card_number', 'account_number', 'account_bank', 'account_name', 'height', 'weight', 'hired_at',
                 'household_address', 'living_address', 'native_place', 'education', 'remark', 'concat_name', 'concat_tel', 'concat_type'
             ])) {
                 $data[$k] = $v;
