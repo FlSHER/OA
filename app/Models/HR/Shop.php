@@ -149,6 +149,16 @@ class Shop extends Model
         $this->attributes['address'] = !empty($value) ? $value : '';
     }
 
+    public function setClockInAttribute($value)
+    {
+        $this->attributes['clock_in'] = !empty($value) ? $value : '09:00:00';
+    }
+
+    public function setClockOutAttribute($value)
+    {
+        $this->attributes['clock_out'] = !empty($value) ? $value : '21:00:00';
+    }
+
     /* ----- 修改器End ----- */
 
     /* ----- 本地作用域 Start ----- */
