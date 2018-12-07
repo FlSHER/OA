@@ -425,10 +425,8 @@ class ExcelStaffController extends Controller
             'remark' => 'max:100',
             'department' => [
                 function ($attribute, $value, $fail) {
-                    $department = array_filter(explode('-', $value));
-                    $name = end($department);
-                    if (!Department::where('name', $name)->count()) {
-                        $fail('没有部门名称为 “'.$value.'” 的部门！');
+                    if (!Department::where('full_name', $value)->count()) {
+                        $fail('“'.$value.'” 部门不存在！');
                     }
                 }
             ],
