@@ -137,8 +137,7 @@ class HRMController extends Controller
      */
     public function changeShopInfo(Request $request)
     {
-        $id = $request->has('id') ? $request->id : Shop::where('shop_sn', $request->shop_sn)->value('id');
-        return $this->changeInfo($request->input(), 'App\Models\HR\Shop', $id);
+        return $this->changeInfo($request->input(), 'App\Models\HR\Shop', $request->shop_sn);
     }
 
     /**
