@@ -1,4 +1,4 @@
-<?php
+<?php 
 
 namespace App\Services;
 
@@ -16,7 +16,7 @@ class StaffService
 
         return [
             'status' => 1,
-            'message' => '添加成功'
+            'message' => '添加成功',
         ];
     }
 
@@ -27,11 +27,11 @@ class StaffService
         if ($this->isDirty()) {
             return [
                 'status' => 1,
-                'message' => '编辑成功'
+                'message' => '编辑成功',
             ];
         } else {
             return [
-                'status' => -1,
+                'status' => -1, 
                 'message' => '未发现改动'
             ];
         }
@@ -44,12 +44,13 @@ class StaffService
         } else {
             $model = new StaffModel();
         }
+
         $this->fillDataAndSave($model, $data);
     }
 
     /**
      * 保存一条数据
-     *
+     * 
      * @param type $model
      * @param type $data
      * @throws \Illuminate\Database\QueryException
@@ -62,7 +63,7 @@ class StaffService
         try {
             $model->fill($data);
             $this->saving($model, $data);
-            if (!$this->hasTransfer($data)) {
+            if (! $this->hasTransfer($data)) {
                 $this->addDirty($model);
                 $model->save();
                 $this->saved($model, $data);
@@ -84,7 +85,7 @@ class StaffService
 
     /**
      * 是否可预约操作。
-     *
+     * 
      * @param  [type]  $data
      * @return boolean
      */
@@ -92,7 +93,7 @@ class StaffService
     {
         $operationType = $data['operation_type'];
         if (
-            in_array($operationType, ['transfer', 'import_transfer', 'employ']) &&
+            in_array($operationType, ['transfer', 'import_transfer', 'employ']) && 
             strtotime($data['operate_at']) > strtotime(date('Y-m-d'))
         ) {
             return true;
@@ -107,7 +108,7 @@ class StaffService
     protected function changeBelongsToMany($model, $data)
     {
         if (array_has($data, 'relatives')) {
-            $relatives = collect($data['relatives']) ?: collect([]);
+            $relatives = collect($data['relatives']) ? : collect([]);
             $relationQuery = $model->relative();
             $original = $relationQuery->get();
 
@@ -124,7 +125,7 @@ class StaffService
 
         }
         if (array_has($data, 'cost_brands')) {
-            $cost_brands = $data['cost_brands'] ?: [];
+            $cost_brands = $data['cost_brands'] ? : [];
             $relationQuery = $model->cost_brands();
             $original = $relationQuery->get();
 
@@ -135,7 +136,7 @@ class StaffService
             }
         }
         if (array_has($data, 'tags')) {
-            $tags = $data['tags'] ?: [];
+            $tags = $data['tags'] ? : [];
             $relationQuery = $model->tags();
             $original = $relationQuery->get();
 
@@ -155,7 +156,7 @@ class StaffService
      * @return type
      */
     protected function makeBelongsToManyDirty($response, $original, $changed)
-    {
+    {   
         $newAttached = [];
         foreach ($response['attached'] as $v) {
             $pivot = $changed->find($v)->pivot;
@@ -200,12 +201,12 @@ class StaffService
 
         $operationType = $data['operation_type'];
         if (
-            ($operationType === 'leave') &&
+            ($operationType === 'leave') && 
             ($model->status_id !== -2)
         ) {
             $this->setLeaving($model);
         } elseif (
-            in_array($operationType, ['transfer', 'import_transfer', 'employ']) &&
+            in_array($operationType, ['transfer', 'import_transfer', 'employ']) && 
             strtotime($data['operate_at']) > strtotime(date('Y-m-d'))
         ) {
             $this->transferLater($model, $data);
@@ -216,8 +217,8 @@ class StaffService
     {
         // 如果是离职操作并且跳过了离职交接 修改操作类型
         if (
-            array_has($data, 'skip_leaving') &&
-            $data['operation_type'] === 'leave' &&
+            array_has($data, 'skip_leaving') && 
+            $data['operation_type'] === 'leave' && 
             $data['skip_leaving']
         ) {
             $data['operation_type'] = 'leaving';
@@ -227,7 +228,7 @@ class StaffService
 
     /**
      * 设置离职记录。
-     *
+     * 
      * @param [type] $model
      */
     private function setLeaving($model)
@@ -241,7 +242,7 @@ class StaffService
 
     /**
      * 创建一条预约操作.
-     *
+     * 
      * @param  [type] $model
      * @param  [type] $data
      */
@@ -252,9 +253,7 @@ class StaffService
             $islock = $model->tmp()->where('status', 1)->count();
             // 判断费用品牌是否变更
             if (!empty($data['cost_brands'])) {
-                $current = array_map(function ($key) {
-                    return (int)$key;
-                }, $data['cost_brands']);
+                $current = array_map(function ($key) { return (int) $key; }, $data['cost_brands']);
                 $original = $model->cost_brands()->pluck('id')->toArray();
                 if (!empty(array_diff($original, $current)) || !empty(array_diff($current, $original))) {
                     $dirty['cost_brands'] = $data['cost_brands'];
@@ -289,7 +288,7 @@ class StaffService
     {
         $dirty = $this->getDirtyWithOriginal($model);
 
-        if (!empty($relation)) {
+        if (! empty($relation)) {
             $dirty = [$relation => $dirty];
         }
 
