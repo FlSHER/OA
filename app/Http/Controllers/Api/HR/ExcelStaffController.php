@@ -170,12 +170,7 @@ class ExcelStaffController extends Controller
                 $data['brand_id'] = $this->getBrand($v);
 
             } elseif ($v && $k === 'department') {
-                $name = $v;
-                if (strpos($v, '-') !== false) {
-                    $department = explode('-', $v);
-                    $name = end($department);
-                }
-                $data['department_id'] = $this->getDepartment($name);
+                $data['department_id'] = $this->getDepartment($v);
 
             } elseif ($v && $k === 'position') {
                 $data['position_id'] = $this->getPosition($v);
@@ -346,13 +341,13 @@ class ExcelStaffController extends Controller
      {
         $key = "department_list";
         $department = Cache::get($key, function () use ($key) {
-            $department = Department::select('id', 'name')->get();
+            $department = Department::select('id', 'name', 'full_name')->get();
             Cache::put($key, $department, now()->addMinutes(10));
 
             return $department;
         });
  
-        return $department->where('name', $name)->pluck('id')->last();   
+        return $department->where('full_name', $name)->pluck('id')->last();   
      }
      
      // 缓存职位
