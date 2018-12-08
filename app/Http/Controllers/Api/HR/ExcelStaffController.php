@@ -68,6 +68,7 @@ class ExcelStaffController extends Controller
                 $makeVal['operation_type'] = 'import_entry';
                 $makeVal['operation_remark'] = 'Excel批量导入';
                 $this->staffService->create($makeVal);
+                $body[] = true;
             } else {
                 $error['row'] = $key + 1;
                 $error['rowData'] = $data[$key];
@@ -101,6 +102,7 @@ class ExcelStaffController extends Controller
                 $makeVal['operation_type'] = 'edit';
                 $makeVal['operation_remark'] = 'Excel批量编辑';
                 $this->staffService->update($makeVal);
+                $body[] = true;
             } else {
                 $error['row'] = $key + 1;
                 $error['rowData'] = $data[$key];
@@ -134,6 +136,7 @@ class ExcelStaffController extends Controller
                 $makeVal['operation_type'] = 'import_transfer';
                 $makeVal['operation_remark'] = 'Excel批量变动';
                 $this->staffService->update($makeVal);
+                $body[] = true;
             } else {
                 $error['row'] = $key + 1;
                 $error['rowData'] = $data[$key];
