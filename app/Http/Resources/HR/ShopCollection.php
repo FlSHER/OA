@@ -64,8 +64,8 @@ class ShopCollection extends ResourceCollection
                 $shop->city_id,
                 $shop->county_id,
             ])
-            ->pluck('name')->implode(' ');
+            ->pluck('name')->implode('-');
 
-        return $address.$shop->address;
+        return $address.' '.$shop->address;
     }
 }
