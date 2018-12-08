@@ -31,7 +31,7 @@ class ShopCollection extends ResourceCollection
                 'province_id' => $shop->province_id,
                 'city_id' => $shop->city_id,
                 'county_id' => $shop->county_id,
-                'address' => $shop->address,
+                'address' => $this->makeShop($shop),
                 'clock_out' => $shop->clock_out,
                 'clock_in' => $shop->clock_in,
                 'brand' => $shop->brand->only('id', 'name'),
@@ -54,5 +54,18 @@ class ShopCollection extends ResourceCollection
                 'status_id' => $shop->status_id,
             ];
         })->toArray();
+    }
+
+    protected function makeShop($shop)
+    {
+        $address = \DB::table('i_district')
+            ->whereIn('id', [
+                $shop->province_id,
+                $shop->city_id,
+                $shop->county_id,
+            ])
+            ->pluck('name')->implode(' ');
+
+        return $address.$shop->address;
     }
 }

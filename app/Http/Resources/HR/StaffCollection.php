@@ -47,7 +47,7 @@ class StaffCollection extends ResourceCollection
                 'dingtalk_number' => $staff->dingtalk_number,
                 'wechat_number' => $staff->wechat_number,
 
-                'shop' => $staff->shop ? $this->makeShop($staff->shop) : null,
+                'shop' => $staff->shop ? $staff->shop->only(['shop_sn', 'name', 'manager_sn', 'manager_name']) : null,
                 'cost_brands' => $staff->cost_brands,
                 'department' => $staff->department->only(['id', 'full_name', 'manager_sn', 'manager_name']),
                 'relatives' => $staff->relative ? $staff->relative->map($makeRelative) : [],
@@ -85,19 +85,5 @@ class StaffCollection extends ResourceCollection
             ];
 
         })->toArray();
-    }
-
-    protected function makeShop($shop)
-    {
-        $base = $shop->only(['shop_sn', 'name', 'manager_sn', 'manager_name']);
-        $address = \DB::table('i_district')
-            ->whereIn('id', [
-                $shop->province_id,
-                $shop->city_id,
-                $shop->county_id,
-            ])
-            ->pluck('name')->implode(' ');
-
-        return array_merge($base, ['address' => $address]);
     }
 }
