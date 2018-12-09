@@ -447,8 +447,8 @@ class ExcelStaffController extends Controller
     {
         $rules = [
             'realname' => 'required|string|max:10',
-            'brand' => 'exists:brands,name',
-            'position' => 'exists:positions,name',
+            'brand' => 'exists:brands,name,deleted_at,NULL',
+            'position' => 'exists:positions,name,deleted_at,NULL',
             'mobile' => 'required|unique:staff,mobile|cn_phone',
             'id_card_number' => 'required|ck_identity',
             'gender' => 'in:未知,男,女',
@@ -457,7 +457,7 @@ class ExcelStaffController extends Controller
             'national' => 'exists:i_national,name',
             'education' => 'exists:i_education,name',
             'politics' => 'exists:i_politics,name',
-            'shop_sn' => 'exists:shops,shop_sn|max:10',
+            'shop_sn' => 'exists:shops,shop_sn,deleted_at,NULL|max:10',
             'marital_status' => 'exists:i_marital_status,name',
             'household_province' => 'exists:i_district,name',
             'household_city' => 'exists:i_district,name',
@@ -477,13 +477,7 @@ class ExcelStaffController extends Controller
             'weight' => 'integer|between:30,150',
             'dingtalk_number' => 'max:50',
             'remark' => 'max:100',
-            'department' => [
-                function ($attribute, $value, $fail) {
-                    if (!Department::where('full_name', $value)->count()) {
-                        $fail('“'.$value.'” 部门不存在！');
-                    }
-                }
-            ],
+            'department' => 'max:100|exists:departments,full_name,deleted_at,NULL',
             'cost_brand' => [
                 'required_with:brand',
                 function ($attribute, $content, $fail) use ($value) {
