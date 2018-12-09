@@ -182,9 +182,10 @@ class ExcelStaffController extends Controller
      * @return void
      */
     protected function makeFillStaff($value)
-    {
+    {   
+        // 给默认执行时间
+        $value['operate_at'] = !empty($value['operate_at']) ? $value['operate_at'] : now()->toDateString();
         $data = [];
-        $data['operate_at'] = !empty($value['operate_at']) ? $value['operate_at'] : now()->toDateString();
         if (!empty($value['staff_sn'])) {
             $data['staff_sn'] = $value['staff_sn'];
             $data['realname'] = HR\Staff::where('staff_sn', $value['staff_sn'])->value('realname');
@@ -198,7 +199,7 @@ class ExcelStaffController extends Controller
         foreach ($value as $k => $v) { 
             if (in_array($k, [
                 'realname', 'mobile', 'shop_sn', 'dingtalk_number', 'wechat_number', 'national', 'politics', 'gender',
-                'marital_status', 'id_card_number', 'account_number', 'account_bank', 'account_name', 'height', 'weight', 'hired_at',
+                'marital_status', 'id_card_number', 'account_number', 'account_bank', 'account_name', 'height', 'weight',
                 'household_address', 'living_address', 'native_place', 'education', 'remark', 'concat_name', 'concat_tel', 'concat_type'
             ])) {
                 $data[$k] = $v;
@@ -233,6 +234,19 @@ class ExcelStaffController extends Controller
 
             } elseif ($v && $k === 'living_county') {
                 $data['living_county_id'] = $this->getDistrict($v);
+
+            } elseif ($v && $k === 'hired_at') {
+                if (is_numeric($v)) {
+                    $data['hired_at'] = date('Y-m-d', (($v - 25569) * 24 * 3600));
+                } else {
+                    $data['hired_at'] = $v;
+                }
+            } elseif ($v && $k === 'operate_at') {
+                if (is_numeric($v)) {
+                    $data['operate_at'] = date('Y-m-d', (($v - 25569) * 24 * 3600));
+                } else {
+                    $data['operate_at'] = $v;
+                }
             }
         }
 
