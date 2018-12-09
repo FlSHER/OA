@@ -271,6 +271,7 @@ class StaffController extends Controller
     {
         $leaving = HR\Staff::find($request->staff_sn)->leaving;
         if ($request->has('operate_at')) {
+            $this->processValidator($request->all());
             $leavingInfo = [
                 'staff_sn' => $leaving->staff_sn,
                 'status_id' => $leaving->original_status_id,
@@ -283,13 +284,10 @@ class StaffController extends Controller
             }
             $request->replace($leavingInfo);
             $leaving->delete();
-            $result = $this->staffService->update($request->all());
-            $operateAt = Carbon::parse($request->operate_at);
-            $result['changes'] = $request->all();
+            $this->staffService->update($request->all());
             return response()->json([
-                'changes' => $request->all(),
+                'changes' => ['status_id' => -1],
                 'message' => '操作成功',
-                'status' => 1,
             ], 201);
         } else {
             $operatorSn = app('CurrentUser')->staff_sn;
