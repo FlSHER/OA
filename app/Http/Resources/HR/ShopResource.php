@@ -31,6 +31,7 @@ class ShopResource extends Resource
             'city_id' => $this->city_id,
             'county_id' => $this->county_id,
             'address' => $this->address,
+            'full_address' => $this->makeShop($this),
             'clock_out' => $this->clock_out,
             'clock_in' => $this->clock_in,
             'brand' => $this->brand->only('id', 'name'),
@@ -52,5 +53,18 @@ class ShopResource extends Resource
             'work_type' => $this->work_type,
             'status_id' => $this->status_id,
         ];
+    }
+
+    protected function makeShop($shop)
+    {
+        $address = \DB::table('i_district')
+            ->whereIn('id', [
+                $shop->province_id,
+                $shop->city_id,
+                $shop->county_id,
+            ])
+            ->pluck('name')->implode('-');
+
+        return $address.' '.$shop->address;
     }
 }
