@@ -188,7 +188,7 @@ class SignController extends Controller
         $requestTrue = $request->input('true');
         $cache = Cache::get('start_' . $round);
         if (array_has($cache, 'data') && array_has($cache['data'], $requestUserId)) {
-            abort('400', '你已经参与过本轮活力了，不能重复提交');
+            abort(400, '你已经参与过本轮活力了，不能重复提交');
         }
 
         //答案是否正确
