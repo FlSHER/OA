@@ -58,14 +58,15 @@ class SignController extends Controller
 
 
         $userData = SignUser::where('user_id', $user['userid'])->first();
-        if (!is_null($userData)) {
-            abort(400, '你已签到过了');
+        //未签到的进行签到
+        if (is_null($userData)) {
+            SignUser::create([
+                'user_id'=>$user['userid'],
+                'name'=>$user['name'],
+                'avatar'=>$user['avatar']
+            ]);
         }
-        SignUser::create([
-            'user_id'=>$user['userid'],
-            'name'=>$user['name'],
-            'avatar'=>$user['avatar']
-        ]);
+
         return response()->json($user, 200);
     }
 
