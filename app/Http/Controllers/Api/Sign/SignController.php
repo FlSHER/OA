@@ -40,6 +40,7 @@ class SignController extends Controller
         $code = $request->query('code');
         $result =  app('Dingtalk')->passCodeGetUserInfo($code);
         $data = $this->getUserInfo($result['userid']);
+        $data = array_only($data,['userid','name','avatar']);
         return response()->json($data,200);
     }
 
