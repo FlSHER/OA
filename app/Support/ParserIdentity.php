@@ -58,7 +58,7 @@ class ParserIdentity
             return true;
         }
 
-        if ($this->checkFormat() && $this->checkBirth() && $this->checkLastCode()) {
+        if ($this->checkFormat() && $this->checkBirth() && $this->checkLastCode() && $this->idLength == 18) {
             $this->isValidate = true;
 
             return true;
