@@ -41,6 +41,8 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapDingtalkApiRoutes();//钉钉接口路由
         //
+        //临时签到接口路由
+        $this->mapSignApiRouters();
     }
 
     /**
@@ -98,5 +100,12 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware('api')
             ->namespace($this->namespace)
             ->group(base_path('routes/api/dingtalk.php'));
+    }
+
+    protected function mapSignApiRouters()
+    {
+        Route::prefix('sign')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api/sign.php'));
     }
 }
