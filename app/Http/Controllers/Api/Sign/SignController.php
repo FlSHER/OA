@@ -43,7 +43,7 @@ class SignController extends Controller
         $sign = Cache::get('sign');
         if(!is_null($sign)){
             if(time()< strtotime($startDateTime)){
-                abort(400,'签到时间还没开始呢，你不能进行签到');
+                abort(400,'大会签到未开始');
             }
         }
 
