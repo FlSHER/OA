@@ -7,11 +7,9 @@
  */
 Route::namespace('Api\Sign')->group(function(){
 
-    //获取当前用户
+    //获取当前用户 (并签到)
     Route::get('get-user','SignController@getUser');
 
-    // 签到
-    Route::post('/','SignController@sign');
     // 点击答题开始
     Route::get('start','SignController@start');
 

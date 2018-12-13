@@ -31,17 +31,42 @@ class SignController extends Controller
     }
 
     /**
-     * 获取当前用户
+     * 获取当前用户（并签到）
      * @param Request $request
      * @return mixed
      */
     public function getUser(Request $request)
     {
+        //签到开始时间
+        $startDateTime = '2018-12-14 16:00:00';
+
+        $sign = Cache::get('sign');
+        if(!is_null($sign)){
+            if(time()< strtotime($startDateTime)){
+                abort(400,'签到时间还没开始呢，你不能进行签到');
+            }
+        }
+
+        //获取用户信息
         $code = $request->query('code');
         $result =  app('Dingtalk')->passCodeGetUserInfo($code);
-        $data = $this->getUserInfo($result['userid']);
-        $data = array_only($data,['userid','name','avatar']);
-        return response()->json($data,200);
+        if(!array_has($result,'userid')){
+            abort(400,'无法获取用户信息');
+        }
+        $user = $this->getUserInfo($result['userid']);
+        $user = array_only($user,['userid','name','avatar']);
+
+
+        $userData = SignUser::where('user_id', $user['userid'])->first();
+        if (!is_null($userData)) {
+            abort(400, '你已签到过了');
+        }
+        SignUser::create([
+            'user_id'=>$user['userid'],
+            'name'=>$user['name'],
+            'avatar'=>$user['avatar']
+        ]);
+        return response()->json($user, 200);
     }
 
     /**
@@ -57,51 +82,6 @@ class SignController extends Controller
         return $result;
     }
 
-    /**
-     * 签到
-     * @param Request $request
-     */
-    public function sign(Request $request)
-    {
-        //签到开始时间
-        $startDateTime = '2018-12-14 16:00:00';
-
-        $sign = Cache::get('sign');
-        if(!is_null($sign)){
-            if(time()< strtotime($startDateTime)){
-                abort(400,'签到时间还没开始呢，你不能进行签到');
-            }
-        }
-
-        $this->validate($request, [
-            'user_id' => [
-                'required',
-            ],
-            'name' => [
-                'string',
-                'required'
-            ],
-            'department' => [
-                'string',
-                'nullable',
-            ],
-            'avatar' => [
-                'string',
-                'nullable'
-            ]
-        ], [
-            'user_id' => "钉钉号",
-            'name' => "名字",
-            'department' => '部门',
-            'avatar' => '头像',
-        ]);
-        $user = SignUser::where('user_id', $request->input('user_id'))->first();
-        if (!is_null($user)) {
-            abort(400, '你已签到过了');
-        }
-        $data = SignUser::create($request->input());
-        return response()->json($data, 201);
-    }
 
     /**
      * 点击答题开始
