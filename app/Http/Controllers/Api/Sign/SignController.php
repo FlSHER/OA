@@ -147,7 +147,7 @@ class SignController extends Controller
      */
     protected function setRound($round)
     {
-        Cache::put('round', $round, 5);
+        Cache::put('round', $round, 10.5/60);
     }
 
     /**
