@@ -209,6 +209,8 @@ class SignController extends Controller
             'avatar' => $request->input('avatar'),
             'true' => $requestTrue,
             'is_ok' => $isOk,
+            //正确答案
+            'answer'=>$cache['true'],
             'time' => $timeData['time'],
             'str_time' => $timeData['str_time'],
             'score' => $score,
