@@ -41,29 +41,29 @@ class SignController extends Controller
         $startDateTime = '2018-12-14 16:00:00';
 
         $sign = Cache::get('sign');
-        if(!is_null($sign)){
-            if(time()< strtotime($startDateTime)){
-                abort(400,'大会签到未开始');
+        if (!is_null($sign)) {
+            if (time() < strtotime($startDateTime)) {
+                abort(400, '大会签到未开始');
             }
         }
 
         //获取用户信息
         $code = $request->query('code');
-        $result =  app('Dingtalk')->passCodeGetUserInfo($code);
-        if(!array_has($result,'userid')){
-            abort(400,'无法获取用户信息');
+        $result = app('Dingtalk')->passCodeGetUserInfo($code);
+        if (!array_has($result, 'userid')) {
+            abort(400, '无法获取用户信息');
         }
         $user = $this->getUserInfo($result['userid']);
-        $user = array_only($user,['userid','name','avatar']);
+        $user = array_only($user, ['userid', 'name', 'avatar']);
 
 
         $userData = SignUser::where('user_id', $user['userid'])->first();
         //未签到的进行签到
         if (is_null($userData)) {
             SignUser::create([
-                'user_id'=>$user['userid'],
-                'name'=>$user['name'],
-                'avatar'=>$user['avatar']
+                'user_id' => $user['userid'],
+                'name' => $user['name'],
+                'avatar' => $user['avatar']
             ]);
         }
 
@@ -78,7 +78,7 @@ class SignController extends Controller
     protected function getUserInfo($userid)
     {
         $accessToken = app('Dingtalk')->getAccessToken();
-        $url = 'https://oapi.dingtalk.com/user/get?access_token='.$accessToken.'&userid='.$userid;
+        $url = 'https://oapi.dingtalk.com/user/get?access_token=' . $accessToken . '&userid=' . $userid;
         $result = Curl::setUrl($url)->get();
         return $result;
     }
@@ -147,7 +147,7 @@ class SignController extends Controller
      */
     protected function setRound($round)
     {
-        Cache::put('round', $round, 10.5/60);
+        Cache::put('round', $round, 10.5 / 60);
     }
 
     /**
@@ -210,7 +210,7 @@ class SignController extends Controller
             'true' => $requestTrue,
             'is_ok' => $isOk,
             //正确答案
-            'answer'=>$cache['true'],
+            'answer' => $cache['true'],
             'time' => $timeData['time'],
             'str_time' => $timeData['str_time'],
             'score' => $score,
@@ -301,7 +301,6 @@ class SignController extends Controller
                 $top = $cache[$cache['true']];
             }
         }
-
         $data = [
             'round' => $cache['round'],//当前轮回
             'true' => $cache['true'],//正确答案
@@ -309,7 +308,7 @@ class SignController extends Controller
             'B' => $b,
             'C' => $c,
             'D' => $d,
-            'count' => $cache['data'] ? count($cache['data']) : 0,
+            'count' => array_has($cache, 'data') ? count($cache['data']) : 0,
             'top' => $top
         ];
         return response()->json($data, 200);
@@ -421,7 +420,7 @@ class SignController extends Controller
     public function clearSign()
     {
         \DB::table('sign_user')->delete();
-        return response('success',200);
+        return response('success', 200);
     }
 
     /**
@@ -429,8 +428,8 @@ class SignController extends Controller
      */
     public function upSign()
     {
-        Cache::put('sign',1,60*24*5);
-        return response('success',200);
+        Cache::put('sign', 1, 60 * 24 * 5);
+        return response('success', 200);
     }
 
     /**
@@ -439,6 +438,6 @@ class SignController extends Controller
     public function closeSign()
     {
         Cache::forget('sign');
-        return response('success',200);
+        return response('success', 200);
     }
 }
