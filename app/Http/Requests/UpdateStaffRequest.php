@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\HR\CostBrand;
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateStaffRequest extends FormRequest
@@ -32,8 +33,6 @@ class UpdateStaffRequest extends FormRequest
             'brand_id' => 'bail|exists:brands,id',
             'department_id' => 'bail|exists:departments,id',
             'position_id' => 'bail|exists:positions,id',
-            'mobile' => 'bail|cn_phone',
-            'id_card_number' => 'bail|ck_identity',
             'gender' => 'bail|in:男,女',
             'remark' => 'bail|max:100',
             'property' => 'bail|in:0,1,2,3,4',
@@ -67,7 +66,18 @@ class UpdateStaffRequest extends FormRequest
             'relatives.*.relative_name' => ['required_with:relative_type,relative_sn'],
             'tags' => 'bail|array',
             'tags.*.id' => 'bail|exists:tags,id',
+            'mobile' => [
+                'required',
+                'cn_phone',
+                Rule::unique('staff')->ignore($this->staff_sn, 'staff_sn'),
+            ],
+            'id_card_number' => [
+                'required',
+                'ck_identity',
+                Rule::unique('staff')->ignore($this->staff_sn, 'staff_sn'),
+            ],
             'cost_brands' => [
+                'required_with:brand_id',
                 function ($attribute, $value, $fail) use ($brand_id) {
                     $brands = CostBrand::with('brands')->whereIn('id', $value)->get();
                     $brands->map(function ($item) use ($fail, $brand_id) {

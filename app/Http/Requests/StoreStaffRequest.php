@@ -33,7 +33,7 @@ class StoreStaffRequest extends FormRequest
             'department_id' => 'bail|required|exists:departments,id',
             'position_id' => 'bail|required|exists:positions,id',
             'mobile' => 'bail|required|unique:staff,mobile|cn_phone',
-            'id_card_number' => 'bail|required|ck_identity',
+            'id_card_number' => 'bail|required|unique:staff,id_card_number|ck_identity',
             'property' => 'bail|in:0,1,2,3,4',
             'gender' => 'bail|required|in:男,女',
             'education' => 'bail|exists:i_education,name',
@@ -68,6 +68,7 @@ class StoreStaffRequest extends FormRequest
             'tags' => 'bail|array',
             'tags.*.id' => 'bail|exists:tags,id',
             'cost_brands' => [
+                'required_with:brand_id',
                 function ($attribute, $value, $fail) use ($brand_id) {
                     $brands = CostBrand::with('brands')->whereIn('id', $value)->get();
                     $brands->map(function ($item) use ($fail, $brand_id) {
