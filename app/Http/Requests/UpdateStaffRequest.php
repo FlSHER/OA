@@ -29,10 +29,11 @@ class UpdateStaffRequest extends FormRequest
     {
         $brand_id = $this->brand_id;
         return [
+            'staff_sn' => 'required|exists:staff,staff_sn,deleted_at,NULL',
         	'realname' => 'bail|required|string|max:10',
             'brand_id' => 'bail|exists:brands,id',
-            'department_id' => 'bail|exists:departments,id',
-            'position_id' => 'bail|exists:positions,id',
+            'department_id' => 'bail|exists:departments,id,deleted_at,NULL',
+            'position_id' => 'bail|exists:positions,id,deleted_at,NULL',
             'gender' => 'bail|in:男,女',
             'remark' => 'bail|max:100',
             'property' => 'bail|in:0,1,2,3,4',
@@ -69,12 +70,16 @@ class UpdateStaffRequest extends FormRequest
             'mobile' => [
                 'required',
                 'cn_phone',
-                Rule::unique('staff')->ignore($this->staff_sn, 'staff_sn'),
+                Rule::unique('staff')->ignore($this->staff_sn, 'staff_sn')->where(function ($query) {
+                    $query->whereNotNull('deleted_at');
+                }),
             ],
             'id_card_number' => [
                 'required',
                 'ck_identity',
-                Rule::unique('staff')->ignore($this->staff_sn, 'staff_sn'),
+                Rule::unique('staff')->ignore($this->staff_sn, 'staff_sn')->where(function ($query) {
+                    $query->whereNotNull('deleted_at');
+                }),
             ],
             'cost_brands' => [
                 'required_with:brand_id',

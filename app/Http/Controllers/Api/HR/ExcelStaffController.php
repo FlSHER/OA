@@ -449,8 +449,8 @@ class ExcelStaffController extends Controller
             'realname' => 'required|string|max:10',
             'brand' => 'exists:brands,name,deleted_at,NULL',
             'position' => 'exists:positions,name,deleted_at,NULL',
-            'mobile' => 'required|unique:staff,mobile|cn_phone',
-            'id_card_number' => 'required|unique:staff,id_card_number|ck_identity',
+            'mobile' => 'required|unique:staff,mobile,deleted_at,NULL|cn_phone',
+            'id_card_number' => 'required|unique:staff,id_card_number,deleted_at,NULL|ck_identity',
             'gender' => 'in:未知,男,女',
             'property' => 'in:0,1,2,3,4',
             'status' => 'exists:staff_status,name',
@@ -508,7 +508,7 @@ class ExcelStaffController extends Controller
         ];
         if (isset($value['staff_sn'])) {
             $rules = array_merge($rules, [
-                'staff_sn' => 'required|exists:staff,staff_sn',
+                'staff_sn' => 'required|exists:staff,staff_sn,deleted_at,NULL',
                 'dingtalk_number' => 'max:50',
                 'realname' => 'string|max:10',
                 'concat_tel' => 'cn_phone',
@@ -517,11 +517,16 @@ class ExcelStaffController extends Controller
                 'id_card_number' => [
                     'required',
                     'ck_identity',
-                    Rule::unique('staff')->ignore($this->staff_sn, 'staff_sn'),
+                    Rule::unique('staff')->ignore($this->staff_sn, 'staff_sn')->where(function ($query) {
+                        $query->whereNotNull('deleted_at');
+                    }),
                 ],
                 'mobile' => [
+                    'required',
                     'cn_phone',
-                    Rule::unique('staff')->ignore($value['staff_sn'], 'staff_sn'),
+                    Rule::unique('staff')->ignore($value['staff_sn'], 'staff_sn')->where(function ($query) {
+                        $query->whereNotNull('deleted_at');
+                    }),
                 ],
             ]);
         }
