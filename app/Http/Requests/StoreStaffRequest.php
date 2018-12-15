@@ -70,14 +70,14 @@ class StoreStaffRequest extends FormRequest
                 'required',
                 'cn_phone',
                 Rule::unique('staff')->where(function ($query) {
-                    $query->whereNotNull('deleted_at');
+                    $query->whereNull('deleted_at');
                 }),
             ],
             'id_card_number' => [
                 'required',
                 'ck_identity',
                 Rule::unique('staff')->where(function ($query) {
-                    $query->whereNotNull('deleted_at');
+                    $query->whereNull('deleted_at');
                 }),
             ],
             'cost_brands' => [

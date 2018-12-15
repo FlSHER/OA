@@ -71,14 +71,14 @@ class UpdateStaffRequest extends FormRequest
                 'required',
                 'cn_phone',
                 Rule::unique('staff')->ignore($this->staff_sn, 'staff_sn')->where(function ($query) {
-                    $query->whereNotNull('deleted_at');
+                    $query->whereNull('deleted_at');
                 }),
             ],
             'id_card_number' => [
                 'required',
                 'ck_identity',
                 Rule::unique('staff')->ignore($this->staff_sn, 'staff_sn')->where(function ($query) {
-                    $query->whereNotNull('deleted_at');
+                    $query->whereNull('deleted_at');
                 }),
             ],
             'cost_brands' => [
