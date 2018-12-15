@@ -93,11 +93,16 @@ class SignController extends Controller
     {
         $round = $request->query('round');
 
+        list($msec, $sec) = explode(' ', microtime());
+        $msData = explode('.', $msec);
+        $ms = substr($msData[1], 0, 3);
+        $dateTime = $sec . $ms;
         $data = [
             //第几回合
             'round' => $round,
             //开始时间
-            'dateTime' => time(),
+            'dateTime' => $dateTime,
+            'time'=>time(),
         ];
         switch ($round) {
             case 1:
@@ -147,7 +152,7 @@ class SignController extends Controller
      */
     protected function setRound($round)
     {
-        Cache::put('round', $round, 10.5 / 60);
+        Cache::put('round', $round, 10 / 60);
     }
 
     /**
@@ -187,6 +192,10 @@ class SignController extends Controller
         //提交的答案
         $requestTrue = $request->input('true');
         $cache = Cache::get('start_' . $round);
+
+        $timeData = $this->getTime($cache['dateTime']);
+        abort_if($timeData['ms'] > $this->answerTime, 400, '答题已结束');
+
         if (array_has($cache, 'data') && array_has($cache['data'], $requestUserId)) {
             abort(400, '你已经参与过本轮活力了，不能重复提交');
         }
@@ -199,10 +208,9 @@ class SignController extends Controller
 
         if ($isOk) {
             //获取正确分值
-            $score = $this->calculate($cache['dateTime']);
+            $score = $this->calculate($cache['time'],$timeData['dateTime']);
         }
 
-        $timeData = $this->getTime($cache['dateTime']);
         $data = [
             'user_id' => $requestUserId,
             'name' => $request->input('name'),
@@ -213,7 +221,10 @@ class SignController extends Controller
             'answer' => $cache['true'],
             'time' => $timeData['time'],
             'str_time' => $timeData['str_time'],
+            'ms'=>$timeData['ms'],
             'score' => $score,
+            'start_time'=>$cache['dateTime'],
+            'end_time'=>$timeData['end_time']
         ];
         $cache['data'][$requestUserId] = $data;
         $cache[$requestTrue][] = $data;
@@ -226,13 +237,13 @@ class SignController extends Controller
     /**
      * 计算分值
      */
-    protected function calculate($startTime)
+    protected function calculate($startTime,$endTime)
     {
         //默认分值
         $score = 0;
 
         //答题用的时间
-        $time = time() - $startTime;
+        $time = $endTime- $startTime;
 
         //答题时间小于等于配置的答题时间
         if ($time <= $this->answerTime) {
@@ -249,16 +260,26 @@ class SignController extends Controller
      */
     protected function getTime($cacheTime)
     {
-        list($msec, $sec) = explode(' ', microtime());
 
+        list($msec, $sec) = explode(' ', microtime());
         $msData = explode('.', $msec);
         $ms = substr($msData[1], 0, 3);
-        $time = intval($sec) - $cacheTime;
+        $time = $sec . $ms;
 
-        $strTime = $time . '秒' . $ms . '毫秒';
+        //答题用时
+        $totalTime = intval($time - $cacheTime);
+        $subTotalTime = substr($totalTime, -3);
+
+        //用时秒数
+        $totalMsTime = rtrim($totalTime, $subTotalTime);
+
+        $strTime = $totalMsTime . '秒' . $ms . '毫秒';
         return [
             'str_time' => $strTime,
-            'time' => intval($time . $ms),
+            'time' => $totalTime,
+            'ms'=>$totalMsTime,
+            'dateTime'=>$sec,
+            'end_time'=>$time,
         ];
     }
 
