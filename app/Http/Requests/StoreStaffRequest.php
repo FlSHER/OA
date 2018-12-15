@@ -32,8 +32,6 @@ class StoreStaffRequest extends FormRequest
             'brand_id' => 'bail|required|exists:brands,id',
             'department_id' => 'bail|required|exists:departments,id,deleted_at,NULL',
             'position_id' => 'bail|required|exists:positions,id,deleted_at,NULL',
-            'mobile' => 'bail|required|unique:staff,mobile,deleted_at,NULL|cn_phone',
-            'id_card_number' => 'bail|required|unique:staff,id_card_number,deleted_at,NULL|ck_identity',
             'property' => 'bail|in:0,1,2,3,4',
             'gender' => 'bail|required|in:男,女',
             'education' => 'bail|exists:i_education,name',
@@ -67,6 +65,20 @@ class StoreStaffRequest extends FormRequest
             'relatives.*.relative_nsame' => ['required_with:relative_tsype,relative_sn'],
             'tags' => 'bail|array',
             'tags.*.id' => 'bail|exists:tags,id',
+            'mobile' => [
+                'required',
+                'cn_phone',
+                Rule::unique('staff')->where(function ($query) {
+                    $query->whereNotNull('deleted_at');
+                }),
+            ],
+            'id_card_number' => [
+                'required',
+                'ck_identity',
+                Rule::unique('staff')->where(function ($query) {
+                    $query->whereNotNull('deleted_at');
+                }),
+            ],
             'cost_brands' => [
                 'required_with:brand_id',
                 function ($attribute, $value, $fail) use ($brand_id) {

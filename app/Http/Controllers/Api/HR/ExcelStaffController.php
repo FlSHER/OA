@@ -449,8 +449,6 @@ class ExcelStaffController extends Controller
             'realname' => 'required|string|max:10',
             'brand' => 'exists:brands,name,deleted_at,NULL',
             'position' => 'exists:positions,name,deleted_at,NULL',
-            'mobile' => 'required|unique:staff,mobile,deleted_at,NULL|cn_phone',
-            'id_card_number' => 'required|unique:staff,id_card_number,deleted_at,NULL|ck_identity',
             'gender' => 'in:未知,男,女',
             'property' => 'in:0,1,2,3,4',
             'status' => 'exists:staff_status,name',
@@ -478,6 +476,20 @@ class ExcelStaffController extends Controller
             'dingtalk_number' => 'max:50',
             'remark' => 'max:100',
             'department' => 'max:100|exists:departments,full_name,deleted_at,NULL',
+            'mobile' => [
+                'required',
+                'cn_phone',
+                Rule::unique('staff')->where(function ($query) {
+                    $query->whereNotNull('deleted_at');
+                }),
+            ],
+            'id_card_number' => [
+                'required',
+                'ck_identity',
+                Rule::unique('staff')->where(function ($query) {
+                    $query->whereNotNull('deleted_at');
+                }),
+            ],
             'cost_brand' => [
                 'required_with:brand',
                 function ($attribute, $content, $fail) use ($value) {
