@@ -298,7 +298,7 @@ class Staff extends User
         $query->whereIn('brand_id', $brands);
         if (!in_array('0', $departments))
             $query->whereIn('department_id', $departments);
-        $query->orWhere('status_id', '<', 0);
+            $query->orWhere('status_id', '<', 0);
     }
 
     public function scopeApi($query)

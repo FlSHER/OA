@@ -465,7 +465,7 @@ class ExcelStaffController extends Controller
             'living_county' => 'exists:i_district,name',
             'household_address' => 'string|max:30',
             'living_address' => 'string|max:30',
-            'concat_name' => 'required|max:10',
+            'concat_name' => 'required|between:2,10',
             'concat_tel' => 'required|cn_phone',
             'concat_type' => 'required|max:5',
             'account_bank' => 'max:20',
@@ -473,23 +473,12 @@ class ExcelStaffController extends Controller
             'account_number' => 'between:16,19',
             'height' => 'integer|between:140,220',
             'weight' => 'integer|between:30,150',
-            'dingtalk_number' => 'max:50',
             'remark' => 'max:100',
             'department' => 'max:100|exists:departments,full_name,deleted_at,NULL',
-            'mobile' => [
-                'required',
-                'cn_phone',
-                Rule::unique('staff')->where(function ($query) {
-                    $query->whereNotNull('deleted_at');
-                }),
-            ],
-            'id_card_number' => [
-                'required',
-                'ck_identity',
-                Rule::unique('staff')->where(function ($query) {
-                    $query->whereNotNull('deleted_at');
-                }),
-            ],
+            'mobile' => ['required', 'cn_phone', unique_validator('staff', false)],
+            'wechat_number' => ['between:6,20', unique_validator('staff', false)],
+            'id_card_number' => ['required', 'ck_identity', unique_validator('staff', false)],
+            'dingtalk_number' => ['max:50', unique_validator('staff', false)],
             'cost_brand' => [
                 'required_with:brand',
                 function ($attribute, $content, $fail) use ($value) {
@@ -518,28 +507,22 @@ class ExcelStaffController extends Controller
                 }
             ],
         ];
-        if (isset($value['staff_sn'])) {
+        if (!empty($value['staff_sn'])) {
+            $uniqueRule = Rule::unique('staff')->ignore($value['staff_sn'], 'staff_sn')
+                ->where(function ($query) {
+                    $query->whereNull('deleted_at');
+                });
             $rules = array_merge($rules, [
                 'staff_sn' => 'required|exists:staff,staff_sn,deleted_at,NULL',
                 'dingtalk_number' => 'max:50',
                 'realname' => 'string|max:10',
                 'concat_tel' => 'cn_phone',
-                'concat_name' => 'max:10',
+                'concat_name' => 'between:2,10',
                 'concat_type' => 'max:5',
-                'id_card_number' => [
-                    'required',
-                    'ck_identity',
-                    Rule::unique('staff')->ignore($this->staff_sn, 'staff_sn')->where(function ($query) {
-                        $query->whereNull('deleted_at');
-                    }),
-                ],
-                'mobile' => [
-                    'required',
-                    'cn_phone',
-                    Rule::unique('staff')->ignore($value['staff_sn'], 'staff_sn')->where(function ($query) {
-                        $query->whereNull('deleted_at');
-                    }),
-                ],
+                'mobile' => ['required', 'cn_phone', $uniqueRule],
+                'wechat_number' => ['between:6,20', $uniqueRule],
+                'id_card_number' => ['required', 'ck_identity', $uniqueRule],
+                'dingtalk_number' => ['max:50', $uniqueRule],
             ]);
         }
         $validator = Validator::make($value->toArray(), $rules, $this->message());
@@ -548,7 +531,6 @@ class ExcelStaffController extends Controller
                 $this->errors[$this->staffWithMap[$key]] = $error;
             }
         }
-        // return Validator::make($value->toArray(), $rules, $this->message());
     }
 
     /**

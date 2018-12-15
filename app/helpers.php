@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Route;
 
 if (!function_exists('source')) {
@@ -81,5 +82,28 @@ if (!function_exists('createRequest')) {
         $response = Route::dispatch($request);
         
         return $original ? $response->original : $response;
+    }
+}
+
+if (!function_exists('unique_validator')) {
+
+    function unique_validator(string $table, bool $ignore = true, bool $hasDel = false)
+    {
+        $rule = Rule::unique($table);
+
+        if ($ignore) {
+            if ($table === 'staff') {
+                $rule->ignore(request()->staff_sn, 'staff_sn');
+            } else {
+                $rule->ignore(request()->id);
+            }
+        }
+        if ($hasDel === false) {
+            $rule->where(function ($query) {
+                $query->whereNull('deleted_at');
+            });
+        }
+
+        return $rule;
     }
 }
