@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\HR\CostBrand;
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreStaffRequest extends FormRequest
