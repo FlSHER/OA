@@ -102,7 +102,7 @@ class SignController extends Controller
             'round' => $round,
             //开始时间
             'dateTime' => $dateTime,
-            'time'=>time(),
+            'time' => time(),
         ];
         switch ($round) {
             case 1:
@@ -208,7 +208,7 @@ class SignController extends Controller
 
         if ($isOk) {
             //获取正确分值
-            $score = $this->calculate($cache['time'],$timeData['dateTime']);
+            $score = $this->calculate($timeData['time']);
         }
 
         $data = [
@@ -221,10 +221,10 @@ class SignController extends Controller
             'answer' => $cache['true'],
             'time' => $timeData['time'],
             'str_time' => $timeData['str_time'],
-            'ms'=>$timeData['ms'],
+            'ms' => $timeData['ms'],
             'score' => $score,
-            'start_time'=>$cache['dateTime'],
-            'end_time'=>$timeData['end_time']
+            'start_time' => $cache['dateTime'],
+            'end_time' => $timeData['end_time']
         ];
         $cache['data'][$requestUserId] = $data;
         $cache[$requestTrue][] = $data;
@@ -237,18 +237,25 @@ class SignController extends Controller
     /**
      * 计算分值
      */
-    protected function calculate($startTime,$endTime)
+    protected function calculate($time)
     {
         //默认分值
         $score = 0;
 
-        //答题用的时间
-        $time = $endTime- $startTime;
-
-        //答题时间小于等于配置的答题时间
-        if ($time <= $this->answerTime) {
+        //答题时间小于10秒
+        if ($time <= 10000) {
+            //基础分
             $score = $this->init;
-            $score = $score + ($this->timeScore * ($this->answerTime - $time));
+
+            // 剩余时间
+            $surplusTime = ($this->answerTime * 1000) - $time;
+
+            //时间分值
+            $timeScore = ($surplusTime*$this->timeScore)/1000;
+
+            $timeScore = (int)round($timeScore);
+
+            $score = $score+$timeScore;
         }
         return $score;
     }
@@ -277,9 +284,8 @@ class SignController extends Controller
         return [
             'str_time' => $strTime,
             'time' => $totalTime,
-            'ms'=>$totalMsTime,
-            'dateTime'=>$sec,
-            'end_time'=>$time,
+            'ms' => $totalMsTime,
+            'end_time' => $time,
         ];
     }
 
