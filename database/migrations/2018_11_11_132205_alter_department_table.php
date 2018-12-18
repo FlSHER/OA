@@ -20,6 +20,7 @@ class AlterDepartmentTable extends Migration
             $table->char('regional_manager_name', 10)->default('')->comment('大区经理姓名');
             $table->char('personnel_manager_sn', 6)->default('')->comment('人事负责人编号');
             $table->char('personnel_manager_name', 10)->default('')->comment('人事负责人姓名');
+            $table->tinyInteger('cate_id')->default(0)->comment('关联部门分类');
         });
     }
 
@@ -31,6 +32,7 @@ class AlterDepartmentTable extends Migration
     public function down()
     {
         Schema::table('departments', function (Blueprint $table) {
+            $table->dropColumn('cate_id');
             $table->dropColumn('area_manager_sn');
             $table->dropColumn('area_manager_name');
             $table->dropColumn('regional_manager_sn');

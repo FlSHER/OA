@@ -20,6 +20,7 @@ class DepartmentController extends Controller
     public function index(Request $request)
     {
         $list = Department::query()
+            ->with('category')
             ->filterByQueryString()
             ->sortByQueryString()
             ->withPagination();
@@ -43,6 +44,7 @@ class DepartmentController extends Controller
     {
         $rules = [
             'name' => 'required|unique:departments|max:10',
+            'cate_id' => 'exists:department_categories,id',
             'manager_sn' => ['exists:staff,staff_sn'],
         ];
         $messages = [
@@ -50,12 +52,14 @@ class DepartmentController extends Controller
             'name.unique' => '部门名称已存在',
             'name.max' => '部门名称不能超过 :max 个字',
             'manager_sn.exists' => '部门负责人不存在',
+            'cate_id.exists' => '部门分类不存在',
         ];
         $this->validate($request, $rules, $messages);
         $department->fill($request->all());
         $department->save();
+        $department->load('category');
 
-        return response()->json($department, 201);
+        return response()->json(new DepartmentResource($department), 201);
     }
 
     /**
@@ -80,18 +84,21 @@ class DepartmentController extends Controller
     {
         $rules = [
             'name' => 'required|max:10',
+            'cate_id' => 'exists:department_categories,id',
             'manager_sn' => ['exists:staff,staff_sn'],
         ];
         $messages = [
             'name.required' => '部门名称不能为空',
             'name.max' => '部门名称不能超过 :max 个字',
             'manager_sn.exists' => '部门负责人不存在',
+            'cate_id.exists' => '部门分类不存在',
         ];
         $this->validate($request, $rules, $messages);
         $department->fill($request->all());
         $department->save();
+        $department->load('category');
 
-        return response()->json($department, 201);
+        return response()->json(new DepartmentResource($department), 201);
     }
 
     /**

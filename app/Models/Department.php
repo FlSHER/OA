@@ -17,11 +17,18 @@ class Department extends Model
 
     protected $fillable = [
         'name',
+        'cate_id',
         'brand_id',
         'manager_sn',
         'manager_name',
         'parent_id',
-        'is_locked'
+        'is_locked',
+        'area_manager_sn',
+        'area_manager_name',
+        'personnel_manager_sn',
+        'personnel_manager_name',
+        'regional_manager_sn',
+        'regional_manager_name',
     ];
 
 
@@ -82,6 +89,11 @@ class Department extends Model
     public function brand()
     { //品牌
         return $this->belongsTo('App\Models\Brand')->withTrashed();
+    }
+
+    public function category()
+    {
+        return $this->hasOne(DepartmentCategory::class, 'id', 'cate_id');
     }
 
     /* ----- 定义关联End ----- */

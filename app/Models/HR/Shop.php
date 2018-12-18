@@ -67,18 +67,13 @@ class Shop extends Model
             $shop->dirtyAttributes = $dirty;
             $shop->setOpeningAt();
         });
-
-        // 保存 dirty
-        static::saved(function($shop){
-            $shop->recordLog();
-        });
     }
 
     /* ----- 定义关联Start ----- */
 
     public function staff()
     { //店员
-        return $this->hasMany('App\Models\HR\Staff', 'shop_sn', 'shop_sn')->where([['status_id', '>=', 0]]);
+        return $this->hasMany('App\Models\HR\Staff', 'shop_sn', 'shop_sn')->where('status_id', '>=', 0);
     }
 
     public function manager()
@@ -121,6 +116,11 @@ class Shop extends Model
         return $this->belongsTo('App\Models\I\District', 'county_id');
     }
 
+    public function status()
+    {
+        return $this->belongsTo('App\Models\HR\ShopStatu', 'status_id');
+    }
+
     /* ----- 定义关联End ----- */
 
     /* ----- 查询器 Start ----- */
@@ -151,12 +151,22 @@ class Shop extends Model
 
     public function setClockInAttribute($value)
     {
-        $this->attributes['clock_in'] = !empty($value) ? $value : '09:00:00';
+        if (!empty($value)) {
+            $value = (strripos($value, ':') == 5 ) ? $value : $value.':00';
+        } else {
+            $value = '09:00:00';
+        }
+        $this->attributes['clock_in'] = $value;
     }
 
     public function setClockOutAttribute($value)
     {
-        $this->attributes['clock_out'] = !empty($value) ? $value : '21:00:00';
+        if (!empty($value)) {
+            $value = (strripos($value, ':') == 5 ) ? $value : $value.':00';
+        } else {
+            $value = '21:00:00';
+        }
+        $this->attributes['clock_out'] = $value;
     }
 
     /* ----- 修改器End ----- */
@@ -188,25 +198,6 @@ class Shop extends Model
     }
 
     /* ----- 本地作用域 End ----- */
-
-    /**
-     * 记录店铺变更日志。
-     *
-     * @return void
-     */
-    public function recordLog()
-    {
-        // if (!empty($this->dirtyAttributes)) {
-        //     $staff = request()->user();
-        //     $logModel = new ShopLog();
-        //     $logModel->fill([
-        //         'admin_sn' => $staff['staff_sn'],
-        //         'changes' => $this->dirtyAttributes,
-        //         'shop_sn' => $this->dirtyAttributes['shop_sn'] ?? $this->shop_sn,
-        //     ]);
-        //     $logModel->save();
-        // }
-    }
 
     /**
      * 根据店铺状态设置开闭店时间.

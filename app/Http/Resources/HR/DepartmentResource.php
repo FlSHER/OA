@@ -20,6 +20,7 @@ class DepartmentResource extends Resource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'cate_id' => $this->cate_id,
             'brand_id' => $this->brand_id,
             'full_name' => $this->full_name,
             'parent_id' => $this->parent_id,
@@ -27,6 +28,13 @@ class DepartmentResource extends Resource
             'is_public' => $this->is_public,
             'manager_sn' => $this->manager_sn,
             'manager_name' => $this->manager_name,
+            'category' => $this->category,
+            'area_manager_sn' => $this->area_manager_sn,
+            'area_manager_name' => $this->area_manager_name,
+            'personnel_manager_sn' => $this->personnel_manager_sn,
+            'personnel_manager_name' => $this->personnel_manager_name,
+            'regional_manager_sn' => $this->regional_manager_sn,
+            'regional_manager_name' => $this->regional_manager_name,
         ];
     }
 }
