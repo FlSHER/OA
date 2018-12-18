@@ -18,9 +18,7 @@ class DepartmentCategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $categories = DepartmentCategory::query()
-            ->orderBy('id', 'desc')
-            ->get();
+        $categories = DepartmentCategory::query()->get();
 
         return response()->json($categories);
     }
@@ -29,10 +27,10 @@ class DepartmentCategoryController extends Controller
      * 存储部门分类.
      * 
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\DepartmentCategory $category
+     * @param  \App\Models\DepartmentCategory $cate
      * @return mixed
      */
-    public function store(Request $request, DepartmentCategory $category)
+    public function store(Request $request, DepartmentCategory $cate)
     {
         $this->validate($request, [
             'name' => 'required|unique:department_categories|max:10',
@@ -44,25 +42,25 @@ class DepartmentCategoryController extends Controller
             'fields.array' => '分类字段类型错误',
         ]);
 
-        $category->fill($request->all());
-        $category->save();
+        $cate->fill($request->all());
+        $cate->save();
 
-        return response()->json($category, 201);
+        return response()->json($cate, 201);
     }
 
     /**
      * 更新部门分类.
      * 
      * @param  \Illuminate\Http\Request $request
-     * @param  \App\Models\DepartmentCategory $category
+     * @param  \App\Models\DepartmentCategory $cate
      * @return mixed
      */
-    public function update(Request $request, DepartmentCategory $category)
+    public function update(Request $request, DepartmentCategory $cate)
     {
         $this->validate($request, [
             'name' => [
                 'max:10',
-                Rule::unique('department_categories')->ignore($category->id),
+                Rule::unique('department_categories')->ignore($cate->id),
             ],
             'fields' => 'array',
         ], [
@@ -71,22 +69,22 @@ class DepartmentCategoryController extends Controller
             'fields.array' => '分类字段类型错误',
         ]);
 
-        $category->fill($request->all());
-        $category->save();
+        $cate->fill($request->all());
+        $cate->save();
 
-        return response()->json($category, 201);
+        return response()->json($cate, 201);
     }
 
     /**
      * 删除部门分类.
      * 
-     * @param  \App\Models\DepartmentCategory $category
+     * @param  \App\Models\DepartmentCategory $cate
      * @return mixed
      */
-    public function destroy(DepartmentCategory $category)
+    public function destroy(DepartmentCategory $cate)
     {
-        if (!$category->department()->count()) {
-            $category->delete();
+        if (!$cate->department()->count()) {
+            $cate->delete();
 
             return response()->json(null, 204);
         }
@@ -100,7 +98,7 @@ class DepartmentCategoryController extends Controller
      * @param  \App\Models\DepartmentCategory $category
      * @return mixed
      */
-    public function show(DepartmentCategory $category)
+    public function show(DepartmentCategory $cate)
     {   
         return response()->json($category);
     }

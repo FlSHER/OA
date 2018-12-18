@@ -12,11 +12,11 @@ class StaffService
 
     public function create($data)
     {
-        $this->save($data);
+        $this->save(array_except($data, ['staff_sn']));
 
         return [
             'status' => 1,
-            'message' => '添加成功'
+            'message' => '添加成功',
         ];
     }
 
@@ -27,7 +27,7 @@ class StaffService
         if ($this->isDirty()) {
             return [
                 'status' => 1,
-                'message' => '编辑成功'
+                'message' => '编辑成功',
             ];
         } else {
             return [
@@ -44,6 +44,7 @@ class StaffService
         } else {
             $model = new StaffModel();
         }
+
         $this->fillDataAndSave($model, $data);
     }
 
@@ -338,7 +339,7 @@ class StaffService
                 $model->setAttribute('hired_at', $operateAt);
                 break;
             case 'import_entry':
-                $model->setAttribute('hired_at', $operateAt);
+                // $model->setAttribute('hired_at', $operateAt);
                 break;
             case 'reinstate':
                 $model->setAttribute('hired_at', $operateAt);
@@ -350,7 +351,7 @@ class StaffService
                 $model->setAttribute('left_at', $operateAt);
                 break;
             case 'leaving':
-                $model->setAttribute('is_active', 0);
+                // $model->setAttribute('is_active', 0);
                 break;
         }
         if (empty($model->employed_at) && $model->status_id > 1) {

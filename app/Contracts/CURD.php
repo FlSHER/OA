@@ -115,7 +115,7 @@ class CURD
      */
     public function create($data)
     {
-        $this->save($data);
+        $this->save(array_except($data, [$this->primaryKey]));
         return ['status' => 1, 'message' => '添加成功'];
     }
 

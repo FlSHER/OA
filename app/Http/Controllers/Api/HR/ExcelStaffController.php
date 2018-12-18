@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\HR;
 
-use Cache;
 use Validator;
 use App\Models\HR;
 use App\Models\Brand;
@@ -11,11 +10,25 @@ use App\Models\I\District;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
 use App\Services\StaffService;
+use App\Support\ParserIdentity;
 
 class ExcelStaffController extends Controller
 {
-    
+    /**
+     * 导入错误信息.
+     * 
+     * @var array
+     */
+    protected $errors;
+
+    /**
+     * 上传字段中英文映射.
+     * 
+     * @var array
+     */
+    protected $staffWithMap;
     protected $staffService;
 
     public function __construct(StaffService $staffService)
@@ -46,22 +59,30 @@ class ExcelStaffController extends Controller
      */
     public function importAdd(Request $request)
     {
-        $data = $this->combineImportData($request);
-        foreach ($data as $key => $value) {
-            $validator = $this->makeValidator($value);
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' =>  "导入失败第 {$key} 条数据错误", 
-                    'errors' => $validator->errors(),
-                ], 422);
+        $data = array_filter($request->input('data', []));
+        $formatData = $this->combineImportData($request);
+        foreach ($formatData as $key => $value) {
+            $this->makeValidator($value);
+            if (empty($this->errors)) {
+                $makeVal = $this->makeFillStaff($value);
+                $makeVal['operation_type'] = 'import_entry';
+                $makeVal['operation_remark'] = 'Excel批量导入';
+                $this->staffService->create($makeVal);
+                $body[] = true;
+            } else {
+                $error['row'] = $key + 1;
+                $error['rowData'] = $data[$key];
+                $error['message'] = $this->errors;
+                $errors[] = $error;
+                continue;
             }
-            $makeVal = $this->makeFillStaff($value);
-            $makeVal['operation_type'] = 'import_entry';
-            $makeVal['operation_remark'] = 'Excel批量导入';
-            $curd = $this->staffService->create($makeVal);
         }
+        $response['data'] = !empty($body) ? $body : [];
+        $response['errors'] = !empty($errors) ? $errors : [];
+        $response['headers'] = !empty($data[0]) ? $data[0] : [];
+        empty($response['errors']) && $this->cacheClear();
 
-        return response()->json(['message' => '操作成功'], 201);
+        return response()->json($response, 201);
     }
 
     /**
@@ -72,22 +93,30 @@ class ExcelStaffController extends Controller
      */
     public function importEdit(Request $request)
     {
-        $data = $this->combineImportData($request);
-        foreach ($data as $key => $value) {
-            $validator = $this->makeValidator($value);
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' =>  "编辑失败第 {$key} 条数据错误", 
-                    'errors' => $validator->errors(),
-                ], 422);
+        $data = array_filter($request->input('data', []));
+        $formatData = $this->combineImportData($request);
+        foreach ($formatData as $key => $value) {
+            $this->makeValidator($value);
+            if (empty($this->errors)) {
+                $makeVal = $this->makeFillStaff($value);
+                $makeVal['operation_type'] = 'edit';
+                $makeVal['operation_remark'] = 'Excel批量编辑';
+                $this->staffService->update($makeVal);
+                $body[] = true;
+            } else {
+                $error['row'] = $key + 1;
+                $error['rowData'] = $data[$key];
+                $error['message'] = $this->errors;
+                $errors[] = $error;
+                continue;
             }
-            $makeVal = $this->makeFillStaff($value);
-            $makeVal['operation_type'] = 'edit';
-            $makeVal['operation_remark'] = 'Excel批量编辑';
-            $this->staffService->update($makeVal);
         }
+        $response['data'] = !empty($body) ? $body : [];
+        $response['errors'] = !empty($errors) ? $errors : [];
+        $response['headers'] = !empty($data[0]) ? $data[0] : [];
+        empty($response['errors']) && $this->cacheClear();
 
-        return response()->json(['message' => '操作成功'], 201);
+        return response()->json($response, 201);
     }
 
     /**
@@ -98,22 +127,30 @@ class ExcelStaffController extends Controller
      */
     public function importTransfer(Request $request)
     {
-        $data = $this->combineImportData($request);
-        foreach ($data as $key => $value) {
-            $validator = $this->makeValidator($value);
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' =>  "更新失败第 {$key} 条数据错误", 
-                    'errors' => $validator->errors(),
-                ], 422);
+        $data = array_filter($request->input('data', []));
+        $formatData = $this->combineImportData($request);
+        foreach ($formatData as $key => $value) {
+            $this->makeValidator($value);
+            if (empty($this->errors)) {
+                $makeVal = $this->makeFillStaff($value);
+                $makeVal['operation_type'] = 'import_transfer';
+                $makeVal['operation_remark'] = 'Excel批量变动';
+                $this->staffService->update($makeVal);
+                $body[] = true;
+            } else {
+                $error['row'] = $key + 1;
+                $error['rowData'] = $data[$key];
+                $error['message'] = $this->errors;
+                $errors[] = $error;
+                continue;
             }
-            $makeVal = $this->makeFillStaff($value);
-            $makeVal['operation_type'] = 'import_transfer';
-            $makeVal['operation_remark'] = 'Excel批量变动';
-            $this->staffService->update($makeVal);
         }
+        $response['data'] = !empty($body) ? $body : [];
+        $response['errors'] = !empty($errors) ? $errors : [];
+        $response['headers'] = !empty($data[0]) ? $data[0] : [];
+        empty($response['errors']) && $this->cacheClear();
 
-        return response()->json(['message' => '操作成功'], 201);
+        return response()->json($response, 201);
     }
 
     /**
@@ -129,6 +166,7 @@ class ExcelStaffController extends Controller
         $cols = $request->input('cols', []);
         if (count($data) <= 1) return false;
 
+        $this->staffWithMap = collect($cols)->combine($data[0]);
         foreach ($data as $key => $value) {
             if ($key >= 1) {
                 $temp[$key] = collect($cols)->combine($value)->filter();
@@ -144,8 +182,10 @@ class ExcelStaffController extends Controller
      * @return void
      */
     protected function makeFillStaff($value)
-    {
-        $data = ['operate_at' => now()->toDateString()];
+    {   
+        // 给默认执行时间
+        $value['operate_at'] = !empty($value['operate_at']) ? $value['operate_at'] : now()->toDateString();
+        $data = [];
         if (!empty($value['staff_sn'])) {
             $data['staff_sn'] = $value['staff_sn'];
             $data['realname'] = HR\Staff::where('staff_sn', $value['staff_sn'])->value('realname');
@@ -163,17 +203,12 @@ class ExcelStaffController extends Controller
                 'household_address', 'living_address', 'native_place', 'education', 'remark', 'concat_name', 'concat_tel', 'concat_type'
             ])) {
                 $data[$k] = $v;
-            }
-            if ($v && $k === 'brand') {
+
+            } elseif ($v && $k === 'brand') {
                 $data['brand_id'] = $this->getBrand($v);
 
             } elseif ($v && $k === 'department') {
-                $name = $v;
-                if (strpos($v, '-') !== false) {
-                    $department = explode('-', $v);
-                    $name = end($department);
-                }
-                $data['department_id'] = $this->getDepartment($name);
+                $data['department_id'] = $this->getDepartment($v);
 
             } elseif ($v && $k === 'position') {
                 $data['position_id'] = $this->getPosition($v);
@@ -199,6 +234,19 @@ class ExcelStaffController extends Controller
 
             } elseif ($v && $k === 'living_county') {
                 $data['living_county_id'] = $this->getDistrict($v);
+
+            } elseif ($v && $k === 'hired_at') {
+                if (is_numeric($v)) {
+                    $data['hired_at'] = date('Y-m-d', (($v - 25569) * 24 * 3600));
+                } else {
+                    $data['hired_at'] = $v;
+                }
+            } elseif ($v && $k === 'operate_at') {
+                if (is_numeric($v)) {
+                    $data['operate_at'] = date('Y-m-d', (($v - 25569) * 24 * 3600));
+                } else {
+                    $data['operate_at'] = $v;
+                }
             }
         }
 
@@ -251,6 +299,7 @@ class ExcelStaffController extends Controller
     protected function makeExportBaseData($item)
     {
         $property = ['无', '108将', '36天罡', '24金刚', '18罗汉'];
+        $parser = new ParserIdentity($item->id_card_number);
         return [
             'staff_sn' => $item->staff_sn,
             'realname' => $item->realname,
@@ -266,6 +315,10 @@ class ExcelStaffController extends Controller
             'employed_at' => $item->employed_at,
             'left_at' => $item->left_at,
             'property' => $property[$item->property],
+            'account_number' => $item->account_number,
+            'account_name' => $item->account_name,
+            'account_bank' => $item->account_bank,
+            'birthday' => $parser->isValidate() ? $parser->birthday() : '',
             'remark' => $item->remark,
         ];
     }
@@ -304,9 +357,6 @@ class ExcelStaffController extends Controller
         return [
             'mobile' => $item->mobile,
             'id_card_number' => $item->id_card_number,
-            'account_number' => $item->account_number,
-            'account_name' => $item->account_name,
-            'account_bank' => $item->account_bank,
             'national' => $item->national,
             'wechat_number' => $item->wechat_number,
             'education' => $item->education,
@@ -342,13 +392,13 @@ class ExcelStaffController extends Controller
      {
         $key = "department_list";
         $department = Cache::get($key, function () use ($key) {
-            $department = Department::select('id', 'name')->get();
+            $department = Department::select('id', 'name', 'full_name')->get();
             Cache::put($key, $department, now()->addMinutes(10));
 
             return $department;
         });
  
-        return $department->where('name', $name)->pluck('id')->last();   
+        return $department->where('full_name', $name)->pluck('id')->last();   
      }
      
      // 缓存职位
@@ -379,6 +429,14 @@ class ExcelStaffController extends Controller
         return $district->where('name', $name)->pluck('id')->last();
      }
     
+    protected function cacheClear()
+    {
+        Cache::forget('brand_list');
+        Cache::forget('position_list');
+        Cache::forget('district_list');
+        Cache::forget('department_list');
+    }
+
     /**
      * 导入信息合法性验证.
      *
@@ -389,17 +447,15 @@ class ExcelStaffController extends Controller
     {
         $rules = [
             'realname' => 'required|string|max:10',
-            'brand' => 'exists:brands,name',
-            'position' => 'exists:positions,name',
-            'mobile' => 'required|unique:staff,mobile|cn_phone',
-            'id_card_number' => 'required|ck_identity',
+            'brand' => 'exists:brands,name,deleted_at,NULL',
+            'position' => 'exists:positions,name,deleted_at,NULL',
             'gender' => 'in:未知,男,女',
             'property' => 'in:0,1,2,3,4',
             'status' => 'exists:staff_status,name',
             'national' => 'exists:i_national,name',
             'education' => 'exists:i_education,name',
             'politics' => 'exists:i_politics,name',
-            'shop_sn' => 'exists:shops,shop_sn|max:10',
+            'shop_sn' => 'exists:shops,shop_sn,deleted_at,NULL|max:10',
             'marital_status' => 'exists:i_marital_status,name',
             'household_province' => 'exists:i_district,name',
             'household_city' => 'exists:i_district,name',
@@ -409,7 +465,7 @@ class ExcelStaffController extends Controller
             'living_county' => 'exists:i_district,name',
             'household_address' => 'string|max:30',
             'living_address' => 'string|max:30',
-            'concat_name' => 'required|max:10',
+            'concat_name' => 'required|between:2,10',
             'concat_tel' => 'required|cn_phone',
             'concat_type' => 'required|max:5',
             'account_bank' => 'max:20',
@@ -417,17 +473,12 @@ class ExcelStaffController extends Controller
             'account_number' => 'between:16,19',
             'height' => 'integer|between:140,220',
             'weight' => 'integer|between:30,150',
-            'dingtalk_number' => 'max:50',
             'remark' => 'max:100',
-            'department' => [
-                function ($attribute, $value, $fail) {
-                    $department = array_filter(explode('-', $value));
-                    $name = end($department);
-                    if (!Department::where('name', $name)->count()) {
-                        $fail('没有部门名称为 “'.$value.'” 的部门！');
-                    }
-                }
-            ],
+            'department' => 'max:100|exists:departments,full_name,deleted_at,NULL',
+            'mobile' => ['required', 'cn_phone', unique_validator('staff', false)],
+            'wechat_number' => ['between:6,20', unique_validator('staff', false)],
+            'id_card_number' => ['required', 'ck_identity', unique_validator('staff', false)],
+            'dingtalk_number' => ['max:50', unique_validator('staff', false)],
             'cost_brand' => [
                 'required_with:brand',
                 function ($attribute, $content, $fail) use ($value) {
@@ -456,23 +507,30 @@ class ExcelStaffController extends Controller
                 }
             ],
         ];
-        if (isset($value['staff_sn'])) {
+        if (!empty($value['staff_sn'])) {
+            $uniqueRule = Rule::unique('staff')->ignore($value['staff_sn'], 'staff_sn')
+                ->where(function ($query) {
+                    $query->whereNull('deleted_at');
+                });
             $rules = array_merge($rules, [
-                'staff_sn' => 'required|exists:staff,staff_sn',
-                'id_card_number' => 'ck_identity',
+                'staff_sn' => 'required|exists:staff,staff_sn,deleted_at,NULL',
                 'dingtalk_number' => 'max:50',
                 'realname' => 'string|max:10',
                 'concat_tel' => 'cn_phone',
-                'concat_name' => 'max:10',
+                'concat_name' => 'between:2,10',
                 'concat_type' => 'max:5',
-                'mobile' => [
-                    'cn_phone',
-                    Rule::unique('staff')->ignore($value['staff_sn'], 'staff_sn'),
-                ],
+                'mobile' => ['required', 'cn_phone', $uniqueRule],
+                'wechat_number' => ['between:6,20', $uniqueRule],
+                'id_card_number' => ['required', 'ck_identity', $uniqueRule],
+                'dingtalk_number' => ['max:50', $uniqueRule],
             ]);
         }
-
-        return Validator::make($value->toArray(), $rules, $this->message());
+        $validator = Validator::make($value->toArray(), $rules, $this->message());
+        if ($this->staffWithMap) {
+            foreach ($validator->errors()->getMessages() as $key => $error) {
+                $this->errors[$this->staffWithMap[$key]] = $error;
+            }
+        }
     }
 
     /**

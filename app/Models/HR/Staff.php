@@ -68,7 +68,7 @@ class Staff extends User
         'wechat_number',
     ];
 
-    protected $appends = ['avatar'];
+    protected $appends = ['avatar', 'dingding'];
 
     protected $hidden = ['password', 'salt', 'created_at', 'updated_at', 'deleted_at'];
 
@@ -192,7 +192,7 @@ class Staff extends User
 
     /**
      * has gender.
-     * 
+     *
      * @author 28youth
      * @return \Illuminate\Database\Eloquent\Concerns\hasOne
      */
@@ -298,7 +298,7 @@ class Staff extends User
         $query->whereIn('brand_id', $brands);
         if (!in_array('0', $departments))
             $query->whereIn('department_id', $departments);
-        $query->orWhere('status_id', '<', 0);
+            $query->orWhere('status_id', '<', 0);
     }
 
     public function scopeApi($query)
@@ -308,7 +308,7 @@ class Staff extends User
 
     public function scopeWithApi($query)
     {
-        return $query->with(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'tags']);
+        return $query->with(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'status', 'tags']);
     }
 
     public function scopeWorking($query)
@@ -336,12 +336,17 @@ class Staff extends User
      */
     public function getAvatarAttribute()
     {
-        if (! $this->avatarPath()) {
+        if (!$this->avatarPath()) {
             return null;
         }
 
         // return $this->avatar(50);
-        return action('\\'.StaffAvatarController::class.'@show', ['staff' => $this]);
+        return action('\\' . StaffAvatarController::class . '@show', ['staff' => $this]);
+    }
+
+    public function getDingdingAttribute()
+    {
+        return $this->getAttribute('dingtalk_number');
     }
 
 

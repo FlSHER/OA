@@ -199,7 +199,7 @@ class AuthorityService
                 $departmentsTmp = $role->department->pluck('id')->toArray();
                 $departments = array_merge($departments, $departmentsTmp);
             }
-            $departments = array_unique($departments);
+            $departments = array_values(array_unique($departments));
         }
         return $departments;
     }
@@ -220,7 +220,7 @@ class AuthorityService
                 $brandsTmp = $role->brand->pluck('id')->toArray();
                 $brands = array_merge($brands, $brandsTmp);
             }
-            $brands = array_unique($brands);
+            $brands = array_values(array_unique($brands));
         }
         return $brands;
     }

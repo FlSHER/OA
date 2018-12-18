@@ -23,6 +23,7 @@ class TagCollection extends ResourceCollection
                 'name' => $tag->name,
                 'category' => $tag->category,
                 'description' => $tag->description,
+                'category_id' => $tag->tag_category_id,
             ];
         })->toArray();
     }

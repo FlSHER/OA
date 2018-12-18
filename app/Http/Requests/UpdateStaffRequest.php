@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\HR\CostBrand;
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateStaffRequest extends FormRequest
@@ -28,46 +29,49 @@ class UpdateStaffRequest extends FormRequest
     {
         $brand_id = $this->brand_id;
         return [
-        	'realname' => 'bail|required|string|max:10',
-            'brand_id' => 'bail|exists:brands,id',
-            'department_id' => 'bail|exists:departments,id',
-            'position_id' => 'bail|exists:positions,id',
-            'mobile' => 'bail|cn_phone',
-            'id_card_number' => 'bail|ck_identity',
-            'gender' => 'bail|in:未知,男,女',
-            'remark' => 'bail|max:100',
-            'property' => 'bail|in:0,1,2,3,4',
-            'politics' => 'bail|exists:i_politics,name',
-            'shop_sn' => 'bail|exists:shops,shop_sn|max:10',
-            'education' => 'bail|exists:i_education,name',
-            'national' => 'bail|exists:i_national,name',
-            'marital_status' => 'bail|exists:i_marital_status,name',
-            'household_province_id' => 'bail|exists:i_district,id',
-            'household_city_id' => 'bail|exists:i_district,id',
-            'household_county_id' => 'bail|exists:i_district,id',
-            'household_address' => 'bail|string|max:30',
-            'living_province_id' => 'bail|exists:i_district,id',
-            'living_city_id' => 'bail|exists:i_district,id',
-            'living_county_id' => 'bail|exists:i_district,id',
-            'living_address' => 'bail|string|max:30',
-            'concat_name' => 'bail|required|max:10',
-            'concat_tel' => 'bail|required|cn_phone',
-            'concat_type' => 'bail|required|max:5',
-            'dingtalk_number' => 'bail|max:50',
-            'account_bank' => 'bail|max:20',
-            'account_name' => 'bail|max:10',
-            'account_number' => 'bail|between:16,19',
-            'height' => 'bail|integer|between:140,220',
-            'weight' => 'bail|integer|between:30,150',
-            'status_id' => 'bail|exists:staff_status,id',
-            'operate_at' => 'bail|required|date',
-            'operation_remark' => 'bail|max:100',
+            'staff_sn' => 'required|exists:staff,staff_sn,deleted_at,NULL',
+        	'realname' => 'required|between:2,10',
+            'brand_id' => 'exists:brands,id',
+            'department_id' => 'exists:departments,id,deleted_at,NULL',
+            'position_id' => 'exists:positions,id,deleted_at,NULL',
+            'gender' => 'in:男,女',
+            'remark' => 'max:100',
+            'property' => 'in:0,1,2,3,4',
+            'politics' => 'exists:i_politics,name',
+            'shop_sn' => 'exists:shops,shop_sn,deleted_at,NULL|max:10',
+            'education' => 'exists:i_education,name',
+            'national' => 'exists:i_national,name',
+            'marital_status' => 'exists:i_marital_status,name',
+            'household_province_id' => 'exists:i_district,id',
+            'household_city_id' => 'exists:i_district,id',
+            'household_county_id' => 'exists:i_district,id',
+            'household_address' => 'string|max:30',
+            'living_province_id' => 'exists:i_district,id',
+            'living_city_id' => 'exists:i_district,id',
+            'living_county_id' => 'exists:i_district,id',
+            'living_address' => 'string|max:30',
+            'concat_name' => 'required|between:2,10',
+            'concat_tel' => 'required|cn_phone',
+            'concat_type' => 'required|max:5',
+            'account_bank' => 'max:20',
+            'account_name' => 'between:2,10',
+            'account_number' => 'between:16,19',
+            'height' => 'integer|between:140,220',
+            'weight' => 'integer|between:30,150',
+            'status_id' => 'exists:staff_status,id',
+            'operate_at' => 'required|date|after:2000-1-1|before:2038-1-1',
+            'operation_remark' => 'max:100',
             'relatives.*.relative_sn' => ['required_with:relative_type,relative_name'],
             'relatives.*.relative_type' => ['required_with:relative_sn,relative_name'],
             'relatives.*.relative_name' => ['required_with:relative_type,relative_sn'],
-            'tags' => 'bail|array',
-            'tags.*.id' => 'bail|exists:tags,id',
+            'tags' => 'array',
+            'tags.*.id' => 'exists:tags,id',
+            'mobile' => ['required', 'cn_phone', unique_validator('staff')],
+            'wechat_number' => ['between:6,20', unique_validator('staff')],
+            'id_card_number' => ['required', 'ck_identity', unique_validator('staff')],
+            'dingtalk_number' => ['max:50', unique_validator('staff')],
             'cost_brands' => [
+                'required_with:brand_id',
                 function ($attribute, $value, $fail) use ($brand_id) {
                     $brands = CostBrand::with('brands')->whereIn('id', $value)->get();
                     $brands->map(function ($item) use ($fail, $brand_id) {
@@ -88,13 +92,13 @@ class UpdateStaffRequest extends FormRequest
     public function messages(): array
     {
         return [
-			'in' => ':attribute 必须在【:values】中选择。',
-            'max' => ':attribute 不能大于 :max 个字。',
-            'exists' => ':attribute 填写错误。',
-            'unique' => ':attribute 已经存在，请重新填写。',
-            'required' => ':attribute 为必填项，不能为空。',
-            'between' => ':attribute 值 :input 不在 :min - :max 之间。',
-            'required_with' => ':attribute 不能为空。',
+			'in' => ':attribute必须在【:values】中选择。',
+            'max' => ':attribute不能大于 :max 个字。',
+            'exists' => ':attribute填写错误。',
+            'unique' => ':attribute已经存在，请重新填写。',
+            'required' => ':attribute为必填项，不能为空。',
+            'between' => ':attribute值 :input 不在 :min - :max 之间。',
+            'required_with' => ':attribute不能为空。',
         ];
     }
 

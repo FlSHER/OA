@@ -48,9 +48,9 @@ class ShopController extends Controller
         $shop->getConnection()->transaction(function () use ($shop, $data) {
             $shop->save();
             $this->position($shop);
+            
             if (!empty($data['staff'])) {
                 $staffSn = array_column($data['staff'], 'staff_sn');
-                $shop->staff()->update(['shop_sn' => '']);
                 Staff::whereIn('staff_sn', $staffSn)->update(['shop_sn' => $shop->shop_sn]);
             }
             if (!empty($data['tags'])) {
@@ -93,13 +93,13 @@ class ShopController extends Controller
             $shop->save();
             $this->position($shop);
 
-            if (!empty($data['staff'])) {
-                $staffSn = array_column($data['staff'], 'staff_sn');
+            $shop->tags()->sync($data['tags']);
+            if (isset($data['staff'])) {
                 $shop->staff()->update(['shop_sn' => '']);
-                Staff::whereIn('staff_sn', $staffSn)->update(['shop_sn' => $shop->shop_sn]);
-            }
-            if (!empty($data['tags'])) {
-                $shop->tags()->sync($data['tags']);
+                if (!empty($data['staff'])) {
+                    $staffSn = array_column($data['staff'], 'staff_sn');
+                    Staff::whereIn('staff_sn', $staffSn)->update(['shop_sn' => $shop->shop_sn]);
+                }
             }
         });
 

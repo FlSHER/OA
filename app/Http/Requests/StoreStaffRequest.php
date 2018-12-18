@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\HR\Staff;
 use App\Models\HR\CostBrand;
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreStaffRequest extends FormRequest
@@ -15,6 +17,24 @@ class StoreStaffRequest extends FormRequest
      */
     public function authorize()
     {
+        $staffSn = $this->staff_sn;
+        $brandId = $this->brand_id;
+        $departmentId = $this->department_id;
+        $staff = Staff::visible()->find($staffSn);
+        $authority = app('Authority');
+
+        if (!empty($staffSn) && empty($staff)) {
+
+            return false;
+        }
+        if (!empty($departmentId) && !$authority->checkDepartment($departmentId)) {
+
+            return false;
+        }
+        if (!empty($brandId) && !$authority->checkBrand($brandId)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -28,46 +48,48 @@ class StoreStaffRequest extends FormRequest
     {
         $brand_id = $this->brand_id;
         return [
-        	'realname' => 'bail|required|string|max:10',
-            'brand_id' => 'bail|required|exists:brands,id',
-            'department_id' => 'bail|required|exists:departments,id',
-            'position_id' => 'bail|required|exists:positions,id',
-            'mobile' => 'bail|required|unique:staff,mobile|cn_phone',
-            'id_card_number' => 'bail|required|ck_identity',
-            'property' => 'bail|in:0,1,2,3,4',
-            'gender' => 'bail|required|in:未知,男,女',
-            'education' => 'bail|exists:i_education,name',
-            'national' => 'bail|exists:i_national,name',
-            'politics' => 'bail|exists:i_politics,name',
-            'shop_sn' => 'bail|exists:shops,shop_sn|max:10',
-            'status_id' => 'bail|required|exists:staff_status,id',
-            'marital_status' => 'bail|exists:i_marital_status,name',
-            'household_province_id' => 'bail|exists:i_district,id',
-            'household_city_id' => 'bail|exists:i_district,id',
-            'household_county_id' => 'bail|exists:i_district,id',
-            'household_address' => 'bail|string|max:30',
-            'living_province_id' => 'bail|exists:i_district,id',
-            'living_city_id' => 'bail|exists:i_district,id',
-            'living_county_id' => 'bail|exists:i_district,id',
-            'living_address' => 'bail|string|max:30',
-            'concat_name' => 'bail|required|max:10',
-            'concat_tel' => 'bail|required|cn_phone',
-            'concat_type' => 'bail|required|max:5',
-            'dingtalk_number' => 'bail|max:50',
-            'account_bank' => 'bail|max:20',
-            'account_name' => 'bail|max:10',
-            'account_number' => 'bail|between:16,19',
-            'remark' => 'bail|max:100',
-            'height' => 'bail|integer|between:140,220',
-            'weight' => 'bail|integer|between:30,150',
-            'operate_at' => 'bail|required|date',
-            'operation_remark' => 'bail|max:100',
+        	'realname' => 'required|between:2,10',
+            'brand_id' => 'required|exists:brands,id',
+            'department_id' => 'required|exists:departments,id,deleted_at,NULL',
+            'position_id' => 'required|exists:positions,id,deleted_at,NULL',
+            'property' => 'in:0,1,2,3,4',
+            'gender' => 'required|in:男,女',
+            'education' => 'exists:i_education,name',
+            'national' => 'exists:i_national,name',
+            'politics' => 'exists:i_politics,name',
+            'shop_sn' => 'exists:shops,shop_sn,deleted_at,NULL|max:10',
+            'status_id' => 'required|exists:staff_status,id',
+            'marital_status' => 'exists:i_marital_status,name',
+            'household_province_id' => 'exists:i_district,id',
+            'household_city_id' => 'exists:i_district,id',
+            'household_county_id' => 'exists:i_district,id',
+            'household_address' => 'string|max:30',
+            'living_province_id' => 'exists:i_district,id',
+            'living_city_id' => 'exists:i_district,id',
+            'living_county_id' => 'exists:i_district,id',
+            'living_address' => 'string|max:30',
+            'concat_name' => 'required|between:2,10',
+            'concat_tel' => 'required|cn_phone',
+            'concat_type' => 'required|max:5',
+            'account_bank' => 'max:20',
+            'account_name' => 'between:2,10',
+            'account_number' => 'between:16,19',
+            'remark' => 'max:100',
+            'height' => 'integer|between:140,220',
+            'weight' => 'integer|between:30,150',
+            'operate_at' => 'required|date|after:2000-1-1|before:2038-1-1',
+            'operation_remark' => 'max:100',
             'relatives.*.relatives_sn' => ['required_with:relatives_type,relative_name'],
             'relatives.*.relative_stype' => ['required_with:relatives_sn,relative_name'],
             'relatives.*.relative_nsame' => ['required_with:relative_tsype,relative_sn'],
-            'tags' => 'bail|array',
-            'tags.*.id' => 'bail|exists:tags,id',
+            'tags' => 'array',
+            'tags.*.id' => 'exists:tags,id',
+            'mobile' => ['required', 'cn_phone', unique_validator('staff', false)],
+            'wechat_number' => ['between:6,20', unique_validator('staff', false)],
+            'id_card_number' => ['required', 'ck_identity', unique_validator('staff', false)],
+            'dingtalk_number' => ['max:50', unique_validator('staff', false)],
             'cost_brands' => [
+                'required_with:brand_id',
                 function ($attribute, $value, $fail) use ($brand_id) {
                     $brands = CostBrand::with('brands')->whereIn('id', $value)->get();
                     $brands->map(function ($item) use ($fail, $brand_id) {
