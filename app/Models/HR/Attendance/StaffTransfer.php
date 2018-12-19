@@ -51,13 +51,13 @@ class StaffTransfer extends Model
     //离开店铺
     public function leaving_shop()
     {
-        return $this->belongsTo('App\Models\HR\Shop', 'leaving_shop_sn', 'shop_sn');
+        return $this->belongsTo('App\Models\HR\Shop', 'leaving_shop_sn', 'shop_sn')->withTrashed();
     }
 
     //到达店铺
     public function arriving_shop()
     {
-        return $this->belongsTo('App\Models\HR\Shop', 'arriving_shop_sn', 'shop_sn');
+        return $this->belongsTo('App\Models\HR\Shop', 'arriving_shop_sn', 'shop_sn')->withTrashed();
     }
 
     //标签
