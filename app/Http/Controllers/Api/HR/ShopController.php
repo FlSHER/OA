@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\HR;
 use App\Models\HR\Shop;
 use App\Models\HR\Staff;
 use Illuminate\Http\Request;
+use App\Services\ShopService;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\HR\ShopResource;
@@ -12,6 +13,13 @@ use App\Http\Resources\HR\ShopCollection;
 
 class ShopController extends Controller
 {
+    protected $shopService;
+
+    public function __construct(ShopService $shopService)
+    {
+        $this->shopService = $shopService;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -42,21 +50,8 @@ class ShopController extends Controller
     public function store(Request $request, Shop $shop)
     {
         $this->validate($request, $this->rules($request), $this->message());
-        $data = $request->all();
-        $shop->fill($data);
-
-        $shop->getConnection()->transaction(function () use ($shop, $data) {
-            $shop->save();
-            $this->position($shop);
-            
-            if (!empty($data['staff'])) {
-                $staffSn = array_column($data['staff'], 'staff_sn');
-                Staff::whereIn('staff_sn', $staffSn)->update(['shop_sn' => $shop->shop_sn]);
-            }
-            if (!empty($data['tags'])) {
-                $shop->tags()->sync($data['tags']);
-            }
-        });
+        $shop = $this->shopService->create($request->all());
+        $this->position($shop);
 
         $shop->load(['staff', 'brand', 'department', 'manager', 'tags']);
 
@@ -86,22 +81,8 @@ class ShopController extends Controller
     public function update(Request $request, Shop $shop)
     {
         $this->validate($request, $this->rules($request), $this->message());
-        $data = $request->all();
-        $shop->fill($data);
-
-        $shop->getConnection()->transaction(function () use ($shop, $data) {
-            $shop->save();
-            $this->position($shop);
-
-            $shop->tags()->sync($data['tags']);
-            if (isset($data['staff'])) {
-                $shop->staff()->update(['shop_sn' => '']);
-                if (!empty($data['staff'])) {
-                    $staffSn = array_column($data['staff'], 'staff_sn');
-                    Staff::whereIn('staff_sn', $staffSn)->update(['shop_sn' => $shop->shop_sn]);
-                }
-            }
-        });
+        $shop = $this->shopService->update($request->all());
+        $this->position($shop);
 
         $shop->load(['staff', 'brand', 'department', 'manager', 'tags']);
 
