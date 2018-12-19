@@ -50,7 +50,7 @@ class ShopController extends Controller
     public function store(Request $request, Shop $shop)
     {
         $this->validate($request, $this->rules($request), $this->message());
-        $shop = $this->shopService->create($request->all());
+        $shop = $this->shopService->index($request->all());
         $this->position($shop);
 
         $shop->load(['staff', 'brand', 'department', 'manager', 'tags']);
@@ -81,7 +81,7 @@ class ShopController extends Controller
     public function update(Request $request, Shop $shop)
     {
         $this->validate($request, $this->rules($request), $this->message());
-        $shop = $this->shopService->update($request->all());
+        $shop = $this->shopService->index($request->all());
         $this->position($shop);
 
         $shop->load(['staff', 'brand', 'department', 'manager', 'tags']);

@@ -23,22 +23,23 @@ class ShopService
         'department_id' => 'department.name',
     ];
 
-    public function update(array $data)
+    /**
+     * 数据总线.
+     * 
+     * @param  array $data
+     * @return \App\Models\HR\Shop|error
+     */
+    public function index(array $data)
     {
         $model = ShopModel::find($data[$this->primaryKey]);
-        if (empty($model)) {
+        if ($model) {
 
-            return response()->json(['message' => '店铺不存在'], 422);
+            return $this->fillDataAndSave($model, $data);
+        } else {
+            $shopModel = new ShopModel();
+
+            return $this->fillDataAndSave($shopModel, $data);
         }
-
-        return $this->fillDataAndSave($model, $data);
-    }
-
-    public function create(array $data)
-    {
-        $model = new ShopModel();
-
-        return $this->fillDataAndSave($model, $data);
     }
 
     /**
