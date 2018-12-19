@@ -52,21 +52,14 @@ class ShopService
     protected function fillDataAndSave(ShopModel $shopModel, array $data)
     {
         $this->dirty = [];
-
         $block = function () use ($shopModel, $data) {
             $shopModel->fill($data);
             $this->addDirty($shopModel);
-            try {
-                $shopModel->save();
-                $this->changeBelongsToMany($shopModel, $data);
-                !empty($this->dirty) && $this->recordLog($shopModel);
+            $shopModel->save();
+            $this->changeBelongsToMany($shopModel, $data);
+            !empty($this->dirty) && $this->recordLog($shopModel);
 
-                return $shopModel;
-            } catch (\Exception $err) {
-                Log::error($err->getMessage());
-
-                throw $err;
-            }
+            return $shopModel;
         };
 
         return $shopModel->getConnection()->transaction($block);
