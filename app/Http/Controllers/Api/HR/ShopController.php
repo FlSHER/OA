@@ -133,6 +133,7 @@ class ShopController extends Controller
             'department_id' => 'bail|exists:departments,id',
             'brand_id' => 'bail|exists:brands,id',
             'opening_at' => 'required_with:end_at|date_format:Y-m-d',
+            'end_at' => 'date_format:Y-m-d|after:opening_at',
             'province_id' => 'bail|required|exists:i_district,id',
             'city_id' => 'bail|required|exists:i_district,id',
             'county_id' => 'bail|required|exists:i_district,id',
@@ -146,15 +147,6 @@ class ShopController extends Controller
             'assistant_name' => 'bail|max:10',
             'staff' => 'bail|array',
             'staff.*.staff_sn' => 'bail|exists:staff,staff_sn',
-            'end_at' => [
-                'date_format:Y-m-d',
-                function ($attribute, $value, $fail) use ($request) {
-                    $openingAt = $request->opening_at;
-                    if (!empty($openingAt)) {
-                        ($value < $openingAt) && $fail('结束日期不能小于开业日期');
-                    }
-                }
-            ]
         ];
         if (strtolower($request->getMethod()) === 'patch') {
             return array_merge($rules, [
