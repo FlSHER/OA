@@ -216,9 +216,8 @@ class ShopService
         $model = new ShopModel;
         $relation = explode('.', $relationKey)[0];
         $values = array_values($change);
-
-        $original = empty($values[0]) ? '' : $model->$relation()->getModel()->find($values[0])->value('name');
-        $attribute = empty($values[1]) ? '' : $model->$relation()->getModel()->find($values[1])->value('name');
+        $original = empty($values[0]) ? '' : $model->$relation()->getModel()->find($values[0])->name;
+        $attribute = empty($values[1]) ? '' : $model->$relation()->getModel()->find($values[1])->name;
 
         return [$original, $attribute];
     }
