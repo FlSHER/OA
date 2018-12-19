@@ -11,10 +11,16 @@ class ShopLog extends Model
     public $fillable = [
         'target_id',
         'admin_sn',
+        'shop_sn',
         'changes',
     ];
     
     protected $casts = [
         'changes' => 'array',
     ];
+
+    public function shop()
+    {
+    	return $this->belongsTo(Shop::class, 'shop_sn', 'shop_sn')->withTrashed();
+    }
 }
