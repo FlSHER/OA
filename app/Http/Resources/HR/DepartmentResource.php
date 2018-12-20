@@ -35,6 +35,9 @@ class DepartmentResource extends Resource
             'personnel_manager_name' => $this->personnel_manager_name,
             'regional_manager_sn' => $this->regional_manager_sn,
             'regional_manager_name' => $this->regional_manager_name,
+            'brand' => $this->brand,
+            'parents' => $this->parents,
+            'children' => $this->children,
         ];
     }
 }

@@ -51,9 +51,9 @@ class Department extends Model
         return $this->belongsTo('App\Models\Department', 'parent_id');
     }
 
-    public function parent()
+    public function children()
     {
-        return $this->_parent()->with('parent');
+        return $this->_children()->with('children');
     }
 
     public function _children()
@@ -104,6 +104,23 @@ class Department extends Model
     public function getParentIdAttribute($value)
     {
         return intval($value);
+    }
+
+    public function getParentsAttribute()
+    {
+        $parent = $this->_parent;
+        if (empty($parent)) {
+            $parents = [];
+        } else {
+            $parents = $parent->parents;
+            array_push($parents, [
+                'id' => $parent->id,
+                'name' => $parent->name,
+                'full_name' => $parent->full_name,
+            ]);
+        }
+
+        return $parents;
     }
 
     public function getParentIdsAttribute()

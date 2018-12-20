@@ -69,7 +69,8 @@ class DepartmentController extends Controller
      */
     public function show(Department $department)
     {
-        $department->load('brand', '_parent', '_children');
+        $department->load('brand', 'children');
+        $department->parents = $department->parents;
 
         return new DepartmentResource($department);
     }
