@@ -71,7 +71,7 @@ class StoreStaffRequest extends FormRequest
             'mobile' => ['required', 'cn_phone', unique_validator('staff')],
             'id_card_number' => ['required', 'ck_identity', unique_validator('staff')],
         ];
-        if ($operateType === 'entry') {
+        if (in_array($operateType, ['entry', 'reinstate'])) {
             $validator  = array_merge($validator, [
                 'brand_id' => 'required|exists:brands,id',
                 'status_id' => 'required|exists:staff_status,id',
@@ -93,9 +93,15 @@ class StoreStaffRequest extends FormRequest
                     }
                 ],
             ]);
-        } elseif ($operateType === 'edit') {
+        } elseif (in_array($operateType, ['edit', 'reinstate'])) {
             $validator = array_merge($validator, [
                 'staff_sn' => 'required|exists:staff,staff_sn,deleted_at,NULL',
+            ]);
+
+        } elseif ($operateType === 'reinstate') {
+            $validator = array_merge($validator, [
+                'mobile' => ['required', 'cn_phone', unique_validator('staff')],
+                'id_card_number' => ['required', 'ck_identity', unique_validator('staff')],
             ]);
         }
 
@@ -109,6 +115,8 @@ class StoreStaffRequest extends FormRequest
      */
     public function makeBasicValidator(): array
     {
+        $operateType = $this->operation_type;
+
         $validator  = [
             'remark' => 'max:100',
             'property' => 'in:0,1,2,3,4',
@@ -142,11 +150,16 @@ class StoreStaffRequest extends FormRequest
             'relatives.*.relative_type' => ['required_with:relative_sn,relative_name'],
             'relatives.*.relative_name' => ['required_with:relative_type,relative_sn'],
         ];
-        if ($this->operation_type === 'entry') {
+        if ($operateType === 'entry') {
             $validator = array_merge($validator, [
                 'shop_sn' => 'exists:shops,shop_sn,deleted_at,NULL|max:10',
                 'dingtalk_number' => ['max:50', unique_validator('staff', false)],
                 'wechat_number' => ['between:6,20', unique_validator('staff', false)],
+            ]);
+
+        } elseif ($operateType === 'reinstate') {
+            $validator = array_merge($validator, [
+                'shop_sn' => 'exists:shops,shop_sn,deleted_at,NULL|max:10',
             ]);
         }
 
