@@ -450,12 +450,12 @@ class ExcelStaffController extends Controller
             'brand' => 'exists:brands,name,deleted_at,NULL',
             'position' => 'exists:positions,name,deleted_at,NULL',
             'gender' => 'in:未知,男,女',
-            'property' => 'in:0,1,2,3,4',
             'status' => 'exists:staff_status,name',
             'national' => 'exists:i_national,name',
             'education' => 'exists:i_education,name',
             'politics' => 'exists:i_politics,name',
             'shop_sn' => 'exists:shops,shop_sn,deleted_at,NULL|max:10',
+            'department' => 'max:100|exists:departments,full_name,deleted_at,NULL',
             'marital_status' => 'exists:i_marital_status,name',
             'household_province' => 'exists:i_district,name',
             'household_city' => 'exists:i_district,name',
@@ -474,7 +474,6 @@ class ExcelStaffController extends Controller
             'height' => 'integer|between:140,220',
             'weight' => 'integer|between:30,150',
             'remark' => 'max:100',
-            'department' => 'max:100|exists:departments,full_name,deleted_at,NULL',
             'mobile' => ['required', 'cn_phone', unique_validator('staff', false)],
             'wechat_number' => ['between:6,20', unique_validator('staff', false)],
             'id_card_number' => ['required', 'ck_identity', unique_validator('staff', false)],
@@ -496,7 +495,7 @@ class ExcelStaffController extends Controller
                     // 验证品牌/费用品牌的关联性
                     $brand_id = $this->getBrand($value['brand']);
                     $brands = HR\CostBrand::with('brands')->whereIn('name', $costBrands)->get();
-                    $brand = $brands->map(function ($item) use ($fail, $brand_id) {
+                    $brand = $brands->map(function ($item) use ($brand_id) {
                         if (! $item->brands->contains($brand_id)) {
                             return $item->name;
                         }
@@ -514,14 +513,13 @@ class ExcelStaffController extends Controller
                 });
             $rules = array_merge($rules, [
                 'staff_sn' => 'required|exists:staff,staff_sn,deleted_at,NULL',
-                'dingtalk_number' => 'max:50',
                 'realname' => 'string|max:10',
                 'concat_tel' => 'cn_phone',
                 'concat_name' => 'between:2,10',
                 'concat_type' => 'max:5',
-                'mobile' => ['required', 'cn_phone', $uniqueRule],
+                'mobile' => ['cn_phone', $uniqueRule],
                 'wechat_number' => ['between:6,20', $uniqueRule],
-                'id_card_number' => ['required', 'ck_identity', $uniqueRule],
+                'id_card_number' => ['ck_identity', $uniqueRule],
                 'dingtalk_number' => ['max:50', $uniqueRule],
             ]);
         }

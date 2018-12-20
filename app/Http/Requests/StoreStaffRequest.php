@@ -32,6 +32,7 @@ class StoreStaffRequest extends FormRequest
             return false;
         }
         if (!empty($brandId) && !$authority->checkBrand($brandId)) {
+
             return false;
         }
 
@@ -46,20 +47,82 @@ class StoreStaffRequest extends FormRequest
      */
     public function rules(): array
     {
-        $brand_id = $this->brand_id;
-        return [
-        	'realname' => 'required|between:2,10',
-            'brand_id' => 'required|exists:brands,id',
-            'department_id' => 'required|exists:departments,id,deleted_at,NULL',
-            'position_id' => 'required|exists:positions,id,deleted_at,NULL',
-            'property' => 'in:0,1,2,3,4',
+        return array_collapse([
+            $this->makeRequiredValidator(),
+            $this->makeBasicValidator(),
+        ]);
+    }
+
+    /**
+     * 必填项验证规则.
+     * 
+     * @return rules
+     */
+    public function makeRequiredValidator(): array
+    {
+        $operateType = $this->operation_type;
+        $validator  = [
+            'realname' => 'required|between:2,10',
             'gender' => 'required|in:男,女',
-            'education' => 'exists:i_education,name',
-            'national' => 'exists:i_national,name',
-            'politics' => 'exists:i_politics,name',
-            'shop_sn' => 'exists:shops,shop_sn,deleted_at,NULL|max:10',
-            'status_id' => 'required|exists:staff_status,id',
-            'marital_status' => 'exists:i_marital_status,name',
+            'concat_name' => 'required|between:2,10',
+            'concat_tel' => 'required|cn_phone',
+            'concat_type' => 'required|max:5',
+            'operate_at' => 'required|date|after:2000-1-1|before:2038-1-1',
+            'mobile' => ['required', 'cn_phone', unique_validator('staff')],
+            'id_card_number' => ['required', 'ck_identity', unique_validator('staff')],
+        ];
+        if ($operateType === 'entry') {
+            $validator  = array_merge($validator, [
+                'brand_id' => 'required|exists:brands,id',
+                'status_id' => 'required|exists:staff_status,id',
+                'position_id' => 'required|exists:positions,id,deleted_at,NULL',
+                'department_id' => 'required|exists:departments,id,deleted_at,NULL',
+                'mobile' => ['required', 'cn_phone', unique_validator('staff', false)],
+                'id_card_number' => ['required', 'ck_identity', unique_validator('staff', false)],
+                'cost_brands' => ['required', 'array',
+                    function ($attribute, $value, $fail) {
+                        $brands = CostBrand::with('brands')->whereIn('id', $value)->get();
+                        $brand = $brands->map(function ($item) use ($fail) {
+                            if (! $item->brands->contains($this->brand_id)) {
+                                return $item->name;
+                            }
+                        })->filter();
+                        if ($brand->isNotEmpty()) {
+                            $fail("“{$brand->implode('，')}” 不是所属品牌的费用品牌");
+                        }
+                    }
+                ],
+            ]);
+        } elseif ($operateType === 'edit') {
+            $validator = array_merge($validator, [
+                'staff_sn' => 'required|exists:staff,staff_sn,deleted_at,NULL',
+            ]);
+        }
+
+        return $validator;
+    }
+
+    /**
+     * 非必填基础资料验证规则.
+     * 
+     * @return rules
+     */
+    public function makeBasicValidator(): array
+    {
+        $validator  = [
+            'remark' => 'max:100',
+            'property' => 'in:0,1,2,3,4',
+            'operation_remark' => 'max:100',
+            'account_bank' => 'max:20',
+            'account_name' => 'between:2,10',
+            'account_number' => 'between:16,19',
+            'account_active' => 'in:0,1',
+            'wechat_number' => ['between:6,20', unique_validator('staff')],
+            'dingtalk_number' => ['max:50', unique_validator('staff')],
+            'recruiter_sn' => 'exists:staff,staff_sn,deleted_at,NULL|max:10',
+            'recruiter_name' => 'max:10',
+            'tags' => 'array',
+            'tags.*.id' => 'exists:tags,id',
             'household_province_id' => 'exists:i_district,id',
             'household_city_id' => 'exists:i_district,id',
             'household_county_id' => 'exists:i_district,id',
@@ -68,38 +131,26 @@ class StoreStaffRequest extends FormRequest
             'living_city_id' => 'exists:i_district,id',
             'living_county_id' => 'exists:i_district,id',
             'living_address' => 'string|max:30',
-            'concat_name' => 'required|between:2,10',
-            'concat_tel' => 'required|cn_phone',
-            'concat_type' => 'required|max:5',
-            'account_bank' => 'max:20',
-            'account_name' => 'between:2,10',
-            'account_number' => 'between:16,19',
-            'remark' => 'max:100',
+            'marital_status' => 'exists:i_marital_status,name',
+            'native_place' => 'string|max:30',
+            'national' => 'exists:i_national,name',
+            'education' => 'exists:i_education,name',
+            'politics' => 'exists:i_politics,name',
             'height' => 'integer|between:140,220',
             'weight' => 'integer|between:30,150',
-            'operate_at' => 'required|date|after:2000-1-1|before:2038-1-1',
-            'operation_remark' => 'max:100',
-            'relatives.*.relatives_sn' => ['required_with:relatives_type,relative_name'],
-            'relatives.*.relative_stype' => ['required_with:relatives_sn,relative_name'],
-            'relatives.*.relative_nsame' => ['required_with:relative_tsype,relative_sn'],
-            'tags' => 'array',
-            'tags.*.id' => 'exists:tags,id',
-            'mobile' => ['required', 'cn_phone', unique_validator('staff', false)],
-            'wechat_number' => ['between:6,20', unique_validator('staff', false)],
-            'id_card_number' => ['required', 'ck_identity', unique_validator('staff', false)],
-            'dingtalk_number' => ['max:50', unique_validator('staff', false)],
-            'cost_brands' => [
-                'required_with:brand_id',
-                function ($attribute, $value, $fail) use ($brand_id) {
-                    $brands = CostBrand::with('brands')->whereIn('id', $value)->get();
-                    $brands->map(function ($item) use ($fail, $brand_id) {
-                        if (! $item->brands->contains($brand_id)) {
-                            $fail("{$item->name} 不是所属品牌的费用品牌");
-                        }
-                    });
-                }
-            ],
+            'relatives.*.relative_sn' => ['required_with:relative_type,relative_name'],
+            'relatives.*.relative_type' => ['required_with:relative_sn,relative_name'],
+            'relatives.*.relative_name' => ['required_with:relative_type,relative_sn'],
         ];
+        if ($this->operation_type === 'entry') {
+            $validator = array_merge($validator, [
+                'shop_sn' => 'exists:shops,shop_sn,deleted_at,NULL|max:10',
+                'dingtalk_number' => ['max:50', unique_validator('staff', false)],
+                'wechat_number' => ['between:6,20', unique_validator('staff', false)],
+            ]);
+        }
+
+        return $validator;
     }
 
     /**

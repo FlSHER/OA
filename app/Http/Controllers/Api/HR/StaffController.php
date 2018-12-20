@@ -7,12 +7,11 @@ use Validator;
 use Carbon\Carbon;
 use App\Models\HR;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreStaffRequest;
-use App\Http\Resources\HR\StaffResource;
-use App\Http\Requests\UpdateStaffRequest;
-use App\Http\Resources\HR\StaffCollection;
 use App\Services\StaffService;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\HR\StaffResource;
+use App\Http\Resources\HR\StaffCollection;
+use App\Http\Requests\StoreStaffRequest as StaffRequest;
 
 class StaffController extends Controller
 {
@@ -66,7 +65,7 @@ class StaffController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreStaffRequest $request)
+    public function store(StaffRequest $request)
     {
         $data = $request->all();
 
@@ -90,7 +89,7 @@ class StaffController extends Controller
      * @param  \App\Models\HR\Staff $staff
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateStaffRequest $request, HR\Staff $staff)
+    public function update(StaffRequest $request, HR\Staff $staff)
     {
         $data = $request->all();
 
