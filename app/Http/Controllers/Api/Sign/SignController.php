@@ -12,7 +12,7 @@ use Curl;
 class SignController extends Controller
 {
     //结束时间
-    protected $endDateTime = '2018-12-23 18:00:00';
+    protected $endDateTime = '2018-12-25 18:00:00';
 
     //答题时间 （秒）
     protected $answerTime = 10;
@@ -38,7 +38,7 @@ class SignController extends Controller
     public function getUser(Request $request)
     {
         //签到开始时间
-        $startDateTime = '2018-12-22 16:00:00';
+        $startDateTime = '2018-12-24 16:00:00';
 
         $sign = Cache::get('sign');
         if (!is_null($sign)) {
