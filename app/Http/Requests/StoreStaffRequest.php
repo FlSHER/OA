@@ -93,12 +93,14 @@ class StoreStaffRequest extends FormRequest
                     }
                 ],
             ]);
-        } elseif (in_array($operateType, ['edit', 'reinstate'])) {
+        }
+        if (in_array($operateType, ['edit', 'reinstate'])) {
             $validator = array_merge($validator, [
                 'staff_sn' => 'required|exists:staff,staff_sn,deleted_at,NULL',
             ]);
 
-        } elseif ($operateType === 'reinstate') {
+        }
+        if ($operateType === 'reinstate') {
             $validator = array_merge($validator, [
                 'mobile' => ['required', 'cn_phone', unique_validator('staff')],
                 'id_card_number' => ['required', 'ck_identity', unique_validator('staff')],
