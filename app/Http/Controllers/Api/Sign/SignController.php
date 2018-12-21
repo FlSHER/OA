@@ -390,17 +390,20 @@ class SignController extends Controller
             if (array_has($user, $v['user_id'])) {
                 $user[$v['user_id']]['score'] = $user[$v['user_id']]['score'] + $v['score'];
                 $user[$v['user_id']]['total_time'] = $user[$v['user_id']]['total_time'] + $v['time'];
+                $user[$v['user_id']]['number'] = $user[$v['user_id']]['number'] +=1;
             } else {
                 $user[$v['user_id']] = [
                     'user_id' => $v['user_id'],
                     'name' => $v['name'],
                     'avatar' => $v['avatar'],
                     'score' => $v['score'],
-                    'total_time' => $v['time']
+                    'total_time' => $v['time'],
+                    'number'=>1,
                 ];
             }
         }
 
+        $user = array_pluck($user,[]);
         $userCollect = collect($user);
         $topUser = $userCollect->sortByDesc('score')->all();
         return response()->json($topUser, 200);
