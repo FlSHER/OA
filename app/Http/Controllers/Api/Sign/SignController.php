@@ -105,31 +105,31 @@ class SignController extends Controller
         ];
         switch ($round) {
             case 1:
-                $true = 'A';
+                $true = 'C';
                 break;
             case 2:
-                $true = 'B';
+                $true = 'C';
                 break;
             case 3:
-                $true = 'A';
+                $true = 'B';
                 break;
             case 4:
                 $true = 'A';
                 break;
             case 5:
-                $true = 'A';
+                $true = 'B';
                 break;
             case 6:
-                $true = 'A';
+                $true = 'D';
                 break;
             case 7:
                 $true = 'A';
                 break;
             case 8:
-                $true = 'A';
+                $true = 'B';
                 break;
             case 9:
-                $true = 'A';
+                $true = 'D';
                 break;
             case 10:
                 $true = 'A';
