@@ -169,6 +169,16 @@ class Shop extends Model
         $this->attributes['clock_out'] = $value;
     }
 
+    public function setOpeningAtAttribute($value)
+    {
+        $this->attributes['opening_at'] = !empty($value) ? $value : null;
+    }
+
+    public function setEndAtAttribute($value)
+    {
+        $this->attributes['end_at'] = !empty($value) ? $value : null;
+    }
+
     /* ----- 修改器End ----- */
 
     /* ----- 本地作用域 Start ----- */

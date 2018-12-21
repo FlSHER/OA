@@ -113,9 +113,14 @@ Trait ListScopes
                 preg_match('/((?<relation>.*)\.|^)(?<key>.+?)(?<mark>=|~|>=|>|<=|<)(?<value>.+?)$/', $filter, $match);
                 $relation = trim($match['relation']);
                 if ($relation) {
-                    $query->whereHas($relation, function ($query) use ($match, $isOrWhere) {
+                    $builder = function ($query) use ($match, $isOrWhere) {
                         $this->filterBuilder($query, $match, $isOrWhere);
-                    });
+                    };
+                    if ($isOrWhere) {
+                        $query->orWhereHas($relation, $builder);
+                    } else {
+                        $query->whereHas($relation, $builder);
+                    }
                 } else {
                     $this->filterBuilder($query, $match, $isOrWhere);
                 }

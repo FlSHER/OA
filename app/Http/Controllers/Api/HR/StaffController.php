@@ -7,12 +7,12 @@ use Validator;
 use Carbon\Carbon;
 use App\Models\HR;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreStaffRequest;
-use App\Http\Resources\HR\StaffResource;
-use App\Http\Requests\UpdateStaffRequest;
-use App\Http\Resources\HR\StaffCollection;
 use App\Services\StaffService;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\ProcessRequest;
+use App\Http\Resources\HR\StaffResource;
+use App\Http\Resources\HR\StaffCollection;
+use App\Http\Requests\StoreStaffRequest as StaffRequest;
 
 class StaffController extends Controller
 {
@@ -66,7 +66,7 @@ class StaffController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreStaffRequest $request)
+    public function store(StaffRequest $request)
     {
         $data = $request->all();
 
@@ -90,7 +90,7 @@ class StaffController extends Controller
      * @param  \App\Models\HR\Staff $staff
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateStaffRequest $request, HR\Staff $staff)
+    public function update(StaffRequest $request, HR\Staff $staff)
     {
         $data = $request->all();
 
@@ -212,10 +212,9 @@ class StaffController extends Controller
      * @param  Request $request
      * @return mixed
      */
-    public function process(Request $request)
+    public function process(ProcessRequest $request)
     {
         $data = $request->all();
-        $this->processValidator($data);
         $this->staffService->update($data);
         $operateAt = Carbon::parse($data['operate_at'])->gt(now());
 
@@ -231,10 +230,9 @@ class StaffController extends Controller
      * @param  Request $request
      * @return mixed
      */
-    public function transfer(Request $request)
+    public function transfer(ProcessRequest $request)
     {
         $data = $request->all();
-        $this->processValidator($data);
         $this->staffService->update($data);
 
         $data['cost_brands'] = HR\CostBrand::whereIn('id', $data['cost_brands'])->get();
@@ -252,10 +250,9 @@ class StaffController extends Controller
      * @param  Request $request
      * @return mixed
      */
-    public function leave(Request $request)
+    public function leave(ProcessRequest $request)
     {
         $data = $request->all();
-        $this->processValidator($data);
         $this->staffService->update($data);
         if (!$data['skip_leaving']) {
             $data['status_id'] = 0;
@@ -272,11 +269,10 @@ class StaffController extends Controller
      * @param  Request $request
      * @return mixed
      */
-    public function leaving(Request $request)
+    public function leaving(ProcessRequest $request)
     {
         $leaving = HR\Staff::find($request->staff_sn)->leaving;
         if ($request->has('operate_at')) {
-            $this->processValidator($request->all());
             $leavingInfo = [
                 'staff_sn' => $leaving->staff_sn,
                 'status_id' => $leaving->original_status_id,
@@ -308,64 +304,6 @@ class StaffController extends Controller
             $leaving->fill($data)->save();
             return ['status' => 1, 'message' => '交接成功'];
         }
-    }
-
-    /**
-     * 入转调离操作验证.
-     *
-     * @param  array $value
-     * @return mixed
-     */
-    protected function processValidator($value)
-    {
-        $rules = [
-            'staff_sn' => 'required|exists:staff,staff_sn',
-            'operate_at' => 'required|date_format:Y-m-d',
-            'operation_type' => 'required|in:entry,employ,transfer,leave,active,leaving',
-            'operation_remark' => 'max:100',
-        ];
-        switch ($value['operation_type']) {
-            case 'employ'://转正
-                $rules = array_merge($rules, [
-                    'status_id' => 'required|in:2',
-                ]);
-                break;
-            case 'leave': //离职
-                $rules = array_merge($rules, [
-                    'status_id' => 'required|in:-1,-2,-3,-4',
-                    'skip_leaving' => 'in:0,1',
-                ]);
-                break;
-            case 'transfer': //人事变动
-                $rules = array_merge($rules, [
-                    'cost_brands' => 'array',
-                    'status_id' => 'required|in:1,2,3',
-                    'brand_id' => 'required|exists:brands,id',
-                    'shop_sn' => 'max:10|exists:shops,shop_sn',
-                    'position_id' => 'required|exists:positions,id',
-                    'department_id' => 'required|exists:departments,id',
-                ]);
-                break;
-        }
-
-        return Validator::make($value, $rules, $this->message())->validate();
-    }
-
-    /**
-     * 统一处理验证错误信息.
-     *
-     * @return array
-     */
-    protected function message(): array
-    {
-        return [
-            'required' => ':attribute为必填项，不能为空。',
-            'unique' => ':attribute已经存在，请重新填写。',
-            'in' => ':attribute必须在【:values】中选择。',
-            'max' => ':attribute不能大于 :max 个字。',
-            'exists' => ':attribute填写错误。',
-            'date_format' => '时间格式错误',
-        ];
     }
 
 }
