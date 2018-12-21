@@ -78,7 +78,7 @@ class StaffResource extends Resource
             'concat_name' => $this->concat_name,
             'concat_tel' => $this->concat_tel,
             'concat_type' => $this->concat_type,
-            'job_source' => $staff->job_source,
+            'job_source' => $this->job_source,
         ];
     }
 }
