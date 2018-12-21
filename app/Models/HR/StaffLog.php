@@ -7,8 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 class StaffLog extends Model {
 
     protected $table = 'staff_log';
-    protected $fillable = ['staff_sn', 'admin_sn', 'operation_type', 'operation_remark', 'operate_at', 'changes'];
-    protected $casts = ['changes' => 'array'];
+
+    protected $fillable = [
+        'staff_sn',
+        'admin_sn',
+        'changes',
+        'operation_type',
+        'operation_remark',
+        'operate_at',
+    ];
+
+    protected $casts = [
+        'changes' => 'array',
+    ];
 
     /**
      * 操作名称本地化
@@ -30,15 +41,20 @@ class StaffLog extends Model {
 
     /* ----- 定义关联Start ----- */
 
-    public function staff() { //员工
-        return $this->belongsTo('App\Models\HR\Staff', 'staff_sn', 'staff_sn')->select('staff_sn', 'realname')->withTrashed();
+    public function staff() {
+        return $this->belongsTo('App\Models\HR\Staff', 'staff_sn', 'staff_sn')
+            ->select('staff_sn', 'realname')
+            ->withTrashed();
     }
 
-    public function admin() { //操作人员
-        return $this->belongsTo('App\Models\HR\Staff', 'admin_sn', 'staff_sn')->select('staff_sn', 'realname')->withTrashed();
+    public function admin() {
+        return $this->belongsTo('App\Models\HR\Staff', 'admin_sn', 'staff_sn')
+            ->select('staff_sn', 'realname')
+            ->withTrashed();
     }
 
     /* ----- 定义关联End ----- */
+
 
     /* ----- 访问器Start ----- */
 
@@ -57,10 +73,4 @@ class StaffLog extends Model {
     }
 
     /* ----- 访问器End ----- */
-
-    /* ----- 修改器Start ----- */
-
-
-
-    /* ----- 修改器End ----- */
 }
