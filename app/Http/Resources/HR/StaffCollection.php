@@ -82,6 +82,7 @@ class StaffCollection extends ResourceCollection
                 'concat_name' => $staff->concat_name,
                 'concat_tel' => $staff->concat_tel,
                 'concat_type' => $staff->concat_type,
+                'job_source' => $staff->job_source,
             ];
 
         })->toArray();

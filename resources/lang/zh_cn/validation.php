@@ -162,6 +162,7 @@ return [
         'relative_sn' => '关系人编号',
         'relative_type' => '关系人类型',
         'relative_name' => '关系人姓名',
+        'job_source' => '招聘渠道',
 
         // 店铺字段
         'name' => '店铺名称',

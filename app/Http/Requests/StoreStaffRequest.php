@@ -121,6 +121,7 @@ class StoreStaffRequest extends FormRequest
 
         $validator  = [
             'remark' => 'max:100',
+            'job_source' => 'max:20',
             'property' => 'in:0,1,2,3,4',
             'operation_remark' => 'max:100',
             'account_bank' => 'max:20',
