@@ -66,6 +66,7 @@ class Staff extends User
         'concat_tel',
         'concat_type',
         'wechat_number',
+        'job_source',
     ];
 
     protected $appends = ['avatar', 'dingding'];
