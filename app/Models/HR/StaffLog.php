@@ -47,10 +47,10 @@ class StaffLog extends Model {
     }
 
     public function getChangesAttribute($value) {
-        $value = json_decode($value, true);
         $data = [];
+        $value = json_decode($value, true);
         foreach ($value as $k => $v) {
-            $key = isset($this->columnLocalization[$k]) ? $this->columnLocalization[$k] : $k;
+            $key = $this->columnLocalization[$k] ?? $k;
             $data[$key] = $v;
         }
         return $data;

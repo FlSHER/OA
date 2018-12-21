@@ -299,7 +299,9 @@ class ExcelStaffController extends Controller
     protected function makeExportBaseData($item)
     {
         $property = ['无', '108将', '36天罡', '24金刚', '18罗汉'];
+        $transfer = $this->getLastChange($item);
         $parser = new ParserIdentity($item->id_card_number);
+
         return [
             'staff_sn' => $item->staff_sn,
             'realname' => $item->realname,
@@ -318,9 +320,35 @@ class ExcelStaffController extends Controller
             'account_number' => $item->account_number,
             'account_name' => $item->account_name,
             'account_bank' => $item->account_bank,
+            'job_source' => $item->job_source,
             'birthday' => $parser->isValidate() ? $parser->birthday() : '',
+            'position_pull' => $transfer->isNotEmpty() ? $transfer[0] : '',
+            'position_push' => $transfer->isNotEmpty() ? $transfer[1] : '',
+            'position_push_at' => $transfer->isNotEmpty() ? $transfer[2] : '',
             'remark' => $item->remark,
         ];
+    }
+
+    /**
+     * 获取员工最后一次职位变动记录.
+     * 
+     * @param  \App\Models\HR\Staff $item
+     * 
+     * @return Collection
+     */
+    public function getLastChange($item)
+    {
+        $transfer = collect([]);
+        $lastLog = $item->change_log()->where('operation_type', 'transfer')->latest()->first();
+
+        if (!empty($lastLog->changes) && is_array($lastLog->changes)) {
+            $transfer = collect($lastLog->changes)->filter(function ($v, $k) {
+                return ($k === '职位' || $k === 'position');
+            })->collapse();
+            $transfer->isNotEmpty() && $transfer->push($lastLog->created_at->toDateString());
+        }
+
+        return $transfer;
     }
 
     /**
