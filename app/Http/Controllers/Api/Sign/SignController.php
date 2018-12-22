@@ -406,8 +406,7 @@ class SignController extends Controller
         $user = array_pluck($user,[]);
         $userCollect = collect($user);
         $topUser = $userCollect->sortByDesc('score')->take(8)->all();
-        $topUser = array_pluck($topUser,[]);
-        return response()->json($topUser, 200);
+        return response()->json(array_values($topUser), 200);
     }
 
 
