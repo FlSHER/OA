@@ -12,7 +12,7 @@ use Curl;
 class SignController extends Controller
 {
     //结束时间
-    protected $endDateTime = '2018-12-15 18:00:00';
+    protected $endDateTime = '2018-12-25 18:00:00';
 
     //答题时间 （秒）
     protected $answerTime = 10;
@@ -31,16 +31,43 @@ class SignController extends Controller
     }
 
     /**
-     * 获取当前用户
+     * 获取当前用户（并签到）
      * @param Request $request
      * @return mixed
      */
     public function getUser(Request $request)
     {
+        //签到开始时间
+        $startDateTime = '2018-12-24 16:00:00';
+
+        $sign = Cache::get('sign');
+        if (!is_null($sign)) {
+            if (time() < strtotime($startDateTime)) {
+                abort(400, '大会签到未开始');
+            }
+        }
+
+        //获取用户信息
         $code = $request->query('code');
-        $result =  app('Dingtalk')->passCodeGetUserInfo($code);
-        $data = $this->getUserInfo($result['userid']);
-        return response()->json($data,200);
+        $result = app('Dingtalk')->passCodeGetUserInfo($code);
+        if (!array_has($result, 'userid')) {
+            abort(400, '无法获取用户信息');
+        }
+        $user = $this->getUserInfo($result['userid']);
+        $user = array_only($user, ['userid', 'name', 'avatar']);
+
+
+        $userData = SignUser::where('user_id', $user['userid'])->first();
+        //未签到的进行签到
+        if (is_null($userData)) {
+            SignUser::create([
+                'user_id' => $user['userid'],
+                'name' => $user['name'],
+                'avatar' => $user['avatar']
+            ]);
+        }
+
+        return response()->json($user, 200);
     }
 
     /**
@@ -51,56 +78,11 @@ class SignController extends Controller
     protected function getUserInfo($userid)
     {
         $accessToken = app('Dingtalk')->getAccessToken();
-        $url = 'https://oapi.dingtalk.com/user/get?access_token='.$accessToken.'&userid='.$userid;
+        $url = 'https://oapi.dingtalk.com/user/get?access_token=' . $accessToken . '&userid=' . $userid;
         $result = Curl::setUrl($url)->get();
         return $result;
     }
 
-    /**
-     * 签到
-     * @param Request $request
-     */
-    public function sign(Request $request)
-    {
-        //签到开始时间
-        $startDateTime = '2018-12-14 16:00:00';
-
-        $sign = Cache::get('sign');
-        if(!is_null($sign)){
-            if(time()< strtotime($startDateTime)){
-                abort(400,'签到时间还没开始呢，你不能进行签到');
-            }
-        }
-
-        $this->validate($request, [
-            'user_id' => [
-                'required',
-            ],
-            'name' => [
-                'string',
-                'required'
-            ],
-            'department' => [
-                'string',
-                'nullable',
-            ],
-            'avatar' => [
-                'string',
-                'nullable'
-            ]
-        ], [
-            'user_id' => "钉钉号",
-            'name' => "名字",
-            'department' => '部门',
-            'avatar' => '头像',
-        ]);
-        $user = SignUser::where('user_id', $request->input('user_id'))->first();
-        if (!is_null($user)) {
-            abort(400, '你已签到过了');
-        }
-        $data = SignUser::create($request->input());
-        return response()->json($data, 201);
-    }
 
     /**
      * 点击答题开始
@@ -111,39 +93,43 @@ class SignController extends Controller
     {
         $round = $request->query('round');
 
+        list($msec, $sec) = explode(' ', microtime());
+        $msData = explode('.', $msec);
+        $ms = substr($msData[1], 0, 3);
+        $dateTime = $sec . $ms;
         $data = [
             //第几回合
             'round' => $round,
             //开始时间
-            'dateTime' => time(),
+            'dateTime' => $dateTime,
         ];
         switch ($round) {
             case 1:
-                $true = 'A';
+                $true = 'C';
                 break;
             case 2:
-                $true = 'B';
+                $true = 'C';
                 break;
             case 3:
-                $true = 'A';
+                $true = 'B';
                 break;
             case 4:
                 $true = 'A';
                 break;
             case 5:
-                $true = 'A';
+                $true = 'B';
                 break;
             case 6:
-                $true = 'A';
+                $true = 'D';
                 break;
             case 7:
                 $true = 'A';
                 break;
             case 8:
-                $true = 'A';
+                $true = 'B';
                 break;
             case 9:
-                $true = 'A';
+                $true = 'D';
                 break;
             case 10:
                 $true = 'A';
@@ -165,7 +151,7 @@ class SignController extends Controller
      */
     protected function setRound($round)
     {
-        Cache::put('round', $round, 5);
+        Cache::put('round', $round, 10 / 60);
     }
 
     /**
@@ -205,8 +191,13 @@ class SignController extends Controller
         //提交的答案
         $requestTrue = $request->input('true');
         $cache = Cache::get('start_' . $round);
+
+        //答题用时
+        $answerTime= $this->getTime($cache['dateTime']);
+        abort_if($answerTime > ($this->answerTime*1000), 400, '答题已结束');
+
         if (array_has($cache, 'data') && array_has($cache['data'], $requestUserId)) {
-            abort('400', '你已经参与过本轮活力了，不能重复提交');
+            abort(400, '你已经参与过本轮活力了，不能重复提交');
         }
 
         //答案是否正确
@@ -217,18 +208,17 @@ class SignController extends Controller
 
         if ($isOk) {
             //获取正确分值
-            $score = $this->calculate($cache['dateTime']);
+            $score = $this->calculate($answerTime);
         }
 
-        $timeData = $this->getTime($cache['dateTime']);
         $data = [
             'user_id' => $requestUserId,
             'name' => $request->input('name'),
             'avatar' => $request->input('avatar'),
-            'true' => $requestTrue,
             'is_ok' => $isOk,
-            'time' => $timeData['time'],
-            'str_time' => $timeData['str_time'],
+            //正确答案
+            'answer' => $cache['true'],
+            'time' => $answerTime,
             'score' => $score,
         ];
         $cache['data'][$requestUserId] = $data;
@@ -242,18 +232,25 @@ class SignController extends Controller
     /**
      * 计算分值
      */
-    protected function calculate($startTime)
+    protected function calculate($time)
     {
         //默认分值
         $score = 0;
 
-        //答题用的时间
-        $time = time() - $startTime;
-
-        //答题时间小于等于配置的答题时间
-        if ($time <= $this->answerTime) {
+        //答题时间小于10秒
+        if ($time <= 10000) {
+            //基础分
             $score = $this->init;
-            $score = $score + ($this->timeScore * ($this->answerTime - $time));
+
+            // 剩余时间
+            $surplusTime = ($this->answerTime * 1000) - $time;
+
+            //时间分值
+            $timeScore = ($surplusTime*$this->timeScore)/1000;
+
+            $timeScore = (int)round($timeScore);
+
+            $score = $score+$timeScore;
         }
         return $score;
     }
@@ -265,17 +262,16 @@ class SignController extends Controller
      */
     protected function getTime($cacheTime)
     {
-        list($msec, $sec) = explode(' ', microtime());
 
+        list($msec, $sec) = explode(' ', microtime());
         $msData = explode('.', $msec);
         $ms = substr($msData[1], 0, 3);
-        $time = intval($sec) - $cacheTime;
+        $time = $sec . $ms;
 
-        $strTime = $time . '秒' . $ms . '毫秒';
-        return [
-            'str_time' => $strTime,
-            'time' => intval($time . $ms),
-        ];
+        //答题用时
+        $answerTime = intval($time - $cacheTime);
+
+        return $answerTime;
     }
 
     /**
@@ -317,7 +313,6 @@ class SignController extends Controller
                 $top = $cache[$cache['true']];
             }
         }
-
         $data = [
             'round' => $cache['round'],//当前轮回
             'true' => $cache['true'],//正确答案
@@ -325,7 +320,7 @@ class SignController extends Controller
             'B' => $b,
             'C' => $c,
             'D' => $d,
-            'count' => $cache['data'] ? count($cache['data']) : 0,
+            'count' => array_has($cache, 'data') ? count($cache['data']) : 0,
             'top' => $top
         ];
         return response()->json($data, 200);
@@ -395,17 +390,20 @@ class SignController extends Controller
             if (array_has($user, $v['user_id'])) {
                 $user[$v['user_id']]['score'] = $user[$v['user_id']]['score'] + $v['score'];
                 $user[$v['user_id']]['total_time'] = $user[$v['user_id']]['total_time'] + $v['time'];
+                $user[$v['user_id']]['number'] = $user[$v['user_id']]['number'] +=1;
             } else {
                 $user[$v['user_id']] = [
                     'user_id' => $v['user_id'],
                     'name' => $v['name'],
                     'avatar' => $v['avatar'],
                     'score' => $v['score'],
-                    'total_time' => $v['time']
+                    'total_time' => $v['time'],
+                    'number'=>1,
                 ];
             }
         }
 
+        $user = array_pluck($user,[]);
         $userCollect = collect($user);
         $topUser = $userCollect->sortByDesc('score')->all();
         return response()->json($topUser, 200);
@@ -437,7 +435,7 @@ class SignController extends Controller
     public function clearSign()
     {
         \DB::table('sign_user')->delete();
-        return response('success',200);
+        return response('success', 200);
     }
 
     /**
@@ -445,8 +443,8 @@ class SignController extends Controller
      */
     public function upSign()
     {
-        Cache::put('sign',1,60*24*5);
-        return response('success',200);
+        Cache::put('sign', 1, 60 * 24 * 5);
+        return response('success', 200);
     }
 
     /**
@@ -455,6 +453,6 @@ class SignController extends Controller
     public function closeSign()
     {
         Cache::forget('sign');
-        return response('success',200);
+        return response('success', 200);
     }
 }
