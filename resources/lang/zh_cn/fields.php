@@ -143,6 +143,11 @@ return [
         'status.name' => '店铺状态',
         'staff' => '店铺店员',
         'tags' => '店铺标签',
+        'total_area' => '店铺面积',
+        'shop_type' => '店铺类型',
+        'work_type' => '工作类型',
+        'city_ratio' => '城市系数',
+        'staff_deploy' => '人员配置',
 
     ],
     /* 店铺管理 End */

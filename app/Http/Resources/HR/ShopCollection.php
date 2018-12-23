@@ -52,6 +52,8 @@ class ShopCollection extends ResourceCollection
                 'total_area' => $shop->total_area,
                 'shop_type' => $shop->shop_type,
                 'work_type' => $shop->work_type,
+                'city_ratio' => $shop->city_ratio,
+                'staff_deploy' => $shop->staff_deploy,
                 'status_id' => $shop->status_id,
             ];
         })->toArray();

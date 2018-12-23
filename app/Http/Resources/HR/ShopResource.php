@@ -51,6 +51,8 @@ class ShopResource extends Resource
             'total_area' => $this->total_area,
             'shop_type' => $this->shop_type,
             'work_type' => $this->work_type,
+            'city_ratio' => $this->city_ratio,
+            'staff_deploy' => $this->staff_deploy,
             'status_id' => $this->status_id,
         ];
     }

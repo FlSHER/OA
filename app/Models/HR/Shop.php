@@ -53,6 +53,8 @@ class Shop extends Model
         'shop_type',
         'work_type',
         'work_schedule_id',
+        'city_ratio',
+        'staff_deploy',
     ];
 
     protected $dirtyAttributes = [];

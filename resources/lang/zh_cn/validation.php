@@ -180,9 +180,11 @@ return [
         'manager_name' => '店长姓名',
         'assistant_sn' => '助店人编号',
         'assistant_name' => '助店人姓名',
-        'total_area' => '总面积',
+        'total_area' => '店铺面积',
         'shop_type' => '店铺类型',
         'work_type' => '工作类型',
+        'city_ratio' => '城市系数',
+        'staff_deploy' => '人员配置',
         'staff' => '店员',
     ],
 
