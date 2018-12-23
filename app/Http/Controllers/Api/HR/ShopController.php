@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Api\HR;
 
 use App\Models\HR\Shop;
-use App\Models\HR\Staff;
 use Illuminate\Http\Request;
 use App\Services\ShopService;
-use Illuminate\Validation\Rule;
+use App\Http\Requests\ShopRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\HR\ShopResource;
 use App\Http\Resources\HR\ShopCollection;
@@ -47,9 +46,8 @@ class ShopController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, Shop $shop)
+    public function store(ShopRequest $request, Shop $shop)
     {
-        $this->validate($request, $this->rules($request), $this->message());
         $shop = $this->shopService->index($request->all());
         $this->position($shop);
 
@@ -78,9 +76,8 @@ class ShopController extends Controller
      * @param  \App\Models\HR\Shop $shop
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Shop $shop)
+    public function update(ShopRequest $request, Shop $shop)
     {
-        $this->validate($request, $this->rules($request), $this->message());
         $shop = $this->shopService->index($request->all());
         $this->position($shop);
 
@@ -122,54 +119,5 @@ class ShopController extends Controller
                 'longitude' => $shop->lng
             ]);
         }
-    }
-
-    protected function rules(Request $request)
-    {
-        $rules = [
-            'name' => 'bail|required|max:50',
-            'shop_sn' => 'bail|required|unique:shops|max:10',
-            'status_id' => 'bail|required|exists:shop_status,id',
-            'department_id' => 'bail|exists:departments,id',
-            'brand_id' => 'bail|exists:brands,id',
-            'opening_at' => 'required_with:end_at|date_format:Y-m-d',
-            'end_at' => 'date_format:Y-m-d|after:opening_at',
-            'province_id' => 'bail|required|exists:i_district,id',
-            'city_id' => 'bail|required|exists:i_district,id',
-            'county_id' => 'bail|required|exists:i_district,id',
-            'address' => 'bail|max:50',
-            'real_address' => 'bail|max:50',
-            'tags' => 'bail|array',
-            'tags.*.id' => 'bail|exists:tags,id',
-            'manager_sn' => 'bail|exists:staff,staff_sn',
-            'manager_name' => 'bail|max:10',
-            'assistant_sn' => 'bail|exists:staff,staff_sn',
-            'assistant_name' => 'bail|max:10',
-            'staff' => 'bail|array',
-            'staff.*.staff_sn' => 'bail|exists:staff,staff_sn',
-        ];
-        if (strtolower($request->getMethod()) === 'patch') {
-            return array_merge($rules, [
-                'shop_sn' => [
-                    'required',
-                    'max:10',
-                    Rule::unique('shops')->ignore($request->shop_sn, 'shop_sn'),
-                ],
-            ]);
-        }
-
-        return $rules;
-    }
-
-    protected function message()
-    {
-        return [
-            'required' => ':attribute 为必填项，不能为空。',
-            'unique' => ':attribute 已经存在，请重新填写。',
-            'array' => ':attribute 数据格式错误。',
-            'max' => ':attribute 不能大于 :max 个字。',
-            'exists' => ':attribute 填写错误。',
-            'after_or_equal' => ':attribute 不能小于 :values。',
-        ];
     }
 }
