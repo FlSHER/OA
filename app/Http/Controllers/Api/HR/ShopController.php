@@ -120,4 +120,73 @@ class ShopController extends Controller
             ]);
         }
     }
+
+    /**
+     * 导出店铺信息.
+     * 
+     * @param  Request $request
+     * @return mixed
+     */
+    public function export(Request $request)
+    {
+        $data = [];
+        $hasAuth = app('Authority')->checkAuthority(196);
+        $shops = Shop::query()
+            ->with(['staff', 'department', 'brand', 'province', 'city', 'county', 'status', 'tags'])
+            ->filterByQueryString()
+            ->sortByQueryString()
+            ->get();
+
+        $shops->map(function ($item, $key) use (&$data, $hasAuth) {
+
+            // 基础数据
+            $exportData = $this->makeExportBaseData($item);
+
+            $data[$key] = $exportData;
+        });
+
+        return response()->json($data, 201);
+    }
+
+    /**
+     * 组装导出基础数据。
+     * 
+     * @param  [type] $item
+     * @return array
+     */
+    protected function makeExportBaseData($item)
+    {
+        $address = implode(' ', [
+            $item->province->name ?? '',
+            $item->city->name ?? '',
+            $item->county->name ?? '',
+        ]);
+
+        return [
+            'shop_sn' => $item->shop_sn,
+            'name' => $item->name,
+            'manager_sn' => $item->manager_sn ?: '',
+            'manager_name' => $item->manager_name,
+            'department' => $item->department->full_name,
+            'area_manager_name' => $item->department->area_manager_name,
+            'regional_manager_name' => $item->department->regional_manager_name,
+            'personnel_manager_name' => $item->department->personnel_manager_name,
+            'assistant_sn' => $item->assistant_sn,
+            'assistant_name' => $item->assistant_name,
+            'brand' => $item->brand->name,
+            'address' => $address.' '.$item->address,
+            'status' => $item->status->name,
+            'clock_out' => $item->clock_out,
+            'clock_in' => $item->clock_in,
+            'opening_at' => $item->opening_at,
+            'end_at' => $item->end_at,
+            'total_area' => $item->total_area,
+            'shop_type' => $item->shop_type,
+            'work_type' => $item->work_type,
+            'city_ratio' => $item->city_ratio,
+            'staff_deploy' => $item->staff_deploy,
+            'staff' => $item->staff->implode('realname', ','),
+            'tags' => $item->tags->implode('name', ','),
+        ];
+    }
 }

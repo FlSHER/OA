@@ -179,6 +179,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
         // 店铺定位 /api/hr/shops/position
         Route::post('hr/shops/position', 'ShopController@position');
 
+        // 导出店铺资料 /api/hr/shops/export
+        Route::post('hr/shops/export', 'ShopController@export');
+
         Route::apiResource('hr/tags', 'TagController');// 员工标签
         Route::apiResource('hr/shops', 'ShopController');// 店铺
         Route::apiResource('hr/roles', 'RoleController');// 角色
