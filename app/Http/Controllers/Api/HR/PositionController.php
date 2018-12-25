@@ -21,10 +21,10 @@ class PositionController extends Controller
             ->filterByQueryString()
             ->sortByQueryString()
             ->withPagination();
-            
+
         if (isset($list['data'])) {
             $list['data'] = new PositionCollection($list['data']);
-            
+
             return $list;
         }
 
@@ -49,13 +49,13 @@ class PositionController extends Controller
             'name.max' => '职位名称不能超过 :max 个字',
             'level.required' => '职级不能为空',
             'level.max' => '职级不能大于 :max',
-        ]; 
+        ];
         $this->validate($request, $rules, $message);
         $data = $request->all();
         $position->name = $data['name'];
         $position->level = $data['level'];
         $position->is_public = $data['is_public'];
-        
+
         $position->getConnection()->transaction(function () use ($position, $data) {
             $position->save();
             $position->brand()->attach($data['brands']);
@@ -63,7 +63,7 @@ class PositionController extends Controller
 
         $position->load('brand');
         $position->brands = $position->brand;
-        
+
         return response()->json($position, 201);
     }
 
@@ -96,23 +96,23 @@ class PositionController extends Controller
         $message = [
             'name.required' => '职位名称不能为空',
             'name.max' => '职位名称不能超过 :max 个字',
-            'level.required' => '职级不能为空', 
+            'level.required' => '职级不能为空',
         ];
         $this->validate($request, $rules, $message);
         $data = $request->all();
         $position->name = $data['name'];
         $position->level = $data['level'];
         $position->is_public = $data['is_public'];
-        
+
         $position->getConnection()->transaction(function () use ($position, $data) {
             $position->save();
             $position->brand()->detach();
             $position->brand()->attach($data['brands']);
         });
-        
+
         $position->load('brand');
         $position->brands = $position->brand;
-        
+
         return response()->json($position, 201);
     }
 
@@ -124,7 +124,7 @@ class PositionController extends Controller
      */
     public function destroy(Position $position)
     {
-        $hasStaff = $position->staffs->isNotEmpty();
+        $hasStaff = $position->staffs()->where('status_id', '>=', 0)->count() > 0;
         if ($hasStaff) {
             return response()->json(['message' => '有在职员工使用的职位不能删除'], 422);
         }
