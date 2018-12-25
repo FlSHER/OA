@@ -139,10 +139,12 @@ class ShopController extends Controller
 
         $shops->map(function ($item, $key) use (&$data, $hasAuth) {
 
-            // 基础数据
-            $exportData = $this->makeExportBaseData($item);
+            if ($hasAuth) {
+                // 基础数据
+                $exportData = $this->makeExportBaseData($item);
 
-            $data[$key] = $exportData;
+                $data[$key] = $exportData;
+            }
         });
 
         return response()->json($data, 201);
