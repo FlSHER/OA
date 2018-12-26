@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\HR\Staff;
 use App\Models\Traits\ListScopes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Position extends Model {
-
+class Position extends Model
+{
     use SoftDeletes, ListScopes;
 
-    protected $guarded = ['id', 'brand'];
+    protected $guarded = ['id', 'brand', 'brands'];
 
     protected $fillable = [
         'name',
@@ -44,7 +45,8 @@ class Position extends Model {
 
     /* ----- 访问器Start ----- */
 
-    public function getOptionAttribute() { //获取option
+    public function getOptionAttribute()
+    { //获取option
         return '<option value="' . $this->id . '">' . $this->name . '</option>';
     }
 
@@ -52,9 +54,15 @@ class Position extends Model {
 
     /* ----- 本地作用域 Start ----- */
 
-    public function scopeApi($query) {
+    public function scopeApi($query)
+    {
         $query->with('brand');
     }
 
     /* ----- 本地作用域 End ----- */
+
+    public function staff()
+    {
+        return $this->hasMany(Staff::class, 'position_id');
+    }
 }

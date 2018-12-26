@@ -25,15 +25,21 @@ class PositionRequest extends FormRequest
     {
         $rules = [
             'name' => 'required|unique:positions,name,NULL,name,deleted_at,NULL|max:10',
-            'level' => 'numeric|max:99',
+            'level' => 'numeric|integer|max:99',
             'is_public' => 'in:0,1',
             'is_manager' => 'in:0,1',
             'brands' => 'array',
         ];
+        if ($this->getMethod() === 'PATCH') {
+            $rules = array_merge($rules, [
+                'name' => [
+                    'required',
+                    unique_validator('positions'),
+                ],
+            ]);
+        }
 
-        return [
-            //
-        ];
+        return $rules;
     }
 
     /**
@@ -46,6 +52,7 @@ class PositionRequest extends FormRequest
         return [
             'name' => '职位名称',
             'level' => '职级',
+            'brands' => '关联品牌',
             'is_public' => '是否公共职位',
         ];
     }

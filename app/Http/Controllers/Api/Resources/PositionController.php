@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api\Resources;
 
 use App\Models\HR\Staff;
-use App\Models\HR\Position;
+use App\Models\Position;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PositionRequest;
 use App\Http\Resources\HR\PositionCollection;
 
 class PositionController extends Controller
@@ -37,25 +38,10 @@ class PositionController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, Position $position)
+    public function store(PositionRequest $request, Position $position)
     {
-        $rules = [
-            'name' => 'required|unique:positions|max:10',
-            'level' => 'required|integer|max:100',
-        ];
-        $message = [
-            'name.required' => '职位名称不能为空',
-            'name.unique' => '职位名称已存在',
-            'name.max' => '职位名称不能超过 :max 个字',
-            'level.required' => '职级不能为空',
-            'level.max' => '职级不能大于 :max',
-        ]; 
-        $this->validate($request, $rules, $message);
         $data = $request->all();
-        $position->name = $data['name'];
-        $position->level = $data['level'];
-        $position->is_public = $data['is_public'];
-        
+        $position->fill($data);
         $position->getConnection()->transaction(function () use ($position, $data) {
             $position->save();
             $position->brand()->attach($data['brands']);
@@ -70,7 +56,7 @@ class PositionController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\HR\Position $position
+     * @param  \App\Models\Position $position
      * @return \Illuminate\Http\Response
      */
     public function show(Position $position)
@@ -84,30 +70,16 @@ class PositionController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @param  \App\Models\HR\Position $position
+     * @param  \App\Models\Position $position
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Position $position)
+    public function update(PositionRequest $request, Position $position)
     {
-        $rules = [
-            'name' => 'required|max:10',
-            'level' => 'required',
-        ];
-        $message = [
-            'name.required' => '职位名称不能为空',
-            'name.max' => '职位名称不能超过 :max 个字',
-            'level.required' => '职级不能为空', 
-        ];
-        $this->validate($request, $rules, $message);
         $data = $request->all();
-        $position->name = $data['name'];
-        $position->level = $data['level'];
-        $position->is_public = $data['is_public'];
-        
+        $position->fill($data);
         $position->getConnection()->transaction(function () use ($position, $data) {
             $position->save();
-            $position->brand()->detach();
-            $position->brand()->attach($data['brands']);
+            $position->brand()->sync($data['brands']);
         });
         
         $position->load('brand');
@@ -119,13 +91,12 @@ class PositionController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\HR\Position $position
+     * @param  \App\Models\Position $position
      * @return \Illuminate\Http\Response
      */
     public function destroy(Position $position)
     {
-        $hasStaff = $position->staffs->isNotEmpty();
-        if ($hasStaff) {
+        if ($position->staff->isNotEmpty()) {
             return response()->json(['message' => '有在职员工使用的职位不能删除'], 422);
         }
         $position->getConnection()->transaction(function () use ($position) {
