@@ -35,12 +35,7 @@ class DepartmentCategoryController extends Controller
         $this->validate($request, [
             'name' => 'required|unique:department_categories|max:10',
             'fields' => 'array',
-        ], [
-            'name.required' => '部门分类名称必填',
-            'name.max' => '部门分类名称过长',
-            'name.unique' => '部门分类已经存在',
-            'fields.array' => '分类字段类型错误',
-        ]);
+        ], [], $this->attributes());
 
         $cate->fill($request->all());
         $cate->save();
@@ -58,16 +53,9 @@ class DepartmentCategoryController extends Controller
     public function update(Request $request, DepartmentCategory $cate)
     {
         $this->validate($request, [
-            'name' => [
-                'max:10',
-                Rule::unique('department_categories')->ignore($cate->id),
-            ],
+            'name' => [unique_validator('department_categories'), 'max:10'],
             'fields' => 'array',
-        ], [
-            'name.max' => '部门分类名称过长',
-            'name.unique' => '部门分类已经存在',
-            'fields.array' => '分类字段类型错误',
-        ]);
+        ], [], $this->attributes());
 
         $cate->fill($request->all());
         $cate->save();
@@ -101,5 +89,18 @@ class DepartmentCategoryController extends Controller
     public function show(DepartmentCategory $cate)
     {   
         return response()->json($category);
+    }
+
+    /**
+     * 翻译验证字段名称.
+     * 
+     * @return array
+     */
+    public function attributes(): array
+    {
+        return [
+            'name' => '部门分类',
+            'fields' => '分类字段',
+        ];
     }
 }
