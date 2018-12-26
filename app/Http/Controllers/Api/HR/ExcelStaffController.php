@@ -525,6 +525,7 @@ class ExcelStaffController extends Controller
         }
         $validator = Validator::make($value->toArray(), $rules, $this->message());
         if ($this->staffWithMap) {
+            $this->errors = [];
             foreach ($validator->errors()->getMessages() as $key => $error) {
                 $this->errors[$this->staffWithMap[$key]] = $error;
             }
