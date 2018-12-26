@@ -45,7 +45,7 @@ class DepartmentController extends Controller
         $rules = [
             'name' => 'required|unique:departments|max:10',
             'cate_id' => 'exists:department_categories,id',
-            'manager_sn' => ['exists:staff,staff_sn'],
+            'manager_sn' => 'exists:staff,staff_sn',
         ];
         $messages = [
             'name.required' => '部门名称不能为空',
@@ -57,7 +57,7 @@ class DepartmentController extends Controller
         $this->validate($request, $rules, $messages);
         $department->fill($request->all());
         $department->save();
-        $department->load('category');
+        $department->load('category', 'brand', 'children');
 
         return response()->json(new DepartmentResource($department), 201);
     }
@@ -70,6 +70,8 @@ class DepartmentController extends Controller
      */
     public function show(Department $department)
     {
+        $department->load('brand', 'children');
+
         return new DepartmentResource($department);
     }
 
@@ -85,7 +87,7 @@ class DepartmentController extends Controller
         $rules = [
             'name' => 'required|max:10',
             'cate_id' => 'exists:department_categories,id',
-            'manager_sn' => ['exists:staff,staff_sn'],
+            'manager_sn' => 'exists:staff,staff_sn',
         ];
         $messages = [
             'name.required' => '部门名称不能为空',
@@ -96,7 +98,7 @@ class DepartmentController extends Controller
         $this->validate($request, $rules, $messages);
         $department->fill($request->all());
         $department->save();
-        $department->load('category');
+        $department->load('category', 'brand', 'children');
 
         return response()->json(new DepartmentResource($department), 201);
     }

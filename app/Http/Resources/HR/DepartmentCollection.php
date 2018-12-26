@@ -35,6 +35,9 @@ class DepartmentCollection extends ResourceCollection
                 'personnel_manager_name' => $department->personnel_manager_name,
                 'regional_manager_sn' => $department->regional_manager_sn,
                 'regional_manager_name' => $department->regional_manager_name,
+                'minister_sn' => $department->minister_sn,
+                'minister_name' => $department->minister_name,
+                'province_id' => $department->province_id,
             ];
         })->toArray();
     }

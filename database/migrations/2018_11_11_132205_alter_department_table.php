@@ -20,7 +20,10 @@ class AlterDepartmentTable extends Migration
             $table->char('regional_manager_name', 10)->default('')->comment('大区经理姓名');
             $table->char('personnel_manager_sn', 6)->default('')->comment('人事负责人编号');
             $table->char('personnel_manager_name', 10)->default('')->comment('人事负责人姓名');
+            $table->char('minister_sn', 6)->default('')->comment('部长员工编号');
+            $table->char('minister_name', 10)->default('')->comment('部长姓名');
             $table->tinyInteger('cate_id')->default(0)->comment('关联部门分类');
+            $table->mediumInteger('province_id')->default(0)->comment('部门省份');
         });
     }
 
@@ -33,6 +36,9 @@ class AlterDepartmentTable extends Migration
     {
         Schema::table('departments', function (Blueprint $table) {
             $table->dropColumn('cate_id');
+            $table->dropColumn('province_id');
+            $table->dropColumn('minister_sn');
+            $table->dropColumn('minister_name');
             $table->dropColumn('area_manager_sn');
             $table->dropColumn('area_manager_name');
             $table->dropColumn('regional_manager_sn');
