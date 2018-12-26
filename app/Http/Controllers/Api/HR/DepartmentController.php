@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\HR;
 use Illuminate\Http\Request;
 use App\Models\Department;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DepartmentRequest;
 use App\Http\Resources\HR\StaffCollection;
 use App\Http\Resources\HR\DepartmentResource;
 use App\Http\Resources\HR\DepartmentCollection;
@@ -40,21 +41,8 @@ class DepartmentController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, Department $department)
+    public function store(DepartmentRequest $request, Department $department)
     {
-        $rules = [
-            'name' => 'required|unique:departments|max:10',
-            'cate_id' => 'exists:department_categories,id',
-            'manager_sn' => 'exists:staff,staff_sn',
-        ];
-        $messages = [
-            'name.required' => '部门名称不能为空',
-            'name.unique' => '部门名称已存在',
-            'name.max' => '部门名称不能超过 :max 个字',
-            'manager_sn.exists' => '部门负责人不存在',
-            'cate_id.exists' => '部门分类不存在',
-        ];
-        $this->validate($request, $rules, $messages);
         $department->fill($request->all());
         $department->save();
         $department->load('category', 'brand', 'children');
@@ -82,20 +70,8 @@ class DepartmentController extends Controller
      * @param  \App\Models\Department $department
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Department $department)
+    public function update(DepartmentRequest $request, Department $department)
     {
-        $rules = [
-            'name' => 'required|max:10',
-            'cate_id' => 'exists:department_categories,id',
-            'manager_sn' => 'exists:staff,staff_sn',
-        ];
-        $messages = [
-            'name.required' => '部门名称不能为空',
-            'name.max' => '部门名称不能超过 :max 个字',
-            'manager_sn.exists' => '部门负责人不存在',
-            'cate_id.exists' => '部门分类不存在',
-        ];
-        $this->validate($request, $rules, $messages);
         $department->fill($request->all());
         $department->save();
         $department->load('category', 'brand', 'children');
@@ -111,8 +87,7 @@ class DepartmentController extends Controller
      */
     public function destroy(Department $department)
     {
-        $hasStaff = $department->staff->isNotEmpty();
-        if ($hasStaff) {
+        if ($department->staff->isNotEmpty()) {
             return response()->json(['message' => '有在职员工使用的部门不能删除'], 422);
         }
 
@@ -156,8 +131,8 @@ class DepartmentController extends Controller
     public function sortBy(Request $request)
     {
         $this->validate($request, [
-            'new_data.*.name' => 'bail|required|string',
-            'new_data.*.sort' => 'bail|required|numeric',
+            'new_data.*.name' => 'required|string',
+            'new_data.*.sort' => 'required|numeric',
         ], [
             'new_data.*.name.required' => '部门名称不能为空',
             'new_data.*.sort.required' => '部门排序值不能为空',

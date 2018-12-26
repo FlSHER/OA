@@ -14,16 +14,16 @@ class AlterDepartmentTable extends Migration
     public function up()
     {
         Schema::table('departments', function (Blueprint $table) {
+            $table->tinyInteger('cate_id')->default(0)->comment('关联部门分类');
+            $table->mediumInteger('province_id')->default(0)->comment('部门省份');
+            $table->char('minister_sn', 6)->default('')->comment('部长员工编号');
+            $table->char('minister_name', 10)->default('')->comment('部长姓名');
             $table->char('area_manager_sn', 6)->default('')->comment('区域经理编号');
             $table->char('area_manager_name', 10)->default('')->comment('区域经理姓名');
             $table->char('regional_manager_sn', 6)->default('')->comment('大区经理编号');
             $table->char('regional_manager_name', 10)->default('')->comment('大区经理姓名');
             $table->char('personnel_manager_sn', 6)->default('')->comment('人事负责人编号');
             $table->char('personnel_manager_name', 10)->default('')->comment('人事负责人姓名');
-            $table->char('minister_sn', 6)->default('')->comment('部长员工编号');
-            $table->char('minister_name', 10)->default('')->comment('部长姓名');
-            $table->tinyInteger('cate_id')->default(0)->comment('关联部门分类');
-            $table->mediumInteger('province_id')->default(0)->comment('部门省份');
         });
     }
 
