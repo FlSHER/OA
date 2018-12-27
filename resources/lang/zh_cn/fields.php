@@ -85,6 +85,7 @@ return [
         ],
         'operate_at' => '执行时间',
         'operation_type' => [// 操作类型
+            'add' => '入职',
             'edit' => '编辑',
             'entry' => '入职',
             'import_entry' => '导入入职',

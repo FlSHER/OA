@@ -71,6 +71,17 @@ class StaffService
                 if ($this->isDirty()) {
                     $log = new StaffOperationLogService();
                     $log->model($model)->write($this->dirty, $data);
+
+                    // 增加职位变动记录
+                    /*if (
+                        !empty($this->dirty['position_id']) && 
+                        in_array($data['operation_type'], ['transfer', 'import_transfer'])
+                    ) {
+                        $data['operation_type'] = 'position';
+                        $log->model($model)->write([
+                            'position_id' => $this->dirty['position_id']
+                        ], $data);
+                    }*/
                 }
             }
             \DB::commit();
@@ -268,14 +279,6 @@ class StaffService
 
             $this->addDirty($model);
             $model->setRawAttributes($model->getOriginal());
-
-            // 如果有职位变动 直接添加一条记录
-            if (!empty($dirty['position_id'])) {
-                $log = new StaffOperationLogService();
-                $log->model($model)->write([
-                    'position_id' => $dirty['position_id']
-                ], $data);
-            }
         }
     }
 
