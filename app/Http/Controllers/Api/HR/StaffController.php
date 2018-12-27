@@ -69,9 +69,7 @@ class StaffController extends Controller
     public function store(StaffRequest $request)
     {
         $data = $request->all();
-
         $curd = $this->staffService->create($data);
-
         if ($curd['status'] == 1) {
             $staff = HR\Staff::withApi()
                 ->orderBy('staff_sn', 'desc')
@@ -87,16 +85,14 @@ class StaffController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @param  \App\Models\HR\Staff $staff
      * @return \Illuminate\Http\Response
      */
-    public function update(StaffRequest $request, HR\Staff $staff)
+    public function update(StaffRequest $request)
     {
         $data = $request->all();
-
         $curd = $this->staffService->update($data);
         if ($curd['status'] == 1 || $curd['status'] == -1) {
-            $staff->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'status', 'tags']);
+            $staff = HR\Staff::withApi()->where('staff_sn', $data['staff_sn'])->first();
 
             return response()->json(new StaffResource($staff), 201);
         }
@@ -137,6 +133,34 @@ class StaffController extends Controller
             ->get();
 
         return response()->json($logs, 200);
+    }
+
+    public function formatLog(HR\Staff $staff)
+    {
+        $logs = HR\StaffLog::with('staff', 'admin')
+            ->where('staff_sn', $staff->staff_sn)
+            ->whereNotIn('operation_type', ['edit', 'active', 'delete'])
+            ->orderBy('id', 'asc')
+            ->get();
+        $format = $logs->filter(function ($item) {
+            if (in_array($item->operation_type, ['人事变动', '导入变动', '职位变动']) && !empty($item->changes) ) {
+                return collect($item->changes)->filter(function ($v, $k) {
+                    return ($k === '职位' || $k === 'position');
+                })->isNotEmpty();
+            }
+            return true;
+        })->map(function ($item) {
+            if (in_array($item->operation_type, ['人事变动', '导入变动', '职位变动'])) {
+                $item->changes = collect($item->changes)->filter(function ($v, $k) {
+                    return ($k === '职位' || $k === 'position');
+                })->collapse();
+            } else {
+                $item->changes = [];
+            }
+            return $item;
+        })->values();
+
+        return response()->json($format, 200);
     }
 
     /**

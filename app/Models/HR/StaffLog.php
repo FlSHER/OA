@@ -58,8 +58,9 @@ class StaffLog extends Model {
 
     /* ----- 访问器Start ----- */
 
-    public function getOperationTypeAttribute($value) {
-        return array_has($this->typeLocalization, $value) ? $this->typeLocalization[$value] : $value;
+    public function getOperationTypeAttribute($value)
+    {
+        return $this->typeLocalization[$value] ?? $value;
     }
 
     public function getChangesAttribute($value) {

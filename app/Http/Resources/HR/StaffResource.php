@@ -17,6 +17,11 @@ class StaffResource extends Resource
      */
     public function toArray($request)
     {
+        $shop = [];
+        if ($this->shop) {
+            $shop = $this->shop->only(['shop_sn', 'name', 'manager_sn', 'manager_name', 'real_address']);
+            $shop['manager_mobile'] = $this->shop->load('manager')->manager->mobile ?? '';
+        }
         return [
             'staff_sn' => $this->staff_sn,
             'realname' => $this->realname,
@@ -36,6 +41,7 @@ class StaffResource extends Resource
             'dingtalk_number' => $this->dingtalk_number,
             'wechat_number' => $this->wechat_number,
 
+            'shop' => $shop,
             'tags' => $this->tags,
             'brand' => $this->brand->only(['id', 'name']),
             'status' => $this->status->only(['id', 'name']),
@@ -43,7 +49,6 @@ class StaffResource extends Resource
             'relatives' => $this->relative ? new StaffRelativeCollection($this->relative) : [],
             'department' => $this->department->only(['id', 'full_name', 'manager_sn', 'manager_name']),
             'cost_brands' => $this->cost_brands,
-            'shop' => $this->shop ? $this->shop->only(['shop_sn', 'name', 'manager_sn', 'manager_name']) : null,
             'household_province_name' => $this->household_province ? $this->household_province->name : '',
             'household_city_name' => $this->household_city ? $this->household_city->name : '',
             'household_county_name' => $this->household_county ? $this->household_county->name : '',
