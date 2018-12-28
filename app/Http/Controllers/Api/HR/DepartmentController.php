@@ -28,10 +28,10 @@ class DepartmentController extends Controller
 
         if (isset($list['data'])) {
             $list['data'] = new DepartmentCollection($list['data']);
-            
+
             return $list;
         }
-        
+
         return new DepartmentCollection($list);
     }
 
@@ -87,7 +87,8 @@ class DepartmentController extends Controller
      */
     public function destroy(Department $department)
     {
-        if ($department->staff->isNotEmpty()) {
+        $hasStaff = $department->staff()->where('status_id', '>=', 0)->count() > 0;
+        if ($hasStaff) {
             return response()->json(['message' => '有在职员工使用的部门不能删除'], 422);
         }
 
@@ -104,7 +105,7 @@ class DepartmentController extends Controller
     public function tree()
     {
         return Department::get()->map(function ($item) {
-            $item->parent_id = $item->parent_id ? : null;
+            $item->parent_id = $item->parent_id ?: null;
 
             return $item;
         });
@@ -126,7 +127,7 @@ class DepartmentController extends Controller
     /**
      * 部门拖动排序
      *
-     * @return mixed 
+     * @return mixed
      */
     public function sortBy(Request $request)
     {

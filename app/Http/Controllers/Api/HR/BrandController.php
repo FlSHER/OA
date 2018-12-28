@@ -21,13 +21,13 @@ class BrandController extends Controller
             ->filterByQueryString()
             ->sortByQueryString()
             ->withPagination();
-            
+
         if (isset($list['data'])) {
             $list['data'] = new BrandCollection($list['data']);
 
             return $list;
         }
-        
+
         return new BrandCollection($list);
     }
 
@@ -104,7 +104,7 @@ class BrandController extends Controller
      */
     public function destroy(Brand $brand)
     {
-        if ($brand->staffs->isNotEmpty()) {
+        if ($brand->staffs()->where('status_id', '>=', 0)->count() > 0) {
 
             return response()->json(['message' => '有在职员工使用的品牌不能删除'], 422);
 

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\HR;
 
 use Validator;
 use App\Models\HR;
-use App\Models\Brand;
 use App\Models\Department;
 use App\Models\I\District;
 use Illuminate\Http\Request;
@@ -214,7 +213,7 @@ class ExcelStaffController extends Controller
                 $data['position_id'] = $this->getPosition($v);
 
             } elseif ($v && $k === 'status') {
-                $status = ['试用期' => 1, '在职' => 2, '停薪留职' => 3, '离职' => -1, '自动离职' => -2, '开除' => -3, '劝退' => -4];
+                $status = ['离职中' => 0, '试用期' => 1, '在职' => 2, '停薪留职' => 3];
                 $data['status_id'] = $status[$v];
 
             } elseif ($v && $k === 'household_province') {
@@ -406,7 +405,7 @@ class ExcelStaffController extends Controller
      {
         $key = "brand_list";
         $brand = Cache::get($key, function () use ($key) {
-            $brand = Brand::select('id', 'name')->get();
+            $brand = HR\Brand::select('id', 'name')->get();
             Cache::put($key, $brand, now()->addMinutes(10));
 
             return $brand;
@@ -478,7 +477,6 @@ class ExcelStaffController extends Controller
             'brand' => 'exists:brands,name,deleted_at,NULL',
             'position' => 'exists:positions,name,deleted_at,NULL',
             'gender' => 'in:未知,男,女',
-            'status' => 'exists:staff_status,name',
             'national' => 'exists:i_national,name',
             'education' => 'exists:i_education,name',
             'politics' => 'exists:i_politics,name',
@@ -506,6 +504,11 @@ class ExcelStaffController extends Controller
             'wechat_number' => ['between:6,20', unique_validator('staff', false)],
             'id_card_number' => ['required', 'ck_identity', unique_validator('staff', false)],
             'dingtalk_number' => ['max:50', unique_validator('staff', false)],
+            'status' => [
+                Rule::exists('staff_status', 'name')->where(function ($query) {
+                    $query->where('id', '>=', 0);
+                }),
+            ],
             'cost_brand' => [
                 'required_with:brand',
                 function ($attribute, $content, $fail) use ($value) {

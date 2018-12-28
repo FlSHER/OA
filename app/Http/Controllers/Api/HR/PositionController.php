@@ -22,10 +22,10 @@ class PositionController extends Controller
             ->filterByQueryString()
             ->sortByQueryString()
             ->withPagination();
-            
+
         if (isset($list['data'])) {
             $list['data'] = new PositionCollection($list['data']);
-            
+
             return $list;
         }
 
@@ -49,7 +49,7 @@ class PositionController extends Controller
 
         $position->load('brand');
         $position->brands = $position->brand;
-        
+
         return response()->json($position, 201);
     }
 
@@ -81,10 +81,10 @@ class PositionController extends Controller
             $position->save();
             $position->brand()->sync($data['brands']);
         });
-        
+
         $position->load('brand');
         $position->brands = $position->brand;
-        
+
         return response()->json($position, 201);
     }
 
@@ -96,7 +96,8 @@ class PositionController extends Controller
      */
     public function destroy(Position $position)
     {
-        if ($position->staff->isNotEmpty()) {
+        $hasStaff = $position->staff()->where('status_id', '>=', 0)->count() > 0;
+        if ($hasStaff) {
             return response()->json(['message' => '有在职员工使用的职位不能删除'], 422);
         }
         $position->getConnection()->transaction(function () use ($position) {

@@ -193,8 +193,8 @@ class SignController extends Controller
         $cache = Cache::get('start_' . $round);
 
         //答题用时
-        $answerTime= $this->getTime($cache['dateTime']);
-        abort_if($answerTime > ($this->answerTime*1000), 400, '答题已结束');
+        $answerTime = $this->getTime($cache['dateTime']);
+        abort_if($answerTime > ($this->answerTime * 1000), 400, '答题已结束');
 
         if (array_has($cache, 'data') && array_has($cache['data'], $requestUserId)) {
             abort(400, '你已经参与过本轮活力了，不能重复提交');
@@ -246,11 +246,11 @@ class SignController extends Controller
             $surplusTime = ($this->answerTime * 1000) - $time;
 
             //时间分值
-            $timeScore = ($surplusTime*$this->timeScore)/1000;
+            $timeScore = ($surplusTime * $this->timeScore) / 1000;
 
             $timeScore = (int)round($timeScore);
 
-            $score = $score+$timeScore;
+            $score = $score + $timeScore;
         }
         return $score;
     }
@@ -390,7 +390,7 @@ class SignController extends Controller
             if (array_has($user, $v['user_id'])) {
                 $user[$v['user_id']]['score'] = $user[$v['user_id']]['score'] + $v['score'];
                 $user[$v['user_id']]['total_time'] = $user[$v['user_id']]['total_time'] + $v['time'];
-                $user[$v['user_id']]['number'] = $user[$v['user_id']]['number'] +=1;
+                $user[$v['user_id']]['number'] = $user[$v['user_id']]['number'] += 1;
             } else {
                 $user[$v['user_id']] = [
                     'user_id' => $v['user_id'],
@@ -398,15 +398,23 @@ class SignController extends Controller
                     'avatar' => $v['avatar'],
                     'score' => $v['score'],
                     'total_time' => $v['time'],
-                    'number'=>1,
+                    'number' => 1,
                 ];
             }
         }
 
-        $user = array_pluck($user,[]);
+        $user = array_pluck($user, []);
         $userCollect = collect($user);
-        $topUser = $userCollect->sortByDesc('score')->all();
-        return response()->json($topUser, 200);
+        $topUser = $userCollect
+            ->sortByDesc(function ($product) {
+                $averageTime = $product['total_time'] / $product['number'];
+                $dot = 1 - $averageTime / 10000;
+                return (int)$product['score'] + $dot;
+            })
+            ->take(8)
+            ->values()
+            ->all();
+        return response()->json(array_values($topUser), 200);
     }
 
 
