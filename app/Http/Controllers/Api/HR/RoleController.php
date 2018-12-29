@@ -158,11 +158,11 @@ class RoleController extends Controller
     public function destroy(Role $role)
     {
         return $role->getConnection()->transaction(function () use ($role) {
-            $role->delete();
             $role->staff()->detach();
             $role->brand()->detach();
             $role->authority()->detach();
             $role->department()->detach();
+            $role->delete();
 
             return response()->json(null, 204);
         });

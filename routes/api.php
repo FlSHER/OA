@@ -191,13 +191,12 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
         Route::apiResource('hr/staff', 'StaffController');// 员工        
         Route::apiResource('hr/brands', 'BrandController');// 品牌
         Route::apiResource('hr/authorities', 'RbacController');// 权限
-        Route::apiResource('hr/shop_tags', 'ShopTagController'); // 店铺标签
         Route::apiResource('hr/positions', 'PositionController');// 职位
         Route::apiResource('hr/cost_brands', 'CostBrandController');// 费用品牌
         Route::apiResource('hr/departments', 'DepartmentController');// 部门
         Route::apiResource('hr/tag/categories', 'TagCateController');// 标签分类
         Route::apiResource('hr/department/cates', 'DepartmentCategoryController');// 部门分类
-        Route::apiResource('hr/hr-roles', 'HrRoleController');// hr员工品牌、部门角色
+        Route::apiResource('hr/hr_roles', 'HrRoleController');// hr员工品牌、部门角色
     });
     Route::prefix('table')->group(function () {
         Route::post('staff', 'Resources\StaffController@index');
