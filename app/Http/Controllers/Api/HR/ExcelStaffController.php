@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Http\Controllers\Api\HR;
 
@@ -17,14 +17,14 @@ class ExcelStaffController extends Controller
 {
     /**
      * 导入错误信息.
-     * 
+     *
      * @var array
      */
     protected $errors;
 
     /**
      * 上传字段中英文映射.
-     * 
+     *
      * @var array
      */
     protected $staffWithMap;
@@ -37,7 +37,7 @@ class ExcelStaffController extends Controller
 
     /**
      * 批量操作员工.
-     * 
+     *
      * @param  Request $request
      * @return mixed
      */
@@ -181,7 +181,7 @@ class ExcelStaffController extends Controller
      * @return void
      */
     protected function makeFillStaff($value)
-    {   
+    {
         // 给默认执行时间
         $value['operate_at'] = !empty($value['operate_at']) ? $value['operate_at'] : now()->toDateString();
         $data = [];
@@ -195,7 +195,7 @@ class ExcelStaffController extends Controller
             $costIds = HR\CostBrand::whereIn('name', $cost)->pluck('id')->toArray();
             $data['cost_brands'] = $costIds;
         }
-        foreach ($value as $k => $v) { 
+        foreach ($value as $k => $v) {
             if (in_array($k, [
                 'realname', 'mobile', 'shop_sn', 'dingtalk_number', 'wechat_number', 'national', 'politics', 'gender',
                 'marital_status', 'id_card_number', 'account_number', 'account_bank', 'account_name', 'height', 'weight',
@@ -282,16 +282,16 @@ class ExcelStaffController extends Controller
 
                 $exportData = array_merge($exportData, $this->makeExportHighData($item));
             }
-            
+
             $data[$key] = $exportData;
         });
-        
+
         return response()->json($data, 201);
     }
 
     /**
      * 组装导出基础数据。
-     * 
+     *
      * @param  [type] $item
      * @return array
      */
@@ -310,6 +310,7 @@ class ExcelStaffController extends Controller
             'department' => $item->department->full_name,
             'position' => $item->position->name,
             'status' => $item->status->name,
+            'birthday' => $parser->isValidate() ? $parser->birthday() : '',
             'hired_at' => $item->hired_at,
             'employed_at' => $item->employed_at,
             'left_at' => $item->left_at,
@@ -317,14 +318,14 @@ class ExcelStaffController extends Controller
             'account_number' => $item->account_number,
             'account_name' => $item->account_name,
             'account_bank' => $item->account_bank,
-            'birthday' => $parser->isValidate() ? $parser->birthday() : '',
+            'recruiter_name' => $item->recruiter_name,
             'remark' => $item->remark,
         ];
     }
 
     /**
      * 组装导出高级权限用户数据。
-     * 
+     *
      * @param  $item
      * @return array
      */
@@ -363,8 +364,8 @@ class ExcelStaffController extends Controller
             'marital_status' => $item->marital_status,
             'height' => $item->height,
             'weight' => $item->weight,
-            'household_city' => $makeHouseholdCity.' '.$item->household_address,
-            'living_city' => $makeLivingCity.' '.$item->living_address,
+            'household_city' => $makeHouseholdCity . ' ' . $item->household_address,
+            'living_city' => $makeLivingCity . ' ' . $item->living_address,
             'native_place' => $item->native_place,
             'concat_name' => $item->concat_name,
             'concat_tel' => $item->concat_tel,
@@ -372,9 +373,9 @@ class ExcelStaffController extends Controller
         ];
     }
 
-     // 缓存职位
-     protected function getBrand($name)
-     {
+    // 缓存职位
+    protected function getBrand($name)
+    {
         $key = "brand_list";
         $brand = Cache::get($key, function () use ($key) {
             $brand = HR\Brand::select('id', 'name')->get();
@@ -382,13 +383,13 @@ class ExcelStaffController extends Controller
 
             return $brand;
         });
- 
-        return $brand->where('name', $name)->pluck('id')->last();   
-     }
- 
-     // 缓存部门
-     protected function getDepartment($name)
-     {
+
+        return $brand->where('name', $name)->pluck('id')->last();
+    }
+
+    // 缓存部门
+    protected function getDepartment($name)
+    {
         $key = "department_list";
         $department = Cache::get($key, function () use ($key) {
             $department = Department::select('id', 'name', 'full_name')->get();
@@ -396,13 +397,13 @@ class ExcelStaffController extends Controller
 
             return $department;
         });
- 
-        return $department->where('full_name', $name)->pluck('id')->last();   
-     }
-     
-     // 缓存职位
-     protected function getPosition($name)
-     {
+
+        return $department->where('full_name', $name)->pluck('id')->last();
+    }
+
+    // 缓存职位
+    protected function getPosition($name)
+    {
         $key = "position_list";
         $position = Cache::get($key, function () use ($key) {
             $position = HR\Position::select('id', 'name')->get();
@@ -410,13 +411,13 @@ class ExcelStaffController extends Controller
 
             return $position;
         });
- 
-        return $position->where('name', $name)->pluck('id')->last();   
-     }
 
-     // 缓存地区
-     protected function getDistrict($name)
-     {
+        return $position->where('name', $name)->pluck('id')->last();
+    }
+
+    // 缓存地区
+    protected function getDistrict($name)
+    {
         $key = "district_list";
         $district = Cache::get($key, function () use ($key) {
             $district = District::select('id', 'name')->get();
@@ -426,8 +427,8 @@ class ExcelStaffController extends Controller
         });
 
         return $district->where('name', $name)->pluck('id')->last();
-     }
-    
+    }
+
     protected function cacheClear()
     {
         Cache::forget('brand_list');
@@ -487,19 +488,19 @@ class ExcelStaffController extends Controller
                     $brandName = HR\CostBrand::pluck('name');
                     $costBrands = array_filter(explode('/', $content));
                     $brand = collect($costBrands)->map(function ($brand) use ($brandName) {
-                        if (! $brandName->contains($brand)) {
+                        if (!$brandName->contains($brand)) {
                             return $brand;
                         }
                     })->filter();
                     if ($brand->isNotEmpty()) {
                         $fail("“{$brand->implode('，')}” 费用品牌不存在！");
                     }
-                    
+
                     // 验证品牌/费用品牌的关联性
                     $brand_id = $this->getBrand($value['brand']);
                     $brands = HR\CostBrand::with('brands')->whereIn('name', $costBrands)->get();
                     $brand = $brands->map(function ($item) use ($brand_id) {
-                        if (! $item->brands->contains($brand_id)) {
+                        if (!$item->brands->contains($brand_id)) {
                             return $item->name;
                         }
                     })->filter();
@@ -537,7 +538,7 @@ class ExcelStaffController extends Controller
 
     /**
      * 统一处理验证错误信息.
-     * 
+     *
      * @return array
      */
     protected function message(): array
