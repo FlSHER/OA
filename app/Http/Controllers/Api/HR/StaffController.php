@@ -111,7 +111,7 @@ class StaffController extends Controller
      */
     public function show(HR\Staff $staff)
     {
-        $staff->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'tags']);
+        $staff->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'tags', 'tags.category']);
         $staff->oa = app('Authority')->getAuthoritiesByStaffSn($staff->staff_sn);
 
         return new StaffResource($staff);
@@ -128,7 +128,7 @@ class StaffController extends Controller
     {
         $logs = HR\StaffLog::with('staff', 'admin')
             ->where('staff_sn', $staff->staff_sn)
-            ->whereNotIn('operation_type', ['edit', 'active', 'delete'])
+            ->whereNotIn('operation_type', ['active', 'delete'])
             ->orderBy('id', 'asc')
             ->get();
 
