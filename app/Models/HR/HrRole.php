@@ -13,6 +13,8 @@ class HrRole extends Model
 
     protected $guarded = ['id'];
 
+    protected $hidden = ['created_at', 'updated_at', 'deleted_at'];
+
 
     public function staff()
     {
@@ -24,7 +26,6 @@ class HrRole extends Model
     {
         return $this->belongsToMany('App\Models\Department', 'hr_role_has_departments')
             ->select('departments.id', 'departments.name', 'departments.full_name')
-            ->orderBy('parent_id', 'asc')
             ->withTrashed();
     }
 

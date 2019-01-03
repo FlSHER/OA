@@ -17,7 +17,8 @@ class HrRoleController extends Controller
      */
     public function index()
     {
-        $list = HrRole::with('staff', 'brand', 'department')
+        $list = HrRole::query()
+            ->with(['staff', 'brand', 'department'])
         	->filterByQueryString()
         	->sortByQueryString()
         	->withPagination();
