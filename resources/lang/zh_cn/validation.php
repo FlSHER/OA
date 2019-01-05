@@ -180,6 +180,8 @@ return [
         'manager_name' => '店长姓名',
         'assistant_sn' => '助店人编号',
         'assistant_name' => '助店人姓名',
+        'clock_in' => '上班时间',
+        'clock_out' => '下班时间',
         'total_area' => '店铺面积',
         'shop_type' => '店铺类型',
         'work_type' => '工作类型',

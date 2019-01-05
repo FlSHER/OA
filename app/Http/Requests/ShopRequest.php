@@ -48,10 +48,10 @@ class ShopRequest extends FormRequest
             'tags.*.id' => 'exists:tags,id',
             'staff' => 'array',
             'staff.*.staff_sn' => 'exists:staff,staff_sn',
-            'total_area' => ['regex:/^\d+(\.\d{1,2})?$/'],
-            'shop_type' => Rule::in(['A', 'B1', 'B2', 'B3', 'C']),
-            'work_type' => Rule::in(['全班', '倒班']),
-            'city_ratio' => Rule::in(['0.8', '1', '1.2']),
+            'total_area' => ['nullable', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'shop_type' => [Rule::in(['A', 'B1', 'B2', 'B3', 'C'])],
+            'work_type' => [Rule::in(['全班', '倒班'])],
+            'city_ratio' => ['nullable', Rule::in(['0.8', '1', '1.2'])],
             'staff_deploy' => 'numeric|between:1,99',
         ];
         if ($this->getMethod() === 'PATCH') {
