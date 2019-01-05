@@ -22,4 +22,7 @@ Route::middleware('auth:api')->namespace('Api\Dingtalk')->group(function () {
     Route::get('job','MessageController@index');
     //重发工作通知失败的信息
     Route::post('job/{id}','MessageController@retrace');
+
+    // 通用发送钉钉工作通知消息
+    Route::post('user-notification', 'NotificationController@send');
 });
