@@ -18,7 +18,7 @@ class StaffTmp extends Model
     	'admin_sn', 
     	'changes', 
     	'status', 
-    	'operate_at', 
+    	'operate_at',
     ];
     
     /**

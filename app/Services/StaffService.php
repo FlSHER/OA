@@ -8,7 +8,31 @@ use App\Services\Tools\OperationLogs\StaffOperationLogService;
 
 class StaffService
 {
+    /**
+     * 变更数据
+     * 
+     * @var array
+     */
     protected $dirty = [];
+
+    /**
+     * 变更日志服务.
+     * 
+     * @var StaffOperationLogService
+     */
+    protected $logService;
+
+    /**
+     * 可预约操作类型
+     * 
+     * @var array
+     */
+    protected $types = ['transfer', 'import_transfer', 'employ', 'leave', 'leaving', 'reinstate'];
+
+    public function __construct(StaffOperationLogService $logService)
+    {
+        $this->logService = $logService;
+    }
 
     public function create($data)
     {
@@ -69,8 +93,7 @@ class StaffService
                 $this->saved($model, $data);
                 $this->changeBelongsToMany($model, $data);
                 if ($this->isDirty()) {
-                    $log = new StaffOperationLogService();
-                    $log->model($model)->write($this->dirty, $data);
+                    $this->logService->model($model)->write($this->dirty, $data);
                 }
             }
             \DB::commit();
@@ -91,9 +114,8 @@ class StaffService
      */
     protected function hasTransfer($data)
     {
-        $operationType = $data['operation_type'];
         if (
-            in_array($operationType, ['transfer', 'import_transfer', 'employ']) && 
+            in_array($data['operation_type'], $this->types) && 
             strtotime($data['operate_at']) > strtotime(date('Y-m-d'))
         ) {
             return true;
@@ -206,7 +228,7 @@ class StaffService
         ) {
             $this->setLeaving($model);
         } elseif (
-            in_array($operationType, ['transfer', 'import_transfer', 'employ']) && 
+            in_array($operationType, $this->types) && 
             strtotime($data['operate_at']) > strtotime(date('Y-m-d'))
         ) {
             $this->transferLater($model, $data);
@@ -241,42 +263,20 @@ class StaffService
     }
 
     /**
-     * 创建一条预约操作.
+     * 创建一条预约操作(将执行操作延后数据不做任何处理).
      * 
-     * @param  [type] $model
-     * @param  [type] $data
+     * @param  Staff $model
+     * @param  array $data
      */
     private function transferLater($model, $data)
     {
-        $dirty = $model->getDirty();
-        if (!empty($dirty)) {
-            $islock = $model->tmp()->where('status', 1)->count();
-            // 判断费用品牌是否变更
-            if (!empty($data['cost_brands'])) {
-                $current = array_map(function ($key) { return (int) $key; }, $data['cost_brands']);
-                $original = $model->cost_brands()->pluck('id')->toArray();
-                if (!empty(array_diff($original, $current)) || !empty(array_diff($current, $original))) {
-                    $dirty['cost_brands'] = $data['cost_brands'];
-                }
-            }
-            $model->tmp()->create([
-                'changes' => $dirty,
-                'admin_sn' => $data['admin_sn'] ?? app('CurrentUser')->getStaffSn(),
-                'operate_at' => $data['operate_at'],
-                'status' => $islock ? 0 : 1,
-            ]);
-
-            $this->addDirty($model);
-            $model->setRawAttributes($model->getOriginal());
-
-            // 如果有职位变动 直接添加一条记录
-            if (!empty($dirty['position_id'])) {
-                $log = new StaffOperationLogService();
-                $log->model($model)->write([
-                    'position_id' => $dirty['position_id']
-                ], $data);
-            }
-        }
+        $islock = $model->tmp()->where('status', 1)->count();
+        $model->tmp()->create([
+            'changes' => $data,
+            'admin_sn' => $data['admin_sn'] ?? app('CurrentUser')->getStaffSn(),
+            'operate_at' => $data['operate_at'],
+            'status' => $islock ? 0 : 1,
+        ]);
     }
 
     /**

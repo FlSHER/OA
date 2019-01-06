@@ -50,21 +50,13 @@ class TransferStaff extends Command
      */
     public function handle()
     {
-        $list = StaffTmp::whereDate('operate_at', '<=', date('Y-m-d'))->where('status', '<>', 2)->get();
+        $list = StaffTmp::whereDate('operate_at', date('Y-m-d'))->where('status', '<>', 2)->get();
         try {
-
-            \DB::beginTransaction();
             foreach ($list as $key => $tmp) {
-                $staff = Staff::find($tmp->staff_sn);
                 $changes = array_filter($tmp->changes);
-                if (!empty($changes) && !empty($staff)) {
-
+                if (!empty($changes)) {
                     $data = array_merge($changes, [
-                        'staff_sn' => $staff->staff_sn,
                         'admin_sn' => $tmp->admin_sn,
-                        'operate_at' => date('Y-m-d'),
-                        'operation_type' => 'transfer',
-                        'operation_remark' => '执行预约任务',
                     ]);
                     $result = $this->staffService->update($data);
                     if ($result['status'] === 1) {
@@ -72,11 +64,8 @@ class TransferStaff extends Command
                     }
                 }
             }
-            \DB::commit();
 
         } catch (\Exception $e) {
-
-            \DB::rollBack();
             Log::error($this->signature.'-|-'.$e->getMessage());
         }
     }

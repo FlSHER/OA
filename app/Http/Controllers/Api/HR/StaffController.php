@@ -219,7 +219,7 @@ class StaffController extends Controller
         $operateAt = Carbon::parse($data['operate_at'])->gt(now());
 
         return response()->json([
-            'message' => '操作成功',
+            'message' => $operateAt ? '预约成功' : '操作成功',
             'changes' => $operateAt ? [] : $data,
         ], 201);
     }
@@ -234,12 +234,11 @@ class StaffController extends Controller
     {
         $data = $request->all();
         $this->staffService->update($data);
-
         $data['cost_brands'] = HR\CostBrand::whereIn('id', $data['cost_brands'])->get();
         $operateAt = Carbon::parse($data['operate_at'])->gt(now());
 
         return response()->json([
-            'message' => '操作成功',
+            'message' => $operateAt ? '预约成功' : '操作成功',
             'changes' => $operateAt ? [] : $data,
         ], 201);
     }
@@ -254,12 +253,12 @@ class StaffController extends Controller
     {
         $data = $request->all();
         $this->staffService->update($data);
-        if (!$data['skip_leaving']) {
-            $data['status_id'] = 0;
-        }
+        !$data['skip_leaving'] && $data['status_id'] = 0;
+        $operateAt = Carbon::parse($data['operate_at'])->gt(now());
+
         return response()->json([
-            'message' => '离职成功',
-            'changes' => $data,
+            'message' => $operateAt ? '预约成功' : '操作成功',
+            'changes' => $operateAt ? [] : $data,
         ], 201);
     }
 
@@ -271,39 +270,14 @@ class StaffController extends Controller
      */
     public function leaving(ProcessRequest $request)
     {
-        $leaving = HR\Staff::find($request->staff_sn)->leaving;
-        if ($request->has('operate_at')) {
-            $leavingInfo = [
-                'staff_sn' => $leaving->staff_sn,
-                'status_id' => $leaving->original_status_id,
-                'operate_at' => $request->operate_at,
-                'operation_type' => 'leaving',
-                'operation_remark' => $request->operation_remark,
-            ];
-            if (!empty($request->left_at)) {
-                $leavingInfo['left_at'] = $request->left_at;
-            }
-            $request->replace($leavingInfo);
-            $leaving->delete();
-            $this->staffService->update($request->all());
-            return response()->json([
-                'changes' => ['status_id' => -1],
-                'message' => '操作成功',
-            ], 201);
-        } else {
-            $operatorSn = app('CurrentUser')->staff_sn;
-            $operatorName = app('CurrentUser')->realname;
-            $data = $request->all();
-            foreach ($data as $k => $v) {
-                if (is_array($v)) {
-                    $data[$k . '_operator_sn'] = $operatorSn;
-                    $data[$k . '_operator_name'] = $operatorName;
-                    $data[$k . '_operate_at'] = time();
-                }
-            }
-            $leaving->fill($data)->save();
-            return ['status' => 1, 'message' => '交接成功'];
-        }
+        $data = $request->all();
+        $this->staffService->update($data);
+        $operateAt = Carbon::parse($data['operate_at'])->gt(now());
+
+        return response()->json([
+            'message' => $operateAt ? '预约成功' : '操作成功',
+            'changes' => $operateAt ? [] : ['status_id' => -1],
+        ], 201);
     }
 
 }
