@@ -33,6 +33,9 @@ abstract class Message
     {
         if (is_int($message) || is_string($message)) {
             $message = new Text($message);
+
+        } elseif (is_array($message)) {
+            $message = new Link($message);
         }
         return $message;
     }
@@ -66,5 +69,20 @@ class Text extends Message
     public function __construct(string $content)
     {
         parent::__construct(compact('content'));
+    }
+}
+
+class Link extends Message
+{
+    protected $type = 'link';
+    
+    public function __construct(array $content)
+    {
+        parent::__construct([
+            'messageUrl' => $content['url'],
+            'picUrl' => $content['picUrl'] ?? '1',
+            'title' => $content['title'] ?? '待处理消息',
+            'text' => $content['text'],
+        ]);
     }
 }

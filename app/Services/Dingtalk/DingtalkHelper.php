@@ -12,7 +12,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 trait DingtalkHelper
 {
-
     /**
      * Make a http request.
      *
@@ -39,7 +38,7 @@ trait DingtalkHelper
             'base_uri' => method_exists($this, 'getBaseUri') ? $this->getBaseUri() : 'https://oapi.dingtalk.com/',
             'timeout' => property_exists($this, 'timeout') ? $this->timeout : 5.0,
         ];
-
+        
         return $options;
     }
 
@@ -67,7 +66,6 @@ trait DingtalkHelper
     {
         $contentType = $response->getHeaderLine('Content-Type');
         $contents = $response->getBody()->getContents();
-
         if (false !== stripos($contentType, 'json') || stripos($contentType, 'javascript')) {
             return json_decode($contents, true);
         } elseif (false !== stripos($contentType, 'xml')) {

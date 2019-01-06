@@ -30,8 +30,8 @@ class NotificationController extends Controller
 	public function send(Request $request)
 	{
 		$this->validate($request, [
-			'msg' => 'required|max:100',
-			'agent_id' => 'required|in:39806381,52370430,130038188',
+			'message' => 'required',
+			'agent_id' => 'required|in:39806381,52370430,130038188,181982181',
 			'userid_list.*' => 'required|exists:staff,staff_sn',
 		], [], $this->attributes());
 
@@ -41,10 +41,15 @@ class NotificationController extends Controller
 			->filter()
 			->implode(',');
 
-		$message = "{$data['msg']}\n".date('Y/m/d H:i:s');
+		if (is_array($data['message'])) {
+			$data['message']['text'] = "{$data['message']['text']}\n".date('Y/m/d H:i:s');
+		} else {
+			$data['message'] = "{$data['message']}\n".date('Y/m/d H:i:s');
+		}
+
 		$result = $this->messageService
             ->ofAgent($data['agent_id'])
-			->withReply($message)
+			->withReply($data['message'])
 			->toUser($users)
             ->send();
 

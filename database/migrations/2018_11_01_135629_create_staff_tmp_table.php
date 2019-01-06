@@ -17,8 +17,8 @@ class CreateStaffTmpTable extends Migration
             $table->increments('id');
             $table->mediumInteger('staff_sn')->unsigned()->comment('被操作员工编号');
             $table->mediumInteger('admin_sn')->unsigned()->comment('管理员编号');
-            $table->date('operate_at')->nullable()->comment('执行日期');
             $table->text('changes')->comment('变动明细');
+            $table->date('operate_at')->comment('执行日期');
             $table->smallInteger('status')->default(0)->comment('状态: 0-锁定 1-未锁定 2-已还原');
             $table->timestamps();
         });

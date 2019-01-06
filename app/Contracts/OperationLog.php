@@ -133,7 +133,7 @@ class OperationLog
     protected function makeBasicInfo($others)
     {
         $data = [
-            'admin_sn' => app('CurrentUser')->getStaffSn(),
+            'admin_sn' => $others['admin_sn'] ?? app('CurrentUser')->getStaffSn(),
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),
         ];
