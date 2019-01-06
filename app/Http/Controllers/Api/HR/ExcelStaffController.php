@@ -309,6 +309,7 @@ class ExcelStaffController extends Controller
             'shop_name' => $item->shop->name ?? '',
             'department' => $item->department->full_name,
             'position' => $item->position->name,
+            'position_level' => $item->position->level,
             'status' => $item->status->name,
             'birthday' => $parser->isValidate() ? $parser->birthday() : '',
             'hired_at' => $item->hired_at,
@@ -343,15 +344,15 @@ class ExcelStaffController extends Controller
         $temp = $district->mapWithKeys(function ($city) {
             return [$city->id => $city->name];
         });
-        $makeHouseholdCity = implode(' ', [
+        $makeHouseholdCity = implode('-', [
             $temp[$item->household_province_id] ?? '',
-            $temp[$item->household_county_id] ?? '',
             $temp[$item->household_city_id] ?? '',
+            $temp[$item->household_county_id] ?? '',
         ]);
-        $makeLivingCity = implode(' ', [
+        $makeLivingCity = implode('-', [
             $temp[$item->living_province_id] ?? '',
-            $temp[$item->living_county_id] ?? '',
             $temp[$item->living_city_id] ?? '',
+            $temp[$item->living_county_id] ?? '',
         ]);
 
         return [
