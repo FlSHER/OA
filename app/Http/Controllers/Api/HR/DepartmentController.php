@@ -42,13 +42,14 @@ class DepartmentController extends Controller
     public function store(Request $request, Department $department)
     {
         $rules = [
-            'name' => 'required|unique:departments|max:10',
+            'name' => ['required','unique:departments','alpha_num','max:10'],
             'manager_sn' => ['exists:staff,staff_sn'],
         ];
         $messages = [
             'name.required' => '部门名称不能为空',
             'name.unique' => '部门名称已存在',
             'name.max' => '部门名称不能超过 :max 个字',
+            'name.alpha_num' => '部门名称不能含有特殊符号',
             'manager_sn.exists' => '部门负责人不存在',
         ];
         $this->validate($request, $rules, $messages);
@@ -79,12 +80,13 @@ class DepartmentController extends Controller
     public function update(Request $request, Department $department)
     {
         $rules = [
-            'name' => 'required|max:10',
+            'name' => ['required', 'alpha_num', 'max:10'],
             'manager_sn' => ['exists:staff,staff_sn'],
         ];
         $messages = [
             'name.required' => '部门名称不能为空',
             'name.max' => '部门名称不能超过 :max 个字',
+            'name.alpha_num' => '部门名称不能含有特殊符号',
             'manager_sn.exists' => '部门负责人不存在',
         ];
         $this->validate($request, $rules, $messages);
