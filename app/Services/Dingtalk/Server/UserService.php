@@ -59,7 +59,7 @@ class UserService extends DingtalkAbstract
             return $this->httpPostJson('user/batchdelete', ['useridlist' => $userId]);
         }
 
-        return $this->httpGet('user/delete', $userId);
+        return $this->httpGet('user/delete', ['userid' => $userId]);
     }
 
     /**

@@ -42,14 +42,12 @@ class CostBrandController extends Controller
         $data = $request->all();
         $this->validate($request, [
             'name' => 'required|unique:brands|max:10',
-            'brands' => 'required|array',
         ], [], [
             'name' => '费用品牌名称',
-            'brands' => '关联品牌',
         ]);
         $brand->name = $data['name'];
         $brand->save();
-        $brand->brands()->attach($data['brands']);
+        $brand->brands()->attach((array)$data['brands']);
 
         return response()->json($brand->load('brands'), 201);
     }
@@ -79,14 +77,12 @@ class CostBrandController extends Controller
         $data = $request->all();
         $this->validate($request, [
             'name' => 'required|max:10',
-            'brands' => 'array',
         ], [], [
             'name' => '费用品牌名称',
-            'brands' => '关联品牌',
         ]);
         $cost_brand->name = $data['name'];
         $cost_brand->save();
-        $cost_brand->brands()->sync($data['brands']);
+        $cost_brand->brands()->sync((array)$data['brands']);
 
         return response()->json($cost_brand->load('brands'), 201);
     }
