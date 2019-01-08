@@ -276,7 +276,7 @@ class StaffController extends Controller
 
         return response()->json([
             'message' => $operateAt ? '预约成功' : '操作成功',
-            'changes' => $operateAt ? [] : ['status_id' => -1],
+            'changes' => $operateAt ? [] : $data,
         ], 201);
     }
 
