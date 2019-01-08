@@ -270,7 +270,7 @@ class StaffController extends Controller
      */
     public function leaving(ProcessRequest $request)
     {
-        $data = $request->all();
+        $data = array_merge($request->all(), ['status_id' => 0]);
         $this->staffService->update($data);
         $operateAt = Carbon::parse($data['operate_at'])->gt(now());
 
