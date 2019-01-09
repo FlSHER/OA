@@ -107,3 +107,28 @@ if (!function_exists('unique_validator')) {
         return $rule;
     }
 }
+if (!function_exists('array_to_tree')) {
+    function array_to_tree($list, $pk = 'id', $pid = 'parent_id', $child = '_children', $root = 0)
+    {
+        $tree = [];
+        if (is_array($list)) {
+            $refer = [];
+            foreach ($list as $key => $data) {
+                $list[$key][$child] = [];
+                $refer[$data[$pk]] =& $list[$key];
+            }
+            foreach ($list as $key => $data) {
+                $parentId = $data[$pid];
+                if ($root == $parentId) {
+                    $tree[] =& $list[$key];
+                } else {
+                    if (isset($refer[$parentId])) {
+                        $parent =& $refer[$parentId];
+                        $parent[$child][] =& $list[$key];
+                    }
+                }
+            }
+        }
+        return $tree;
+    }
+}

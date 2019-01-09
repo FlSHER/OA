@@ -22,6 +22,7 @@ class Department extends Model
         'manager_sn',
         'manager_name',
         'parent_id',
+        'source_id',
         'is_locked',
         'province_id',
         'minister_sn',
@@ -32,6 +33,7 @@ class Department extends Model
         'personnel_manager_name',
         'regional_manager_sn',
         'regional_manager_name',
+        'sort',
     ];
 
 
