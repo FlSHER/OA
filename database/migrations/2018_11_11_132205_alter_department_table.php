@@ -24,6 +24,7 @@ class AlterDepartmentTable extends Migration
             $table->char('regional_manager_name', 10)->default('')->comment('大区经理姓名');
             $table->char('personnel_manager_sn', 6)->default('')->comment('人事负责人编号');
             $table->char('personnel_manager_name', 10)->default('')->comment('人事负责人姓名');
+            $table->integer('source_id')->comment('关联钉钉部门ID');
         });
     }
 
@@ -45,6 +46,7 @@ class AlterDepartmentTable extends Migration
             $table->dropColumn('regional_manager_name');
             $table->dropColumn('personnel_manager_sn');
             $table->dropColumn('personnel_manager_name');
+            $table->dropColumn('source_id');
         });
     }
 }
