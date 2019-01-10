@@ -226,12 +226,21 @@ class StaffService
             ($operationType === 'leave') && 
             ($model->status_id !== -2)
         ) {
-            // $this->setLeaving($model);
+            $this->setLeaving($model);
         } elseif (
             in_array($operationType, $this->types) && 
             strtotime($data['operate_at']) > strtotime(date('Y-m-d'))
         ) {
             $this->transferLater($model, $data);
+
+        } elseif (
+            $operationType === 'leaving' && 
+            strtotime($data['operate_at']) <= strtotime(date('Y-m-d'))
+        ) {
+            $leaving = $model->leaving;
+            $model->setAttribute('status_id', $leaving->original_status_id);
+
+            $leaving->delete();
         }
     }
 

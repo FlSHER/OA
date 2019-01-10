@@ -270,13 +270,16 @@ class StaffController extends Controller
      */
     public function leaving(ProcessRequest $request)
     {
-        $data = array_merge($request->all(), ['status_id' => -1]);
-        $this->staffService->update($data);
-        $operateAt = Carbon::parse($data['operate_at'])->gt(now());
+        $this->staffService->update($request->all());
+        $operateAt = Carbon::parse($request->operate_at)->gt(now());
+        if (!$operateAt) {
+            $staff = HR\Staff::find($request->staff_sn);
+            $request->merge(['status_id' => $staff->status_id]);
+        }
 
         return response()->json([
             'message' => $operateAt ? '预约成功' : '操作成功',
-            'changes' => $operateAt ? [] : $data,
+            'changes' => $operateAt ? [] : $request->all(),
         ], 201);
     }
 

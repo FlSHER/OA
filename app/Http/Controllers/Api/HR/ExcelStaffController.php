@@ -213,7 +213,7 @@ class ExcelStaffController extends Controller
                 $data['position_id'] = $this->getPosition($v);
 
             } elseif ($v && $k === 'status') {
-                $status = ['离职中' => 0, '试用期' => 1, '在职' => 2, '停薪留职' => 3];
+                $status = ['试用期' => 1, '在职' => 2, '停薪留职' => 3];
                 $data['status_id'] = $status[$v];
 
             } elseif ($v && $k === 'household_province') {
@@ -480,7 +480,7 @@ class ExcelStaffController extends Controller
             'dingtalk_number' => ['max:50', unique_validator('staff', false)],
             'status' => [
                 Rule::exists('staff_status', 'name')->where(function ($query) {
-                    $query->where('id', '>=', 0);
+                    $query->where('id', '>', 0);
                 }),
             ],
             'cost_brand' => [
