@@ -90,7 +90,7 @@ class StaffService
             if (! $this->hasTransfer($data)) {
                 $this->addDirty($model);
                 $model->save();
-                $this->saved($model, $data);
+                // $this->saved($model, $data);
                 $this->changeBelongsToMany($model, $data);
                 if ($this->isDirty()) {
                     $this->logService->model($model)->write($this->dirty, $data);

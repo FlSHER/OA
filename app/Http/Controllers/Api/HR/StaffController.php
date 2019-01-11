@@ -253,8 +253,10 @@ class StaffController extends Controller
     {
         $data = $request->all();
         $this->staffService->update($data);
-        !$data['skip_leaving'] && $data['status_id'] = 0;
         $operateAt = Carbon::parse($data['operate_at'])->gt(now());
+        if (!$data['skip_leaving'] && $data['status_id'] != -2) {
+            $data['status_id'] = 0;
+        }
 
         return response()->json([
             'message' => $operateAt ? '预约成功' : '操作成功',
