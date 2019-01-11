@@ -90,7 +90,7 @@ class StaffService
             if (! $this->hasTransfer($data)) {
                 $this->addDirty($model);
                 $model->save();
-                // $this->saved($model, $data);
+                $this->saved($model, $data);
                 $this->changeBelongsToMany($model, $data);
                 if ($this->isDirty()) {
                     $this->logService->model($model)->write($this->dirty, $data);
@@ -217,7 +217,7 @@ class StaffService
         return array_except($pivot->toArray(), [$pivot->getForeignKey(), $pivot->getOtherKey()]);
     }
 
-    public function saving($model, array $data)
+    public function saving($model, &$data)
     {
         $this->operating($model, $data);
 
@@ -226,7 +226,7 @@ class StaffService
             ($operationType === 'leave') && 
             ($model->status_id !== -2)
         ) {
-            $this->setLeaving($model);
+            $this->setLeaving($model, $data);
         } elseif (
             in_array($operationType, $this->types) && 
             strtotime($data['operate_at']) > strtotime(date('Y-m-d'))
@@ -235,6 +235,7 @@ class StaffService
 
         } elseif (
             $operationType === 'leaving' && 
+            $model->status_id === 0 && 
             strtotime($data['operate_at']) <= strtotime(date('Y-m-d'))
         ) {
             $leaving = $model->leaving;
@@ -244,16 +245,18 @@ class StaffService
         }
     }
 
-    protected function saved($model, $data)
+    protected function saved($model, &$data)
     {
         // 如果是离职操作并且跳过了离职交接 修改操作类型
         if (
-            array_has($data, 'skip_leaving') && 
             $data['operation_type'] === 'leave' && 
-            $data['skip_leaving']
+            $model->status_id !== -2 && 
+            !$data['skip_leaving']
         ) {
             $data['operation_type'] = 'leaving';
-            $this->save($data);
+
+        } elseif ($data['operation_type'] === 'leaving') {
+            $data['operation_type'] = 'leave';
         }
     }
 
@@ -262,8 +265,12 @@ class StaffService
      * 
      * @param [type] $model
      */
-    private function setLeaving($model)
-    {
+    private function setLeaving($model, $data)
+    {   
+        // 跳过离职中操作
+        if ($data['skip_leaving']) {
+            return false;
+        }
         $model->leaving()->create([
             'staff_sn' => $model->staff_sn,
             'original_status_id' => $model->status_id,
