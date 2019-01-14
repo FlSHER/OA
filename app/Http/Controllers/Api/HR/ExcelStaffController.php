@@ -479,6 +479,7 @@ class ExcelStaffController extends Controller
             'id_card_number' => ['required', 'ck_identity', unique_validator('staff', false)],
             'dingtalk_number' => ['max:50', unique_validator('staff', false)],
             'status' => [
+                'required',
                 Rule::exists('staff_status', 'name')->where(function ($query) {
                     $query->where('id', '>', 0);
                 }),
@@ -526,6 +527,11 @@ class ExcelStaffController extends Controller
                 'wechat_number' => ['between:6,20', $uniqueRule],
                 'id_card_number' => ['ck_identity', $uniqueRule],
                 'dingtalk_number' => ['max:50', $uniqueRule],
+                'status' => [
+                    Rule::exists('staff_status', 'name')->where(function ($query) {
+                        $query->where('id', '>', 0);
+                    }),
+                ],
             ]);
         }
         $validator = Validator::make($value->toArray(), $rules, $this->message());
