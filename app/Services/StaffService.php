@@ -220,20 +220,23 @@ class StaffService
     public function saving($model, &$data)
     {
         $this->operating($model, $data);
-
         $operationType = $data['operation_type'];
-        if (
-            ($operationType === 'leave') && 
-            ($model->status_id !== -2)
-        ) {
+
+        // 设置离职记录
+        if (($operationType === 'leave') && ($model->status_id !== -2)) {
             $this->setLeaving($model, $data);
-        } elseif (
+        }
+
+        // 设置预约记录
+        if (
             in_array($operationType, $this->types) && 
-            strtotime($data['operate_at']) > strtotime(date('Y-m-d'))
+            (strtotime($data['operate_at']) > strtotime(date('Y-m-d')))
         ) {
             $this->transferLater($model, $data);
+        }
 
-        } elseif (
+        // 离职交接，删除交接记录并设置离职状态
+        if(
             $operationType === 'leaving' && 
             $model->status_id === 0 && 
             strtotime($data['operate_at']) <= strtotime(date('Y-m-d'))
