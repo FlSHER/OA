@@ -75,7 +75,7 @@ class StaffTmpController extends Controller
      */
     public function trans($item): array
     {
-        $trans = trans('fields.staff');
+        $trans = array_dot(trans('fields.staff'));
         $relationMap = [
             'shop_sn' => 'shop.name',
             'brand_id' => 'brand.name',
@@ -90,10 +90,13 @@ class StaffTmpController extends Controller
                 $key = $trans[$relationKey];
                 $value = $this->getRelationName($relationKey, $change);
             } elseif (is_array($change)) {
-                $key = $trans[$key];
+                $key = $trans[$key] ?? $key;
                 $value = CostBrand::whereIn('id', $change)->pluck('name');
+            } elseif ($key == 'operation_type') {
+                $value = $trans[$key.'.'.$change] ?? $key;
+                $key = '操作类型';
             } else {
-                $key = $trans[$key];
+                $key = $trans[$key] ?? $key;
                 $value = $change;
             }
             $changes[$key] = $value;
