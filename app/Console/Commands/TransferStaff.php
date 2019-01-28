@@ -51,23 +51,25 @@ class TransferStaff extends Command
     public function handle()
     {
         $list = StaffTmp::whereDate('operate_at', '<=', date('Y-m-d'))->where('status', '<>', 2)->get();
-        try {
+        
             foreach ($list as $key => $tmp) {
-                $changes = $tmp->changes;
-                if (!empty($changes)) {
-                    $data = array_merge($changes, [
-                        'admin_sn' => $tmp->admin_sn,
-                    ]);
-                    $result = $this->staffService->update($data);
-                    if ($result['status'] === 1) {
-                        $tmp->delete();
+                try {
+                    $changes = $tmp->changes;
+                    if (!empty($changes)) {
+                        $data = array_merge($changes, [
+                            'admin_sn' => $tmp->admin_sn,
+                        ]);
+                        $result = $this->staffService->update($data);
+                        if ($result['status'] === 1) {
+                            $tmp->delete();
+                        }
                     }
+                } catch (\Exception $e) {
+                    Log::error($this->signature.'-'.$tmp->id.'-|-'.$e->getMessage());
                 }
             }
 
-        } catch (\Exception $e) {
-            Log::error($this->signature.'-|-'.$e->getMessage());
-        }
+        
     }
 
 }
