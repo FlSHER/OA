@@ -53,7 +53,7 @@ class TransferStaff extends Command
         $list = StaffTmp::whereDate('operate_at', '<=', date('Y-m-d'))->where('status', '<>', 2)->get();
         try {
             foreach ($list as $key => $tmp) {
-                $changes = array_filter($tmp->changes);
+                $changes = $tmp->changes;
                 if (!empty($changes)) {
                     $data = array_merge($changes, [
                         'admin_sn' => $tmp->admin_sn,
