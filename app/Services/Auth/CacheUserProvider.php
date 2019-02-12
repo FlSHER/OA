@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Encypt;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class CacheUserProvider extends EloquentUserProvider
@@ -62,7 +63,9 @@ class CacheUserProvider extends EloquentUserProvider
             if ($user) {
                 return $user;
             } else {
-                abort(400, '电话号码错误');
+                throw ValidationException::withMessages([
+                    'mobile' => ['用户不存在'],
+                ]);
             }
         }
     }

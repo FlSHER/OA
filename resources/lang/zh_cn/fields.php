@@ -99,6 +99,7 @@ return [
             'leaving' => '离职交接',
             'position' => '职位变动',
         ],
+        'skip_leaving' => '跳过离职交接',
         'operation_remark' => '操作备注',
     ],
     /* 员工管理 End */
