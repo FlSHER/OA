@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use App\Models\HR\Staff;
 use Encypt;
@@ -30,8 +31,7 @@ class LoginController extends Controller
     public function showLoginForm()
     {
         session()->reflash();
-        $app = app('Menu')->getAppData();
-        return response()->view('login', ['app' => $app]);
+        return view('login');
     }
 
     public function username()
@@ -63,6 +63,13 @@ class LoginController extends Controller
         } else {
             return ['status' => 1, 'url' => $url];
         }
+    }
+
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        throw ValidationException::withMessages([
+            'password' => ['密码不正确'],
+        ]);
     }
 
     protected function credentials(Request $request)
@@ -136,6 +143,14 @@ class LoginController extends Controller
     private function encyptPassword($password, $salt)
     {
         $this->password = Encypt::password($password, $salt);
+    }
+
+    public function logout(Request $request)
+    {
+        $this->guard()->logout();
+        session()->invalidate();
+        session()->put('url.intended', $request->input('url'));
+        return redirect('/login');
     }
 
 }

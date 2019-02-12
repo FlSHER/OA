@@ -12,7 +12,7 @@
  */
 
 Auth::routes();
-Route::get('/logout/{url?}', ['uses' => 'Auth\LoginController@logout'])->name('logout');
+Route::get('/logout', ['uses' => 'Auth\LoginController@logout'])->name('logout');
 
 Route::group(['middleware' => 'admin'], function () {
     Route::get('/', ['uses' => 'HomeController@showDashBoard'])->name('home'); //首页仪表盘
