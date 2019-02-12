@@ -149,7 +149,7 @@ class LoginController extends Controller
     {
         $this->guard()->logout();
         session()->invalidate();
-        session()->put('url.intended', $request->input('url'));
+        session()->put('url.intended', urldecode($request->input('url')));
         return redirect('/login');
     }
 
