@@ -50,7 +50,7 @@ class StaffTmpController extends Controller
      */
     public function restore(StaffTmp $tmp)
     {
-        abort_if($tmp->status !== 1, 422, '禁止还原');
+        abort_if($tmp->status !== 1, 422, '禁止撤销');
 
         $tmp->status = 2;
         $tmp->getConnection()->transaction(function () use ($tmp) {
@@ -85,11 +85,11 @@ class StaffTmpController extends Controller
         ];
         $changes = [];
         foreach ($item->changes as $key => $change) {
-            if (array_has($relationMap, $key)) {
+            if (array_has($relationMap, $key) && !empty($change)) {
                 $relationKey = $relationMap[$key];
                 $key = $trans[$relationKey];
                 $value = $this->getRelationName($relationKey, $change);
-            } elseif (is_array($change)) {
+            } elseif (is_array($change) && !empty($change)) {
                 $key = $trans[$key] ?? $key;
                 $value = CostBrand::whereIn('id', $change)->pluck('name');
             } elseif ($key == 'operation_type') {
