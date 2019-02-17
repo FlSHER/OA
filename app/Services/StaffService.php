@@ -289,6 +289,9 @@ class StaffService
      */
     private function transferLater($model, $data)
     {
+        $isTmp = $model->tmp()->whereDate('operate_at', $data['operate_at'])->count();
+        abort_if($isTmp, 422, '当前日期已有预约操作,请预约其他日期');
+
         $islock = $model->tmp()->where('status', 1)->count();
         $model->tmp()->create([
             'changes' => $data,

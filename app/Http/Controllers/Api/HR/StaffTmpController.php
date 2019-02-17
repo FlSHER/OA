@@ -50,7 +50,7 @@ class StaffTmpController extends Controller
      */
     public function restore(StaffTmp $tmp)
     {
-        abort_if($tmp->status !== 1, 422, '禁止还原');
+        abort_if($tmp->status !== 1, 422, '禁止撤销');
 
         $tmp->status = 2;
         $tmp->getConnection()->transaction(function () use ($tmp) {
