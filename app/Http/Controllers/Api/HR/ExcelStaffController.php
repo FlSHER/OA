@@ -278,7 +278,7 @@ class ExcelStaffController extends Controller
             $checkDepart = app('Authority')->checkDepartment($item->department_id);
             // dd($hasAuth);
             // merge 高级权限数据
-            if ($hasAuth && ($checkBrand || $checkDepart || $item->status_id < 0)) {
+            if ($hasAuth && (($checkBrand && $checkDepart) || $item->status_id < 0)) {
 
                 $exportData = array_merge($exportData, $this->makeExportHighData($item));
             }
