@@ -7,8 +7,7 @@ use App\Models\HR\Staff;
 use Illuminate\Http\Request;
 use App\Services\StaffService;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\HR\StaffResource;
-use App\Http\Resources\HR\StaffCollection;
+use App\Http\Resources\StaffResource;
 use App\Http\Resources\CurrentUserResource;
 use Illuminate\Support\Facades\Log;
 
@@ -28,6 +27,9 @@ class StaffController extends Controller
      */
     public function index(Request $request)
     {
+        // 不允许返回全部用户
+        if (! $request->has('page')) $request->merge(['page' => 1]);
+
         preg_match('/role\.id=(.*?)(;|$)/', $request->filters, $match);
         $roleId = false;
         if ($match) {
@@ -49,13 +51,9 @@ class StaffController extends Controller
             ->sortByQueryString()
             ->withPagination();
 
-        if (isset($list['data'])) {
-            $list['data'] = new StaffCollection(collect($list['data']));
-
-            return $list;
-        } else {
-            return new StaffCollection($list);
-        }
+        return array_merge($list, [
+            'data' => StaffResource::collection($list['data'])
+        ]);
     }
 
     /**
@@ -68,7 +66,7 @@ class StaffController extends Controller
     {
         $staff->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'status', 'tags']);
 
-        return new StaffResource($staff);
+        return StaffResource::make($staff);
     }
 
     public function getCurrentUser()

@@ -30,6 +30,9 @@ class StaffController extends Controller
      */
     public function index(Request $request)
     {
+        // 不允许返回全部用户
+        if (! $request->has('page')) $request->merge(['page' => 1]);
+
         preg_match('/role\.id=(.*?)(;|$)/', $request->filters, $match);
         $roleId = false;
         if ($match) {
@@ -51,13 +54,9 @@ class StaffController extends Controller
             ->sortByQueryString()
             ->withPagination();
 
-        if (isset($list['data'])) {
-            $list['data'] = new StaffCollection(collect($list['data']));
-
-            return $list;
-        } else {
-            return new StaffCollection($list);
-        }
+        return array_merge($list, [
+            'data' => new StaffCollection($list['data'])
+        ]);
     }
 
     /**
@@ -77,7 +76,7 @@ class StaffController extends Controller
                 ->orderBy('staff_sn', 'desc')
                 ->first();
 
-            return response()->json(new StaffResource($staff), 201);
+            return response()->json(StaffResource::make($staff), 201);
         }
 
         return response()->json($curd, 422);
@@ -98,7 +97,7 @@ class StaffController extends Controller
         if ($curd['status'] == 1 || $curd['status'] == -1) {
             $staff->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'status', 'tags']);
 
-            return response()->json(new StaffResource($staff), 201);
+            return response()->json(StaffResource::make($staff), 201);
         }
 
         return response()->json([
@@ -118,7 +117,7 @@ class StaffController extends Controller
         $staff->load(['relative', 'position', 'department', 'brand', 'shop', 'cost_brands', 'tags']);
         $staff->oa = app('Authority')->getAuthoritiesByStaffSn($staff->staff_sn);
 
-        return new StaffResource($staff);
+        return StaffResource::make($staff);
     }
 
 

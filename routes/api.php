@@ -52,6 +52,8 @@ Route::get('/dingtalk/register_approval_callback', ['uses' => 'Api\DingtalkContr
 Route::any('/dingtalk/approval_callback', ['uses' => 'Api\DingtalkController@approvalCallback']); //钉钉审批回调
 
 Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
+    // OA后台退出前 清空缓存
+    Route::post('login/clear', function () { return (string) session()->invalidate(); });
     // 通用 api 资源路由
     Route::namespace('Resources')->group(function () {
         // 员工入职流程 /api/staff/entrant

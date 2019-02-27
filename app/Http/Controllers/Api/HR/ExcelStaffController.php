@@ -276,7 +276,7 @@ class ExcelStaffController extends Controller
             // 筛选掉无权限查看的员工
             $checkBrand = app('Authority')->checkBrand($item->brand_id);
             $checkDepart = app('Authority')->checkDepartment($item->department_id);
-            // dd($hasAuth);
+
             // merge 高级权限数据
             if ($hasAuth && (($checkBrand && $checkDepart) || $item->status_id < 0)) {
 
