@@ -16,41 +16,22 @@ class StaffCollection extends ResourceCollection
      */
     public function toArray($request)
     {
-        $types = \DB::table('staff_relative_type')
+        /*$types = \DB::table('staff_relative_type')
             ->select(['id', 'name'])->get()->mapWithKeys(function ($item) {
                 return [$item->id => ['id' => $item->id, 'name' => $item->name]];
-            });
-        return $this->collection->map(function ($staff) use ($types) {
-            $makeRelative = function ($item) use ($types) {
+            });*/
+        return $this->collection->map(function ($staff) {
+            /*$makeRelative = function ($item) use ($types) {
                 return [
                     'staff_sn' => $item->staff_sn,
                     'realname' => $item->realname,
                     'relative_type' => $types[$item->pivot->relative_type],
                 ];
-            };
-            $response = [
-                'staff_sn' => $staff->staff_sn,
-                'realname' => $staff->realname,
-                'mobile' => $staff->mobile,
-                'gender' => $staff->gender,
-                'brand_id' => $staff->brand_id,
-                'department_id' => $staff->department_id,
-                'position_id' => $staff->position_id,
-                'shop_sn' => $staff->shop_sn,
-                'status_id' => $staff->status_id,
-                'is_active' => $staff->is_active,
-                'hired_at' => $staff->hired_at,
-                'employed_at' => $staff->employed_at,
+            };*/
 
-                'shop' => $staff->shop ? $staff->shop->only(['shop_sn', 'name', 'manager_sn', 'manager_name']) : null,
-                'cost_brands' => $staff->cost_brands,
-                'department' => $staff->department->only(['id', 'full_name', 'manager_sn', 'manager_name']),
-                'position' => $staff->position->only(['id', 'name', 'level']),
-                'status' => $staff->status->only(['id', 'name']),
-                'brand' => $staff->brand->only(['id', 'name']),
-            ];
-
-            /*$checkBrand = app('Authority')->checkBrand($staff->brand_id);
+            /*
+            // 需要高级权限返回的字段信息
+            $checkBrand = app('Authority')->checkBrand($staff->brand_id);
             $checkDepart = app('Authority')->checkDepartment($staff->department_id);
             if (($checkBrand && $checkDepart) || $staff->status_id < 0) {
                 $response = array_merge($response, [
@@ -89,7 +70,27 @@ class StaffCollection extends ResourceCollection
                 ]);
             }*/
 
-            return $response;
+            return  [
+                'staff_sn' => $staff->staff_sn,
+                'realname' => $staff->realname,
+                'mobile' => $staff->mobile,
+                'gender' => $staff->gender,
+                'brand_id' => $staff->brand_id,
+                'department_id' => $staff->department_id,
+                'position_id' => $staff->position_id,
+                'shop_sn' => $staff->shop_sn,
+                'status_id' => $staff->status_id,
+                'is_active' => $staff->is_active,
+                'hired_at' => $staff->hired_at,
+                'employed_at' => $staff->employed_at,
+
+                'shop' => $staff->shop ? $staff->shop->only(['shop_sn', 'name', 'manager_sn', 'manager_name']) : null,
+                'cost_brands' => $staff->cost_brands,
+                'department' => $staff->department->only(['id', 'full_name', 'manager_sn', 'manager_name']),
+                'position' => $staff->position->only(['id', 'name', 'level']),
+                'status' => $staff->status->only(['id', 'name']),
+                'brand' => $staff->brand->only(['id', 'name']),
+            ];
 
         })->toArray();
     }
