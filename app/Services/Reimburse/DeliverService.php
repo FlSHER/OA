@@ -117,7 +117,7 @@ class DeliverService
                 try {
                     $processInstanceId = app('Dingtalk')->startApprovalAndRecord($this->appId, $this->singleProcessCode, $dingApproveSn, $formData, $callback, $initiatorSn);
                 } catch (HttpException $e) {
-                    if ($e->getMessage()['message'] == '钉钉员工资料不存在') {
+                    if ($e->getMessage() == '钉钉员工资料不存在') {
                         $initiatorSn = $reimbursement->accountant_staff_sn;
                         $processInstanceId = app('Dingtalk')->startApprovalAndRecord($this->appId, $this->singleProcessCode, $dingApproveSn, $formData, $callback, $initiatorSn);
                     } else {
