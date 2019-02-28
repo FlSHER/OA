@@ -8,7 +8,7 @@ use App\Http\Resources\HR\StaffRelativeCollection;
 class StaffResource extends Resource
 {
 
-    public static $wrap = null;
+    // public static $wrap = null;
 
     /**
      * Transform the resource into an array.
@@ -18,6 +18,8 @@ class StaffResource extends Resource
      */
     public function toArray($request)
     {
+        parent::withoutWrapping();
+        
         return [
             'staff_sn' => $this->staff_sn,
             'realname' => $this->realname,

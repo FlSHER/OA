@@ -27,9 +27,6 @@ class StaffController extends Controller
      */
     public function index(Request $request)
     {
-        // 不允许返回全部用户
-        if (! $request->has('page')) $request->merge(['page' => 1]);
-
         preg_match('/role\.id=(.*?)(;|$)/', $request->filters, $match);
         $roleId = false;
         if ($match) {
@@ -51,9 +48,12 @@ class StaffController extends Controller
             ->sortByQueryString()
             ->withPagination();
 
-        return array_merge($list, [
-            'data' => StaffResource::collection($list['data'])
-        ]);
+        if ($request->has('page')) {
+            return array_merge($list, [
+                'data' => StaffResource::collection($list['data'])
+            ]);
+        }
+        return StaffResource::collection($list);
     }
 
     /**
