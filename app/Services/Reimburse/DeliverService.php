@@ -119,6 +119,7 @@ class DeliverService
                 } catch (HttpException $e) {
                     if ($e->getMessage() == '钉钉员工资料不存在') {
                         $initiatorSn = $reimbursement->accountant_staff_sn;
+                        $formData['申请人'] .= '（已离职）';
                         $processInstanceId = app('Dingtalk')->startApprovalAndRecord($this->appId, $this->singleProcessCode, $dingApproveSn, $formData, $callback, $initiatorSn);
                     } else {
                         throw $e;
