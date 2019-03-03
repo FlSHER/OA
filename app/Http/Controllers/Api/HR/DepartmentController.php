@@ -146,27 +146,37 @@ class DepartmentController extends Controller
      *
      * @return mixed
      */
-    public function sortBy(Request $request)
+    public function sortBy(Request $request, Department $department)
     {
         $this->validate($request, [
-            'new_data.*.name' => 'bail|required|string',
-            'new_data.*.sort' => 'bail|required|numeric',
+            'new_data.*.id' => 'required|exists:departments,id',
+            'new_data.*.name' => 'required',
+            'new_data.*.sort' => 'required|numeric',
         ], [
+            'new_data.*.id.required' => '部门不能为空',
             'new_data.*.name.required' => '部门名称不能为空',
             'new_data.*.sort.required' => '部门排序值不能为空',
         ]);
 
-        $departments = Department::get();
-        $data = $request->input('new_data', []);
-        foreach ($data as $key => $val) {
-            $isUpdate = $departments->filter(function ($item) use ($val) {
-                return $item->id === $val['id'] && $item->sort !== $val['sort'];
-            });
-            if ($isUpdate->isNotEmpty()) {
-                Department::where('id', $val['id'])->update(['sort' => $val['sort']]);
-            }
+        $data = array_filter($request->input('new_data', []));
+        if (empty($data)) {
+            return response()->json(['message' => '没有变动']);
         }
+        return $department->getConnection()->transaction(function () use ($data) {
+            $column = array_column($data, 'id');
+            Department::whereIn('id', $column)->get()->map(function ($item) use ($data) {
+                foreach ($data as $key => $dept) {
+                    if ($dept['id'] == $item->id) {
+                        $item->sort = $dept['sort'];
+                        $item->parent_id = $dept['parent_id'];
+                        $item->save();
+                    }
+                }
+            });
 
-        return response()->json(['message' => '操作成功'], 201);
+            $newData = Department::whereIn('id', $column)->get();
+
+            return response()->json($newData, 201);
+        });
     }
 }

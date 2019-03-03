@@ -27,6 +27,7 @@ class DepartmentCollection extends ResourceCollection
                 'is_public' => $department->is_public,
                 'manager_sn' => $department->manager_sn,
                 'manager_name' => $department->manager_name,
+                'sort' => $department->sort,
             ];
         })->toArray();
     }
