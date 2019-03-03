@@ -33,7 +33,7 @@ class StaffRelationController extends Controller
     {
         return [
             ['id' => 0, 'name' => '无'],
-            ['id' => 1, 'name' => '108将'],
+            ['id' => 1, 'name' => '109将'],
             ['id' => 2, 'name' => '36天罡'],
             ['id' => 3, 'name' => '24金刚'],
             ['id' => 4, 'name' => '18罗汉'],

@@ -299,8 +299,15 @@ class ExcelStaffController extends Controller
      */
     protected function makeExportBaseData($item)
     {
-        $property = ['无', '108将', '36天罡', '24金刚', '18罗汉'];
-        $parser = new ParserIdentity($item->id_card_number);
+        $property = ['无', '109将', '36天罡', '24金刚', '18罗汉'];
+
+        $birthday = '';
+        $year = substr($item->id_card_number, 6, 4);
+        $month = substr($item->id_card_number, 10, 2);
+        $day = substr($item->id_card_number, 12, 2);
+        if (checkdate($month, $day, $year)) {
+            $birthday = sprintf('%s-%s-%s', $year, $month, $day);
+        }
         return [
             'staff_sn' => $item->staff_sn,
             'realname' => $item->realname,
@@ -313,7 +320,7 @@ class ExcelStaffController extends Controller
             'position' => $item->position->name,
             'position_level' => $item->position->level,
             'status' => $item->status->name,
-            'birthday' => $parser->isValidate() ? $parser->birthday() : '',
+            'birthday' => $birthday,
             'hired_at' => $item->hired_at,
             'employed_at' => $item->employed_at,
             'left_at' => $item->left_at,
