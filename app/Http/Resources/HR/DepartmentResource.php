@@ -27,6 +27,7 @@ class DepartmentResource extends Resource
             'is_public' => $this->is_public,
             'manager_sn' => $this->manager_sn,
             'manager_name' => $this->manager_name,
+            'sort' => $department->sort,
         ];
     }
 }

@@ -37,7 +37,7 @@ class CurrentUserResource extends Resource
             'status' => $this->status->only(['id', 'name']),
             'property' => [
                 'id' => $this->property,
-                'name' => ['无', '108将', '36天罡', '24金刚', '18罗汉'][$this->property],
+                'name' => ['无', '109将', '36天罡', '24金刚', '18罗汉'][$this->property],
             ],
             'hired_at' => $this->hired_at,
             'employed_at' => $this->employed_at,
