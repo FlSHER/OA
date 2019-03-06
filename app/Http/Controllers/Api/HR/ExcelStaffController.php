@@ -302,9 +302,9 @@ class ExcelStaffController extends Controller
         $property = ['无', '109将', '36天罡', '24金刚', '18罗汉'];
 
         $birthday = '';
-        $year = substr($item->id_card_number, 6, 4);
-        $month = substr($item->id_card_number, 10, 2);
-        $day = substr($item->id_card_number, 12, 2);
+        $year = (int)substr($item->id_card_number, 6, 4);
+        $month = (int)substr($item->id_card_number, 10, 2);
+        $day = (int)substr($item->id_card_number, 12, 2);
         if (checkdate($month, $day, $year)) {
             $birthday = sprintf('%s-%s-%s', $year, $month, $day);
         }
@@ -583,10 +583,10 @@ class ExcelStaffController extends Controller
 
     /**
      * 验证导入字段.
-     * 
+     *
      * @param  行数据 $item
      * @param  验证规则 $rules
-     * 
+     *
      * @return void
      */
     protected function makeValidator($item, $rules)
