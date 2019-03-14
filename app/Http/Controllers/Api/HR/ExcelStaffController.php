@@ -61,7 +61,7 @@ class ExcelStaffController extends Controller
         $data = array_filter($request->input('data', []));
         $formatData = $this->combineImportData($request);
         foreach ($formatData as $key => $value) {
-            $this->makeValidator($value);
+            $this->makeValidator($value, $this->addRules($value));
             if (empty($this->errors)) {
                 $makeVal = $this->makeFillStaff($value);
                 $makeVal['operation_type'] = 'import_entry';
@@ -95,7 +95,7 @@ class ExcelStaffController extends Controller
         $data = array_filter($request->input('data', []));
         $formatData = $this->combineImportData($request);
         foreach ($formatData as $key => $value) {
-            $this->makeValidator($value);
+            $this->makeValidator($value, $this->editRules($value));
             if (empty($this->errors)) {
                 $makeVal = $this->makeFillStaff($value);
                 $makeVal['operation_type'] = 'edit';
@@ -129,7 +129,7 @@ class ExcelStaffController extends Controller
         $data = array_filter($request->input('data', []));
         $formatData = $this->combineImportData($request);
         foreach ($formatData as $key => $value) {
-            $this->makeValidator($value);
+            $this->makeValidator($value, $this->transferRules($value));
             if (empty($this->errors)) {
                 $makeVal = $this->makeFillStaff($value);
                 $makeVal['operation_type'] = 'import_transfer';
@@ -161,7 +161,9 @@ class ExcelStaffController extends Controller
     protected function combineImportData(Request $request)
     {
         $temp = [];
-        $data = array_filter($request->input('data', []));
+        $data = array_filter($request->input('data', []), function ($item) {
+            return !empty($item) && !empty($item[0]);
+        });
         $cols = $request->input('cols', []);
         if (count($data) <= 1) return false;
 
@@ -276,9 +278,9 @@ class ExcelStaffController extends Controller
             // 筛选掉无权限查看的员工
             $checkBrand = app('Authority')->checkBrand($item->brand_id);
             $checkDepart = app('Authority')->checkDepartment($item->department_id);
-            // dd($hasAuth);
+
             // merge 高级权限数据
-            if ($hasAuth && ($checkBrand || $checkDepart || $item->status_id < 0)) {
+            if ($hasAuth && (($checkBrand && $checkDepart) || $item->status_id < 0)) {
 
                 $exportData = array_merge($exportData, $this->makeExportHighData($item));
             }
@@ -297,10 +299,15 @@ class ExcelStaffController extends Controller
      */
     protected function makeExportBaseData($item)
     {
-        $property = ['无', '108将', '36天罡', '24金刚', '18罗汉'];
-        $transfer = $this->getLastChange($item);
-        $parser = new ParserIdentity($item->id_card_number);
+        $property = ['无', '109将', '36天罡', '24金刚', '18罗汉'];
 
+        $birthday = '';
+        $year = (int)substr($item->id_card_number, 6, 4);
+        $month = (int)substr($item->id_card_number, 10, 2);
+        $day = (int)substr($item->id_card_number, 12, 2);
+        if (checkdate($month, $day, $year)) {
+            $birthday = sprintf('%s-%s-%s', $year, $month, $day);
+        }
         return [
             'staff_sn' => $item->staff_sn,
             'realname' => $item->realname,
@@ -313,7 +320,7 @@ class ExcelStaffController extends Controller
             'position' => $item->position->name,
             'position_level' => $item->position->level,
             'status' => $item->status->name,
-            'birthday' => $parser->isValidate() ? $parser->birthday() : '',
+            'birthday' => $birthday,
             'hired_at' => $item->hired_at,
             'employed_at' => $item->employed_at,
             'left_at' => $item->left_at,
@@ -468,41 +475,17 @@ class ExcelStaffController extends Controller
     }
 
     /**
-     * 导入信息合法性验证.
+     * 批量入职 rules.
      *
-     * @param array $value
      * @return void
      */
-    protected function makeValidator($value)
+    protected function addRules($item)
     {
-        $rules = [
+        return array_merge($this->commonRules($item), [
             'realname' => 'required|string|max:10',
-            'brand' => 'exists:brands,name,deleted_at,NULL',
-            'position' => 'exists:positions,name,deleted_at,NULL',
-            'gender' => 'in:未知,男,女',
-            'national' => 'exists:i_national,name',
-            'education' => 'exists:i_education,name',
-            'politics' => 'exists:i_politics,name',
-            'shop_sn' => 'exists:shops,shop_sn,deleted_at,NULL|max:10',
-            'department' => 'max:100|exists:departments,full_name,deleted_at,NULL',
-            'marital_status' => 'exists:i_marital_status,name',
-            'household_province' => 'exists:i_district,name',
-            'household_city' => 'exists:i_district,name',
-            'household_county' => 'exists:i_district,name',
-            'living_province' => 'exists:i_district,name',
-            'living_city' => 'exists:i_district,name',
-            'living_county' => 'exists:i_district,name',
-            'household_address' => 'string|max:30',
-            'living_address' => 'string|max:30',
             'concat_name' => 'required|between:2,10',
             'concat_tel' => 'required|cn_phone',
             'concat_type' => 'required|max:5',
-            'account_bank' => 'max:20',
-            'account_name' => 'max:10',
-            'account_number' => 'between:16,19',
-            'height' => 'integer|between:140,220',
-            'weight' => 'integer|between:30,150',
-            'remark' => 'max:100',
             'mobile' => ['required', 'cn_phone', unique_validator('staff', false)],
             'wechat_number' => ['between:6,20', unique_validator('staff', false)],
             'id_card_number' => ['required', 'ck_identity', unique_validator('staff', false)],
@@ -513,9 +496,91 @@ class ExcelStaffController extends Controller
                     $query->where('id', '>', 0);
                 }),
             ],
+        ]);
+    }
+
+    /**
+     * 批量编辑信息 rules.
+     *
+     * @param array $item
+     * @return void
+     */
+    protected function editRules($item)
+    {
+        $uniqueRule = Rule::unique('staff')->ignore($item['staff_sn'], 'staff_sn')->where(function ($query) {
+            $query->whereNull('deleted_at');
+        });
+        return array_merge($this->commonRules($item), [
+            'staff_sn' => 'required|exists:staff,staff_sn,deleted_at,NULL',
+            'realname' => 'string|max:10',
+            'concat_name' => 'between:2,10',
+            'concat_tel' => 'cn_phone',
+            'concat_type' => 'rmax:5',
+            'mobile' => ['cn_phone', $uniqueRule],
+            'wechat_number' => ['between:6,20', $uniqueRule],
+            'id_card_number' => ['ck_identity', $uniqueRule],
+            'dingtalk_number' => ['max:50', $uniqueRule],
+            'status' => [
+                Rule::exists('staff_status', 'name')->where(function ($query) {
+                    $query->where('id', '>', 0);
+                }),
+            ],
+        ]);
+    }
+
+    /**
+     * 批量变动信息 rules.
+     *
+     * @param array $item
+     * @return void
+     */
+    protected function transferRules($item)
+    {
+        return array_merge($this->commonRules($item), [
+            'staff_sn' => 'required|exists:staff,staff_sn,deleted_at,NULL',
+            'status' => [
+                Rule::exists('staff_status', 'name')->where(function ($query) {
+                    $query->where('id', '>', 0);
+                }),
+            ],
+        ]);
+    }
+
+    /**
+     * 批量(入职|编辑|变动)通用部分规则.
+     *
+     * @param array $item
+     * @return rules
+     */
+    protected function commonRules($item)
+    {
+        return [
+            'gender' => 'in:未知,男,女',
+            'national' => 'exists:i_national,name',
+            'politics' => 'exists:i_politics,name',
+            'education' => 'exists:i_education,name',
+            'marital_status' => 'exists:i_marital_status,name',
+            'household_province' => 'exists:i_district,name',
+            'household_county' => 'exists:i_district,name',
+            'household_city' => 'exists:i_district,name',
+            'living_province' => 'exists:i_district,name',
+            'living_county' => 'exists:i_district,name',
+            'living_city' => 'exists:i_district,name',
+            'household_address' => 'string|max:30',
+            'living_address' => 'string|max:30',
+            'account_bank' => 'max:20',
+            'account_name' => 'max:10',
+            'account_number' => 'between:16,19',
+            'remark' => 'max:100',
+            'height' => 'integer|between:140,220',
+            'weight' => 'integer|between:30,150',
+            'shop_sn' => 'exists:shops,shop_sn,deleted_at,NULL|max:10',
+            'position' => 'exists:positions,name,deleted_at,NULL',
+            'department' => 'max:100|exists:departments,full_name,deleted_at,NULL',
+            'brand' => 'exists:brands,name,deleted_at,NULL',
             'cost_brand' => [
                 'required_with:brand',
-                function ($attribute, $content, $fail) use ($value) {
+                function ($attribute, $content, $fail) use ($item) {
                     $brandName = HR\CostBrand::pluck('name');
                     $costBrands = array_filter(explode('/', $content));
                     $brand = collect($costBrands)->map(function ($brand) use ($brandName) {
@@ -528,7 +593,7 @@ class ExcelStaffController extends Controller
                     }
 
                     // 验证品牌/费用品牌的关联性
-                    $brand_id = $this->getBrand($value['brand']);
+                    $brand_id = $this->getBrand($item['brand']);
                     $brands = HR\CostBrand::with('brands')->whereIn('name', $costBrands)->get();
                     $brand = $brands->map(function ($item) use ($brand_id) {
                         if (!$item->brands->contains($brand_id)) {
@@ -541,45 +606,20 @@ class ExcelStaffController extends Controller
                 }
             ],
         ];
-        if (!empty($value['staff_sn'])) {
-            $uniqueRule = Rule::unique('staff')->ignore($value['staff_sn'], 'staff_sn')
-                ->where(function ($query) {
-                    $query->whereNull('deleted_at');
-                });
-            $rules = array_merge($rules, [
-                'staff_sn' => 'required|exists:staff,staff_sn,deleted_at,NULL',
-                'realname' => 'string|max:10',
-                'concat_tel' => 'cn_phone',
-                'concat_name' => 'between:2,10',
-                'concat_type' => 'max:5',
-                'mobile' => ['cn_phone', $uniqueRule],
-                'wechat_number' => ['between:6,20', $uniqueRule],
-                'id_card_number' => ['ck_identity', $uniqueRule],
-                'dingtalk_number' => ['max:50', $uniqueRule],
-                'status' => [
-                    Rule::exists('staff_status', 'name')->where(function ($query) {
-                        $query->where('id', '>', 0);
-                    }),
-                ],
-            ]);
-        }
-        $validator = Validator::make($value->toArray(), $rules, $this->message());
-        if ($this->staffWithMap) {
-            $this->errors = [];
-            foreach ($validator->errors()->getMessages() as $key => $error) {
-                $this->errors[$this->staffWithMap[$key]] = $error;
-            }
-        }
     }
 
     /**
-     * 统一处理验证错误信息.
+     * 验证导入字段.
      *
-     * @return array
+     * @param  行数据 $item
+     * @param  验证规则 $rules
+     *
+     * @return void
      */
-    protected function message(): array
+    protected function makeValidator($item, $rules)
     {
-        return [
+        $item = $item->toArray();
+        $validator = Validator::make($item, $rules, [
             'in' => ':attribute必须在【:values】中选择。',
             'max' => ':attribute不能大于 :max 个字。',
             'exists' => ':attribute填写错误。',
@@ -588,6 +628,12 @@ class ExcelStaffController extends Controller
             'between' => ':attribute参数 :input 不在 :min - :max 之间。',
             'required_with' => ':attribute不能为空。',
             'date_format' => '时间格式错误',
-        ];
+        ]);
+        if ($this->staffWithMap) {
+            $this->errors = [];
+            foreach ($validator->errors()->getMessages() as $key => $error) {
+                $this->errors[$this->staffWithMap[$key]] = $error;
+            }
+        }
     }
 }

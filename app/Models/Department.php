@@ -284,22 +284,23 @@ class Department extends Model
             $originalParentId = $this->getOriginal('parent_id');
             $rolesOrigin = DB::table('role_has_departments')->where('department_id', $originalParentId)->pluck('role_id')->toArray();
             $rolesNew = DB::table('role_has_departments')->where('department_id', $this->parent_id)->pluck('role_id')->toArray();
+            $curRoles = DB::table('role_has_departments')->where('department_id', $this->id)->pluck('role_id')->toArray();
             if ($rolesOrigin != $rolesNew) {
                 $this->role()->detach(array_diff($rolesOrigin, $rolesNew));
-                $this->role()->attach(array_diff($rolesNew, $rolesOrigin));
-                $this->changeChildrenRoleAuthority($rolesOrigin, $rolesNew);
+                $this->role()->attach(array_diff($rolesNew, $rolesOrigin, $curRoles));
+                $this->changeChildrenRoleAuthority($rolesOrigin, $rolesNew, $curRoles);
             }
         }
     }
 
-    private function changeChildrenRoleAuthority($rolesOrigin, $rolesNew)
+    private function changeChildrenRoleAuthority($rolesOrigin, $rolesNew, $curRoles)
     {
         if(isset($this->_children) && $this->_children)
         {
-            $this->_children->each(function ($item) use ($rolesOrigin, $rolesNew) {
+            $this->_children->each(function ($item) use ($rolesOrigin, $rolesNew, $curRoles) {
                 $item->role()->detach(array_diff($rolesOrigin, $rolesNew));
-                $item->role()->attach(array_diff($rolesNew, $rolesOrigin));
-                $item->changeChildrenRoleAuthority($rolesOrigin, $rolesNew);
+                $item->role()->attach(array_diff($rolesNew, $rolesOrigin, $curRoles));
+                $item->changeChildrenRoleAuthority($rolesOrigin, $rolesNew, $curRoles);
             });
         }
     }

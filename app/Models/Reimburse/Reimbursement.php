@@ -4,10 +4,11 @@ namespace App\Models\Reimburse;
 
 use App\Models\Traits\ListScopes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Reimbursement extends Model
 {
-    use ListScopes;
+    use ListScopes,SoftDeletes;
 
     protected $connection = 'reimburse_mysql';
 //    protected $dates = ['send_time','approve_time','audit_time','reject_time','create_time'];

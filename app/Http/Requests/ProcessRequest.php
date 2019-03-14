@@ -28,24 +28,25 @@ class ProcessRequest extends FormRequest
         $rules = $this->makeBasicValidator();
 
         if ($operateType === 'employ') {
-            $rules = array_collapse($rules, [
+            $rules = array_merge($rules, [
                 'status_id' => 'required|in:2',
             ]);
 
         } elseif ($operateType === 'leave') {
-            $rules = array_collapse($rules, [
+            $rules = array_merge($rules, [
                 'status_id' => 'required|in:-1,-2,-3,-4',
                 'skip_leaving' => 'in:0,1',
             ]);
 
         } elseif ($operateType === 'transfer') {
-            $rules = array_collapse($rules, [
+            $rules = array_merge($rules, [
                 'brand_id' => 'required|exists:brands,id',
                 'status_id' => 'required|exists:staff_status,id',
                 'shop_sn' => 'exists:shops,shop_sn,deleted_at,NULL|max:10',
                 'position_id' => 'required|exists:positions,id,deleted_at,NULL',
                 'department_id' => 'required|exists:departments,id,deleted_at,NULL',
-                'cost_brands' => ['required', 'array',
+                'cost_brands' => [
+                    'required',
                     function ($attribute, $value, $fail) {
                         $brands = CostBrand::with('brands')->whereIn('id', $value)->get();
                         $brand = $brands->map(function ($item) {

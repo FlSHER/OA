@@ -13,6 +13,7 @@ namespace App\Services\Reimburse;
 use App\Models\Reimburse\Reimbursement;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class DeliverService
 {
@@ -113,7 +114,17 @@ class DeliverService
             if (!empty($dingApproveSn)) {
                 $formData = $this->makeFormData($reimbursement);
                 $initiatorSn = $reimbursement->staff_sn;//报销单创建人编号
-                $processInstanceId = app('Dingtalk')->startApprovalAndRecord($this->appId, $this->singleProcessCode, $dingApproveSn, $formData, $callback, $initiatorSn);
+                try {
+                    $processInstanceId = app('Dingtalk')->startApprovalAndRecord($this->appId, $this->singleProcessCode, $dingApproveSn, $formData, $callback, $initiatorSn);
+                } catch (HttpException $e) {
+                    if ($e->getMessage() == '钉钉员工资料不存在') {
+                        $initiatorSn = $reimbursement->accountant_staff_sn;
+                        $formData['申请人'] .= '（已离职）';
+                        $processInstanceId = app('Dingtalk')->startApprovalAndRecord($this->appId, $this->singleProcessCode, $dingApproveSn, $formData, $callback, $initiatorSn);
+                    } else {
+                        throw $e;
+                    }
+                }
                 $reimbursement->process_instance_id = $processInstanceId;
             }
             $reimbursement->second_rejecter_staff_sn = '';
