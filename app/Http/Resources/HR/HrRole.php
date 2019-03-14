@@ -14,8 +14,6 @@ class HrRole extends Resource
      */
     public function toArray($request)
     {
-        Resource::withoutWrapping();
-
         return parent::toArray($request);
     }
 }
