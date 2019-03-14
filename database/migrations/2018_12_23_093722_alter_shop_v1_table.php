@@ -15,7 +15,7 @@ class AlterShopV1Table extends Migration
     {
         Schema::table('shops', function (Blueprint $table) {
             $table->decimal('city_ratio', 2, 1)->nullable()->comment('城市系数');
-            $table->tinyInteger('staff_deploy')->default(0)->comment('员工配置');
+            $table->tinyInteger('staff_deploy')->nullable()->comment('员工配置');
         });
     }
 

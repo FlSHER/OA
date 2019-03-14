@@ -22,8 +22,8 @@ class AlterShopTable extends Migration
             $table->date('end_at')->nullable()->comment('结束时间');
 
             $table->decimal('total_area', 5, 2)->nullable()->comment('店铺总面积');
-            $table->enum('shop_type', ['A', 'B1', 'B2', 'B3', 'C'])->default('A')->comment('店铺类型');
-            $table->enum('work_type', ['全班', '倒班'])->default('全班')->comment('上班类型');
+            $table->char('shop_type', 10)->default('')->comment('店铺类型');
+            $table->char('work_type', 10)->default('')->comment('上班类型');
             $table->tinyInteger('work_schedule_id')->default(0)->comment('关联工作排班表ID');
 
             $table->foreign('status_id')->references('id')->on('shop_status');

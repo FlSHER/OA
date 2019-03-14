@@ -35,8 +35,8 @@ class ShopRequest extends FormRequest
             'county_id' => 'required|exists:i_district,id,level,3',
             'address' => 'required|max:50',
             'status_id' => 'required|exists:shop_status,id',
-            'clock_in' => ['regex:/^\d{2}:\d{2}$/'],
-            'clock_out' => ['regex:/^\d{2}:\d{2}$/'],
+            'clock_in' => ['nullable','regex:/^\d{2}:\d{2}$/'],
+            'clock_out' => ['nullable','regex:/^\d{2}:\d{2}$/'],
             'opening_at' => 'required_with:end_at|date_format:Y-m-d',
             'end_at' => 'date_format:Y-m-d|after:opening_at',
             'manager_sn' => 'required_with:manager_name|exists:staff,staff_sn',
@@ -52,7 +52,7 @@ class ShopRequest extends FormRequest
             'shop_type' => [Rule::in(['A', 'B1', 'B2', 'B3', 'C'])],
             'work_type' => [Rule::in(['全班', '倒班'])],
             'city_ratio' => ['nullable', Rule::in(['0.8', '1', '1.2'])],
-            'staff_deploy' => 'numeric|between:1,99',
+            'staff_deploy' => 'nullable|numeric|between:1,99',
         ];
         if ($this->getMethod() === 'PATCH') {
 			$rules = array_merge($rules, [
