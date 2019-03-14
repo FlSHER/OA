@@ -24,7 +24,7 @@ class DepartmentRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'name' => ['required','unique:departments,name,NULL,name,deleted_at,NULL','regex:/^[\u4e00-\u9fa5_a-zA-Z0-9]{2,10}$/'],
+            'name' => ['required','unique:departments,name,NULL,name,deleted_at,NULL','regex:/^[\\\u4e00-\\\u9fa5\w\d]{2,10}$/iu'],
             // 'name' => 'required|unique:departments,name,NULL,name,deleted_at,NULL|max:10',
             'cate_id' => 'exists:department_categories,id',
             'brand_id' => 'required|exists:brands,id',
@@ -44,7 +44,7 @@ class DepartmentRequest extends FormRequest
             $rules = array_merge($rules, [
                 'name' => [
                     'required',
-                    'regex:/^[\u4e00-\u9fa5_a-zA-Z0-9]{2,10}$/',
+                    'regex:/^[\\\u4e00-\\\u9fa5\w\d]{2,10}$/iu',
                     unique_validator('departments'),
                 ],
             ]);
