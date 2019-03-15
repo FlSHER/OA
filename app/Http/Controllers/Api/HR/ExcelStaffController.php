@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\HR;
 
 use Validator;
 use App\Models\HR;
+use App\Models\Position;
 use App\Models\Department;
 use App\Models\I\District;
 use Illuminate\Http\Request;
@@ -443,7 +444,7 @@ class ExcelStaffController extends Controller
     {
         $key = "position_list";
         $position = Cache::get($key, function () use ($key) {
-            $position = HR\Position::select('id', 'name')->get();
+            $position = Position::select('id', 'name')->get();
             Cache::put($key, $position, now()->addMinutes(10));
 
             return $position;
