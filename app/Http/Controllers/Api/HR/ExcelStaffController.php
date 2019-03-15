@@ -299,6 +299,7 @@ class ExcelStaffController extends Controller
      */
     protected function makeExportBaseData($item)
     {
+        $transfer = $this->getLastChange($item);
         $property = ['无', '109将', '36天罡', '24金刚', '18罗汉'];
 
         $birthday = '';
@@ -329,7 +330,6 @@ class ExcelStaffController extends Controller
             'account_name' => $item->account_name,
             'account_bank' => $item->account_bank,
             'job_source' => $item->job_source,
-            'birthday' => $parser->isValidate() ? $parser->birthday() : '',
             'position_pull' => $transfer->isNotEmpty() ? $transfer[0] : '',
             'position_push' => $transfer->isNotEmpty() ? $transfer[1] : '',
             'position_push_at' => $transfer->isNotEmpty() ? $transfer[2] : '',
