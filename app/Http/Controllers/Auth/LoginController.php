@@ -153,4 +153,38 @@ class LoginController extends Controller
         return redirect('/login');
     }
 
+    public function transfer()
+    {
+        \App\Models\HR\Staff::query()->where('status_id', '>=', 0)->chunk(500, function ($users) {
+            foreach ($users as $user) {
+                try {
+                    $transfer = $this->getLastChange($user);
+                    if ($transfer->isNotEmpty()) {
+                        $user->last_position = $transfer[0] ?? '';
+                        $user->latest_position = $transfer[1] ?? '';
+                        $user->last_position_at = $transfer[2] ?? '';
+                        $user->save();
+                        dump($user->staff_sn);
+                    }
+                } catch (\Exception $e) {
+                    dump($e->getMessage()); 
+                }
+            }
+        });
+    }
+
+    public function getLastChange($item)
+    {
+        $transfer = collect([]);
+        $lastLog = $item->change_log()->where('operation_type', 'transfer')->latest()->first();
+
+        if (!empty($lastLog->changes) && is_array($lastLog->changes)) {
+            $transfer = collect($lastLog->changes)->filter(function ($v, $k) {
+                return ($k === '职位' || $k === 'position');
+            })->collapse();
+            $transfer->isNotEmpty() && $transfer->push($lastLog->operate_at);
+        }
+
+        return $transfer;
+    }
 }

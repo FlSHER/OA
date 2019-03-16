@@ -300,9 +300,6 @@ class ExcelStaffController extends Controller
      */
     protected function makeExportBaseData($item)
     {
-        $transfer = $this->getLastChange($item);
-        $property = ['无', '109将', '36天罡', '24金刚', '18罗汉'];
-
         $birthday = '';
         $year = (int)substr($item->id_card_number, 6, 4);
         $month = (int)substr($item->id_card_number, 10, 2);
@@ -310,6 +307,7 @@ class ExcelStaffController extends Controller
         if (checkdate($month, $day, $year)) {
             $birthday = sprintf('%s-%s-%s', $year, $month, $day);
         }
+        $property = ['无', '109将', '36天罡', '24金刚', '18罗汉'];
         return [
             'staff_sn' => $item->staff_sn,
             'realname' => $item->realname,
@@ -331,9 +329,9 @@ class ExcelStaffController extends Controller
             'account_name' => $item->account_name,
             'account_bank' => $item->account_bank,
             'job_source' => $item->job_source,
-            'position_pull' => $transfer->isNotEmpty() ? $transfer[0] : '',
-            'position_push' => $transfer->isNotEmpty() ? $transfer[1] : '',
-            'position_push_at' => $transfer->isNotEmpty() ? $transfer[2] : '',
+            'position_pull' => $item->last_position,
+            'position_push' => $item->latest_position,
+            'position_push_at' => $item->last_position_at,
             'recruiter_name' => $item->recruiter_name,
             'remark' => $item->remark,
         ];

@@ -51,7 +51,7 @@ class StaffRelationController extends Controller
     }
 
     /**
-     * 获取全部民族.
+     * 获取全部学历.
      * 
      * @return array
      */

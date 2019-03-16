@@ -80,7 +80,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
         // 获取员工状态列表 /api/staff/property
         Route::get('staff/property', 'StaffRelationController@property');
 
-        // 获取全部民族列表 /api/staff/national
+        // 获取全部民族 /api/staff/national
         Route::get('staff/national', 'StaffRelationController@national');
 
         // 获取学历信息 /api/staff/education

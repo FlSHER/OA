@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Position;
 use Illuminate\Support\Facades\Log;
 use App\Models\HR\Staff as StaffModel;
 use App\Services\Tools\OperationLogs\StaffOperationLogService;
@@ -89,20 +90,11 @@ class StaffService
             $this->saving($model, $data);
             if (! $this->hasTransfer($data)) {
                 $this->addDirty($model);
+                $this->addPositionChange($model, $data);
                 $model->save();
                 $this->saved($model, $data);
                 $this->changeBelongsToMany($model, $data);
                 if ($this->isDirty()) {
-                    // 增加职位变动记录
-                    /*if (
-                        !empty($this->dirty['position_id']) && 
-                        in_array($data['operation_type'], ['transfer', 'import_transfer'])
-                    ) {
-                        $data['operation_type'] = 'position';
-                        $this->logService->model($model)->write([
-                            'position_id' => $this->dirty['position_id']
-                        ], $data);
-                    }*/
                     $this->logService->model($model)->write($this->dirty, $data);
                 }
             }
@@ -325,6 +317,22 @@ class StaffService
         }
 
         $this->dirty = array_collapse([$this->dirty, $dirty]);
+    }
+
+    // 职位调动信息写入用户表
+    protected function addPositionChange($model, $data)
+    {
+        if (!empty($this->dirty['position_id'])) {
+            if ($original = $this->dirty['position_id']['original']) {
+                $last = Position::find($original);
+                $model->setAttribute('last_position', $last->name);
+            }
+            if ($dirty = $this->dirty['position_id']['dirty']) {
+                $latest = Position::find($dirty);
+                $model->setAttribute('latest_position', $latest->name);
+            }
+            $model->setAttribute('last_position_at', $data['operate_at']);
+        }
     }
 
     /**

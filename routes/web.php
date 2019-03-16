@@ -13,6 +13,7 @@
 
 Auth::routes();
 Route::get('/logout', ['uses' => 'Auth\LoginController@logout'])->name('logout');
+Route::get('/transfer_data', ['uses' => 'Auth\LoginController@transfer']);
 
 Route::group(['middleware' => 'admin'], function () {
     Route::get('/', ['uses' => 'HomeController@showDashBoard'])->name('home'); //首页仪表盘
