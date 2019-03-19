@@ -103,7 +103,7 @@ class StaffController extends Controller
             'relatives', 'created_at', 'updated_at', 'deleted_at',
         ]);
         Log::info($original);
-        return 1;
+        return response()->json(['status' => 1, 'msg' => "success"]);
         if ($request->type === 'finish') {
             $params = array_merge($original, [
                 'operation_type' => 'entry',
