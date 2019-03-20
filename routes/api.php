@@ -74,26 +74,8 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
         // 晋升流程  /api/staff/promotion
         Route::post('staff/promotion', 'StaffController@promotion');
 
-        // 获取员工状态列表 /api/staff/status
-        Route::get('staff/status', 'StaffRelationController@status');
-
-        // 获取员工状态列表 /api/staff/property
-        Route::get('staff/property', 'StaffRelationController@property');
-
-        // 获取全部民族 /api/staff/national
-        Route::get('staff/national', 'StaffRelationController@national');
-
-        // 获取学历信息 /api/staff/education
-        Route::get('staff/education', 'StaffRelationController@education');
-
-        // 获取政治面貌信息 /api/staff/politics
-        Route::get('staff/politics', 'StaffRelationController@politics');
-
-        // 获取婚姻状态选项 /api/staff/marital
-        Route::get('staff/marital', 'StaffRelationController@marital');
-
-        // 关系类型选项 /api/staff/relative_type
-        Route::get('staff/relative_type', 'StaffRelationController@relativeType');
+        // 获取员工关联数据 /api/staff/relations
+        Route::get('staff/relations', 'StaffRelationController@index');
 
         // 上传员工头像
         Route::post('staff/avatar', 'StaffAvatarController@update');

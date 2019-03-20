@@ -4,24 +4,19 @@ namespace App\Http\Controllers\Api\Resources;
 
 use App\Models\HR;
 use App\Models\I;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
 
 class StaffRelationController extends Controller
 {
-    /**
-     * 获取员工状态列表.
-     * 
-     * @return array
-     */
-    public function status()
+    public function index(Request $request)
     {
-        $list = HR\StaffStatus::query()
-            ->filterByQueryString()
-            ->sortByQueryString()
-            ->get();
+        $type = in_array($type = $request->query('type', 'status'), [
+            'status', 'property', 'national', 'education', 'politics', 'marital', 'relative_type'
+        ]) ? $type : 'status';
 
-        return response()->json($list, 200);
+        return app()->call([$this, camel_case($type)]);
     }
 
     /**
@@ -37,6 +32,26 @@ class StaffRelationController extends Controller
             ['id' => 2, 'name' => '36天罡'],
             ['id' => 3, 'name' => '24金刚'],
             ['id' => 4, 'name' => '18罗汉'],
+        ];
+    }
+
+
+    /**
+     * 获取员工状态列表.
+     * 
+     * @return array
+     */
+    public function status()
+    {
+        return [
+            ['id' => 0, 'name' => '离职中'],
+            ['id' => 1, 'name' => '试用期'],
+            ['id' => 2, 'name' => '在职'],
+            ['id' => 3, 'name' => '停薪留职'],
+            ['id' => -1, 'name' => '离职'],
+            ['id' => -2, 'name' => '自动离职'],
+            ['id' => -3, 'name' => '开除'],
+            ['id' => -4, 'name' => '劝退'],
         ];
     }
 

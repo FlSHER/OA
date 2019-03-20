@@ -137,7 +137,7 @@ class Staff extends User
 
     public function position()
     { //职位
-        return $this->belongsTo('App\Models\Position');
+        return $this->belongsTo('App\Models\Position')->withTrashed();
     }
 
     public function brand()
