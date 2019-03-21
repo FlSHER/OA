@@ -30,6 +30,7 @@ class StaffCollection extends ResourceCollection
                 'is_active' => $staff->is_active,
                 'hired_at' => $staff->hired_at,
                 'employed_at' => $staff->employed_at,
+                'left_at' => $staff->left_at,
                 'property' => $staff->property,
 
                 'shop' => $staff->shop ? $staff->shop->only(['shop_sn', 'name', 'manager_sn', 'manager_name']) : null,
