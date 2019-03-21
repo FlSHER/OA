@@ -7,11 +7,33 @@ use App\Models\I;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
+use App\Services\RelationService;
 
 class StaffRelationController extends Controller
 {
     public function index(Request $request)
     {
+        $service = new RelationService;
+        $newData = [];
+        $keys = $service->staffKeys();
+        $data = $service->res();
+        foreach ($keys as $key => $withKey) {
+            if (isset($data[$key])) {
+                switch ($key) {
+                    case 'account_active':
+                        $newData[$withKey] = ($data[$key] == '是') ? 1 : 0;
+                        break;
+                    case 'shop':
+                        $newData[$withKey] = !empty($data[$key]) ? 1 : 0;
+                        break;
+                    default:
+                        $newData[$withKey] = $data[$key];
+                        break;
+                }
+            }
+        }
+        dd($newData);
+        exit;
         $type = in_array($type = $request->query('type', 'status'), [
             'status', 'property', 'national', 'education', 'politics', 'marital', 'relative_type'
         ]) ? $type : 'status';

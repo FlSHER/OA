@@ -39,8 +39,8 @@ class DepartmentResource extends Resource
             'minister_name' => $this->minister_name,
             'province_id' => $this->province_id,
             'brand' => $this->brand,
-            // 'parents' => $this->parents,
-            // 'children' => $this->children,
+            'parents' => $this->parents,
+            'children' => $this->children,
         ];
     }
 }

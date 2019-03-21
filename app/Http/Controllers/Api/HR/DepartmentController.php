@@ -60,7 +60,7 @@ class DepartmentController extends Controller
     {
         $department->load('brand', 'children');
 
-        return new DepartmentResource($department);
+        return response()->json($department);
     }
 
     /**

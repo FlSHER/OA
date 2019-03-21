@@ -17,7 +17,7 @@ class StaffCollection extends ResourceCollection
     public function toArray($request)
     {
         return $this->collection->map(function ($staff) {
-            return  [
+            return [
                 'staff_sn' => $staff->staff_sn,
                 'realname' => $staff->realname,
                 'mobile' => $staff->mobile,
@@ -30,6 +30,8 @@ class StaffCollection extends ResourceCollection
                 'is_active' => $staff->is_active,
                 'hired_at' => $staff->hired_at,
                 'employed_at' => $staff->employed_at,
+                'left_at' => $staff->left_at,
+                'property' => $staff->property,
 
                 'shop' => $staff->shop ? $staff->shop->only(['shop_sn', 'name', 'manager_sn', 'manager_name']) : null,
                 'cost_brands' => $staff->cost_brands,
@@ -37,35 +39,6 @@ class StaffCollection extends ResourceCollection
                 'position' => $staff->position->only(['id', 'name', 'level']),
                 'status' => $staff->status->only(['id', 'name']),
                 'brand' => $staff->brand->only(['id', 'name']),
-                'tags' => $staff->tags,
-
-                'height' => $staff->height,
-                'weight' => $staff->weight,
-                'recruiter_sn' => $staff->recruiter_sn,
-                'recruiter_name' => $staff->recruiter_name,
-                'id_card_number' => $staff->id_card_number,
-                'account_number' => $staff->account_number,
-                'account_bank' => $staff->account_bank,
-                'account_name' => $staff->account_name,
-                'account_active' => $staff->account_active,
-                'household_province_id' => $staff->household_province_id,
-                'household_city_id' => $staff->household_city_id,
-                'household_county_id' => $staff->household_county_id,
-                'household_address' => $staff->household_address,
-                'living_province_id' => $staff->living_province_id,
-                'living_city_id' => $staff->living_city_id,
-                'living_county_id' => $staff->living_county_id,
-                'living_address' => $staff->living_address,
-                'native_place' => $staff->native_place,
-                'education' => $staff->education,
-                'national' => $staff->national,
-                'marital_status' => $staff->marital_status,
-                'politics' => $staff->politics,
-                'remark' => $staff->remark,
-                'concat_name' => $staff->concat_name,
-                'concat_tel' => $staff->concat_tel,
-                'concat_type' => $staff->concat_type,
-                'job_source' => $staff->job_source,
             ];
 
         })->toArray();
