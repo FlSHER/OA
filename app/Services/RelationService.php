@@ -19,7 +19,6 @@ class RelationService
             'cost_brand' => 'cost_brands',
             'status' => 'status_id',
             'property' => 'property',
-            'shop.value' => 'shop_sn',
             'remark' => 'remark',
             'account_bank' => 'account_bank',
             'account_number' => 'account_number',
@@ -29,14 +28,15 @@ class RelationService
             'concat_type' => 'concat_type',
             'wechat_number' => 'wechat_number',
             'dingtalk_number' => 'dingtalk_number',
+            'shop' => 'shop_sn',
             'recruiter.value' => 'recruiter_sn',
             'recruiter.text' => 'recruiter_name',
             'recruiter_channel' => 'job_source',
             'staff_tags' => 'tags',
-            'household.province_id' => 'household_province_id',
-            'household.city_id' => 'household_city_id',
-            'household.county_id' => 'household_county_id',
-            'household.address' => 'household_address',
+            'household_province_id' => 'household_province_id',
+            'household_city_id' => 'household_city_id',
+            'household_county_id' => 'household_county_id',
+            'household_address' => 'household_address',
             'living_province_id' => 'living_province_id',
             'living_city_id' => 'living_city_id',
             'living_county_id' => 'living_county_id',
@@ -50,7 +50,76 @@ class RelationService
             'marital_status' => 'marital_status',
             'operate_at' => 'operate_at',
             'operation_remark' => 'operation_remark',
-            'account_active' => '是',
+            'account_active' => 'account_active',
+        ];
+    }
+
+    public function res()
+    {
+        return [
+          'realname' => '测试入职',
+          'id_card_number' => '360521200101019999',
+          'mobile' => '13882143092',
+          'gender' => '男',
+          'brand' => '12',
+          'positions' => '23',
+          'cost_brand' => ['4'],
+          'department' => '10',
+          'status' => '1',
+          'property' => '0',
+          'shop' => NULL,
+          'remark' => '重新入职的人员',
+          'account_bank' => '农行',
+          'account_number' => '111111111111111',
+          'account_name' => '看看',
+          'account_active' => '是',
+          'concat_name' => '王小二',
+          'concat_tel' => '13882143092',
+          'concat_type' => '朋友',
+          'wechat_number' => '',
+          'dingtalk_number' => '',
+          'recruiter' =>
+            array (
+              'value' => 116880,
+              'text' => '庞敏',
+            ),
+          'recruiter_channel' => '拉勾网',
+          'staff_tags' => ['1', '3'],
+          'household_province_id' => '110000',
+          'household_city_id' => '110100',
+          'household_county_id' => '110101',
+          'household_address' => '哇哈哈',
+          'living_province_id' => '220000',
+          'living_city_id' => '220400',
+          'living_county_id' => '220403',
+          'living_address' => 'jiedao',
+          'native_place' => '四川',
+          'national' => '0',
+          'education' => '0',
+          'politics' => '1',
+          'height' => '55',
+          'weiget' => '67',
+          'marital_status' => '0',
+          'operate_at' => '2019-03-20',
+          'operation_remark' => '',
+          'privy' =>
+          array (
+            0 =>
+            array (
+              'id' => 1,
+              'run_id' => 41,
+              'data_id' => 1,
+              'name' =>
+              array (
+                'value' => 121833,
+                'text' => '张卫',
+              ),
+              'type' => '11',
+              'created_at' => NULL,
+              'updated_at' => NULL,
+              'deleted_at' => NULL,
+            ),
+          )
         ];
     }
 }
