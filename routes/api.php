@@ -57,7 +57,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
     // 通用 api 资源路由
     Route::namespace('Resources')->group(function () {
         // 员工入职流程 /api/staff/entrant
-        Route::post('staff/entrant', 'WorkflowController@entrant');
+        Route::post('staff/entrant', 'WorkflowController@entry');
 
          // 员工转正流程 /api/staff/process
         Route::post('staff/process', 'StaffController@process');
