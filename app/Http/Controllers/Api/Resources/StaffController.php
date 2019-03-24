@@ -6,6 +6,7 @@ use Validator;
 use App\Models\HR\Staff;
 use Illuminate\Http\Request;
 use App\Services\StaffService;
+use App\Services\RelationService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\StaffResource;
 use App\Http\Resources\CurrentUserResource;
@@ -14,10 +15,12 @@ use Illuminate\Support\Facades\Log;
 class StaffController extends Controller
 {
     protected $staffService;
+    protected $relationService;
 
-    public function __construct(StaffService $staffService)
+    public function __construct(StaffService $staffService, RelationService $relationService)
     {
         $this->staffService = $staffService;
+        $this->relationService = $relationService;
     }
 
     /**
@@ -89,58 +92,6 @@ class StaffController extends Controller
     }
 
     /**
-     * 🐟员工入职流程.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return mixed
-     */
-    public function entrant(Request $request)
-    {
-        $data = $request->input('data', []);
-        Log::info($data);
-        $original = $this->filterData($data, [
-            'id' ,'run_id', 'shop', 'recruiter', 'household', 'living',
-            'relatives', 'created_at', 'updated_at', 'deleted_at',
-        ]);
-        Log::info($original);
-        return response()->json(['status' => 1, 'msg' => "success"]);
-        if ($request->type === 'finish') {
-            $params = array_merge($original, [
-                'operation_type' => 'entry',
-                'shop_sn' => $data['shop']['value'],
-                'recruiter_sn' => $data['recruiter']['value'],
-                'recruiter_name' => $data['recruiter']['text'],
-                'account_active' => ($data['account_active'] == '是') ? 1 : 0,
-                'relatives' => $this->makeRelatives($data['relatives']),
-            ]);
-            $validator = $this->entrantStaffValidator($params);
-            if ($validator->fails()) {
-                $errors = $validator->errors();
-                return response()->json(['status' => 0, 'msg' => $errors->first()], 422);
-            }
-            $result = $this->staffService->create($params);
-
-            return response()->json($result, 201);
-        }
-
-        return response()->json(['status' => 0, 'msg' => '流程验证错误'], 422);
-    }
-
-    // 转换关系数据结构
-    protected function makeRelatives($original)
-    {
-        $relatives = [];
-        foreach ((array)$original as $key => $val) {
-            $relatives[$key] = [
-                'relative_type' => $val['relative_type'],
-                'relative_sn' => $val['relative_staff']['value'],
-                'relative_name' => $val['relative_staff']['text'],
-            ];
-        }
-        return $relatives;
-    }
-
-    /**
      * 转正流程.
      * 
      * @param  Request $request
@@ -160,7 +111,7 @@ class StaffController extends Controller
             $validator = $this->processValidator($params);
             if ($validator->fails()) {
                 $errors = $validator->errors();
-                return response()->json(['status' => 0, 'msg' => $errors->first()], 422);
+                return response()->json(['status' => 0, 'msg' => $errors->json()], 422);
             }
             $result = $this->staffService->update($params);
 
@@ -371,9 +322,9 @@ class StaffController extends Controller
             'weight' => 'bail|integer|between:30,150',
             'operate_at' => 'bail|required|date',
             'operation_remark' => 'bail|max:100',
-            'relatives.*.relatives_sn' => ['required_with:relatives_type,relative_name'],
-            'relatives.*.relative_stype' => ['required_with:relatives_sn,relative_name'],
-            'relatives.*.relative_nsame' => ['required_with:relative_tsype,relative_sn'],
+            'relatives.*.relative_sn' => ['required_with:relative_type,relative_name'],
+            'relatives.*.relative_type' => ['required_with:relative_sn,relative_name'],
+            'relatives.*.relative_name' => ['required_with:relative_type,relative_sn'],
         ];
 
         return Validator::make($value, $rules, $this->message());

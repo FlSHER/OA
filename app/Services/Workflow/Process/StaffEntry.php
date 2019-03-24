@@ -1,12 +1,13 @@
 <?php 
 
-namespace App\Services;
+namespace App\Services\Workflow\Process;
 
+use Validator;
 
-class RelationService
+class StaffEntry
 {
-    
-    public function makeFillStaffData(array $data): array
+	
+	public function makeFillData(array $data): array
     {   
         $newData = [];
         $keys = $this->staffWithKeys();
@@ -92,75 +93,67 @@ class RelationService
         ];
     }
 
-    public function res()
+    public function validator(array $value)
+    {
+        $rules = [
+            'realname' => 'required|string|max:10',
+            'brand_id' => 'required|exists:brands,id',
+            'department_id' => 'required|exists:departments,id',
+            'position_id' => 'required|exists:positions,id',
+            'mobile' => 'required|unique:staff,mobile|cn_phone',
+            'id_card_number' => 'required|ck_identity',
+            'property' => 'in:0,1,2,3,4',
+            'gender' => 'required|in:未知,男,女',
+            'education' => 'exists:i_education,name',
+            'national' => 'exists:i_national,name',
+            'politics' => 'exists:i_politics,name',
+            'shop_sn' => 'exists:shops,shop_sn|max:10',
+            'status_id' => 'required|exists:staff_status,id',
+            'marital_status' => 'exists:i_marital_status,name',
+            'household_province_id' => 'exists:i_district,id',
+            'household_city_id' => 'exists:i_district,id',
+            'household_county_id' => 'exists:i_district,id',
+            'living_province_id' => 'exists:i_district,id',
+            'living_city_id' => 'exists:i_district,id',
+            'living_county_id' => 'exists:i_district,id',
+            'household_address' => 'string|max:30',
+            'living_address' => 'string|max:30',
+            'concat_name' => 'required|max:10',
+            'concat_tel' => 'required|cn_phone',
+            'concat_type' => 'required|max:5',
+            'dingtalk_number' => 'max:50',
+            'account_bank' => 'max:20',
+            'account_name' => 'max:10',
+            'account_number' => 'between:16,19',
+            'remark' => 'max:100',
+            'height' => 'integer|between:140,220',
+            'weight' => 'integer|between:30,150',
+            'operate_at' => 'required|date',
+            'operation_remark' => 'max:100',
+            'relatives.*.relative_sn' => ['required_with:relative_type,relative_name'],
+            'relatives.*.relative_type' => ['required_with:relative_sn,relative_name'],
+            'relatives.*.relative_name' => ['required_with:relative_type,relative_sn'],
+        ];
+
+        return Validator::make($value, $rules, $this->message());
+    }
+
+    /**
+     * 统一返回验证错误信息.
+     * 
+     * @return array
+     */
+    public function message(): array
     {
         return [
-          'realname' => '测试入职',
-          'id_card_number' => '360521200101019999',
-          'mobile' => '13882143092',
-          'gender' => '男',
-          'brand' => '12',
-          'positions' => '23',
-          'cost_brand' => ['4'],
-          'department' => '10',
-          'status' => '1',
-          'property' => '0',
-          'shop' => array (
-              'value' => 116880,
-              'text' => '庞敏',
-            ),
-          'remark' => '重新入职的人员',
-          'account_bank' => '农行',
-          'account_number' => '111111111111111',
-          'account_name' => '看看',
-          'account_active' => '是',
-          'concat_name' => '王小二',
-          'concat_tel' => '13882143092',
-          'concat_type' => '朋友',
-          'wechat_number' => '',
-          'dingtalk_number' => '',
-          'recruiter' =>
-            array (
-              'value' => 116880,
-              'text' => '庞敏',
-            ),
-          'recruiter_channel' => '拉勾网',
-          'staff_tags' => ['1', '3'],
-          'household_province_id' => '110000',
-          'household_city_id' => '110100',
-          'household_county_id' => '110101',
-          'household_address' => '哇哈哈',
-          'living_province_id' => '220000',
-          'living_city_id' => '220400',
-          'living_county_id' => '220403',
-          'living_address' => 'jiedao',
-          'native_place' => '四川',
-          'national' => '0',
-          'education' => '0',
-          'politics' => '1',
-          'height' => '55',
-          'weiget' => '67',
-          'marital_status' => '0',
-          'operate_at' => '2019-03-20',
-          'operation_remark' => '',
-          'privy' =>
-          array (
-            0 =>
-            array (
-              'id' => 1,
-              'run_id' => 41,
-              'data_id' => 1,
-              'name' =>
-              array (
-                'value' => 121833,
-                'text' => '张卫',
-              ),
-              'type' => '11',
-              'created_at' => NULL,
-              'updated_at' => NULL,
-              'deleted_at' => NULL,
-            ),
-          )
+            'in' => ':attribute必须在【:values】中选择。',
+            'max' => ':attribute不能大于 :max 个字。',
+            'exists' => ':attribute填写错误。',
+            'unique' => ':attribute已经存在，请重新填写。',
+            'required' => ':attribute为必填项，不能为空。',
+            'between' => ':attribute参数 :input 不在 :min - :max 之间。',
+            'required_with' => ':attribute不能为空。',
+            'date_format' => '时间格式错误',
         ];
     }
 }
