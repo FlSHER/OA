@@ -6,7 +6,45 @@ namespace App\Services;
 class RelationService
 {
     
-    public function staffKeys()
+    public function makeFillStaffData(array $data): array
+    {   
+        $newData = [];
+        $keys = $this->staffWithKeys();
+        foreach ($keys as $key => $withKey) {
+            if (empty($data[$key])) continue;
+            switch ($key) {
+                case 'account_active':
+                    $trans = ['否' => 0, '是' => 1];
+                    $newData[$withKey] = $trans[$data[$key]];
+                    break;
+                case 'shop':
+                    $newData[$withKey] = $data[$key]['value'];
+                    break;
+                case 'recruiter':
+                    $newData[$withKey] = $data[$key]['value'];
+                    $newData['recruiter_name'] = $data[$key]['text'];
+                    break;
+                case 'privy':
+                    $relatives = [];
+                    foreach ($data[$key] as $key => $item) {
+                        $relatives[] = [
+                            'relative_type' => $item['type'],
+                            'relative_name' => $item['name']['text'],
+                            'relative_sn' => $item['name']['value'],
+                        ];
+                    }
+                    $newData[$withKey] = $relatives;
+                    break;
+                default:
+                    $newData[$withKey] = $data[$key];
+                    break;
+            }
+        }
+        return $newData;
+    }
+
+    // 员工入职字段映射
+    public function staffWithKeys(): array
     {
         return [
             'realname' => 'realname',
@@ -29,8 +67,7 @@ class RelationService
             'wechat_number' => 'wechat_number',
             'dingtalk_number' => 'dingtalk_number',
             'shop' => 'shop_sn',
-            'recruiter.value' => 'recruiter_sn',
-            'recruiter.text' => 'recruiter_name',
+            'recruiter' => 'recruiter_sn',
             'recruiter_channel' => 'job_source',
             'staff_tags' => 'tags',
             'household_province_id' => 'household_province_id',
@@ -51,6 +88,7 @@ class RelationService
             'operate_at' => 'operate_at',
             'operation_remark' => 'operation_remark',
             'account_active' => 'account_active',
+            'privy' => 'relatives',
         ];
     }
 
@@ -67,7 +105,10 @@ class RelationService
           'department' => '10',
           'status' => '1',
           'property' => '0',
-          'shop' => NULL,
+          'shop' => array (
+              'value' => 116880,
+              'text' => '庞敏',
+            ),
           'remark' => '重新入职的人员',
           'account_bank' => '农行',
           'account_number' => '111111111111111',
