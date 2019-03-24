@@ -11,7 +11,7 @@ use App\Http\Resources\StaffResource;
 use App\Http\Resources\CurrentUserResource;
 use App\Services\Workflow\Process\StaffEntry;
 
-class WorkflowController extends \App\Http\Controllers\Controller
+class WorkflowController extends Controller
 {
     protected $staffService;
 
@@ -28,6 +28,7 @@ class WorkflowController extends \App\Http\Controllers\Controller
      */
     public function entry(Request $request)
     {
+    	\Log::info($request->all());
         $data = $request->input('data', []);
     	$service = new StaffEntry();
         $params = $service->makeFillData($data);
