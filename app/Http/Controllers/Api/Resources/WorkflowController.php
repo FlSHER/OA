@@ -28,17 +28,14 @@ class WorkflowController extends Controller
      */
     public function entry(Request $request)
     {
-    	\Log::info($request->all());
         $data = $request->input('data', []);
     	$service = new StaffEntry();
         $params = $service->makeFillData($data);
         $validator = $service->validator($params);
-        \Log::info($params);
         if ($validator->fails()) {
             $errors = $validator->errors();
             return response()->json(['status' => 0, 'msg' => $errors->toJson()], 422);
         }
-        \Log::info($request->type);
         if ($request->type === 'finish') {
 
             $result = $this->staffService->create($params);

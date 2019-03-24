@@ -6,7 +6,6 @@ use Validator;
 use App\Models\HR\Staff;
 use Illuminate\Http\Request;
 use App\Services\StaffService;
-use App\Services\RelationService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\StaffResource;
 use App\Http\Resources\CurrentUserResource;
@@ -15,12 +14,10 @@ use Illuminate\Support\Facades\Log;
 class StaffController extends Controller
 {
     protected $staffService;
-    protected $relationService;
 
-    public function __construct(StaffService $staffService, RelationService $relationService)
+    public function __construct(StaffService $staffService)
     {
         $this->staffService = $staffService;
-        $this->relationService = $relationService;
     }
 
     /**
