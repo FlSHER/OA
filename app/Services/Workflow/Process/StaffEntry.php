@@ -9,7 +9,7 @@ class StaffEntry
 	
 	public function makeFillData(array $data): array
     {   
-        $newData = [];
+        $newData = ['operation_remark' => ''];
         $keys = $this->staffWithKeys();
         foreach ($keys as $key => $withKey) {
             if (empty($data[$key])) continue;
