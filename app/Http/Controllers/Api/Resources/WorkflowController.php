@@ -35,7 +35,7 @@ class WorkflowController extends \App\Http\Controllers\Controller
         \Log::info($params);
         if ($validator->fails()) {
             $errors = $validator->errors();
-            return response()->json(['status' => 0, 'msg' => json_encode($errors)], 422);
+            return response()->json(['status' => 0, 'msg' => $errors->toJson()], 422);
         }
         \Log::info($request->type);
         if ($request->type === 'finish') {
