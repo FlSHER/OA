@@ -6,23 +6,18 @@ use Validator;
 use App\Models\HR\Staff;
 use Illuminate\Http\Request;
 use App\Services\StaffService;
-use App\Services\RelationService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\StaffResource;
 use App\Http\Resources\CurrentUserResource;
-use Illuminate\Support\Facades\Log;
+use App\Services\Workflow\Process\StaffEntry;
 
 class WorkflowController extends \App\Http\Controllers\Controller
 {
     protected $staffService;
-    protected $relationService;
 
-    public function __construct(
-    	StaffService $staffService, 
-    	RelationService $relationService)
+    public function __construct(StaffService $staffService)
     {
         $this->staffService = $staffService;
-        $this->relationService = $relationService;
     }
 
     /**
@@ -31,15 +26,18 @@ class WorkflowController extends \App\Http\Controllers\Controller
      * @param  \Illuminate\Http\Request $request
      * @return mixed
      */
-    public function entrant(Request $request)
+    public function entry(Request $request)
     {
         $data = $request->input('data', []);
-        $params = $this->relationService->makeFillStaffData($data);
-        $validator = $this->entrantStaffValidator($params);
+    	$service = new StaffEntry();
+        $params = $service->makeFillData($data);
+        $validator = $service->validator($params);
+        \Log::info('entry:'.$params);
         if ($validator->fails()) {
             $errors = $validator->errors();
             return response()->json(['status' => 0, 'msg' => $errors->json()], 422);
         }
+        \Log::info('entry_type:'.$request->type);
         if ($request->type === 'finish') {
 
             $result = $this->staffService->create($params);
