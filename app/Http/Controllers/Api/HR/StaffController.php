@@ -136,30 +136,24 @@ class StaffController extends Controller
 
     public function formatLog(HR\Staff $staff)
     {
-        $logs = HR\StaffLog::with('staff', 'admin')
+        $logs = HR\StaffLog::where('is_show', 1)
             ->where('staff_sn', $staff->staff_sn)
-            ->whereNotIn('operation_type', ['edit', 'active', 'delete'])
             ->orderBy('id', 'asc')
             ->get();
-        $format = $logs->filter(function ($item) {
-            if (in_array($item->operation_type, ['人事变动', '导入变动', '职位变动']) && !empty($item->changes) ) {
-                return collect($item->changes)->filter(function ($v, $k) {
-                    return ($k === '职位' || $k === 'position');
-                })->isNotEmpty();
+        $format = $logs->map(function ($item) use ($staff) {
+            $changes = [];
+            $transfer = ['人事变动', '导入变动', '职位变动'];
+            if (in_array($item->operation_type, $transfer)) {
+                $allow = [
+                    'department', 'position', 'brand', 'status', 'cost_brands', 
+                    '部门全称', '职位', '品牌', '员工状态', '费用品牌'
+                ];
+                $changes = collect($item->changes)->only($allow)->values();
             }
-            return true;
-        })->map(function ($item) {
-            if (in_array($item->operation_type, ['人事变动', '导入变动', '职位变动'])) {
-                $item->changes = collect($item->changes)->filter(function ($v, $k) {
-                    return ($k === '职位' || $k === 'position');
-                })->collapse();
-            } else {
-                $item->changes = [];
-            }
+            $item->transfer = $changes;
             return $item;
-        })->values();
-
-        return response()->json($format, 200);
+        });
+        return response()->json($format);
     }
 
     /**

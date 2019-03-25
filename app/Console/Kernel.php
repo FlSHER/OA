@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
+        \App\Console\Commands\TransferStaffLog::class,
         \App\Console\Commands\TransferStaff::class,
         \App\Console\Commands\UpdateDistrictJs::class,
         \App\Console\Commands\MakeWorkingSchedule::class,
