@@ -148,6 +148,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
         // 变动记录 /api/hr/staff/:staff/logs
         Route::get('hr/staff/{staff}/logs', 'StaffController@logs');
 
+        // 获取员工关联数据 /api/hr/staff/relations
+        Route::get('hr/staff/{staff}/relations', 'StaffController@relations');
+
         // 格式化变动记录 /api/hr/staff/:staff/format-logs
         Route::get('hr/staff/{staff}/format-logs', 'StaffController@formatLog');
 

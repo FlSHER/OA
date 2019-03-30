@@ -116,6 +116,75 @@ class StaffController extends Controller
         return StaffResource::make($staff);
     }
 
+    /**
+     * 获取员工关系人数据.
+     * 
+     * @param  HR\Staff $staff
+     * @return array
+     */
+    public function relations(HR\Staff $staff)
+    {
+        if ($staff->relative->isEmpty()) {
+            return response()->json(['nodes' => [], 'edges' => []]);
+        }
+        $nodes = [[
+            'staff_sn' => $staff->staff_sn,
+            'image' => url('default_avatar.png'),
+            'name' => $staff->realname,
+            'current' => 1,
+        ]];
+        $links = [];
+        $this->makeRelation($staff->relative, $staff->staff_sn, $nodes, $links);
+
+        return response()->json(['nodes' => $nodes, 'edges' => $links]);
+    }
+
+    public function makeRelation($relative, $current, &$nodes, &$links)
+    {
+        $relative->map(function ($item) use ($current, &$nodes, &$links) {
+            $has = collect($nodes)->filter(function ($node) use ($item) {
+                return $node['staff_sn'] === $item->staff_sn;
+            });
+            if ($has->isEmpty()) {
+                $nodes[] = [
+                    'staff_sn' => $item->staff_sn,
+                    'name' => $item->realname,
+                    'image' => url('default_avatar.png'),
+                ];
+            }
+            $source = collect($nodes)->filter(function ($node) use ($item) {
+                return $node['staff_sn'] === $item->pivot->staff_sn;
+            });
+            $target = collect($nodes)->filter(function ($node) use ($item) {
+                return $node['staff_sn'] === $item->pivot->relative_sn;
+            });
+            array_push($links, [
+                "source" => $source->keys()[0],
+                "target" => $target->keys()[0],
+                "relation" => $this->relativeType()[$item->pivot->relative_type],
+            ]);
+            if ($item->staff_sn === $current) {
+                return false;
+            }
+            if ($item->relative->isNotEmpty()) {
+                $this->makeRelation($item->relative, $current, $nodes, $links);
+            }
+        });
+    }
+
+    /**
+     * 获取关系类型.
+     * 
+     * @return StaffRelativeType
+     */
+    public function relativeType()
+    {
+        return  \Cache::remember('CacheRelativeType', now()->addMonth(), function () {
+            return HR\StaffRelativeType::get()->mapWithKeys(function ($item) {
+                return [$item->id => $item->name];
+            });
+        });
+    }
 
     /**
      * 员工变动日志列表。
