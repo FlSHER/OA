@@ -129,7 +129,7 @@ class StaffController extends Controller
         }
         $nodes = [[
             'staff_sn' => $staff->staff_sn,
-            'image' => url('default_avatar.png'),
+            'image' => 'http://120.79.121.158:8101/default_avatar.png',
             'name' => $staff->realname,
             'current' => 1,
         ]];
@@ -149,7 +149,7 @@ class StaffController extends Controller
                 $nodes[] = [
                     'staff_sn' => $item->staff_sn,
                     'name' => $item->realname,
-                    'image' => url('default_avatar.png'),
+                    'image' => 'http://120.79.121.158:8101/default_avatar.png',
                 ];
             }
             $source = collect($nodes)->filter(function ($node) use ($item) {
