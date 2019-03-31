@@ -106,7 +106,11 @@ class LoginForm extends Component {
         },
         onFail: (err) => {
           this.setState({ loading: false });
-          message.error('获取钉钉授权码失败，请手动登录');
+          message.error(
+            <div>
+              获取钉钉授权码失败，请手动登录。<br />{err.errmsg}
+            </div>
+          );
         }
       });
     } catch (e) {
